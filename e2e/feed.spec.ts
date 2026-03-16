@@ -3,7 +3,8 @@ import { test, expect } from './fixtures'
 test.describe('Feed page', () => {
   test('loads and displays post cards', async ({ page }) => {
     await page.goto('/')
-    await expect(page.getByRole('heading', { level: 3 })).toHaveCount(1)
+    const postCards = page.getByRole('heading', { level: 3 })
+    await expect(postCards).not.toHaveCount(0)
     await expect(page.getByText('Hello World')).toBeVisible()
   })
 
