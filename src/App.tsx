@@ -1,23 +1,25 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Suspense } from 'react';
-import { Layout } from '@/components/layout/Layout';
 import { FeedPage } from '@/pages/FeedPage';
 import { PostPage } from '@/pages/PostPage';
-import { LinkInterceptor } from '@/components/LinkInterceptor';
+
+function getComponent() {
+  const route = window.location.pathname;
+  console.log('Current route:', route);
+  switch (route) {
+    case '/':
+      return <FeedPage />;
+    default:
+      return <PostPage />;
+  }
+}
 
 function App() {
+  const route = window.location.pathname;
+
   return (
-    <BrowserRouter>
-      <LinkInterceptor />
-      <Layout>
-        <Suspense fallback={<div className="loading">Loading...</div>}>
-          <Routes>
-            <Route path="/" element={<FeedPage />} />
-            <Route path="/posts/:slug" element={<PostPage />} />
-          </Routes>
-        </Suspense>
-      </Layout>
-    </BrowserRouter>
+    <div className="layout">
+      <hb-header current-path={route} />
+      <main className="layout-main">{getComponent()}</main>
+    </div>
   );
 }
 
