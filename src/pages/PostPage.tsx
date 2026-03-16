@@ -1,6 +1,5 @@
-import { useParams, Link } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { getPostBySlug } from '@/lib/posts'
-import { BlogPost } from '@/components/blog/BlogPost'
 
 export function PostPage() {
   const { slug } = useParams<{ slug: string }>()
@@ -10,12 +9,12 @@ export function PostPage() {
     return (
       <div className="not-found">
         <h1>Post not found</h1>
-        <Link to="/">
+        <a href="/">
           Back to home
-        </Link>
+        </a>
       </div>
     )
   }
 
-  return <BlogPost post={post} />
+  return <hb-blog-post post={post} />
 }
