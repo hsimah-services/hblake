@@ -13,7 +13,8 @@ export class HbHeader extends HTMLElement {
 
   private render() {
     const currentPath = this.getAttribute('current-path') ?? '/'
-    const activeClass = currentPath === '/' ? 'nav-link--active' : 'nav-link--inactive'
+    const homeClass = currentPath === '/' ? 'nav-link--active' : 'nav-link--inactive'
+    const aboutClass = currentPath.startsWith('/about') ? 'nav-link--active' : 'nav-link--inactive'
 
     this.innerHTML = `
       <header class="header">
@@ -21,7 +22,8 @@ export class HbHeader extends HTMLElement {
           <div class="header-content">
             <a href="/" class="header-logo">hblake</a>
             <nav class="header-nav">
-              <a href="/" class="nav-link ${escapeHtml(activeClass)}">Home</a>
+              <a href="/" class="nav-link ${escapeHtml(homeClass)}">Home</a>
+              <a href="/about" class="nav-link ${escapeHtml(aboutClass)}">About</a>
             </nav>
           </div>
         </div>

@@ -13,7 +13,7 @@ const modules = import.meta.glob('/posts/*.md', {
   eager: true,
 }) as Record<string, string>
 
-function parseFrontmatter(raw: string): { metadata: Record<string, string>; content: string } {
+export function parseFrontmatter(raw: string): { metadata: Record<string, string>; content: string } {
   const match = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/)
   if (!match) {
     return { metadata: {}, content: raw }

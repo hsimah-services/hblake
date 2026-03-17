@@ -1,6 +1,6 @@
-import { marked } from 'marked'
 import { escapeHtml } from '../lib/html'
-import { getPostBySlug } from '@/lib/posts';
+import { getPostBySlug } from '@/lib/posts'
+import type { HbMarkdownRenderer } from './hb-markdown-renderer'
 
 export class HbBlogPost extends HTMLElement {
   connectedCallback() {
@@ -23,8 +23,6 @@ export class HbBlogPost extends HTMLElement {
       return;
     }
 
-
-    const html = marked.parse(post.content) as string
     const imageHtml = post.image
       ? `<img src="${escapeHtml(post.image)}" alt="${escapeHtml(post.title)}" class="post-image" />`
       : ''
@@ -36,8 +34,11 @@ export class HbBlogPost extends HTMLElement {
           <h1 class="post-title">${escapeHtml(post.title)}</h1>
           <time class="post-meta">${escapeHtml(post.date)}</time>
         </header>
-        <div class="prose">${html}</div>
+        <hb-markdown-renderer></hb-markdown-renderer>
       </article>
     `
+
+    const renderer = this.querySelector<HbMarkdownRenderer>('hb-markdown-renderer')!
+    renderer.setContent(post.content)
   }
 }

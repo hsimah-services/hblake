@@ -30,6 +30,9 @@ export class HbApp extends HTMLElement {
       case path.startsWith('/posts/'):
         this.main.innerHTML = '<hb-blog-post></hb-blog-post>'
         break
+      case path.startsWith('/about'):
+        this.main.innerHTML = '<hb-about></hb-about>'
+        break
     }
   }
 
