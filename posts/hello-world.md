@@ -8,7 +8,7 @@ Welcome to my blog. This is the first post, written in **markdown**.
 
 ## What is this?
 
-A minimal static blog built with React and Vite. Posts are markdown files checked into the repo.
+A minimal static blog built with Web Components and Vite. Posts are markdown files checked into the repo.
 
 ### Features
 
