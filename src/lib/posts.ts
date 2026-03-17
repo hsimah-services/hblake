@@ -1,4 +1,11 @@
-import type { Post } from '@/types'
+interface Post {
+  slug: string
+  title: string
+  date: string
+  description: string
+  image?: string
+  content: string
+}
 
 const modules = import.meta.glob('/posts/*.md', {
   query: '?raw',
