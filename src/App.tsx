@@ -1,14 +1,11 @@
-import { FeedPage } from '@/pages/FeedPage';
-import { PostPage } from '@/pages/PostPage';
-
 function getComponent() {
   const route = window.location.pathname;
-  console.log('Current route:', route);
+  
   switch (route) {
     case '/':
-      return <FeedPage />;
+      return <hb-feed />;
     default:
-      return <PostPage />;
+      return <hb-blog-post />;
   }
 }
 

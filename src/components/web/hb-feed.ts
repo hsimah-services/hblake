@@ -1,27 +1,21 @@
 import { escapeHtml } from '../../lib/html'
-import type { Post } from '../../types'
+import { getAllPosts } from '@/lib/posts'
 
 export class HbFeed extends HTMLElement {
-  private _posts: Post[] = []
-
-  get posts(): Post[] {
-    return this._posts
-  }
-
-  set posts(value: Post[]) {
-    this._posts = value
+  connectedCallback() {
     this.render()
   }
 
   private render() {
-    if (this._posts.length === 0) {
+    const posts = getAllPosts();
+    if (posts.length === 0) {
       this.innerHTML = '<p class="feed-empty">No posts yet.</p>'
       return
     }
 
     this.innerHTML = `
       <div class="feed">
-        ${this._posts
+        ${posts
           .map(
             (post) => `
           <a href="/posts/${escapeHtml(post.slug)}" class="feed-link">

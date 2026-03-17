@@ -16,11 +16,15 @@ declare module 'react' {
         HTMLElement
       >
       'hb-feed': React.DetailedHTMLProps<
-        React.HTMLAttributes<HTMLElement> & { posts?: Post[] },
+        React.HTMLAttributes<HTMLElement>,
         HTMLElement
       >
       'hb-blog-post': React.DetailedHTMLProps<
         React.HTMLAttributes<HTMLElement> & { post?: Post },
+        HTMLElement
+      >
+      'hb-feed-page': React.DetailedHTMLProps<
+        React.HTMLAttributes<HTMLElement>,
         HTMLElement
       >
     }

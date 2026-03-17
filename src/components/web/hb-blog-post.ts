@@ -1,36 +1,40 @@
 import { marked } from 'marked'
 import { escapeHtml } from '../../lib/html'
-import type { Post } from '../../types'
+import { getPostBySlug } from '@/lib/posts';
 
 export class HbBlogPost extends HTMLElement {
-  private _post: Post | null = null
-
-  get post(): Post | null {
-    return this._post
-  }
-
-  set post(value: Post | null) {
-    this._post = value
+  connectedCallback() {
     this.render()
   }
 
   private render() {
-    if (!this._post) {
-      this.innerHTML = ''
-      return
+    const route = window.location.pathname;
+    const slug = route.slice(1).split('/').at(1) ?? '';
+
+    const post = getPostBySlug(slug);
+    if (!post) {
+      this.innerHTML = `
+        <div class="not-found">
+          <h1>Post not found</h1>
+          <a href="/">
+            Back to home
+          </a>
+        </div>`;
+      return;
     }
 
-    const html = marked.parse(this._post.content) as string
-    const imageHtml = this._post.image
-      ? `<img src="${escapeHtml(this._post.image)}" alt="${escapeHtml(this._post.title)}" class="post-image" />`
+
+    const html = marked.parse(post.content) as string
+    const imageHtml = post.image
+      ? `<img src="${escapeHtml(post.image)}" alt="${escapeHtml(post.title)}" class="post-image" />`
       : ''
 
     this.innerHTML = `
       <article>
         ${imageHtml}
         <header class="post-header">
-          <h1 class="post-title">${escapeHtml(this._post.title)}</h1>
-          <time class="post-meta">${escapeHtml(this._post.date)}</time>
+          <h1 class="post-title">${escapeHtml(post.title)}</h1>
+          <time class="post-meta">${escapeHtml(post.date)}</time>
         </header>
         <div class="prose">${html}</div>
       </article>
