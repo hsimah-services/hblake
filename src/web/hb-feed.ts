@@ -1,4 +1,4 @@
-import { escapeHtml } from '../../lib/html'
+import { escapeHtml } from '../lib/html'
 import { getAllPosts } from '@/lib/posts'
 
 export class HbFeed extends HTMLElement {

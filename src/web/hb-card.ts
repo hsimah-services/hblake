@@ -1,4 +1,4 @@
-import { escapeHtml } from '../../lib/html'
+import { escapeHtml } from '../lib/html'
 
 export class HbCard extends HTMLElement {
   static observedAttributes = ['card-title', 'card-date', 'card-description']

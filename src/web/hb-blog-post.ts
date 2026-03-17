@@ -1,5 +1,5 @@
 import { marked } from 'marked'
-import { escapeHtml } from '../../lib/html'
+import { escapeHtml } from '../lib/html'
 import { getPostBySlug } from '@/lib/posts';
 
 export class HbBlogPost extends HTMLElement {

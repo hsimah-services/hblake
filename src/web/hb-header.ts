@@ -1,4 +1,4 @@
-import { escapeHtml } from '../../lib/html'
+import { escapeHtml } from '../lib/html'
 
 export class HbHeader extends HTMLElement {
   static observedAttributes = ['current-path']

@@ -9,7 +9,7 @@ function getComponent() {
   }
 }
 
-function App() {
+export default function app() {
   const route = window.location.pathname;
 
   return (
@@ -19,5 +19,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
