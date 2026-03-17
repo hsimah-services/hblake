@@ -1,6 +1,6 @@
 # hblake
 
-A minimal static blog built with React, TypeScript, and Vite. Posts are markdown files in the `posts/` directory — the filename becomes the URL slug.
+A minimal static blog built with Web Components, TypeScript, and Vite. Posts are markdown files in the `posts/` directory — the filename becomes the URL slug.
 
 ## Getting Started
 
@@ -35,7 +35,7 @@ Your markdown content here.
 
 ## Stack
 
-- [React 19](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
+- [Web Components](https://developer.mozilla.org/en-US/docs/Web/API/Web_Components) + [TypeScript](https://www.typescriptlang.org/)
 - [Vite](https://vite.dev/)
 - [Playwright](https://playwright.dev/) for e2e tests
 - [marked](https://marked.js.org/) for markdown rendering
