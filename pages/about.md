@@ -25,7 +25,7 @@ This is my technical blog - expect write-ups on engineering problems, system des
 
 ## This Site
 
-Built with vanilla Web Components, TypeScript, and Vite. No frameworks, no runtime dependencies beyond `marked` for markdown rendering. Just the platform.
+Built on [markr](https://github.com/hsimah-services/markr) — a minimal blog engine using Web Components, TypeScript, and Vite.
 
 ## External Links
 
