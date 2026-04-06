@@ -6,9 +6,9 @@ description: Running WordPress in Docker with MariaDB, Redis object caching, WPG
 
 # Pupyrus: WordPress With Redis and WPGraphQL
 
-Pupyrus is the WordPress installation for [The Loft](https://github.com/hsimah-services/the-loft). It runs as a four-container stack: WordPress, MariaDB, Redis for object caching, and a WP-CLI container for automated setup. The name is "puppy" + "papyrus" — a writing surface with a dog pun.
+Pupyrus is the WordPress installation for [The Loft](https://github.com/hsimah-services/the-loft). It runs as a four-container stack: WordPress, MariaDB, Redis for object caching, and a WP-CLI container for automated setup. The name is "puppy" + "papyrus" - a writing surface with a dog pun.
 
-WordPress might seem like an odd choice for a homelab blog when static site generators exist (and we use one for [hbla.ke](/posts/pawst)). But Pupyrus isn't just a blog — it's a headless CMS that exposes content via GraphQL, which other projects in the fleet can consume.
+WordPress might seem like an odd choice for a homelab blog when static site generators exist (and we use one for [hbla.ke](/posts/pawst)). But Pupyrus isn't just a blog - it's a headless CMS that exposes content via GraphQL, which other projects in the fleet can consume.
 
 ## Architecture
 
@@ -81,7 +81,7 @@ redis:
     image: redis:7-alpine
 ```
 
-WordPress generates a lot of database queries on every page load — options, transients, user sessions, menu structures. The Redis Object Cache plugin stores these in memory, so subsequent requests skip the database entirely.
+WordPress generates a lot of database queries on every page load - options, transients, user sessions, menu structures. The Redis Object Cache plugin stores these in memory, so subsequent requests skip the database entirely.
 
 The WordPress container configures Redis via `WORDPRESS_CONFIG_EXTRA`:
 
@@ -106,7 +106,7 @@ The trade-off: Redis uses slightly more memory than Memcached for the same datas
 
 The `GRAPHQL_JWT_AUTH_SECRET_KEY` in the config points to [WPGraphQL](https://www.wpgraphql.com/) with JWT authentication. WPGraphQL exposes WordPress content (posts, pages, custom post types, menus) as a GraphQL API. JWT auth allows authenticated queries from external clients.
 
-This turns WordPress into a headless CMS. The content is managed through wp-admin (familiar UI, plugin ecosystem, media library), but the front-end can be anything — a React app, a static site generator, or another service in the fleet.
+This turns WordPress into a headless CMS. The content is managed through wp-admin (familiar UI, plugin ecosystem, media library), but the front-end can be anything - a React app, a static site generator, or another service in the fleet.
 
 ### Why WPGraphQL Over the REST API
 
@@ -148,7 +148,7 @@ fi
 
 This runs during `setup.sh` on a fresh deployment. It checks if WordPress is already installed (idempotent), and if not, runs the five-minute install non-interactively. The admin credentials come from `.env`.
 
-The `--rm` flag ensures the CLI container is removed after each run. It doesn't need to stay running — it's a one-shot tool.
+The `--rm` flag ensures the CLI container is removed after each run. It doesn't need to stay running - it's a one-shot tool.
 
 ## Networking
 
@@ -173,14 +173,14 @@ Two directories on the host:
 | `/opt/pupyrus/db` | MariaDB data files |
 | `/opt/pupyrus/html` | WordPress files (themes, plugins, uploads) |
 
-Both are owned by `littledog:pack-member` (the fleet's service account). Because these are bind mounts rather than Docker volumes, they're easy to back up with standard filesystem tools — `rsync`, `tar`, or whatever your backup strategy uses.
+Both are owned by `littledog:pack-member` (the fleet's service account). Because these are bind mounts rather than Docker volumes, they're easy to back up with standard filesystem tools - `rsync`, `tar`, or whatever your backup strategy uses.
 
 ## Trade-Offs
 
-- **WordPress is heavy**: PHP, a database, a cache server — it's a lot of moving parts compared to a static site. For a headless CMS that other services query, the complexity is justified. For a simple blog, it wouldn't be.
+- **WordPress is heavy**: PHP, a database, a cache server - it's a lot of moving parts compared to a static site. For a headless CMS that other services query, the complexity is justified. For a simple blog, it wouldn't be.
 - **Plugin ecosystem is a double-edged sword**: Plugins make WordPress incredibly flexible but also introduce security surface area. Every plugin is code running on your server. We keep the plugin count minimal.
 - **Updates require attention**: WordPress core, plugins, and themes need regular updates. Unlike static sites that have no runtime dependencies, a WordPress site that doesn't get updated becomes a security liability.
-- **MariaDB backups**: The database needs proper backup procedures. A corrupt database without a backup means losing all content. We should be doing automated `mysqldump` exports — this is a gap in the current setup.
+- **MariaDB backups**: The database needs proper backup procedures. A corrupt database without a backup means losing all content. We should be doing automated `mysqldump` exports - this is a gap in the current setup.
 
 ## Future Work
 

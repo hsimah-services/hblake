@@ -6,11 +6,11 @@ description: Running GoToSocial as a self-hosted Fediverse instance with Phanpy 
 
 # Pulsr: A Private Fediverse Instance for Fleet Reporting
 
-Pulsr is a self-hosted [Fediverse](https://en.wikipedia.org/wiki/Fediverse) instance running on [The Loft](https://github.com/hsimah-services/the-loft). It's powered by GoToSocial with Phanpy as the web client. Beyond personal social posting, every host in the fleet has its own account and posts system metrics every six hours. The name comes from "pulsar" — a spinning neutron star that emits signals. Pulsr emits status updates.
+Pulsr is a self-hosted [Fediverse](https://en.wikipedia.org/wiki/Fediverse) instance running on [The Loft](https://github.com/hsimah-services/the-loft). It's powered by GoToSocial with Phanpy as the web client. Beyond personal social posting, every host in the fleet has its own account and posts system metrics every six hours. The name comes from "pulsar" - a spinning neutron star that emits signals. Pulsr emits status updates.
 
 ## Why Self-Host a Fediverse Instance
 
-The Fediverse is a network of interconnected social media servers running ActivityPub. You can follow and interact with users on Mastodon, Pixelfed, Akkoma, and other platforms — all from your own server. The reasons to self-host:
+The Fediverse is a network of interconnected social media servers running ActivityPub. You can follow and interact with users on Mastodon, Pixelfed, Akkoma, and other platforms - all from your own server. The reasons to self-host:
 
 - **Your data, your server**: Posts, media, and follower relationships live on hardware you control. No algorithm changes, no surprise policy updates, no account suspensions.
 - **Custom domain**: Posts come from `@user@pulsr.hsimah.com`. The domain is yours permanently.
@@ -21,7 +21,7 @@ The Fediverse is a network of interconnected social media servers running Activi
 [GoToSocial](https://gotosocial.org/) is a lightweight ActivityPub server written in Go. It's the right fit for a private homelab instance for several reasons:
 
 **Pros:**
-- **Tiny resource footprint**: GoToSocial uses SQLite (no separate database server) and runs comfortably in ~100MB of RAM. Mastodon requires PostgreSQL, Redis, Sidekiq, and a streaming server — four additional processes at minimum.
+- **Tiny resource footprint**: GoToSocial uses SQLite (no separate database server) and runs comfortably in ~100MB of RAM. Mastodon requires PostgreSQL, Redis, Sidekiq, and a streaming server - four additional processes at minimum.
 - **Single binary**: One container, one process. No background job workers, no streaming server, no Elasticsearch.
 - **No web client bundled**: GoToSocial is API-only. You pick your own client. This keeps the server lean and lets you use whatever front-end you prefer.
 
@@ -91,10 +91,10 @@ This is the most interesting use of Pulsr. Every host in the fleet has its own G
 
 | Host | Username |
 |------|----------|
-| space-needle | `space_needle` |
-| viking | `viking` |
-| fjord | `fjord` |
-| calavera | `calavera` |
+| `space-needle` | `space_needle` |
+| `viking` | `viking` |
+| `fjord` | `fjord` |
+| `calavera` | `calavera` |
 
 Every six hours, a cron job runs `pulsr-ctl report`, which collects system metrics and posts them as a status update.
 
@@ -104,7 +104,7 @@ The report gathers:
 
 - **CPU usage**: Averaged from per-minute samples collected by a separate cron job writing to `/var/log/loft/cpu.log`
 - **Memory**: Total, used, and available from `/proc/meminfo`
-- **Disk**: Usage for configured mount points (e.g., `/` and `/mammoth` on space-needle)
+- **Disk**: Usage for configured mount points (e.g., `/` and `/mammoth` on `space-needle`)
 - **System updates**: Number of security and total package updates available, plus whether a reboot is required
 - **Docker image updates**: Which running containers have newer images available upstream (checked daily via `skopeo`)
 - **Git status**: Whether the local clone of the-loft is up to date with the remote
@@ -126,7 +126,7 @@ The CPU collector runs every minute so the report can average over the reporting
 
 ### Account Provisioning
 
-Fleet accounts are created automatically by `setup.sh` on space-needle:
+Fleet accounts are created automatically by `setup.sh` on `space-needle`:
 
 ```bash
 for host_conf_file in "${REPO_DIR}"/hosts/*/host.conf; do
@@ -154,7 +154,7 @@ The script iterates over every host config in the repo, creates a GoToSocial acc
 3. Authorize the application
 4. Exchange the authorization code for an access token
 
-The token is stored in `/etc/loft/pulsr.env` on each host and doesn't expire unless manually revoked. This is more robust than expiring PATs — the token survives indefinitely, and each host has its own credentials.
+The token is stored in `/etc/loft/pulsr.env` on each host and doesn't expire unless manually revoked. This is more robust than expiring PATs - the token survives indefinitely, and each host has its own credentials.
 
 ## External Access
 
@@ -170,7 +170,7 @@ Cloudflare's free Universal SSL covers single-level subdomains only. `pulsr.loft
 
 - **SQLite at scale**: For a private instance with a few accounts and a few hundred posts, SQLite is perfect. If this grew to hundreds of active users (unlikely), PostgreSQL would be necessary. GoToSocial supports both.
 - **No full-text search**: GoToSocial doesn't support Elasticsearch/Meilisearch integration yet. You can't search the text of posts. For a private instance, this is rarely needed.
-- **Federation complexity**: Being part of the Fediverse means dealing with spam, moderation, and server-to-server trust. On a private instance with registration closed, this is minimal — but you still receive federated content that you might need to moderate.
+- **Federation complexity**: Being part of the Fediverse means dealing with spam, moderation, and server-to-server trust. On a private instance with registration closed, this is minimal - but you still receive federated content that you might need to moderate.
 - **Monitoring via social posts**: It's creative but not a substitute for real alerting. If a host is down, it can't post its report. The absence of a report is the signal, but nobody's watching for that. A proper monitoring tool (Uptime Kuma, Prometheus + Alertmanager) would be more reliable.
 
 ## Future Work

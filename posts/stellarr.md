@@ -6,7 +6,7 @@ description: Running Radarr, Sonarr, Lidarr, Jackett, Transmission, and Soulseek
 
 # Stellarr: The *arr Stack Behind a VPN
 
-Stellarr is the media acquisition layer for [The Loft](https://github.com/hsimah-services/the-loft). It bundles seven containers into a single compose file: a NordVPN container providing a shared WireGuard tunnel, Transmission and slskd routing through that tunnel, and Radarr, Sonarr, Lidarr, and Jackett running on the host network. The name is "stellar" + the *arr naming convention — a stellar collection of stars.
+Stellarr is the media acquisition layer for [The Loft](https://github.com/hsimah-services/the-loft). It bundles seven containers into a single compose file: a NordVPN container providing a shared WireGuard tunnel, Transmission and slskd routing through that tunnel, and Radarr, Sonarr, Lidarr, and Jackett running on the host network. The name is "stellar" + the *arr naming convention - a stellar collection of stars.
 
 ## Why One Compose File
 
@@ -46,11 +46,11 @@ A few things to call out:
 
 ### Why bubuntux/nordvpn
 
-This image handles NordVPN authentication, server selection, and WireGuard setup automatically. The alternative is running a generic WireGuard container and manually configuring NordVPN's WireGuard keys — doable but more maintenance. The trade-off is vendor lock-in: this image only works with NordVPN. If you switch providers, you'd swap to a generic WireGuard or OpenVPN image.
+This image handles NordVPN authentication, server selection, and WireGuard setup automatically. The alternative is running a generic WireGuard container and manually configuring NordVPN's WireGuard keys - doable but more maintenance. The trade-off is vendor lock-in: this image only works with NordVPN. If you switch providers, you'd swap to a generic WireGuard or OpenVPN image.
 
 ### Why NordLynx Over OpenVPN
 
-NordLynx is NordVPN's WireGuard implementation. WireGuard is faster and uses less CPU than OpenVPN — meaningful on a box running a dozen other services. The trade-off: WireGuard is newer and has a smaller codebase (which is actually a security positive), but some users prefer OpenVPN's longer track record.
+NordLynx is NordVPN's WireGuard implementation. WireGuard is faster and uses less CPU than OpenVPN - meaningful on a box running a dozen other services. The trade-off: WireGuard is newer and has a smaller codebase (which is actually a security positive), but some users prefer OpenVPN's longer track record.
 
 ## Transmission
 
@@ -70,7 +70,7 @@ transmission:
       - vpn
 ```
 
-The key detail is `network_mode: service:vpn`. This makes Transmission share the VPN container's network stack. All of Transmission's traffic — including peer connections — goes through the WireGuard tunnel. If the VPN drops, Transmission loses network access entirely rather than falling back to your real IP.
+The key detail is `network_mode: service:vpn`. This makes Transmission share the VPN container's network stack. All of Transmission's traffic - including peer connections - goes through the WireGuard tunnel. If the VPN drops, Transmission loses network access entirely rather than falling back to your real IP.
 
 ### Automated Torrent Cleanup
 
@@ -128,7 +128,7 @@ slskd is a modern web-based Soulseek client. Like Transmission, it routes throug
 
 ### Why Soulseek
 
-Soulseek fills a gap that torrents don't cover well: rare, niche, and out-of-print music. Public torrent trackers have good coverage for popular releases, but if you want a specific Japanese pressing of a jazz album from 1972, Soulseek is often the only place to find it. The trade-off is speed — downloads depend on the uploader being online and having bandwidth — and there's no organized indexing like torrent trackers provide.
+Soulseek fills a gap that torrents don't cover well: rare, niche, and out-of-print music. Public torrent trackers have good coverage for popular releases, but if you want a specific Japanese pressing of a jazz album from 1972, Soulseek is often the only place to find it. The trade-off is speed - downloads depend on the uploader being online and having bandwidth - and there's no organized indexing like torrent trackers provide.
 
 ### Lidarr Integration
 
@@ -152,7 +152,7 @@ radarr:
     network_mode: host
 ```
 
-These run on the **host network** rather than through the VPN. They don't need VPN protection — they're just web UIs and API servers that talk to indexers and download clients over HTTPS. Running them on the host network simplifies port access and avoids any VPN-related latency on the management UIs.
+These run on the **host network** rather than through the VPN. They don't need VPN protection - they're just web UIs and API servers that talk to indexers and download clients over HTTPS. Running them on the host network simplifies port access and avoids any VPN-related latency on the management UIs.
 
 ### Why LinuxServer.io Images
 
@@ -171,7 +171,7 @@ jackett:
       - 9117:9117
 ```
 
-Jackett runs on the host network with its own port mapping (not through the VPN) because it only talks to tracker APIs over HTTPS — it doesn't need IP masking.
+Jackett runs on the host network with its own port mapping (not through the VPN) because it only talks to tracker APIs over HTTPS - it doesn't need IP masking.
 
 **Alternative: Prowlarr.** The *arr team now maintains Prowlarr as their official indexer manager, with tighter integration into Radarr/Sonarr/Lidarr (it syncs indexer configs automatically). I haven't migrated yet because Jackett works and I haven't had a reason to switch. If you're starting fresh, Prowlarr is probably the better choice.
 
@@ -195,7 +195,7 @@ Having downloads and library on the same filesystem is critical for hardlinks to
 ## Trade-Offs
 
 - **NordVPN lock-in**: The VPN container is NordVPN-specific. Switching providers means replacing the image and reconfiguring auth.
-- **All-or-nothing VPN**: If the VPN drops, both Transmission and slskd lose connectivity. There's no fallback — which is the point, but it means downloads stall during VPN outages.
+- **All-or-nothing VPN**: If the VPN drops, both Transmission and slskd lose connectivity. There's no fallback - which is the point, but it means downloads stall during VPN outages.
 - **Nightly Lidarr**: The nightly tag is less stable. We accept occasional bugs in exchange for plugin support.
 - **No Prowlarr**: Jackett works but is technically the legacy option. Migration is on the TODO list.
 

@@ -1,22 +1,22 @@
 ---
 title: "Howlr: Multi-Room Audio With Music Assistant and Snapcast"
 date: 2026-04-06
-description: Building a whole-home audio system across a condo with Music Assistant, Snapcast, Spotify Connect, AirPlay, and Raspberry Pis — without buying a Sonos
+description: Building a whole-home audio system across a condo with Music Assistant, Snapcast, Spotify Connect, AirPlay, and Raspberry Pis - without buying a Sonos
 ---
 
 # Howlr: Multi-Room Audio With Music Assistant and Snapcast
 
-Howlr is the multi-room audio system for [The Loft](https://github.com/hsimah-services/the-loft). It streams music from Spotify, Plex, Apple Music, and a vinyl turntable to speakers throughout the condo using Music Assistant and Snapcast. The name comes from huskies howling — this one streams audio to every room.
+Howlr is the multi-room audio system for [The Loft](https://github.com/hsimah-services/the-loft). It streams music from Spotify, Plex, Apple Music, and a vinyl turntable to speakers throughout the condo using Music Assistant and Snapcast. The name comes from huskies howling - this one streams audio to every room.
 
 ## Why Not Just Buy a Sonos
 
 The obvious alternative to building a multi-room audio system is buying one. Sonos, Apple HomePod, or Amazon Echo speakers all do multi-room audio out of the box. Here's why I didn't go that route:
 
-- **Source lock-in**: Sonos and HomePod each have preferred ecosystems. I wanted to stream from any source — Spotify, Apple Music, Plex, and a turntable — to any room, from a single interface.
+- **Source lock-in**: Sonos and HomePod each have preferred ecosystems. I wanted to stream from any source - Spotify, Apple Music, Plex, and a turntable - to any room, from a single interface.
 - **Cost**: Good Sonos speakers for three rooms costs over $1,000. Two Raspberry Pis with decent powered monitors cost under $200 total, and they're general-purpose computers that also run other services.
-- **Control**: I can add sources, rooms, and automation without waiting for a vendor to add a feature. When I added the vinyl turntable, it was a URL change in Music Assistant — no firmware update required.
+- **Control**: I can add sources, rooms, and automation without waiting for a vendor to add a feature. When I added the vinyl turntable, it was a URL change in Music Assistant - no firmware update required.
 
-The trade-off: setup complexity is significantly higher than plugging in a Sonos. And the mobile app experience isn't as polished — Music Assistant's web UI works well but it's not a native app.
+The trade-off: setup complexity is significantly higher than plugging in a Sonos. And the mobile app experience isn't as polished - Music Assistant's web UI works well but it's not a native app.
 
 ## Architecture
 
@@ -24,7 +24,7 @@ Howlr uses Docker Compose profiles to run different containers on different host
 
 ```yaml
 services:
-  # Server profile — runs on space-needle
+  # Server profile - runs on space-needle
   music-assistant:
     image: ghcr.io/music-assistant/server:latest
     container_name: howlr
@@ -34,7 +34,7 @@ services:
     volumes:
       - /opt/howlr:/data
 
-  # Client profile — runs on viking and fjord
+  # Client profile - runs on viking and fjord
   snapclient:
     image: ivdata/snapclient:latest
     container_name: howlr-snapclient
@@ -50,10 +50,10 @@ services:
 
 Each host's `.env` file selects which profile runs:
 
-- **space-needle** (`COMPOSE_PROFILES=server`): Runs Music Assistant, which includes a built-in Snapcast server
-- **viking** and **fjord** (`COMPOSE_PROFILES=client`): Run lightweight Snapcast clients that receive audio and play it through attached speakers
+- `space-needle` (`COMPOSE_PROFILES=server`): Runs Music Assistant, which includes a built-in Snapcast server
+- `viking` and `fjord` (`COMPOSE_PROFILES=client`): Run lightweight Snapcast clients that receive audio and play it through attached speakers
 
-This means one compose file works for all hosts. `docker compose up -d` on space-needle starts the server; the same command on a Pi starts the client. The profile is controlled by a single environment variable.
+This means one compose file works for all hosts. `docker compose up -d` on `space-needle` starts the server; the same command on a Pi starts the client. The profile is controlled by a single environment variable.
 
 ## Music Assistant
 
@@ -62,7 +62,7 @@ This means one compose file works for all hosts. `docker compose up -d` on space
 - **Multiple music sources**: Spotify, Apple Music, Tidal, Plex (our own library), and a custom Icecast URL (the turntable)
 - **Built-in Snapcast server**: No separate Snapcast server container needed. MA manages player groups, volume, and sync.
 - **Spotify Connect plugin**: Each room appears as a Spotify Connect target. Open Spotify on your phone, tap "Upstairs", and it plays through the Pi in that room.
-- **AirPlay Receiver plugin**: Same idea for Apple devices. AirPlay to "Downstairs" and it plays through fjord's speakers.
+- **AirPlay Receiver plugin**: Same idea for Apple devices. AirPlay to "Downstairs" and it plays through `fjord`'s speakers.
 
 ### Why Music Assistant Over Mopidy, Volumio, or Roon
 
@@ -71,13 +71,13 @@ This means one compose file works for all hosts. `docker compose up -d` on space
 - **Roon**: Arguably the best multi-room audio software, but it costs $10/month and requires a Roon-specific endpoint setup. Music Assistant is free and open-source.
 - **Home Assistant + Snapcast**: Music Assistant started as a Home Assistant add-on and graduated to a standalone project. You can still integrate it with HA for automation, but it runs independently.
 
-The trade-off: Music Assistant is younger software. The Spotify Connect and AirPlay plugins are early-stage with 0.5-5 second startup latency on play/pause/skip. Ongoing playback is real-time with no degradation — it's just the initial command that's slow.
+The trade-off: Music Assistant is younger software. The Spotify Connect and AirPlay plugins are early-stage with 0.5-5 second startup latency on play/pause/skip. Ongoing playback is real-time with no degradation - it's just the initial command that's slow.
 
 ## Snapcast: Synchronized Audio
 
 [Snapcast](https://github.com/badaix/snapcast) is the transport layer. It streams audio from the server to clients with time synchronization, so speakers in different rooms play in perfect sync. This is the same technique Sonos uses (though with a different protocol).
 
-The server runs inside Music Assistant. Clients connect to it from viking and fjord:
+The server runs inside Music Assistant. Clients connect to it from `viking` and `fjord`:
 
 ```yaml
 snapclient:
@@ -91,16 +91,16 @@ snapclient:
 ```
 
 - **`/dev/snd`** passes the host's ALSA sound devices into the container. The Pis have USB DACs or 3.5mm output going to powered monitors.
-- **`HOST`** points to space-needle's IP where the Snapcast server runs.
+- **`HOST`** points to `space-needle`'s IP where the Snapcast server runs.
 - **`HOST_ID`** gives each client a stable identity for room grouping. Without this, Snapcast would assign a new random ID on every container restart, losing your group configuration.
 
 ### Why Host Networking for Audio
 
-Both server and client use `network_mode: host`. Music Assistant needs host networking for its Spotify Connect and AirPlay plugins (they use mDNS/Bonjour for discovery, which requires being on the LAN broadcast domain). Snapclient needs it for low-latency audio — bridge networking adds measurable latency that can cause sync issues.
+Both server and client use `network_mode: host`. Music Assistant needs host networking for its Spotify Connect and AirPlay plugins (they use mDNS/Bonjour for discovery, which requires being on the LAN broadcast domain). Snapclient needs it for low-latency audio - bridge networking adds measurable latency that can cause sync issues.
 
 ## The Raspberry Pi Clients
 
-Viking and fjord are Raspberry Pi 3 B+ boards. They're old hardware — the Pi 3 B+ was released in 2018 — but Snapclient is lightweight enough to run on them comfortably. Music Assistant's server requires a Pi 4+ for arm64 support, so the Pi 3s are client-only.
+`viking` and `fjord` are Raspberry Pi 3 B+ boards. They're old hardware - the Pi 3 B+ was released in 2018 - but Snapclient is lightweight enough to run on them comfortably. Music Assistant's server requires a Pi 4+ for arm64 support, so the Pi 3s are client-only.
 
 Each Pi has a powered speaker connected. The ALSA device is set in `.env`:
 
@@ -127,11 +127,11 @@ This catches the common failure mode where the Pi's WiFi adapter drops its DHCP 
 
 The Spotify Connect plugin in Music Assistant has one significant limitation: **only one target can be active per Spotify account at a time**. If you're streaming to "Upstairs" and someone else in the household opens Spotify and picks "Downstairs", it'll take over the session.
 
-The workaround: a Spotify Family plan. Each family member gets their own Spotify login and can stream to different rooms simultaneously. This is a Music Assistant limitation, not a Snapcast one — Snapcast itself handles multiple simultaneous streams without issue.
+The workaround: a Spotify Family plan. Each family member gets their own Spotify login and can stream to different rooms simultaneously. This is a Music Assistant limitation, not a Snapcast one - Snapcast itself handles multiple simultaneous streams without issue.
 
 ## How Vinyl Fits In
 
-The [Spinnik](/posts/spinnik) service streams the turntable as an Icecast URL (`http://calavera:8000/vinyl`). Music Assistant treats this as a radio station. Select it, pick a room (or all rooms), and the vinyl plays everywhere through the same Snapcast pipeline. No special configuration on the howlr side — just a URL.
+The [Spinnik](/posts/spinnik) service streams the turntable as an Icecast URL (`http://calavera:8000/vinyl`). Music Assistant treats this as a radio station. Select it, pick a room (or all rooms), and the vinyl plays everywhere through the same Snapcast pipeline. No special configuration on the howlr side - just a URL.
 
 ## Trade-Offs
 
@@ -142,7 +142,7 @@ The [Spinnik](/posts/spinnik) service streams the turntable as an Icecast URL (`
 
 ## Future Work
 
-- **Home Assistant integration** for automation — e.g., start playing music when someone arrives home, or lower volume at a certain time.
+- **Home Assistant integration** for automation - e.g., start playing music when someone arrives home, or lower volume at a certain time.
 - **Replace Pi 3s with Pi 4s** for arm64 support, opening the possibility of running Music Assistant on a Pi as a backup server.
 - **Dedicated USB DACs** on the Pis for better audio quality than the 3.5mm output.
 

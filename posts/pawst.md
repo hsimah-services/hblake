@@ -6,7 +6,7 @@ description: Serving two static blogs from a single Nginx container using named 
 
 # Pawst: Static Blog Hosting With Nginx and CI
 
-Pawst is the static blog host for [The Loft](https://github.com/hsimah-services/the-loft). It serves two sites — [hbla.ke](https://hbla.ke) (the blog you're reading now) and [hsimah.com](https://hsimah.com) — from a single Nginx container. The name is "paw" + "post". It hosts blog posts.
+Pawst is the static blog host for [The Loft](https://github.com/hsimah-services/the-loft). It serves two sites - [hbla.ke](https://hbla.ke) (the blog you're reading now) and [hsimah.com](https://hsimah.com) - from a single Nginx container. The name is "paw" + "post". It hosts blog posts.
 
 This is the simplest service in the fleet by design. There's no application server, no database, no build step happening on the server. Just Nginx serving static files that CI pushes in.
 
@@ -40,7 +40,7 @@ Two things stand out: the named Docker volumes and the network setup.
 
 ## Named Volumes for Deployable Content
 
-The blog content lives in two named Docker volumes: `hblake-html` and `hsimah-html`. These aren't bind mounts to host directories — they're Docker-managed volumes.
+The blog content lives in two named Docker volumes: `hblake-html` and `hsimah-html`. These aren't bind mounts to host directories - they're Docker-managed volumes.
 
 Why volumes instead of bind mounts?
 
@@ -50,13 +50,13 @@ Why volumes instead of bind mounts?
 docker cp dist/. pawst:/usr/share/nginx/hblake/
 ```
 
-This writes directly into the running container's volume. No container restart needed — Nginx serves the new files immediately. The volume persists across container rebuilds, so deploying a config change to Nginx doesn't wipe the blog content.
+This writes directly into the running container's volume. No container restart needed - Nginx serves the new files immediately. The volume persists across container rebuilds, so deploying a config change to Nginx doesn't wipe the blog content.
 
 With bind mounts, you'd need the CI runner to write to a host directory (requiring filesystem permissions) and potentially restart Nginx for config changes. Docker volumes keep the content lifecycle separate from the container lifecycle.
 
 ### The Trade-Off
 
-Named volumes are harder to back up and inspect than bind mounts. You can't just `ls /opt/pawst/hblake` to see the files — you need `docker volume inspect` to find the mount point, or exec into the container. For static sites that are rebuilt from source on every deploy, this doesn't matter. The Git repos are the source of truth, not the volume contents.
+Named volumes are harder to back up and inspect than bind mounts. You can't just `ls /opt/pawst/hblake` to see the files - you need `docker volume inspect` to find the mount point, or exec into the container. For static sites that are rebuilt from source on every deploy, this doesn't matter. The Git repos are the source of truth, not the volume contents.
 
 ## Nginx Configuration
 
@@ -119,7 +119,7 @@ location /assets/ {
 }
 ```
 
-Vite produces hashed asset filenames (e.g., `index-abc123.js`). Because the hash changes when the content changes, it's safe to cache them aggressively. The `immutable` directive tells browsers not to even revalidate — the file will never change at that URL.
+Vite produces hashed asset filenames (e.g., `index-abc123.js`). Because the hash changes when the content changes, it's safe to cache them aggressively. The `immutable` directive tells browsers not to even revalidate - the file will never change at that URL.
 
 ### Gzip Compression
 
@@ -141,7 +141,7 @@ The deployment pipeline runs in GitHub Actions on our self-hosted runner (Iditar
 
 No container restart. No downtime. The new files are live immediately.
 
-The CI runner runs on space-needle alongside Pawst, so the `docker cp` command is local. There's no SSH or remote deployment — the runner has direct access to the Docker socket (via the `docker` group).
+The CI runner runs on `space-needle` alongside Pawst, so the `docker cp` command is local. There's no SSH or remote deployment - the runner has direct access to the Docker socket (via the `docker` group).
 
 ## External Access
 
@@ -151,7 +151,7 @@ Both blogs are accessible from outside the LAN via [Mushr's](/posts/mushr) Cloud
 Internet → Cloudflare Edge → cloudflared → Caddy (mushr) → Nginx (pawst)
 ```
 
-On the LAN, dnsmasq resolves `hbla.ke` and `hsimah.com` directly to space-needle's IP, bypassing the tunnel. Caddy handles TLS termination in both cases — Nginx inside Pawst only serves HTTP on port 80.
+On the LAN, dnsmasq resolves `hbla.ke` and `hsimah.com` directly to `space-needle`'s IP, bypassing the tunnel. Caddy handles TLS termination in both cases - Nginx inside Pawst only serves HTTP on port 80.
 
 ### Why a Separate Nginx Instead of Caddy Directly
 

@@ -1,18 +1,18 @@
 ---
 title: "Mushr: Reverse Proxy, DNS, and Tunnels"
 date: 2026-04-06
-description: How we route all traffic through Caddy with real TLS certs, wildcard DNS via dnsmasq, and external access via Cloudflare Tunnel — without opening a single port on the router
+description: How we route all traffic through Caddy with real TLS certs, wildcard DNS via dnsmasq, and external access via Cloudflare Tunnel - without opening a single port on the router
 ---
 
 # Mushr: Reverse Proxy, DNS, and Tunnels
 
-Mushr is the traffic layer for [The Loft](https://github.com/hsimah-services/the-loft). It handles three things: reverse proxying every web service through Caddy with real TLS certificates, wildcard DNS resolution on the LAN via dnsmasq, and external access to selected services through a Cloudflare Tunnel. The name comes from "musher" — the person driving a dog sled. Mushr drives all the traffic.
+Mushr is the traffic layer for [The Loft](https://github.com/hsimah-services/the-loft). It handles three things: reverse proxying every web service through Caddy with real TLS certificates, wildcard DNS resolution on the LAN via dnsmasq, and external access to selected services through a Cloudflare Tunnel. The name comes from "musher" - the person driving a dog sled. Mushr drives all the traffic.
 
 This post walks through the full configuration, why each piece exists, and the trade-offs involved.
 
 ## The Problem
 
-Without a reverse proxy, every service is accessed by IP and port number: `192.168.86.28:7878` for Radarr, `192.168.86.28:8989` for Sonarr, and so on. That works, but it's ugly, hard to remember, and means no TLS. Some services also need to be accessible from outside the LAN — our Fediverse instance and blogs, specifically — but opening ports on a residential router is something I wanted to avoid.
+Without a reverse proxy, every service is accessed by IP and port number: `192.168.86.28:7878` for Radarr, `192.168.86.28:8989` for Sonarr, and so on. That works, but it's ugly, hard to remember, and means no TLS. Some services also need to be accessible from outside the LAN - our Fediverse instance and blogs, specifically - but opening ports on a residential router is something I wanted to avoid.
 
 ## Architecture
 
@@ -40,7 +40,7 @@ The main trade-off is performance. Caddy is slower than Nginx under extreme load
 
 ### Custom Build for Cloudflare DNS-01
 
-We can't use the stock Caddy image because we need the `caddy-dns/cloudflare` module for DNS-01 certificate challenges. The Dockerfile is straightforward — use Caddy's builder image to compile the binary with the module, then copy it into the runtime image:
+We can't use the stock Caddy image because we need the `caddy-dns/cloudflare` module for DNS-01 certificate challenges. The Dockerfile is straightforward - use Caddy's builder image to compile the binary with the module, then copy it into the runtime image:
 
 ```dockerfile
 ARG CADDY_VERSION=2
@@ -107,7 +107,7 @@ Mushr serves every service under two domain patterns:
 | `*.loft.hsimah.com` | HTTPS | `https://radarr.loft.hsimah.com` | Primary, with real certs |
 | `*.space-needle` | HTTP | `http://radarr.space-needle` | LAN fallback, no TLS |
 
-The HTTP fallback exists for backward compatibility — some devices on the network had bookmarks to the old `*.space-needle` URLs. It's also handy when debugging TLS issues since you can verify the service itself is working by hitting the HTTP endpoint.
+The HTTP fallback exists for backward compatibility - some devices on the network had bookmarks to the old `*.space-needle` URLs. It's also handy when debugging TLS issues since you can verify the service itself is working by hitting the HTTP endpoint.
 
 ### Path-Based Routing for Pulsr
 
@@ -155,7 +155,7 @@ Mushr also hosts the [Spinnik vinyl controller UI](/posts/spinnik) as static fil
 
 ## Dnsmasq: Wildcard DNS
 
-For the subdomain URLs to resolve on the LAN, clients need to know that `*.space-needle`, `*.loft.hsimah.com`, `pulsr.hsimah.com`, `hbla.ke`, and `hsimah.com` all point to space-needle's LAN IP. That's what dnsmasq does.
+For the subdomain URLs to resolve on the LAN, clients need to know that `*.space-needle`, `*.loft.hsimah.com`, `pulsr.hsimah.com`, `hbla.ke`, and `hsimah.com` all point to `space-needle`'s LAN IP. That's what dnsmasq does.
 
 The config is minimal:
 
@@ -172,13 +172,13 @@ address=/hbla.ke/192.168.86.28
 address=/hsimah.com/192.168.86.28
 ```
 
-Each `address=` line is a wildcard — `address=/space-needle/192.168.86.28` matches `anything.space-needle`. Everything else falls through to Cloudflare DNS (`1.1.1.1`).
+Each `address=` line is a wildcard - `address=/space-needle/192.168.86.28` matches `anything.space-needle`. Everything else falls through to Cloudflare DNS (`1.1.1.1`).
 
-To use this, you point your router's DHCP DNS setting at space-needle's IP. Every device on the network then resolves these domains locally without any per-device configuration.
+To use this, you point your router's DHCP DNS setting at `space-needle`'s IP. Every device on the network then resolves these domains locally without any per-device configuration.
 
 ### Why Dnsmasq Over Pi-hole or AdGuard Home
 
-Dnsmasq is tiny, single-purpose, and has no web UI or filtering logic. I don't need ad blocking at the DNS level (browser extensions handle that), and I don't want the overhead of a full DNS sinkhole. Dnsmasq does one thing — wildcard resolution — and does it in a 5MB container.
+Dnsmasq is tiny, single-purpose, and has no web UI or filtering logic. I don't need ad blocking at the DNS level (browser extensions handle that), and I don't want the overhead of a full DNS sinkhole. Dnsmasq does one thing - wildcard resolution - and does it in a 5MB container.
 
 The trade-off: no DNS-level analytics or ad blocking. If you want those features, Pi-hole or AdGuard Home would be a better fit, but they're overkill for pure wildcard resolution.
 
@@ -240,8 +240,8 @@ The tunnel container depends on this health check (`condition: service_healthy`)
 ## Trade-Offs
 
 - **Cloudflare dependency**: The TLS certs, DNS, and tunnel all depend on Cloudflare. If Cloudflare has an outage, external access goes down and cert renewals fail. LAN access via the HTTP fallback still works.
-- **Single point of failure**: Mushr going down takes every web service offline. There's no HA setup — this is a homelab, not production infrastructure.
-- **Manual IP in dnsmasq config**: If space-needle's LAN IP changes, you need to update `dnsmasq.conf`. A DHCP reservation on the router prevents this in practice.
+- **Single point of failure**: Mushr going down takes every web service offline. There's no HA setup - this is a homelab, not production infrastructure.
+- **Manual IP in dnsmasq config**: If `space-needle`'s LAN IP changes, you need to update `dnsmasq.conf`. A DHCP reservation on the router prevents this in practice.
 
 ## Future Work
 
