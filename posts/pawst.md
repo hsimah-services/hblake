@@ -108,7 +108,7 @@ Two server blocks, one per blog. Nginx routes requests based on the `Host` heade
 try_files $uri $uri/ /index.html;
 ```
 
-Both blogs are single-page applications built with [markr](https://github.com/hsimah-services/markr) (Web Components + Vite). Client-side routing handles paths like `/posts/my-post`. Without `try_files`, refreshing on a deep link would return a 404 because there's no physical file at that path. `try_files` falls back to `index.html`, which loads the SPA router and handles the path client-side.
+Both blogs are single-page applications built with [markr](https://github.com/hsimah-services/markr) - our self-written micro blogging platform (Web Components + Vite). Client-side routing handles paths like `/posts/my-post`. Without `try_files`, refreshing on a deep link would return a 404 because there's no physical file at that path. `try_files` falls back to `index.html`, which loads the SPA router and handles the path client-side.
 
 ### Asset Caching
 

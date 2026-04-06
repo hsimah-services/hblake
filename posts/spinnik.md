@@ -137,7 +137,7 @@ greetd (auto-login as kiosk user)
 
 ### Power Management
 
-The Surface Pro has suspend, sleep, and hibernate masked via systemd. The lid switch is ignored. Screen blanking is disabled via kernel parameter (`consoleblank=0`) and a udev rule that keeps DPMS off. The result: the screen is always on, showing the turntable controller.
+The Surface Pro 2 has known power management issues - it was retired from daily use for this reason. Suspend and resume are unreliable on this hardware, so we chose to leave it always on rather than risk it not waking up. Suspend, sleep, and hibernate are masked via systemd. The lid switch is ignored. Screen blanking is disabled via kernel parameter (`consoleblank=0`) and a udev rule that keeps DPMS off. The result: the screen is always on, showing the turntable controller.
 
 ### The Touch UI
 
@@ -164,12 +164,12 @@ The stream adds minimal network load. Ogg Vorbis at ~256kbps is about 32KB/s - n
 
 - **DarkIce maintenance risk**: The project is mature but not actively developed. A future OS upgrade could break it, requiring migration to FFmpeg.
 - **Surface Pro 2 is old hardware**: 4GB RAM, a 3rd-gen Intel CPU. It handles audio capture and a kiosk browser fine, but there's no headroom. If it dies, any Linux-capable device with a USB port and display output could replace it.
-- **Always-on display**: The Surface Pro's screen runs 24/7. Modern LCDs handle this fine, but it does consume power. A motion sensor to trigger display sleep would be a nice improvement.
+- **Always-on display**: The Surface Pro's screen runs 24/7. Modern LCDs handle this fine, but it does consume power. Dimming the display would save energy, but because of the Surface Pro 2's unreliable power management, any solution needs to dim the backlight rather than suspend the device.
 - **Single stream**: DarkIce captures one audio source. If we added a second turntable or audio input, we'd need a second DarkIce instance and Icecast mount point.
 
 ## Future Work
 
-- **Motion-activated display** using a USB PIR sensor to sleep/wake the screen.
+- **Motion-activated display dimming** using a USB PIR sensor to dim the backlight when nobody is nearby (without suspending, since the Surface Pro 2 can't reliably wake).
 - **Stream quality selector** in the UI to switch between Ogg Vorbis quality levels based on network conditions (though on a LAN, max quality is always fine).
 - **Record detection** - automatically start/stop the stream when the turntable platter spins (the LP5X doesn't have a digital signal for this, so it would need audio level detection).
 

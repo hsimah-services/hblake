@@ -6,7 +6,7 @@ description: Building a whole-home audio system across a condo with Music Assist
 
 # Howlr: Multi-Room Audio With Music Assistant and Snapcast
 
-Howlr is the multi-room audio system for [The Loft](https://github.com/hsimah-services/the-loft). It streams music from Spotify, Plex, Apple Music, and a vinyl turntable to speakers throughout the condo using Music Assistant and Snapcast. The name comes from huskies howling - this one streams audio to every room.
+Howlr is the multi-room audio system for [The Loft](https://github.com/hsimah-services/the-loft). It streams music from Spotify, Plex, Apple Music, and a vinyl turntable to speakers throughout the condo using Music Assistant and Snapcast. The name comes from pomskies howling - this one streams audio to every room.
 
 ## Why Not Just Buy a Sonos
 

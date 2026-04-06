@@ -101,7 +101,7 @@ The alternative is a RAM disk (`tmpfs`), which is faster but risky if you don't 
 
 ## Why Plex Over Jellyfin or Emby
 
-This is the most common question in self-hosting circles, and the answer is boring: Plex works well for our household and we've been using it for years.
+This is the most common question in self-hosting circles, and the answer is boring: Plex works well for our household and we've been using it for about a year.
 
 **Pros of Plex:**
 - The client apps (Roku, iOS, Android TV, browsers) are polished and work reliably
