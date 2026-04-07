@@ -8,11 +8,11 @@ description: Capturing USB turntable audio with DarkIce, serving it via Icecast,
 
 Spinnik streams our Audio-Technica LP5X turntable to every room in the condo via [Howlr](/posts/howlr) (Music Assistant + Snapcast). It runs on `calavera` - an old Surface Pro 2 that sits next to the turntable, doubling as both the audio capture host and a touchscreen kiosk for controlling playback. The name is "spin" + "Sputnik", keeping with the space theme.
 
-This post digs into the technical details: audio capture with DarkIce, streaming with Icecast, ALSA device pinning with udev, the kiosk lockdown, and the touch UI served through [Mushr](/posts/mushr).
+This post digs into the technical details: audio capture with DarkIce, streaming with Icecast, ALSA device pinning with udev, the kiosk lockdown, and the touch UI served by a local nginx container.
 
 ## The Stack
 
-Spinnik is a two-container stack running on `calavera`:
+Spinnik is a three-container stack running on `calavera`:
 
 ```yaml
 services:
@@ -33,6 +33,18 @@ services:
       - /dev/snd:/dev/snd
     volumes:
       - ./darkice.cfg:/etc/darkice.cfg:ro
+    depends_on:
+      - spinnik-icecast
+
+  spinnik-ui:
+    image: nginx:alpine
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./ui:/usr/share/nginx/html:ro
+      - ./nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
+    environment:
+      MA_API_TOKEN: ${MA_API_TOKEN}
     depends_on:
       - spinnik-icecast
 ```
@@ -141,16 +153,30 @@ The Surface Pro 2 has known power management issues - it was retired from daily 
 
 ### The Touch UI
 
-The controller UI is a single `index.html` file served by Caddy on `space-needle` (via [Mushr](/posts/mushr)). It talks to Music Assistant's API through a Caddy proxy that injects the API token server-side:
+The controller UI is served by the `spinnik-ui` nginx container running locally on `calavera`. Previously the UI was hosted remotely through Mushr's Caddy on `space-needle`, but moving it into the spinnik stack keeps the kiosk self-contained - it works even if `space-needle` is down for maintenance. Nginx handles three concerns: static file serving, API proxying, and stream proxying:
 
-```
-handle /api/spinnik {
-    rewrite * /api
-    reverse_proxy host.docker.internal:8095 {
-        header_up Authorization "Bearer {env.MA_API_TOKEN}"
+```nginx
+server {
+    listen 8080;
+
+    location /api/spinnik {
+        rewrite ^/api/spinnik$ /api break;
+        proxy_pass http://192.168.86.28:8095;
+        proxy_set_header Authorization "Bearer ${MA_API_TOKEN}";
+    }
+
+    location /stream {
+        proxy_pass http://spinnik-icecast:8000/vinyl;
+    }
+
+    location / {
+        root /usr/share/nginx/html;
+        index index.html;
     }
 }
 ```
+
+The API proxy injects the Music Assistant Bearer token server-side, so the kiosk browser never handles authentication. The official nginx image's `envsubst` template support substitutes `${MA_API_TOKEN}` at container startup. The stream proxy provides a clean URL for the Icecast audio - the UI uses `/stream` rather than hitting Icecast directly.
 
 The UI is intentionally simple: a large play/stop button and three room selection buttons (Upstairs, Downstairs, All). It polls Music Assistant every 3 seconds for playback state and updates the UI accordingly. No framework, no build step - just vanilla JavaScript.
 

@@ -134,25 +134,6 @@ Pulsr (GoToSocial + Phanpy) uses a more complex routing pattern. The Phanpy web 
 
 The fallback handler is clever: if Phanpy returns a 404 (e.g., for a user profile URL that Phanpy doesn't know about), Caddy retries the request against GoToSocial. This means deep links to profiles and statuses work even when they don't match Phanpy's client-side routes.
 
-### Spinnik API Proxy
-
-Mushr also hosts the [Spinnik vinyl controller UI](/posts/spinnik) as static files and proxies its API calls to Music Assistant. The proxy injects a Bearer token server-side so the kiosk browser never handles authentication:
-
-```
-(spinnik_routes) {
-    handle /api/spinnik {
-        rewrite * /api
-        reverse_proxy host.docker.internal:8095 {
-            header_up Authorization "Bearer {env.MA_API_TOKEN}"
-        }
-    }
-    handle {
-        root * /srv/spinnik-ui
-        file_server
-    }
-}
-```
-
 ## Dnsmasq: Wildcard DNS
 
 For the subdomain URLs to resolve on the LAN, clients need to know that `*.space-needle`, `*.loft.hsimah.com`, `pulsr.hsimah.com`, `hbla.ke`, and `hsimah.com` all point to `space-needle`'s LAN IP. That's what dnsmasq does.
