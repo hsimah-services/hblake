@@ -1,5 +1,5 @@
 ---
-title: "Pulsr: A Private Fediverse Instance for Fleet Reporting"
+title: [pulsr] A Private Fediverse Instance for Fleet Reporting
 date: 2026-04-06
 description: Running GoToSocial as a self-hosted Fediverse instance with Phanpy as the web client, automated fleet status reporting, and Cloudflare Tunnel for federation
 ---

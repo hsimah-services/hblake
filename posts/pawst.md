@@ -1,5 +1,5 @@
 ---
-title: "Pawst: Static Blog Hosting With Nginx and CI"
+title: [pawst] Static Blog Hosting With Nginx and CI
 date: 2026-04-06
 description: Serving two static blogs from a single Nginx container using named Docker volumes, server_name routing, and CI-driven deployments via docker cp
 ---

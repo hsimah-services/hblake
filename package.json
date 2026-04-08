@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:static": "node tools/prerender.js",
     "lint": "eslint .",
     "preview": "vite preview",
     "test:e2e": "playwright test",
@@ -13,7 +14,7 @@
     "test:e2e:headed": "playwright test --headed"
   },
   "dependencies": {
-    "markr": "git+https://github.com/hsimah-services/markr.git#main"
+    "markr": "git+https://github.com/hsimah-services/markr.git#pre-render"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

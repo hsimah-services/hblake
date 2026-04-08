@@ -1,5 +1,5 @@
 ---
-title: "Howlr: Multi-Room Audio With Music Assistant and Snapcast"
+title: [howlr] Multi-Room Audio With Music Assistant and Snapcast
 date: 2026-04-06
 description: Building a whole-home audio system across a condo with Music Assistant, Snapcast, Spotify Connect, AirPlay, and Raspberry Pis - without buying a Sonos
 ---

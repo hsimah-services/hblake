@@ -1,5 +1,5 @@
 ---
-title: "Stellarr: The *arr Stack Behind a VPN"
+title: [stellarr] The *arr Stack Behind a VPN
 date: 2026-04-06
 description: Running Radarr, Sonarr, Lidarr, Jackett, Transmission, and Soulseek as a single compose stack with shared VPN networking and automated torrent cleanup
 ---

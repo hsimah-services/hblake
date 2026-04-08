@@ -1,5 +1,5 @@
 ---
-title: "Mushr: Reverse Proxy, DNS, and Tunnels"
+title: [mushr] Reverse Proxy, DNS, and Tunnels
 date: 2026-04-06
 description: How we route all traffic through Caddy with real TLS certs, wildcard DNS via dnsmasq, and external access via Cloudflare Tunnel - without opening a single port on the router
 ---

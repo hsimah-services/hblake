@@ -1,5 +1,5 @@
 ---
-title: "Pupyrus: WordPress With Redis and WPGraphQL"
+title: [pupyrus] WordPress With Redis and WPGraphQL
 date: 2026-04-06
 description: Running WordPress in Docker with MariaDB, Redis object caching, WPGraphQL for headless access, and automated setup via WP-CLI
 ---

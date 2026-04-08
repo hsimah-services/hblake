@@ -1,5 +1,5 @@
 ---
-title: "Pawpcorn: Plex With Hardware Transcoding"
+title: [pawpcorn] Plex With Hardware Transcoding
 date: 2026-04-06
 description: Running Plex Media Server in Docker with GPU passthrough, host networking, and a shared media library across five content types
 ---

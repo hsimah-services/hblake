@@ -1,5 +1,5 @@
 ---
-title: "Spinnik: Streaming Vinyl Over the LAN"
+title: [spinnik] Streaming Vinyl Over the LAN
 date: 2026-04-06
 description: Capturing USB turntable audio with DarkIce, serving it via Icecast, pinning ALSA devices with udev, and running it all on a locked-down Surface Pro kiosk
 ---
