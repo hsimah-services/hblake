@@ -35,4 +35,4 @@ TryExec=/var/lib/flatpak/exports/bin/io.github.ungoogled_software.ungoogled_chro
 WM_CLASS=chrome-[my app id]-Default
 ```
 
-ALl in all, nice and easy. It would be nice if it has Just Worked, and maybe it would have if I used Chrome or Edge, but I am working to move away from those browsers and I am happy with a few manual steps as a trade off.
+All in all, nice and easy. It would be nice if it has Just Worked, and maybe it would have if I used Chrome or Edge, but I am working to move away from those browsers and I am happy with a few manual steps as a trade off.
