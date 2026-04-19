@@ -1,6 +1,6 @@
 ---
 title: Installing Music Assistant on Gnome
-date: 2026-04019
+date: 2026-040-19
 description: Installing the Music Assistant PWA on my Fedora work laptop
 ---
 
