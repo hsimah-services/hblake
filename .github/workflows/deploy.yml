@@ -48,4 +48,4 @@ jobs:
           path: dist/
 
       - name: Deploy to pawst
-        run: docker cp dist/. pawst:/usr/share/nginx/hsimah/
+        run: docker cp dist/. pawst:/usr/share/nginx/hblake/
