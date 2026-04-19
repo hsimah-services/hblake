@@ -1,12 +1,12 @@
 # hblake
 
-A minimal static blog built with Web Components, TypeScript, and Vite. Posts are markdown files in the `posts/` directory — the filename becomes the URL slug.
+A minimal static blog built on [markr](https://github.com/hsimah-services/markr). Posts are markdown files in the `posts/` directory — the filename becomes the URL slug.
 
 ## Getting Started
 
 ```bash
 npm install
-npm run dev
+npm run build
 ```
 
 ## Adding a Post
@@ -27,18 +27,12 @@ Your markdown content here.
 
 | Command | Description |
 |---|---|
-| `npm run dev` | Start dev server |
-| `npm run build` | TypeScript check + production build |
-| `npm run preview` | Preview production build |
-| `npm run lint` | Run ESLint |
-| `npm run test:e2e` | Run Playwright e2e tests |
+| `npm run build` | Generate static HTML into `dist/` |
+| `npm run preview` | Preview the static output locally |
 
 ## Stack
 
-- [Web Components](https://developer.mozilla.org/en-US/docs/Web/API/Web_Components) + [TypeScript](https://www.typescriptlang.org/)
-- [Vite](https://vite.dev/)
-- [Playwright](https://playwright.dev/) for e2e tests
-- [marked](https://marked.js.org/) for markdown rendering
+- [markr](https://github.com/hsimah-services/markr) — static site generator (prerender + serve)
 
 ## License
 

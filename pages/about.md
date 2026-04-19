@@ -25,7 +25,7 @@ This is my technical blog - expect write-ups on engineering problems, system des
 
 ## This Site
 
-Built on [markr](https://github.com/hsimah-services/markr) — a minimal blog engine using Web Components, TypeScript, and Vite.
+Built on [markr](https://github.com/hsimah-services/markr) — a minimal static blog engine. Markdown posts are prerended to plain HTML at build time; no JavaScript required.
 
 ## External Links
 
