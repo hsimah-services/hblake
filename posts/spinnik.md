@@ -6,9 +6,17 @@ description: Capturing USB turntable audio with DarkIce, serving it via Icecast,
 
 # Spinnik: Streaming Vinyl Over the LAN
 
+*Retired July 2026: in several months I never actually turned the record streaming on, so the spinnik stack was removed. `calavera` is now a [howlr](/posts/howlr) Snapcast client with a Music Assistant touchscreen - see [Calavera's New Role](/posts/calavera-new-role). This post is kept as a write-up of how the build worked.*
+
 Spinnik streams our Audio-Technica LP5X turntable to every room in the condo via [Howlr](/posts/howlr) (Music Assistant + Snapcast). It runs on `calavera` - an old Surface Pro 2 that sits next to the turntable, doubling as both the audio capture host and a touchscreen kiosk for controlling playback. The name is "spin" + "Sputnik", keeping with the space theme.
 
 This post digs into the technical details: audio capture with DarkIce, streaming with Icecast, ALSA device pinning with udev, the kiosk lockdown, and the touch UI served by a local nginx container.
+
+## Why Stream a Turntable?
+
+We live in a two-story condo in Seattle. Upstairs has a balcony with a view of the Space Needle - a nice place to spend an afternoon. Downstairs is where the record player lives. Vinyl is a fun way to intentionally listen to music: you pick an album, flip it over halfway through, and actually pay attention. The problem was that "intentionally listening" meant sitting in one room. If I put on a record downstairs and walked up to the balcony, I'd lose it.
+
+I already had multi-room audio working through Howlr, with Spotify, Plex and the rest streaming to every room. The missing piece was the turntable. I wanted to drop a needle downstairs and hear it everywhere, including up on the balcony. That meant getting the LP5X's audio onto the network and into Music Assistant.
 
 ## The Stack
 
@@ -89,7 +97,7 @@ quality         = 0.8
 format          = vorbis
 server          = spinnik-icecast
 port            = 8000
-password        = lofty-vinyl-stream
+password        = <icecast-source-password>
 mountPoint      = vinyl
 name            = The Loft Turntable
 description     = Live vinyl from the Audio-Technica LP5X
@@ -188,6 +196,7 @@ The stream adds minimal network load. Ogg Vorbis at ~256kbps is about 32KB/s - n
 
 ## Trade-Offs
 
+- **Latency**: There is a small delay between the needle and the stream. Given the dated technology of a needle bumping over grooves, it's minuscule.
 - **DarkIce maintenance risk**: The project is mature but not actively developed. A future OS upgrade could break it, requiring migration to FFmpeg.
 - **Surface Pro 2 is old hardware**: 4GB RAM, a 3rd-gen Intel CPU. It handles audio capture and a kiosk browser fine, but there's no headroom. If it dies, any Linux-capable device with a USB port and display output could replace it.
 - **Always-on display**: The Surface Pro's screen runs 24/7. Modern LCDs handle this fine, but it does consume power. Dimming the display would save energy, but because of the Surface Pro 2's unreliable power management, any solution needs to dim the backlight rather than suspend the device.
