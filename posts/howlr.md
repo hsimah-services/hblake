@@ -6,7 +6,9 @@ description: Building a whole-home audio system across a condo with Music Assist
 
 # Howlr: Multi-Room Audio With Music Assistant and Snapcast
 
-Howlr is the multi-room audio system for [The Loft](https://github.com/hsimah-services/the-loft). It streams music from Spotify, Plex, Apple Music, and a vinyl turntable to speakers throughout the condo using Music Assistant and Snapcast. The name comes from pomskies howling - this one streams audio to every room.
+*Updated July 2026: the Downstairs Snapcast client is now `calavera`, a Surface Pro 2 with a Music Assistant touchscreen, instead of `fjord`, and the turntable stream ([spinnik](/posts/spinnik)) has been retired. The rest of this post describes the original Raspberry Pi setup. See [Calavera's New Role](/posts/calavera-new-role) for the details.*
+
+Howlr is the multi-room audio system for [The Loft](https://github.com/hsimah-services/the-loft). It streams music from Spotify, Plex, Apple Music, and (for a while) a vinyl turntable to speakers throughout the condo using Music Assistant and Snapcast. The name comes from pomskies howling - this one streams audio to every room.
 
 ## Why Not Just Buy a Sonos
 
@@ -129,9 +131,9 @@ The Spotify Connect plugin in Music Assistant has one significant limitation: **
 
 The workaround: a Spotify Family plan. Each family member gets their own Spotify login and can stream to different rooms simultaneously. This is a Music Assistant limitation, not a Snapcast one - Snapcast itself handles multiple simultaneous streams without issue.
 
-## How Vinyl Fits In
+## How Vinyl Fit In
 
-The [Spinnik](/posts/spinnik) service streams the turntable as an Icecast URL (`http://calavera:8000/vinyl`). Music Assistant treats this as a radio station. Select it, pick a room (or all rooms), and the vinyl plays everywhere through the same Snapcast pipeline. No special configuration on the howlr side - just a URL.
+The [Spinnik](/posts/spinnik) service streamed the turntable as an Icecast URL (`http://calavera:8000/vinyl`). Music Assistant treated this as a radio station. Select it, pick a room (or all rooms), and the vinyl played everywhere through the same Snapcast pipeline. No special configuration on the howlr side - just a URL. Spinnik has since been [retired](/posts/calavera-new-role), but the same trick works for any stream you can point Music Assistant at.
 
 ## Trade-Offs
 
