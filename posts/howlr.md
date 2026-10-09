@@ -1,12 +1,15 @@
 ---
-title: [howlr] Multi-Room Audio With Music Assistant and Snapcast
+title: howlr - Multi-Room Audio With Music Assistant and Snapcast
 date: 2026-04-06
 description: Building a whole-home audio system across a condo with Music Assistant, Snapcast, Spotify Connect, AirPlay, and Raspberry Pis - without buying a Sonos
 ---
 
 # Howlr: Multi-Room Audio With Music Assistant and Snapcast
 
-Howlr is the multi-room audio system for [The Loft](https://github.com/hsimah-services/the-loft). It streams music from Spotify, Plex, Apple Music, and a vinyl turntable to speakers throughout the condo using Music Assistant and Snapcast. The name comes from pomskies howling - this one streams audio to every room.
+*Updated September 2026: the Upstairs Snapcast client is now `woodstock`, a Surface Pro with a Music Assistant touchscreen, instead of `viking`. `woodstock`'s story [can be read here](/posts/woodstock-calaveras-older-sibling)*
+*Updated July 2026: the Downstairs Snapcast client is now `calavera`, a Surface Pro 2 with a Music Assistant touchscreen, instead of `fjord`, and the turntable stream ([spinnik](/posts/spinnik)) has been retired. The rest of this post describes the original Raspberry Pi setup. See [Calavera's New Role](/posts/calavera-new-role) for the details.*
+
+Howlr is the multi-room audio system for [The Loft](https://github.com/hsimah-services/the-loft). It streams music from Spotify, Plex, Apple Music, and (for a while) a vinyl turntable to speakers throughout the condo using Music Assistant and Snapcast. The name comes from pomskies howling - this one streams audio to every room.
 
 ## Why Not Just Buy a Sonos
 
@@ -98,30 +101,13 @@ snapclient:
 
 Both server and client use `network_mode: host`. Music Assistant needs host networking for its Spotify Connect and AirPlay plugins (they use mDNS/Bonjour for discovery, which requires being on the LAN broadcast domain). Snapclient needs it for low-latency audio - bridge networking adds measurable latency that can cause sync issues.
 
-## The Raspberry Pi Clients
+## The Surface Pro (1 & 2) Clients
 
-`viking` and `fjord` are Raspberry Pi 3 B+ boards. They're old hardware - the Pi 3 B+ was released in 2018 - but Snapclient is lightweight enough to run on them comfortably. Music Assistant's server requires a Pi 4+ for arm64 support, so the Pi 3s are client-only.
+`calavera` and `woodstock` are ancient Surface Pro devices in their respective hardware docks. They have been configured as lightweight Debian i3 kiosks with a fullscreen Firefox Music Assistant session. i3 and Music Assistant have been configured for the smaller screen size and touch-first input, forcing mobile mode and using DPI scaling.
 
-Each Pi has a powered speaker connected. The ALSA device is set in `.env`:
+### Surface Pro Stability
 
-```bash
-COMPOSE_PROFILES=client
-SNAPSERVER_HOST=192.168.86.28
-SOUND_DEVICE=default
-HOST_ID=viking
-```
-
-### Pi Stability
-
-Pis on WiFi can be flaky. The fleet has a WiFi watchdog cron job that checks if `wlan0` has lost its IPv4 address and restarts `dhcpcd` if so:
-
-```
-*/5 * * * * root ip link show wlan0 &>/dev/null && \
-  ! ip -4 addr show wlan0 2>/dev/null | grep -q inet && \
-  systemctl restart dhcpcd
-```
-
-This catches the common failure mode where the Pi's WiFi adapter drops its DHCP lease and doesn't renew. It's a hack, but it's kept both Pis online reliably.
+The devices are old. The wifi can drop out, the power management on the docks is flaky and the TypeCover switch does not fire any event (that I can monitor). All of these were solved with good old fashioned hacks - cron jobs checking on the device state and executing scripts as necessary. e.g. if no one has touched the device and nothing is streaming to the device for 10 minutes (which ever is shorter) turn the screen off; on touch or streaming initiated the screen turns back on.
 
 ## Spotify Connect Limitations
 
@@ -129,21 +115,12 @@ The Spotify Connect plugin in Music Assistant has one significant limitation: **
 
 The workaround: a Spotify Family plan. Each family member gets their own Spotify login and can stream to different rooms simultaneously. This is a Music Assistant limitation, not a Snapcast one - Snapcast itself handles multiple simultaneous streams without issue.
 
-## How Vinyl Fits In
-
-The [Spinnik](/posts/spinnik) service streams the turntable as an Icecast URL (`http://calavera:8000/vinyl`). Music Assistant treats this as a radio station. Select it, pick a room (or all rooms), and the vinyl plays everywhere through the same Snapcast pipeline. No special configuration on the howlr side - just a URL.
-
 ## Trade-Offs
 
-- **Startup latency**: Spotify Connect and AirPlay have noticeable delay on the first play/pause/skip action. It's a few seconds, not minutes, but it's jarring compared to a Sonos.
-- **Pi 3 B+ limitations**: Can't run the Music Assistant server, only the client. If a Pi dies, it's replaced with the same model (cheap) or upgraded to a Pi 4 (which could run the server as a backup).
-- **No mobile app**: Music Assistant has a web UI that works on mobile browsers, but there's no native iOS/Android app. The Spotify and Apple Music apps serve as the mobile interface for their respective sources.
-- **WiFi reliability**: Pis on WiFi need a watchdog. Ethernet would be more reliable, but running cables through the condo wasn't practical.
+- **No mobile app**: Music Assistant has a web UI that works on mobile browsers, but there's no native iOS/Android app. The Spotify and Apple Music apps serve as the mobile interface for their respective sources. Pinning Music Assistant as a PWA is an acceptable interface.
 
 ## Future Work
 
 - **Home Assistant integration** for automation - e.g., start playing music when someone arrives home, or lower volume at a certain time.
-- **Replace Pi 3s with Pi 4s** for arm64 support, opening the possibility of running Music Assistant on a Pi as a backup server.
-- **Dedicated USB DACs** on the Pis for better audio quality than the 3.5mm output.
 
 The full configuration is in [the-loft repo](https://github.com/hsimah-services/the-loft) under `services/howlr/`.
