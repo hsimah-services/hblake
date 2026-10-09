@@ -13,7 +13,7 @@ I've been doing this for over 15 years now. It started, as many great careers do
 
 ## Outside the Terminal
 
-When I'm not at a keyboard, you'll find me on one of my bikes (yes, I have four - no, I don't think that's too many). I'm also a big reader and I collect vinyl, because apparently I enjoy hobbies that take up physical space. I also collect felt hats - so far I've picked them up from Australia, Utah, Wyoming, and Tennessee. If you know a good hatmaker, I'm always in the market.
+When I'm not at a keyboard, you'll find me on one of my bikes (yes, I have four - no, I don't think that's too many). I'm also a big reader, a coffee enthusiast, and I collect vinyl, because apparently I enjoy hobbies that take up physical space. I also collect felt hats - so far I've picked them up from Australia, Utah, Wyoming, and Tennessee. If you know a good hatmaker, I'm always in the market.
 
 On top of all that, I'm currently learning both Spanish and French, and doing neither particularly well.
 
@@ -21,11 +21,11 @@ I have two pomskies, Laiko and Belki, who are the real stars of this household. 
 
 ## This Blog
 
-This is my technical blog - expect write-ups on engineering problems, system design ethos, and the occasional deep dive into whatever rabbit hole I've fallen into. The tone here is casual; think of it as a conversation between nerds. If you're after something more polished, you're in the wrong place.
+This is my blog, and it's mostly technical - expect write-ups on engineering problems, system design ethos, and the occasional deep dive into whatever rabbit hole I've fallen into, from my home lab to code generators. Every so often something more personal turns up too, like moving my laptops from Windows to Linux or how I work with Claude. The tone here is casual; think of it as a conversation between nerds. If you're after something more polished, you're in the wrong place.
 
 ## This Site
 
-Built on [markr](https://github.com/hsimah-services/markr) — a minimal static blog engine. Markdown posts are prerended to plain HTML at build time; no JavaScript required.
+Built on [markr](https://github.com/hsimah-services/markr) — a minimal static blog engine. Markdown posts are prerendered to plain HTML at build time; no JavaScript required.
 
 ## External Links
 
