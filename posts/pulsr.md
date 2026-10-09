@@ -1,10 +1,10 @@
 ---
-title: [pulsr] A Private Fediverse Instance for Fleet Reporting
+title: Puslr - A Private Fediverse Instance for Fleet Reporting
 date: 2026-04-06
 description: Running GoToSocial as a self-hosted Fediverse instance with Phanpy as the web client, automated fleet status reporting, and Cloudflare Tunnel for federation
 ---
 
-# Pulsr: A Private Fediverse Instance for Fleet Reporting
+NOTE: Puslr was deprecated due to low use. Homepage, Beszel and Uptime Kuma are now used to do fleet monitoring.
 
 Pulsr is a self-hosted [Fediverse](https://en.wikipedia.org/wiki/Fediverse) instance running on [The Loft](https://github.com/hsimah-services/the-loft). It's powered by GoToSocial with Phanpy as the web client. Beyond personal social posting, every host in the fleet has its own account and posts system metrics every six hours. The name comes from "pulsar" - a spinning neutron star that emits signals. Pulsr emits status updates.
 
