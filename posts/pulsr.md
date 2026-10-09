@@ -158,7 +158,7 @@ The token is stored in `/etc/loft/pulsr.env` on each host and doesn't expire unl
 
 ## External Access
 
-Pulsr is one of only three services accessible from outside the LAN (along with the two blogs served by [Pawst](/posts/pawst)). External access comes through [Mushr's](/posts/mushr) Cloudflare Tunnel.
+Pulsr is one of only two services accessible from outside the LAN (along with the blog served by [Pawst](/posts/pawst)). External access comes through [Mushr's](/posts/mushr) Cloudflare Tunnel.
 
 This is essential for federation. Other Fediverse instances need to reach your server to fetch profiles, deliver posts, and verify signatures. Without external access, you'd have a private microblog that can't interact with the wider network.
 
