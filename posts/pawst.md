@@ -94,7 +94,7 @@ location /assets/ {
 }
 ```
 
-This block is also a leftover. Vite used to produce hashed asset filenames (e.g., `index-abc123.js`), which made it safe to cache them for a year - the URL changed whenever the content did. The site now has no JavaScript or CSS bundles at all; `assets/` only holds a handful of static files (the favicons, a couple of icons and a profile photo) with plain, unhashed names. A year-long `immutable` header on a file like `hblake.png` means a browser that has seen it will never check for a replacement.
+The site has no JavaScript or CSS bundles at all; `assets/` only holds a handful of static files (the favicons, a couple of icons and a profile photo) with plain, unhashed names. A year-long `immutable` header on a file like `hblake.png` means a browser that has seen it will never check for a replacement.
 
 For files that almost never change, that's an acceptable cost. If I ever swap the profile photo, I'll need to rename the file or shorten the cache lifetime.
 
