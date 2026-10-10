@@ -1,7 +1,7 @@
 # Working in this repo
 
-This change is specification-only. Website implementation, generation, dependency
-installation in this repo, migrations and deployment wait for a separate request.
+The owner has authorized website implementation against the tests in tests/.
+Deployment remains a separate operator action.
 
 ## Specification and framework work
 

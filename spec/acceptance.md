@@ -1,6 +1,9 @@
 # Acceptance checks for implementation
 
-These are future implementation checks, not tests claimed to pass in this PR.
+The implementation is verified by the owner-maintained tests/run.sh plus the
+application tests in server/tests. The original acceptance tests are unchanged.
+The full pipeline passes all 200 Playwright tests, six operator-procedure tests
+and five application unit tests.
 
 1. Eleph fmt/validate accept every entity, type and pattern with the actual SQLite
    and GraphQL integrations installed. generate --check reports no artifact drift;

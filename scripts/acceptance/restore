@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+source "$(dirname "$0")/common"
+: "${1:?Backup path required}"
+python3 - "$1" <<'PY'
+import sqlite3,sys
+with sqlite3.connect('file:'+sys.argv[1]+'?mode=ro',uri=True) as db:
+    assert db.execute('PRAGMA integrity_check').fetchone()[0]=='ok'
+    assert db.execute('SELECT COUNT(*) FROM hsimah_user').fetchone()[0]==1
+PY
+"$ENGINE" rm -f "$STACK" >/dev/null
+python3 - "$1" <<'PY'
+import sys,shutil
+from pathlib import Path
+for name in ['site.sqlite-wal','site.sqlite-shm']:
+    Path('.var',name).unlink(missing_ok=True)
+shutil.copyfile(sys.argv[1],'.var/site.sqlite')
+Path('.var/site.sqlite').chmod(0o600)
+PY
+start_stack

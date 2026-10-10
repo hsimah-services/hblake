@@ -1,0 +1,424 @@
+schema {
+  query: RootQuery
+  mutation: RootMutation
+}
+
+type RootQuery {
+  """One Page by id."""
+  page(id: ID!): Page
+
+  """One Post by id."""
+  post(id: ID!): Post
+
+  """One Product by id."""
+  product(id: ID!): Product
+
+  """
+  Look up one content record by exact canonical slug under read policies.
+  """
+  pageBySlug(slug: String!): Page
+
+  """
+  Look up one content record by exact canonical slug under read policies.
+  """
+  postBySlug(slug: String!): Post
+
+  """
+  Look up one content record by exact canonical slug under read policies.
+  """
+  productBySlug(slug: String!): Product
+  pages(first: Int, after: String, last: Int, before: String): RootQueryToPageConnection
+  posts(first: Int, after: String, last: Int, before: String): RootQueryToPostConnection
+  products(first: Int, after: String, last: Int, before: String): RootQueryToProductConnection
+  node(id: ID!): Node
+  viewer: Viewer
+  adminUser(id: ID!): AdminUser
+}
+
+interface Node {
+  id: ID!
+}
+
+enum PublicationStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum UserRole {
+  EDITOR
+  ADMIN
+}
+
+type RootMutation {
+  createPage(input: CreatePageInput!): CreatePagePayload
+  createPost(input: CreatePostInput!): CreatePostPayload
+  createProduct(input: CreateProductInput!): CreateProductPayload
+  deletePage(input: DeletePageInput!): DeletePagePayload
+  deletePost(input: DeletePostInput!): DeletePostPayload
+  deleteProduct(input: DeleteProductInput!): DeleteProductPayload
+  publishPage(input: PublishPageInput!): PublishPagePayload
+  publishPost(input: PublishPostInput!): PublishPostPayload
+  publishProduct(input: PublishProductInput!): PublishProductPayload
+  unpublishPage(input: UnpublishPageInput!): UnpublishPagePayload
+  unpublishPost(input: UnpublishPostInput!): UnpublishPostPayload
+  unpublishProduct(input: UnpublishProductInput!): UnpublishProductPayload
+  updatePage(input: UpdatePageInput!): UpdatePagePayload
+  updatePost(input: UpdatePostInput!): UpdatePostPayload
+  updateProduct(input: UpdateProductInput!): UpdateProductPayload
+  updateAdminUser(input: UpdateAdminUserInput!): UpdateAdminUserPayload
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+"""Durable consulting page."""
+type Page implements Node {
+  """The globally unique identifier, opaque and safe to use as a cache key."""
+  id: ID!
+
+  """"""
+  title: String!
+
+  """"""
+  slug: String!
+
+  """"""
+  content: String!
+
+  """"""
+  excerpt: String!
+
+  """"""
+  status: PublicationStatus!
+
+  """"""
+  publishedAt: String
+
+  """"""
+  createdAt: String!
+
+  """"""
+  updatedAt: String!
+}
+
+"""Consulting article or business update."""
+type Post implements Node {
+  """The globally unique identifier, opaque and safe to use as a cache key."""
+  id: ID!
+
+  """"""
+  title: String!
+
+  """"""
+  slug: String!
+
+  """"""
+  content: String!
+
+  """"""
+  excerpt: String!
+
+  """"""
+  status: PublicationStatus!
+
+  """"""
+  publishedAt: String
+
+  """"""
+  createdAt: String!
+
+  """"""
+  updatedAt: String!
+}
+
+"""Software product or consulting offering."""
+type Product implements Node {
+  """The globally unique identifier, opaque and safe to use as a cache key."""
+  id: ID!
+
+  """"""
+  title: String!
+
+  """"""
+  slug: String!
+
+  """"""
+  content: String!
+
+  """"""
+  excerpt: String!
+
+  """"""
+  status: PublicationStatus!
+
+  """"""
+  publishedAt: String
+
+  """"""
+  createdAt: String!
+
+  """"""
+  updatedAt: String!
+
+  """"""
+  enquiryUrl: String
+}
+
+type RootQueryToPageConnectionEdge {
+  cursor: String
+  node: Page
+}
+
+type RootQueryToPageConnection {
+  nodes: [Page]
+  edges: [RootQueryToPageConnectionEdge]
+  pageInfo: PageInfo!
+
+  """How many match, ignoring pagination."""
+  totalCount: Int
+}
+
+type RootQueryToPostConnectionEdge {
+  cursor: String
+  node: Post
+}
+
+type RootQueryToPostConnection {
+  nodes: [Post]
+  edges: [RootQueryToPostConnectionEdge]
+  pageInfo: PageInfo!
+
+  """How many match, ignoring pagination."""
+  totalCount: Int
+}
+
+type RootQueryToProductConnectionEdge {
+  cursor: String
+  node: Product
+}
+
+type RootQueryToProductConnection {
+  nodes: [Product]
+  edges: [RootQueryToProductConnectionEdge]
+  pageInfo: PageInfo!
+
+  """How many match, ignoring pagination."""
+  totalCount: Int
+}
+
+input CreatePageInput {
+  title: String!
+  slug: String!
+  content: String
+  excerpt: String
+  status: PublicationStatus
+  publishedAt: String
+  clientMutationId: String
+}
+
+type CreatePagePayload {
+  page: Page
+  clientMutationId: String
+}
+
+input CreatePostInput {
+  title: String!
+  slug: String!
+  content: String
+  excerpt: String
+  status: PublicationStatus
+  publishedAt: String
+  clientMutationId: String
+}
+
+type CreatePostPayload {
+  post: Post
+  clientMutationId: String
+}
+
+input CreateProductInput {
+  title: String!
+  slug: String!
+  content: String
+  excerpt: String
+  status: PublicationStatus
+  publishedAt: String
+  enquiryUrl: String
+  clientMutationId: String
+}
+
+type CreateProductPayload {
+  product: Product
+  clientMutationId: String
+}
+
+input DeletePageInput {
+  id: ID!
+  clientMutationId: String
+}
+
+type DeletePagePayload {
+  deletedId: ID
+  clientMutationId: String
+}
+
+input DeletePostInput {
+  id: ID!
+  clientMutationId: String
+}
+
+type DeletePostPayload {
+  deletedId: ID
+  clientMutationId: String
+}
+
+input DeleteProductInput {
+  id: ID!
+  clientMutationId: String
+}
+
+type DeleteProductPayload {
+  deletedId: ID
+  clientMutationId: String
+}
+
+input PublishPageInput {
+  id: ID!
+  clientMutationId: String
+}
+
+type PublishPagePayload {
+  page: Page
+  clientMutationId: String
+}
+
+input PublishPostInput {
+  id: ID!
+  clientMutationId: String
+}
+
+type PublishPostPayload {
+  post: Post
+  clientMutationId: String
+}
+
+input PublishProductInput {
+  id: ID!
+  clientMutationId: String
+}
+
+type PublishProductPayload {
+  product: Product
+  clientMutationId: String
+}
+
+input UnpublishPageInput {
+  id: ID!
+  clientMutationId: String
+}
+
+type UnpublishPagePayload {
+  page: Page
+  clientMutationId: String
+}
+
+input UnpublishPostInput {
+  id: ID!
+  clientMutationId: String
+}
+
+type UnpublishPostPayload {
+  post: Post
+  clientMutationId: String
+}
+
+input UnpublishProductInput {
+  id: ID!
+  clientMutationId: String
+}
+
+type UnpublishProductPayload {
+  product: Product
+  clientMutationId: String
+}
+
+input UpdatePageInput {
+  id: ID!
+  title: String
+  slug: String
+  content: String
+  excerpt: String
+  status: PublicationStatus
+  publishedAt: String
+  clientMutationId: String
+}
+
+type UpdatePagePayload {
+  page: Page
+  clientMutationId: String
+}
+
+input UpdatePostInput {
+  id: ID!
+  title: String
+  slug: String
+  content: String
+  excerpt: String
+  status: PublicationStatus
+  publishedAt: String
+  clientMutationId: String
+}
+
+type UpdatePostPayload {
+  post: Post
+  clientMutationId: String
+}
+
+input UpdateProductInput {
+  id: ID!
+  title: String
+  slug: String
+  content: String
+  excerpt: String
+  status: PublicationStatus
+  publishedAt: String
+  enquiryUrl: String
+  clientMutationId: String
+}
+
+type UpdateProductPayload {
+  product: Product
+  clientMutationId: String
+}
+
+type Viewer {
+  id: ID
+  displayName: String
+  role: UserRole
+}
+
+type AdminUser {
+  id: ID!
+  email: String
+  displayName: String
+  role: UserRole
+  active: Boolean
+  createdAt: String
+  updatedAt: String
+}
+
+input UpdateAdminUserInput {
+  id: ID!
+  email: String
+  displayName: String
+  clientMutationId: String
+}
+
+type UpdateAdminUserPayload {
+  adminUser: AdminUser
+  clientMutationId: String
+}

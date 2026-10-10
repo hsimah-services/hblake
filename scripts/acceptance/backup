@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+source "$(dirname "$0")/common"
+: "${1:?Backup path required}"
+if [[ -e "$1" ]]; then echo 'Backup path already exists.' >&2; exit 1; fi
+backup_file=".var/backup-$(date +%s%N).sqlite"
+scripts/php php server/console.php backup "/app/$backup_file"
+cp -- "$backup_file" "$1"
+chmod 600 "$1"
+python3 -c 'from pathlib import Path; import sys; Path(sys.argv[1]).unlink()' "$backup_file"

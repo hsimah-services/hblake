@@ -1,0 +1,54 @@
+{
+  "name": "hsimah-services/hsimah",
+  "type": "project",
+  "require": {
+    "php": ">=8.3",
+    "ext-pdo_sqlite": "*",
+    "ext-mbstring": "*",
+    "elephentity/runtime": "0.12.0 as 0.11.99",
+    "elephentity/sqlite": "0.1.0-alpha.4",
+    "elephentity/graphql": "0.1.0-alpha.4",
+    "psr/container": "^2.0",
+    "psr/log": "^3.0"
+  },
+  "require-dev": {
+    "elephentity/cli": "^0.12",
+    "elephentity/codegen": "^0.6.1",
+    "elephentity/codegen-php": "dev-fix/declared-enum-decoding",
+    "elephentity/codegen-sqlite": "dev-fix/generated-phpstan-types",
+    "elephentity/codegen-graphql-php": "dev-fix/generated-phpstan-types",
+    "phpstan/phpstan": "^2.0",
+    "phpunit/phpunit": "^11.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Hsimah\\": "server/src/",
+      "Hsimah\\Entity\\": "generated/",
+      "Hsimah\\Type\\": "generated/Type/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Hsimah\\Tests\\": "server/tests/"
+    }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true,
+  "config": {
+    "sort-packages": true
+  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/hsimah-services/elephentity-codegen-php"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/hsimah-services/elephentity-codegen-sqlite"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/hsimah-services/elephentity-codegen-graphql-php"
+    }
+  ]
+}

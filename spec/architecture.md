@@ -7,7 +7,7 @@ GraphQL runtime/builder with a verified compatible release set on protocol 1 and
 IR 1.2, pinned in implementation lockfiles. The standalone integrations are experimental, so a passing pipeline is a prerequisite,
 not something inferred from README examples.
 
-Planned `eleph.json` targets (not executed in this PR):
+The implementation uses these `eleph.json` targets:
 
 ```json
 {
@@ -37,7 +37,8 @@ handlers, safe User DTOs and schema assembly. Generated files remain machine-own
 API handlers use policy-aware EntityGateway operations. BySlug handlers preserve
 read policy evaluation and exact unique matching.
 Collection ordering and bounded pagination belong in the API adapter; default 20,
-maximum 100. Relay Node/PageInfo and identifier adaptation are explicitly wired.
+maximum 100. Relay Node/PageInfo and identifier adaptation are explicitly wired. Schema assembly
+omits the automatic databaseId field to retain the specified content allowlist.
 
 User is excluded from the generic GraphQL manifest. Safe application-owned
 User admin fields: id, email, displayName, role, active, createdAt, updatedAt,
@@ -90,8 +91,10 @@ start with the directory's PascalCase entity name.
 Tsquid currently generates routes only. Proposed content UI generation consumes
 an explicit normalized metadata manifest plus ui/admin.yml and GraphQL schema,
 not PHP or application TypeScript. The upstream issue defines its implementation
-contract. Generated views/forms own field rendering and mechanical mutation
-binding; application modules own auth, business rules and page design.
+contract. The proposed generator will own field rendering and mechanical mutation binding.
+Until that upstream capability exists, shared application components own the forms;
+they are not generated output. Application modules own authentication, business rules
+and page design.
 
 V1 remains a client Vite/Relay app for public content and administration. SSR and
 prerender are deferred, so initial-HTML SEO is not a launch requirement. No PHP

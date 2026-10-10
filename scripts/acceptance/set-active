@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+source "$(dirname "$0")/common"
+exec scripts/php php server/console.php set-active "$@"

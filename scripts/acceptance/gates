@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+source "$(dirname "$0")/common"
+scripts/php composer install --no-interaction --prefer-dist
+scripts/php sh -c 'for package in codegen codegen-php codegen-sqlite codegen-graphql-php; do cargo build --release --locked --manifest-path vendor/elephentity/$package/Cargo.toml || exit; done'
+scripts/php vendor/bin/eleph fmt
+scripts/php vendor/bin/eleph validate spec
+scripts/php vendor/bin/eleph generate --check
+scripts/php vendor/bin/eleph check
+scripts/php vendor/bin/phpstan analyse --no-progress
+scripts/php vendor/bin/phpunit
+scripts/node install --frozen-lockfile
+scripts/node routes:check
+scripts/node exec relay-compiler --validate
+scripts/node lint
+scripts/node exec tsc --noEmit
+scripts/node build

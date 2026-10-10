@@ -60,11 +60,8 @@ the finding, not new bugs proven by running this specification-only change.
 merged. It adds `--provides <saved-describe-json>` to run the compiler with explicit
 snapshot metadata and no builder execution or eleph.json.
 
-The website's [provides.json](provides.json) and [provides.md](provides.md) are
-**temporary spec-review files** copied from reviewed builder declarations. Once the
-implementation adds eleph.json and real builders, live `eleph validate spec`
-replaces them and both files are removed. The snapshot is not permanent project
-configuration or proof of builder compatibility.
+The temporary provides snapshot has been removed. The implementation supplies
+eleph.json and real builders and uses live `eleph validate spec`.
 
 Using the merged change's CLI, the actual command passed without generating files:
 
@@ -85,3 +82,37 @@ UI descriptor checks verify internal consistency only; Tsquid cannot consume adm
   public frontend remains a client-rendered Tsquid app.
 - SQLite upgrades remain application-owned reviewed migrations; the initial
   installer is not an upgrade engine.
+
+## Implementation findings
+
+Runtime 0.12.0 fixes UTC timestamps and visible-row pagination. SQLite and GraphQL
+alpha.4 include the audited integration fixes; global IDs are type-checked. The
+coordinator is 0.6.1. PHP generator 0.6.1 supplies enum-name collision detection;
+its decoder follow-up is temporarily pinned by the lockfile to upstream PR #34.
+
+- [CLI #104](https://github.com/hsimah-services/elephentity/issues/104): release
+  metadata excludes runtime 0.12.0. Temporary explicit Composer alias; no vendored fork.
+- [Runtime #105](https://github.com/hsimah-services/elephentity/issues/105): singular
+  finder results conflict with the collection-only gateway. Schema assembly delegates
+  scalar lookups to the generated finder, which uses policy-aware runtime queries.
+- [Runtime #106](https://github.com/hsimah-services/elephentity/issues/106): declared
+  defaults do not reach generic create mutations. The create adapter supplies the
+  content defaults before invoking the generated resolver.
+- [Runtime #107](https://github.com/hsimah-services/elephentity/issues/107): nullable
+  field verification skips explicit nulls. The update adapter rejects changed
+  publication times, including null, before delegating to the gateway.
+- [PHP builder #33](https://github.com/hsimah-services/elephentity-codegen-php/issues/33):
+  action contexts lack original state. Publication adapters obtain the persisted
+  timestamp through the read gateway and scope it to the action call.
+- [PHP builder PR #34](https://github.com/hsimah-services/elephentity-codegen-php/pull/34):
+  declared enum input/hydration calls an uninjected processor. The upstream fix
+  dispatches enum decoding through ValueDecoder and has a regression test.
+- [GraphQL builder PR #3](https://github.com/hsimah-services/elephentity-codegen-graphql-php/pull/3)
+  and [SQLite builder PR #3](https://github.com/hsimah-services/elephentity-codegen-sqlite/pull/3):
+  generated integration files need checked types at their PHP boundaries to pass
+  PHPStan max. Actual builder output includes those fixes, rather than excluded files.
+
+These temporary branches are pinned by commit in composer.lock. Remove aliases,
+branch pins and adapters as compatible tagged fixes land. Generated artifacts remain
+machine-owned. Tsquid admin generation is still #7; the application's shared forms
+are handwritten and are not claimed as generated screens.

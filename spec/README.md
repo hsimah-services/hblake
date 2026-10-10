@@ -1,12 +1,11 @@
 # Consulting website specification
 
-Status: specification only. Implementation begins after review of this PR.
-No application, generated artifacts, dependency installation in this repo,
-database migration, content import or deployment is part of this change.
+Status: v1 implementation passes the owner-provided acceptance tests.
+Build/run commands and generation boundaries are documented in the root README.
 
 The YAML under `entities`, `patterns` and `types`, plus `project.yml`, is the
 Elephentity model source of truth. Entity Markdown records intent. The UI route
-catalogue uses Tsquid's existing format; entrypoint paths are planned files.
+catalogue uses Tsquid's existing format; entrypoint paths name application files.
 `ui/admin.yml` is a **proposed application UI contract**, not an input currently
 accepted by Tsquid.
 
@@ -31,7 +30,6 @@ Contributor instructions live in [AGENTS.md](../AGENTS.md).
 - Brand copy, logo, domain, contact address, hosting and final visual treatment are
   not yet selected; business claims and contact details come from the owner.
 
-The current repo has an empty README and no checked-in application or content
-to migrate. Build/run instructions will accompany implementation commands.
-The metadata snapshot in provides.json/provides.md is temporary for spec review;
-implementation with real builders will replace it with live validation.
+The root README documents the application toolchain and operator procedures.
+Live builder validation replaces the removed temporary provides snapshot.
+Content is still owner-provided; the initial database is empty.
