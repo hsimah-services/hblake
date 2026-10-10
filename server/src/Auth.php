@@ -15,17 +15,16 @@ final class Auth {
         $rows = is_string($cookie) && preg_match('/^[a-f0-9]{64}$/D',$cookie)
             ? $db->select('SELECT * FROM auth_session WHERE token_hash = ? AND expires_at > ?', [hash('sha256',$cookie),time()]) : [];
         if ($rows) { $this->session=$rows[0]; }
-        else { $this->rotate(null); }
     }
     public static function install(Database $db): void {
         $db->pdo->exec('CREATE TABLE auth_credential (user_id INTEGER PRIMARY KEY REFERENCES hsimah_user(id), password_hash TEXT NOT NULL);
             CREATE TABLE auth_session (token_hash TEXT PRIMARY KEY, user_id INTEGER REFERENCES hsimah_user(id), csrf TEXT NOT NULL, expires_at INTEGER NOT NULL);
             CREATE TABLE auth_failure (address TEXT PRIMARY KEY, attempts INTEGER NOT NULL, started_at INTEGER NOT NULL);');
     }
-    public function csrf(): string { assert($this->session!==null); return $this->session['csrf']; }
+    public function csrf(): string { if ($this->session===null) $this->rotate(null); assert($this->session!==null); return $this->session['csrf']; }
     public function requireCsrf(): void {
         $token=$_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
-        if (!is_string($token) || !hash_equals($this->csrf(),$token)) { self::respond(403,['error'=>'Invalid CSRF token.']); }
+        if ($this->session===null || !is_string($token) || !hash_equals($this->session['csrf'],$token)) { self::respond(403,['error'=>'Invalid CSRF token.']); }
     }
     public function actor(): Actor {
         $id=$this->session['user_id'] ?? null;
@@ -37,6 +36,7 @@ final class Auth {
     /** @param array<string,mixed> $input */
     public function login(array $input): never {
         $this->requireCsrf();
+        $this->purgeExpired();
         $address=Http::server('REMOTE_ADDR') ?: 'local';
         /** @var array{started_at:int,attempts:int}|null $fail */
         $fail=$this->db->select('SELECT * FROM auth_failure WHERE address=?',[$address])[0] ?? null;
@@ -58,12 +58,22 @@ final class Auth {
         self::respond(200,['viewer'=>$viewer]);
     }
     public function logout(): never { $this->requireCsrf(); $this->rotate(null); self::respond(200,['ok'=>true]); }
+    public function purgeExpired(): void {
+        $this->db->execute('DELETE FROM auth_session WHERE expires_at <= ?', [time()]);
+        $this->db->execute('DELETE FROM auth_failure WHERE started_at <= ?', [time()-900]);
+    }
     private function rotate(?int $id): void {
+        $this->purgeExpired();
         if ($this->session!==null) $this->db->execute('DELETE FROM auth_session WHERE token_hash=?',[$this->session['token_hash']]);
         $raw=bin2hex(random_bytes(32));
         $this->session=['token_hash'=>hash('sha256',$raw),'user_id'=>$id,'csrf'=>bin2hex(random_bytes(32)),'expires_at'=>time()+28800];
         $this->db->insert('auth_session',$this->session);
-        setcookie(self::COOKIE,$raw,['expires'=>time()+28800,'path'=>'/','secure'=>str_starts_with(getenv('BASE_URL') ?: '', 'https://'),'httponly'=>true,'samesite'=>'Lax']);
+        setcookie(self::COOKIE,$raw,['expires'=>time()+28800,'path'=>'/','secure'=>self::secureCookie(),'httponly'=>true,'samesite'=>'Lax']);
+    }
+    private static function secureCookie(): bool {
+        $https=strtolower(Http::server('HTTPS'));
+        $host=parse_url('http://'.Http::server('HTTP_HOST'), PHP_URL_HOST);
+        return ($https!=='' && $https!=='off') || !in_array($host,['localhost','127.0.0.1','[::1]'],true);
     }
     /** @param array<string,mixed> $body */
     public static function respond(int $status,array $body): never {

@@ -100,7 +100,9 @@ its decoder follow-up is temporarily pinned by the lockfile to upstream PR #34.
   content defaults before invoking the generated resolver.
 - [Runtime #107](https://github.com/hsimah-services/elephentity/issues/107): nullable
   field verification skips explicit nulls. The update adapter rejects changed
-  publication times, including null, before delegating to the gateway.
+  publication times, including null, non-nullable fields explicitly set to null,
+  and malformed dates before delegating to the gateway. Unexpected storage/parser
+  errors are logged server-side and return a generic message.
 - [PHP builder #33](https://github.com/hsimah-services/elephentity-codegen-php/issues/33):
   action contexts lack original state. Publication adapters obtain the persisted
   timestamp through the read gateway and scope it to the action call.

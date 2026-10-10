@@ -28,7 +28,12 @@ if ($path==='/graphql' || str_starts_with((string)$path,'/auth/')) {
         $result=GraphQL::executeQuery(Schema::build($app),$document,null,null,isset($input['variables']) ? Http::object($input['variables']) : null,is_string($input['operationName'] ?? null) ? $input['operationName'] : null);
         $result->setErrorFormatter(static function(\Throwable $error): array {
             $previous=$error->getPrevious();
-            $message=$previous instanceof \RuntimeException || $previous instanceof \InvalidArgumentException ? $previous->getMessage() : $error->getMessage();
+            if ($previous instanceof \Eleph\Runtime\Verification\CommitRejected || $previous instanceof \Hsimah\UserError) {
+                $message=$previous->getMessage();
+            } else {
+                error_log((string)$error);
+                $message='The request could not be processed.';
+            }
             return ['message'=>$message];
         });
         Auth::respond(200,$result->toArray());

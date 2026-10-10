@@ -42,7 +42,7 @@ The PHP generator is temporarily pinned to [upstream PR #34](https://github.com/
 
 ## Operator data procedures
 
-SQLite, credentials, sessions and dependency caches live outside `server/public` and the built static client. A deployment must serve only those public roots, route `/graphql` and `/auth/*` to PHP, use HTTPS, and give the private data directory mode 0700. Backups include credential hashes and sessions; protect them as private data. No production deployment is configured here.
+SQLite, credentials, sessions and dependency caches live outside `server/public` and the built static client. A deployment must serve only those public roots, route `/graphql` and `/auth/*` to PHP, use HTTPS, and give the private data directory mode 0700. Backups include credential hashes and sessions; protect them as private data. Session cookies use Secure for HTTPS and all public hosts; plain HTTP loopback requests are the only exception. Login throttling uses REMOTE_ADDR: configure trusted-proxy address handling before deploying behind a reverse proxy so clients do not share one failure bucket. No production deployment is configured here.
 
 Initial installation is explicit and refuses existing tables:
 
