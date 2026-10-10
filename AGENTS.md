@@ -25,3 +25,10 @@ installation in this repo, migrations and deployment wait for a separate request
 - Run validation/format checks appropriate to model changes. Build/run instructions
   belong in README once the actual implementation commands exist.
 - Business copy, claims, branding and contact details come from the owner.
+
+## Acceptance tests
+
+- tests/ is the verification for the implementation; tests/README.md defines the
+  harness, HTTP, GraphQL and UI contracts it relies on. `tests/run.sh` must pass.
+- Implement scripts/acceptance/* as described there. Do not edit, skip or weaken a
+  test to make it pass; raise a disagreement with the owner instead.
