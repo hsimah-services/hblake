@@ -1,0 +1,32 @@
+# Proposed application UI contract. Tsquid does not currently consume this file.
+version: 1
+renderer: astryx
+entities:
+  Page:
+    source: graphql
+    list: [title, slug, status, updatedAt]
+    detail: [title, slug, content, excerpt, status, publishedAt, createdAt, updatedAt]
+    create: [title, slug, content, excerpt]
+    edit: [title, slug, content, excerpt]
+    actions: [publish, unpublish, delete]
+  Post:
+    source: graphql
+    list: [title, slug, status, publishedAt, updatedAt]
+    detail: [title, slug, content, excerpt, status, publishedAt, createdAt, updatedAt]
+    create: [title, slug, content, excerpt]
+    edit: [title, slug, content, excerpt]
+    actions: [publish, unpublish, delete]
+  Product:
+    source: graphql
+    list: [title, slug, status, updatedAt]
+    detail: [title, slug, content, excerpt, enquiryUrl, status, publishedAt, createdAt, updatedAt]
+    create: [title, slug, content, excerpt, enquiryUrl]
+    edit: [title, slug, content, excerpt, enquiryUrl]
+    actions: [publish, unpublish, delete]
+  User:
+    source: privateAdminDto
+    list: [displayName, email, role, active, updatedAt]
+    detail: [displayName, email, role, active, createdAt, updatedAt]
+    create: [displayName, email, role]
+    edit: [displayName, email, role, active]
+    actions: []
