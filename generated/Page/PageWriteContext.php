@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Page/PageWriteContext.php
- * digest: sha256:e3d29e1e2530f6cc84d6dd9c5b2cabc190e91fb30f8a14f60f7883092515d243
+ * digest: sha256:ba1a6b76869eb462a9e5a3fde78538b629b726a661174056ac2bdf6839296e11
  */
 
 namespace Hsimah\Entity\Page;
@@ -65,112 +65,112 @@ final readonly class PageWriteContext implements WriteContext
     public function originalTitle(): ?string {
         $value = $this->context->mutation()?->original('title');
         assert(null === $value || is_string($value));
-        
+
         return $value;
     }
 
     public function pendingTitle(): ?string {
         $value = $this->context->mutation()?->pending('title');
         assert(null === $value || is_string($value));
-        
+
         return $value;
     }
 
     public function originalSlug(): ?string {
         $value = $this->context->mutation()?->original('slug');
         assert(null === $value || is_string($value));
-        
+
         return $value;
     }
 
     public function pendingSlug(): ?string {
         $value = $this->context->mutation()?->pending('slug');
         assert(null === $value || is_string($value));
-        
+
         return $value;
     }
 
     public function originalContent(): ?string {
         $value = $this->context->mutation()?->original('content');
         assert(null === $value || is_string($value));
-        
+
         return $value;
     }
 
     public function pendingContent(): ?string {
         $value = $this->context->mutation()?->pending('content');
         assert(null === $value || is_string($value));
-        
+
         return $value;
     }
 
     public function originalExcerpt(): ?string {
         $value = $this->context->mutation()?->original('excerpt');
         assert(null === $value || is_string($value));
-        
+
         return $value;
     }
 
     public function pendingExcerpt(): ?string {
         $value = $this->context->mutation()?->pending('excerpt');
         assert(null === $value || is_string($value));
-        
+
         return $value;
     }
 
     public function originalStatus(): ?PublicationStatus {
         $value = $this->context->mutation()?->original('status');
         assert(null === $value || $value instanceof PublicationStatus);
-        
+
         return $value;
     }
 
     public function pendingStatus(): ?PublicationStatus {
         $value = $this->context->mutation()?->pending('status');
         assert(null === $value || $value instanceof PublicationStatus);
-        
+
         return $value;
     }
 
     public function originalPublishedAt(): ?DateTimeImmutable {
         $value = $this->context->mutation()?->original('publishedAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
-        
+
         return $value;
     }
 
     public function pendingPublishedAt(): ?DateTimeImmutable {
         $value = $this->context->mutation()?->pending('publishedAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
-        
+
         return $value;
     }
 
     public function originalCreatedAt(): ?DateTimeImmutable {
         $value = $this->context->mutation()?->original('createdAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
-        
+
         return $value;
     }
 
     public function pendingCreatedAt(): ?DateTimeImmutable {
         $value = $this->context->mutation()?->pending('createdAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
-        
+
         return $value;
     }
 
     public function originalUpdatedAt(): ?DateTimeImmutable {
         $value = $this->context->mutation()?->original('updatedAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
-        
+
         return $value;
     }
 
     public function pendingUpdatedAt(): ?DateTimeImmutable {
         $value = $this->context->mutation()?->pending('updatedAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
-        
+
         return $value;
     }
 

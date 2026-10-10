@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Page/PageMutationContext.php
- * digest: sha256:fc2db6b78cceaba04f1ebd40a2925b1d1cee12bfeb3ad50e73009719f6f6063d
+ * digest: sha256:e738df57df66420c275cf809e070aba09cd6bf64554e27fc78c693d2e31247e0
  */
 
 namespace Hsimah\Entity\Page;
@@ -97,112 +97,112 @@ final readonly class PageMutationContext implements MutationContext
     public function originalTitle(): ?string {
         $value = $this->context->original('title');
         assert(null === $value || is_string($value));
-        
+
         return $value;
     }
 
     public function pendingTitle(): ?string {
         $value = $this->context->pending('title');
         assert(null === $value || is_string($value));
-        
+
         return $value;
     }
 
     public function originalSlug(): ?string {
         $value = $this->context->original('slug');
         assert(null === $value || is_string($value));
-        
+
         return $value;
     }
 
     public function pendingSlug(): ?string {
         $value = $this->context->pending('slug');
         assert(null === $value || is_string($value));
-        
+
         return $value;
     }
 
     public function originalContent(): ?string {
         $value = $this->context->original('content');
         assert(null === $value || is_string($value));
-        
+
         return $value;
     }
 
     public function pendingContent(): ?string {
         $value = $this->context->pending('content');
         assert(null === $value || is_string($value));
-        
+
         return $value;
     }
 
     public function originalExcerpt(): ?string {
         $value = $this->context->original('excerpt');
         assert(null === $value || is_string($value));
-        
+
         return $value;
     }
 
     public function pendingExcerpt(): ?string {
         $value = $this->context->pending('excerpt');
         assert(null === $value || is_string($value));
-        
+
         return $value;
     }
 
     public function originalStatus(): ?PublicationStatus {
         $value = $this->context->original('status');
         assert(null === $value || $value instanceof PublicationStatus);
-        
+
         return $value;
     }
 
     public function pendingStatus(): ?PublicationStatus {
         $value = $this->context->pending('status');
         assert(null === $value || $value instanceof PublicationStatus);
-        
+
         return $value;
     }
 
     public function originalPublishedAt(): ?DateTimeImmutable {
         $value = $this->context->original('publishedAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
-        
+
         return $value;
     }
 
     public function pendingPublishedAt(): ?DateTimeImmutable {
         $value = $this->context->pending('publishedAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
-        
+
         return $value;
     }
 
     public function originalCreatedAt(): ?DateTimeImmutable {
         $value = $this->context->original('createdAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
-        
+
         return $value;
     }
 
     public function pendingCreatedAt(): ?DateTimeImmutable {
         $value = $this->context->pending('createdAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
-        
+
         return $value;
     }
 
     public function originalUpdatedAt(): ?DateTimeImmutable {
         $value = $this->context->original('updatedAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
-        
+
         return $value;
     }
 
     public function pendingUpdatedAt(): ?DateTimeImmutable {
         $value = $this->context->pending('updatedAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
-        
+
         return $value;
     }
 

@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   User/UserPreCommitContext.php
- * digest: sha256:2cbd69143fcfc82d0a9f49ef760eaf343d01f4fe238ee010e671a662b24bbadb
+ * digest: sha256:ae379329704408058df4602a64d45ed080f2f255d6a04442ec6d1bde3c08f16f
  */
 
 namespace Hsimah\Entity\User;
@@ -151,84 +151,84 @@ final readonly class UserPreCommitContext implements MutableMutationContext
     public function originalCreatedAt(): ?DateTimeImmutable {
         $value = $this->context->original('createdAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
-        
+
         return $value;
     }
 
     public function pendingCreatedAt(): ?DateTimeImmutable {
         $value = $this->context->pending('createdAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
-        
+
         return $value;
     }
 
     public function originalUpdatedAt(): ?DateTimeImmutable {
         $value = $this->context->original('updatedAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
-        
+
         return $value;
     }
 
     public function pendingUpdatedAt(): ?DateTimeImmutable {
         $value = $this->context->pending('updatedAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
-        
+
         return $value;
     }
 
     public function originalEmail(): ?string {
         $value = $this->context->original('email');
         assert(null === $value || is_string($value));
-        
+
         return $value;
     }
 
     public function pendingEmail(): ?string {
         $value = $this->context->pending('email');
         assert(null === $value || is_string($value));
-        
+
         return $value;
     }
 
     public function originalDisplayName(): ?string {
         $value = $this->context->original('displayName');
         assert(null === $value || is_string($value));
-        
+
         return $value;
     }
 
     public function pendingDisplayName(): ?string {
         $value = $this->context->pending('displayName');
         assert(null === $value || is_string($value));
-        
+
         return $value;
     }
 
     public function originalRole(): ?UserRole {
         $value = $this->context->original('role');
         assert(null === $value || $value instanceof UserRole);
-        
+
         return $value;
     }
 
     public function pendingRole(): ?UserRole {
         $value = $this->context->pending('role');
         assert(null === $value || $value instanceof UserRole);
-        
+
         return $value;
     }
 
     public function originalActive(): ?bool {
         $value = $this->context->original('active');
         assert(null === $value || is_bool($value));
-        
+
         return $value;
     }
 
     public function pendingActive(): ?bool {
         $value = $this->context->pending('active');
         assert(null === $value || is_bool($value));
-        
+
         return $value;
     }
 

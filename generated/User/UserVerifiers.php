@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   User/UserVerifiers.php
- * digest: sha256:78d430d1bb5cba32ce8cb6a0fc2a54633f19bb7f1fa906a42c855be7831f5749
+ * digest: sha256:82dedae059503ac14823965252a0c70fc64de60084dbc85a6f957df887c19149
  */
 
 namespace Hsimah\Entity\User;
@@ -56,7 +56,7 @@ final readonly class UserVerifiers implements EntityVerifiers
         MutationContext $context,
     ): Verification {
         assert(is_string($value));
-        
+
         return $this->emailVerifier->verify($value, UserMutationContext::of($context));
     }
 
@@ -65,7 +65,7 @@ final readonly class UserVerifiers implements EntityVerifiers
         MutationContext $context,
     ): Verification {
         assert(is_string($value));
-        
+
         return $this->displayNameVerifier->verify($value, UserMutationContext::of($context));
     }
 }

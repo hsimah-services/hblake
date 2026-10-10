@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Post/PostReadPolicies.php
- * digest: sha256:ece0f97c03beb4823a9eb3bc30066e061783c7714a52570b2d0ad4c31ce31990
+ * digest: sha256:1202d00dbab75a8466b066636a6e28c780be7f8db00ce50cf664d0216cf6c140
  */
 
 namespace Hsimah\Entity\Post;
@@ -41,7 +41,7 @@ final readonly class PostReadPolicies implements EntityReadPolicies
         if (PolicyOutcome::Skip !== $decision->outcome) {
             return $decision->withPolicy('contentVisibility');
         }
-        
+
         return PolicyDecision::deny('No policy allowed this read.')->withPolicy('terminal');
     }
 }

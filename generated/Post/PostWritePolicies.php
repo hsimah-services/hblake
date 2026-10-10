@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Post/PostWritePolicies.php
- * digest: sha256:805f074c357a67a94f16c9e636b360466291f69b3c5589bd2d16a62cca34ca25
+ * digest: sha256:16c861ec3bf7803dadc057b296127859e0e539673b5c4250854f4fa5ab3edd10
  */
 
 namespace Hsimah\Entity\Post;
@@ -43,7 +43,7 @@ final readonly class PostWritePolicies implements EntityWritePolicies
         if (PolicyOutcome::Skip !== $decision->outcome) {
             return $decision->withPolicy('contentStaff');
         }
-        
+
         return PolicyDecision::deny('No policy allowed this write.')->withPolicy('terminal');
     }
 }

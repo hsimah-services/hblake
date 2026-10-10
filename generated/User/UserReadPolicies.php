@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   User/UserReadPolicies.php
- * digest: sha256:4b3e5d135e39885277e860d057b8d39f2530e7bb6357c1894bc8056aba326ac9
+ * digest: sha256:eb0adb26047d02b9dd0ee091def8eae9ca169c75f899005c8d6edaeaabf8de68
  */
 
 namespace Hsimah\Entity\User;
@@ -41,7 +41,7 @@ final readonly class UserReadPolicies implements EntityReadPolicies
         if (PolicyOutcome::Skip !== $decision->outcome) {
             return $decision->withPolicy('staffProfile');
         }
-        
+
         return PolicyDecision::deny('No policy allowed this read.')->withPolicy('terminal');
     }
 }

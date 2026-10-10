@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Wiring.php
- * digest: sha256:2df5c271c3b36d28722e0d16e3c54327e2a54eb505b10449b492ee28f0632f2f
+ * digest: sha256:31f1bca54e30ec0809c73e436fb223b3371f608ab15e226711abb64cbc665e31
  */
 
 namespace Hsimah\Entity;
@@ -123,9 +123,9 @@ final class Wiring
         string $class,
     ): object {
         $service = $c->get($class);
-        
+
         assert($service instanceof $class);
-        
+
         return $service;
     }
 }

@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Catalogue.php
- * digest: sha256:3c4bb76bc6240933b75b48f93184777e904c37cd06d299f315c0bb37a4f7ed61
+ * digest: sha256:30918e307d12551e5264c78d7abf3dd1f724512a57f419177bfa08337857917c
  */
 
 namespace Hsimah\Entity;
@@ -99,9 +99,9 @@ final readonly class Catalogue implements EntityCatalogue
             'User' => $this->container->get(UserHydrator::class),
             default => throw new RuntimeException(sprintf('No entity named "%s".', $entity)),
         };
-        
+
         assert($service instanceof Hydrator);
-        
+
         return $service;
     }
 
@@ -115,9 +115,9 @@ final readonly class Catalogue implements EntityCatalogue
             'User' => $this->container->get(UserVerifiers::class),
             default => throw new RuntimeException(sprintf('No entity named "%s".', $entity)),
         };
-        
+
         assert($service instanceof EntityVerifiers);
-        
+
         return $service;
     }
 
@@ -131,41 +131,41 @@ final readonly class Catalogue implements EntityCatalogue
             'User' => $this->container->get(UserSideEffects::class),
             default => throw new RuntimeException(sprintf('No entity named "%s".', $entity)),
         };
-        
+
         assert($service instanceof EntitySideEffects);
-        
+
         return $service;
     }
 
     private function readPoliciesPageReadPolicies(): EntityReadPolicies {
         $policies = $this->container->get(PageReadPolicies::class);
-        
+
         assert($policies instanceof PageReadPolicies);
-        
+
         return $policies;
     }
 
     private function readPoliciesPostReadPolicies(): EntityReadPolicies {
         $policies = $this->container->get(PostReadPolicies::class);
-        
+
         assert($policies instanceof PostReadPolicies);
-        
+
         return $policies;
     }
 
     private function readPoliciesProductReadPolicies(): EntityReadPolicies {
         $policies = $this->container->get(ProductReadPolicies::class);
-        
+
         assert($policies instanceof ProductReadPolicies);
-        
+
         return $policies;
     }
 
     private function readPoliciesUserReadPolicies(): EntityReadPolicies {
         $policies = $this->container->get(UserReadPolicies::class);
-        
+
         assert($policies instanceof UserReadPolicies);
-        
+
         return $policies;
     }
 
@@ -183,33 +183,33 @@ final readonly class Catalogue implements EntityCatalogue
 
     private function writePoliciesPageWritePolicies(): EntityWritePolicies {
         $policies = $this->container->get(PageWritePolicies::class);
-        
+
         assert($policies instanceof PageWritePolicies);
-        
+
         return $policies;
     }
 
     private function writePoliciesPostWritePolicies(): EntityWritePolicies {
         $policies = $this->container->get(PostWritePolicies::class);
-        
+
         assert($policies instanceof PostWritePolicies);
-        
+
         return $policies;
     }
 
     private function writePoliciesProductWritePolicies(): EntityWritePolicies {
         $policies = $this->container->get(ProductWritePolicies::class);
-        
+
         assert($policies instanceof ProductWritePolicies);
-        
+
         return $policies;
     }
 
     private function writePoliciesUserWritePolicies(): EntityWritePolicies {
         $policies = $this->container->get(UserWritePolicies::class);
-        
+
         assert($policies instanceof UserWritePolicies);
-        
+
         return $policies;
     }
 
@@ -265,6 +265,21 @@ final readonly class Catalogue implements EntityCatalogue
             'Post' => ['title', 'slug'],
             'Product' => ['title', 'slug'],
             'User' => ['email', 'displayName'],
+            default => [],
+        };
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function nonNullableFields(
+        string $entity,
+    ): array {
+        return match ($entity) {
+            'Page' => ['title', 'slug', 'content', 'excerpt', 'status', 'createdAt', 'updatedAt'],
+            'Post' => ['title', 'slug', 'content', 'excerpt', 'status', 'createdAt', 'updatedAt'],
+            'Product' => ['title', 'slug', 'content', 'excerpt', 'status', 'createdAt', 'updatedAt'],
+            'User' => ['createdAt', 'updatedAt', 'email', 'displayName', 'role', 'active'],
             default => [],
         };
     }
@@ -339,9 +354,9 @@ final readonly class Catalogue implements EntityCatalogue
             'Product' => $this->container->get(ProductFinder::class),
             default => throw new RuntimeException(sprintf('%s declares no queries.', $entity)),
         };
-        
+
         assert(is_object($finder));
-        
+
         return $finder;
     }
 
@@ -400,9 +415,9 @@ final readonly class Catalogue implements EntityCatalogue
         array $args,
     ): array {
         $input = $this->container->get(PageInput::class);
-        
+
         assert($input instanceof PageInput);
-        
+
         return $input->decodeAction($action, $args);
     }
 
@@ -415,9 +430,9 @@ final readonly class Catalogue implements EntityCatalogue
         array $args,
     ): array {
         $input = $this->container->get(PostInput::class);
-        
+
         assert($input instanceof PostInput);
-        
+
         return $input->decodeAction($action, $args);
     }
 
@@ -430,9 +445,9 @@ final readonly class Catalogue implements EntityCatalogue
         array $args,
     ): array {
         $input = $this->container->get(ProductInput::class);
-        
+
         assert($input instanceof ProductInput);
-        
+
         return $input->decodeAction($action, $args);
     }
 
@@ -445,9 +460,9 @@ final readonly class Catalogue implements EntityCatalogue
         array $args,
     ): array {
         $input = $this->container->get(UserInput::class);
-        
+
         assert($input instanceof UserInput);
-        
+
         return $input->decodeAction($action, $args);
     }
 
@@ -484,9 +499,9 @@ final readonly class Catalogue implements EntityCatalogue
             'User' => $this->container->get(UserInput::class),
             default => throw new RuntimeException(sprintf('No entity named "%s".', $entity)),
         };
-        
+
         assert(is_object($applier) && method_exists($applier, 'apply'));
-        
+
         $applier->apply($buffer, $input);
     }
 
@@ -508,9 +523,9 @@ final readonly class Catalogue implements EntityCatalogue
         string $class,
     ): object {
         $service = $this->container->get($class);
-        
+
         assert($service instanceof $class);
-        
+
         return $service;
     }
 }

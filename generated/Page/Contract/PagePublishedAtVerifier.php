@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Page/Contract/PagePublishedAtVerifier.php
- * digest: sha256:ff84dd62a4cd40b5801085525451eb9fb1a13d91dc39e55e1123753250477ac4
+ * digest: sha256:18448843bbeefd0373f24bc21f2feb51fef07f4d1194bbd39611c6e8df05f372
  */
 
 namespace Hsimah\Entity\Page\Contract;
@@ -27,7 +27,7 @@ use Hsimah\Entity\Page\PageMutationContext;
 interface PagePublishedAtVerifier
 {
     public function verify(
-        DateTimeImmutable $value,
+        ?DateTimeImmutable $value,
         PageMutationContext $context,
     ): Verification;
 }

@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Product/ProductReadPolicies.php
- * digest: sha256:2020a848b6daf5d25c887fecd3f676d8dccdbf4cc82d2c4e31504285338f6526
+ * digest: sha256:80d135a9061e7006785d45bcba7f5661020b41a0b62767c0af990d01e0736ec2
  */
 
 namespace Hsimah\Entity\Product;
@@ -41,7 +41,7 @@ final readonly class ProductReadPolicies implements EntityReadPolicies
         if (PolicyOutcome::Skip !== $decision->outcome) {
             return $decision->withPolicy('contentVisibility');
         }
-        
+
         return PolicyDecision::deny('No policy allowed this read.')->withPolicy('terminal');
     }
 }

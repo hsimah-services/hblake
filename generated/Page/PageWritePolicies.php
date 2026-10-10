@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Page/PageWritePolicies.php
- * digest: sha256:43ae5e9cd3d5cf824dbba4ef595c2ab6b6364573a083d650d0f68c88fc80a549
+ * digest: sha256:a66f6320c3678494ed371d5b57cd8661812d77491346887afc943558e08fcad2
  */
 
 namespace Hsimah\Entity\Page;
@@ -43,7 +43,7 @@ final readonly class PageWritePolicies implements EntityWritePolicies
         if (PolicyOutcome::Skip !== $decision->outcome) {
             return $decision->withPolicy('contentStaff');
         }
-        
+
         return PolicyDecision::deny('No policy allowed this write.')->withPolicy('terminal');
     }
 }

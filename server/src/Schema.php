@@ -24,12 +24,6 @@ final class Schema {
         $b->enum('UserRole',['values'=>['EDITOR'=>['value'=>'editor'],'ADMIN'=>['value'=>'admin']]]);
         foreach($r->objectConfigs() as $name=>$config) { assert(is_array($config['fields'])); unset($config['fields']['databaseId']); $b->object($name,$config); }
         foreach($r->rootFieldConfigs() as $field) {
-            foreach(['Page','Post','Product'] as $entity) {
-                if ($field['name'] === lcfirst($entity).'BySlug') {
-                    // shortcut: runtime runQuery assumes collections; delegate this generated scalar finder directly.
-                    $field['field']['resolve']=static function($source,array $args) use($app,$entity) { $finder=$app->catalogue->finder($entity); assert($finder instanceof \Hsimah\Entity\Page\PageFinder || $finder instanceof \Hsimah\Entity\Post\PostFinder || $finder instanceof \Hsimah\Entity\Product\ProductFinder); assert(is_string($args['slug'])); return $finder->bySlug($args['slug']); };
-                }
-            }
             $b->field('RootQuery',$field['name'],$field['field']);
         }
         foreach($r->connectionConfigs() as $config) {
@@ -44,40 +38,6 @@ final class Schema {
             $b->connection($config);
         }
         foreach((new MutationRegistrar($manifest,$app->runtime))->configs() as $name=>$config) {
-            if (str_starts_with($name,'create')) {
-                $resolve=$config['mutateAndGetPayload']; assert(is_callable($resolve));
-                $config['mutateAndGetPayload']=static function(array $input) use($resolve): array { $result=$resolve(['content'=>'','excerpt'=>'','status'=>'draft','publishedAt'=>null,...$input]); assert(is_array($result)); return $result; };
-            }
-            if (str_starts_with($name,'update')) {
-                $entity=substr($name,6); $resolve=$config['mutateAndGetPayload']; assert(is_callable($resolve));
-                $config['mutateAndGetPayload']=static function(array $input) use($app,$entity,$resolve): array {
-                    $id=GlobalId::entityId($input['id'] ?? null,$entity) ?? throw new UserError('Invalid content id.');
-                    $row=$app->runtime->find($entity,$id);
-                    if (!$row instanceof \Hsimah\Entity\Pattern\Publishable\Publishable) throw new UserError('Content is unavailable.');
-                    foreach (['title','slug','content','excerpt','status'] as $field) {
-                        if (array_key_exists($field,$input) && $input[$field]===null) throw new UserError(ucfirst($field).' cannot be null.');
-                    }
-                    // Nullable values bypass field verifiers in the current runtime, so validate clearing here too.
-                    if (array_key_exists('publishedAt',$input)) {
-                        $time=$input['publishedAt'];
-                        if ($time!==null && !is_string($time)) throw new UserError('Invalid publication time.');
-                        try { $time=$time===null ? null : new \DateTimeImmutable($time); }
-                        catch (\Exception) { throw new UserError('Invalid publication time.'); }
-                        if ($time != $row->getPublishedAt()) throw new UserError('Publication time is server-owned.');
-                    }
-                    $result=$resolve($input); assert(is_array($result)); return $result;
-                };
-            }
-            if (str_starts_with($name,'publish')) {
-                $entity=substr($name,7); $resolve=$config['mutateAndGetPayload']; assert(is_callable($resolve));
-                $config['mutateAndGetPayload']=static function(array $input) use($app,$entity,$resolve): array {
-                    $id=GlobalId::entityId($input['id'] ?? null,$entity) ?? throw new UserError('Invalid content id.');
-                    $row=$app->runtime->find($entity,$id);
-                    if (!$row instanceof \Hsimah\Entity\Pattern\Publishable\Publishable) throw new UserError('Content is unavailable.');
-                    $app->publish->originalTime=$row->getPublishedAt();
-                    try { $result=$resolve($input); assert(is_array($result)); return $result; } finally { $app->publish->originalTime=null; }
-                };
-            }
             $b->mutation($name,$config);
         }
         $b->field('RootQuery','node',['type'=>'Node','args'=>['id'=>['type'=>['non_null'=>'ID']]],'resolve'=>static function($source,array $args) use($app): ?object {

@@ -9,5 +9,5 @@ use Hsimah\Entity\Page\Contract\PagePublishedAtVerifier;
 use Hsimah\Entity\Post\Contract\PostPublishedAtVerifier;
 use Hsimah\Entity\Product\Contract\ProductPublishedAtVerifier;
 final class PublishedAtVerifier implements PagePublishedAtVerifier, PostPublishedAtVerifier, ProductPublishedAtVerifier {
-    public function verify(DateTimeImmutable $value, MutationContext $context): Verification { return Rules::publication($context); }
+    public function verify(?DateTimeImmutable $value, MutationContext $context): Verification { return Rules::publication($context); }
 }

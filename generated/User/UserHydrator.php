@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   User/UserHydrator.php
- * digest: sha256:842c1cdc866ba6236752d1de428016601291939c8755ddd5c8b1d0d707405aa5
+ * digest: sha256:57d114179757b2e4bfb2837f0eb9a18971b0fb1ede0eeed08c44a27d75b07e75
  */
 
 namespace Hsimah\Entity\User;
@@ -53,7 +53,7 @@ final readonly class UserHydrator implements Hydrator
         Record $record,
     ): DateTimeImmutable {
         $value = $record->value('createdAt');
-        
+
         return $this->decode->datetime($value, 'User.createdAt');
     }
 
@@ -61,7 +61,7 @@ final readonly class UserHydrator implements Hydrator
         Record $record,
     ): DateTimeImmutable {
         $value = $record->value('updatedAt');
-        
+
         return $this->decode->datetime($value, 'User.updatedAt');
     }
 
@@ -69,7 +69,7 @@ final readonly class UserHydrator implements Hydrator
         Record $record,
     ): string {
         $value = $record->value('email');
-        
+
         return $this->decode->string($value, 'User.email');
     }
 
@@ -77,7 +77,7 @@ final readonly class UserHydrator implements Hydrator
         Record $record,
     ): string {
         $value = $record->value('displayName');
-        
+
         return $this->decode->string($value, 'User.displayName');
     }
 
@@ -85,7 +85,7 @@ final readonly class UserHydrator implements Hydrator
         Record $record,
     ): UserRole {
         $value = $record->value('role');
-        
+
         return $this->decode->enum(UserRole::class, $value, 'User.role');
     }
 
@@ -93,7 +93,7 @@ final readonly class UserHydrator implements Hydrator
         Record $record,
     ): bool {
         $value = $record->value('active');
-        
+
         return $this->decode->bool($value, 'User.active');
     }
 }

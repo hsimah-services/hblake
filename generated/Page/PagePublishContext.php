@@ -9,14 +9,16 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Page/PagePublishContext.php
- * digest: sha256:946ed0b89455958181ca0ce0b2c487f65b6f202d27e580dbf002c02f3d627f9a
+ * digest: sha256:1aa8658256f5ec338fb3b7028326de2e761c33a742276568702674e7083dc331
  */
 
 namespace Hsimah\Entity\Page;
 
 use DateTimeImmutable;
 use Eleph\Runtime\Mutation\MutationBuffer;
+use Eleph\Runtime\Mutation\MutationContext;
 use Hsimah\Entity\Enum\PublicationStatus;
+use LogicException;
 
 /**
  * Everything Page::publish() is allowed to write, and nothing else.
@@ -29,11 +31,22 @@ final class PagePublishContext
 
     }
 
+    /**
+     * Read original and pending state without widening the action's writes.
+     */
+    public function context(): PageMutationContext {
+        if (!$this->buffer instanceof MutationContext) {
+            throw new LogicException('Action buffer must expose mutation state.');
+        }
+
+        return PageMutationContext::of($this->buffer);
+    }
+
     public function setStatus(
         PublicationStatus $status,
     ): self {
         $this->buffer->set('status', $status);
-        
+
         return $this;
     }
 
@@ -41,7 +54,7 @@ final class PagePublishContext
         ?DateTimeImmutable $publishedAt,
     ): self {
         $this->buffer->set('publishedAt', $publishedAt);
-        
+
         return $this;
     }
 

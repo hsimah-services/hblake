@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Post/PostInput.php
- * digest: sha256:033dcd771ed7294c0e6a6bc6e23f2bf718186390baf3f7cdb0d12321e3d3efd8
+ * digest: sha256:ceb3b7d59cbffc3d8a60aaacdff56362aeb5bc420951e9f4ff1dcadf7f862529
  */
 
 namespace Hsimah\Entity\Post;
@@ -37,7 +37,7 @@ final readonly class PostInput
         if (null === $value) {
             return null;
         }
-        
+
         return $this->decode->string($value, 'Post.title');
     }
 
@@ -47,7 +47,7 @@ final readonly class PostInput
         if (null === $value) {
             return null;
         }
-        
+
         return $this->decode->string($value, 'Post.slug');
     }
 
@@ -57,7 +57,7 @@ final readonly class PostInput
         if (null === $value) {
             return null;
         }
-        
+
         return $this->decode->string($value, 'Post.content');
     }
 
@@ -67,7 +67,7 @@ final readonly class PostInput
         if (null === $value) {
             return null;
         }
-        
+
         return $this->decode->string($value, 'Post.excerpt');
     }
 
@@ -77,7 +77,7 @@ final readonly class PostInput
         if (null === $value) {
             return null;
         }
-        
+
         return $this->decode->enum(PublicationStatus::class, $value, 'Post.status');
     }
 
@@ -87,13 +87,13 @@ final readonly class PostInput
         if (null === $value) {
             return null;
         }
-        
+
         return $this->decode->datetime($value, 'Post.publishedAt');
     }
 
     /**
-     * Only what the caller supplied. A key that is absent is left alone,
-     * which is what makes a partial update partial.
+     * Seeds declared defaults on create and applies explicit input.
+     * Absent update keys and existing pending values are not reset by defaults.
      *
      * @param array<string, mixed> $input
      */
@@ -104,23 +104,35 @@ final readonly class PostInput
         if (array_key_exists('title', $input)) {
             $buffer->set('title', $this->title($input['title']));
         }
-        
+
         if (array_key_exists('slug', $input)) {
             $buffer->set('slug', $this->slug($input['slug']));
         }
-        
+
+        if (!$buffer->target()->isPersisted() && !$buffer->isChanged('content') && !array_key_exists('content', $input)) {
+            $buffer->set('content', $this->content(''));
+        }
+
         if (array_key_exists('content', $input)) {
             $buffer->set('content', $this->content($input['content']));
         }
-        
+
+        if (!$buffer->target()->isPersisted() && !$buffer->isChanged('excerpt') && !array_key_exists('excerpt', $input)) {
+            $buffer->set('excerpt', $this->excerpt(''));
+        }
+
         if (array_key_exists('excerpt', $input)) {
             $buffer->set('excerpt', $this->excerpt($input['excerpt']));
         }
-        
+
+        if (!$buffer->target()->isPersisted() && !$buffer->isChanged('status') && !array_key_exists('status', $input)) {
+            $buffer->set('status', $this->status(PublicationStatus::Draft));
+        }
+
         if (array_key_exists('status', $input)) {
             $buffer->set('status', $this->status($input['status']));
         }
-        
+
         if (array_key_exists('publishedAt', $input)) {
             $buffer->set('publishedAt', $this->publishedAt($input['publishedAt']));
         }

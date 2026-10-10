@@ -4,24 +4,24 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4ce036c992378ca0813b60b4861df97a",
+    "content-hash": "549739f5a777d14ea202aad953b57086",
     "packages": [
         {
             "name": "elephentity/graphql",
-            "version": "v0.1.0-alpha.4",
+            "version": "v0.2.0-alpha.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hsimah-services/elephentity-graphql-php.git",
-                "reference": "e80cb1fb84b0d91ca428fcc2430d3360f1f75346"
+                "reference": "5d49427719c1a0e89e8a17d60f0a85ec3de4fbde"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hsimah-services/elephentity-graphql-php/zipball/e80cb1fb84b0d91ca428fcc2430d3360f1f75346",
-                "reference": "e80cb1fb84b0d91ca428fcc2430d3360f1f75346",
+                "url": "https://api.github.com/repos/hsimah-services/elephentity-graphql-php/zipball/5d49427719c1a0e89e8a17d60f0a85ec3de4fbde",
+                "reference": "5d49427719c1a0e89e8a17d60f0a85ec3de4fbde",
                 "shasum": ""
             },
             "require": {
-                "elephentity/runtime": "^0.10 || ^0.11 || ^0.12",
+                "elephentity/runtime": "^0.13",
                 "php": ">=8.3",
                 "webonyx/graphql-php": "^15.0"
             },
@@ -38,22 +38,22 @@
             "description": "Experimental Framework-independent GraphQL integration for the Elephentity PHP runtime.",
             "support": {
                 "issues": "https://github.com/hsimah-services/elephentity-graphql-php/issues",
-                "source": "https://github.com/hsimah-services/elephentity-graphql-php/tree/v0.1.0-alpha.4"
+                "source": "https://github.com/hsimah-services/elephentity-graphql-php/tree/v0.2.0-alpha.1"
             },
-            "time": "2026-10-10T18:03:58+00:00"
+            "time": "2026-10-10T20:29:23+00:00"
         },
         {
             "name": "elephentity/runtime",
-            "version": "v0.12.0",
+            "version": "v0.13.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hsimah-services/elephentity-runtime.git",
-                "reference": "eba7d7e61f4c868e77e2fe5e9ebc0925e8003463"
+                "reference": "a2c260d5e47efbab3933fd7a85b39dd07a6afeb1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hsimah-services/elephentity-runtime/zipball/eba7d7e61f4c868e77e2fe5e9ebc0925e8003463",
-                "reference": "eba7d7e61f4c868e77e2fe5e9ebc0925e8003463",
+                "url": "https://api.github.com/repos/hsimah-services/elephentity-runtime/zipball/a2c260d5e47efbab3933fd7a85b39dd07a6afeb1",
+                "reference": "a2c260d5e47efbab3933fd7a85b39dd07a6afeb1",
                 "shasum": ""
             },
             "require": {
@@ -79,26 +79,26 @@
             "description": "Elephentity runtime contracts: storage port, unit of work, verification, loaders.",
             "support": {
                 "issues": "https://github.com/hsimah-services/elephentity-runtime/issues",
-                "source": "https://github.com/hsimah-services/elephentity-runtime/tree/v0.12.0"
+                "source": "https://github.com/hsimah-services/elephentity-runtime/tree/v0.13.1"
             },
-            "time": "2026-10-10T17:23:41+00:00"
+            "time": "2026-10-10T22:13:33+00:00"
         },
         {
             "name": "elephentity/sqlite",
-            "version": "v0.1.0-alpha.4",
+            "version": "v0.1.0-alpha.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hsimah-services/elephentity-sqlite.git",
-                "reference": "e76cc20c60f4e8c5fa4931df405e0237827d49e3"
+                "reference": "818b6dd2868a17b7d0526c1d9b8a778a29903575"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hsimah-services/elephentity-sqlite/zipball/e76cc20c60f4e8c5fa4931df405e0237827d49e3",
-                "reference": "e76cc20c60f4e8c5fa4931df405e0237827d49e3",
+                "url": "https://api.github.com/repos/hsimah-services/elephentity-sqlite/zipball/818b6dd2868a17b7d0526c1d9b8a778a29903575",
+                "reference": "818b6dd2868a17b7d0526c1d9b8a778a29903575",
                 "shasum": ""
             },
             "require": {
-                "elephentity/runtime": "^0.10 || ^0.11 || ^0.12",
+                "elephentity/runtime": "^0.13.1",
                 "ext-mbstring": "*",
                 "ext-pdo": "*",
                 "ext-pdo_sqlite": "*",
@@ -117,9 +117,9 @@
             "description": "Experimental SQLite storage adaptor for the Elephentity PHP runtime.",
             "support": {
                 "issues": "https://github.com/hsimah-services/elephentity-sqlite/issues",
-                "source": "https://github.com/hsimah-services/elephentity-sqlite/tree/v0.1.0-alpha.4"
+                "source": "https://github.com/hsimah-services/elephentity-sqlite/tree/v0.1.0-alpha.5"
             },
-            "time": "2026-10-10T18:04:02+00:00"
+            "time": "2026-10-10T22:23:42+00:00"
         },
         {
             "name": "psr/container",
@@ -308,21 +308,21 @@
     "packages-dev": [
         {
             "name": "elephentity/cli",
-            "version": "v0.12.0",
+            "version": "v0.13.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hsimah-services/elephentity-cli.git",
-                "reference": "f6084173c14452fde8c01d91ae76bf51e9aa3abe"
+                "reference": "d372692cf23d1959850e8886dfd07a8bef782c54"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hsimah-services/elephentity-cli/zipball/f6084173c14452fde8c01d91ae76bf51e9aa3abe",
-                "reference": "f6084173c14452fde8c01d91ae76bf51e9aa3abe",
+                "url": "https://api.github.com/repos/hsimah-services/elephentity-cli/zipball/d372692cf23d1959850e8886dfd07a8bef782c54",
+                "reference": "d372692cf23d1959850e8886dfd07a8bef782c54",
                 "shasum": ""
             },
             "require": {
                 "elephentity/codegen": "^0.6",
-                "elephentity/runtime": "^0.10 || ^0.11",
+                "elephentity/runtime": "^0.10 || ^0.11 || ^0.12 || ^0.13",
                 "elephentity/schema": "^0.11",
                 "php": ">=8.3",
                 "symfony/console": "^7.0 || ^8.0"
@@ -348,9 +348,9 @@
             "description": "The eleph command: validate, generate, check, fmt. Build-time only.",
             "support": {
                 "issues": "https://github.com/hsimah-services/elephentity-cli/issues",
-                "source": "https://github.com/hsimah-services/elephentity-cli/tree/v0.12.0"
+                "source": "https://github.com/hsimah-services/elephentity-cli/tree/v0.13.1"
             },
-            "time": "2026-10-10T16:37:59+00:00"
+            "time": "2026-10-10T20:24:07+00:00"
         },
         {
             "name": "elephentity/codegen",
@@ -397,16 +397,16 @@
         },
         {
             "name": "elephentity/codegen-graphql-php",
-            "version": "dev-fix/generated-phpstan-types",
+            "version": "v0.1.0-alpha.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hsimah-services/elephentity-codegen-graphql-php.git",
-                "reference": "1578a516efd4b316ea7993637aaec2715964ca08"
+                "reference": "716cb9543f2ed7a705d0f6d4b45b297f0250d9fa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hsimah-services/elephentity-codegen-graphql-php/zipball/1578a516efd4b316ea7993637aaec2715964ca08",
-                "reference": "1578a516efd4b316ea7993637aaec2715964ca08",
+                "url": "https://api.github.com/repos/hsimah-services/elephentity-codegen-graphql-php/zipball/716cb9543f2ed7a705d0f6d4b45b297f0250d9fa",
+                "reference": "716cb9543f2ed7a705d0f6d4b45b297f0250d9fa",
                 "shasum": ""
             },
             "require": {
@@ -416,36 +416,41 @@
                 "bin/eleph-gen-graphql-php"
             ],
             "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "Apache-2.0"
             ],
             "description": "Standalone GraphQL PHP manifest generator for Elephentity. Build-time only.",
             "support": {
-                "source": "https://github.com/hsimah-services/elephentity-codegen-graphql-php/tree/fix/generated-phpstan-types",
-                "issues": "https://github.com/hsimah-services/elephentity-codegen-graphql-php/issues"
+                "issues": "https://github.com/hsimah-services/elephentity-codegen-graphql-php/issues",
+                "source": "https://github.com/hsimah-services/elephentity-codegen-graphql-php/tree/v0.1.0-alpha.3"
             },
-            "time": "2026-10-10T19:49:43+00:00"
+            "time": "2026-10-10T20:07:10+00:00"
         },
         {
             "name": "elephentity/codegen-php",
-            "version": "dev-fix/declared-enum-decoding",
+            "version": "v0.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hsimah-services/elephentity-codegen-php.git",
-                "reference": "63af0d9c1806b77718235e1a9953fa8cda5a9959"
+                "reference": "092751008929366d14caf060b6221f5e854da5f5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hsimah-services/elephentity-codegen-php/zipball/63af0d9c1806b77718235e1a9953fa8cda5a9959",
-                "reference": "63af0d9c1806b77718235e1a9953fa8cda5a9959",
+                "url": "https://api.github.com/repos/hsimah-services/elephentity-codegen-php/zipball/092751008929366d14caf060b6221f5e854da5f5",
+                "reference": "092751008929366d14caf060b6221f5e854da5f5",
                 "shasum": ""
             },
             "require": {
+                "elephentity/runtime": "^0.13.1",
                 "nette/php-generator": "^4.1",
                 "php": ">=8.3",
                 "psr/container": "^2.0"
             },
             "require-dev": {
+                "elephentity/graphql": "^0.2@alpha",
+                "elephentity/memory": "^0.13.1",
+                "elephentity/sqlite": "^0.1.0-alpha.5",
                 "friendsofphp/php-cs-fixer": "^3.64",
                 "phpstan/phpstan": "^2.0",
                 "phpunit/phpunit": "^11.0 || ^12.0"
@@ -459,52 +464,29 @@
                     "Eleph\\Gen\\Php\\": "src/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "Eleph\\Gen\\Php\\Tests\\": "tests/"
-                }
-            },
-            "scripts": {
-                "test": [
-                    "phpunit"
-                ],
-                "stan": [
-                    "phpstan analyse --memory-limit=1G"
-                ],
-                "style": [
-                    "php-cs-fixer fix --dry-run --diff"
-                ],
-                "style:fix": [
-                    "php-cs-fixer fix"
-                ],
-                "ci": [
-                    "@style",
-                    "@stan",
-                    "@test"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "Apache-2.0"
             ],
             "description": "The PHP builder for Elephentity: compiles the IR into locked PHP. Build-time only.",
             "support": {
-                "source": "https://github.com/hsimah-services/elephentity-codegen-php/tree/fix/declared-enum-decoding",
-                "issues": "https://github.com/hsimah-services/elephentity-codegen-php/issues"
+                "issues": "https://github.com/hsimah-services/elephentity-codegen-php/issues",
+                "source": "https://github.com/hsimah-services/elephentity-codegen-php/tree/v0.7.0"
             },
-            "time": "2026-10-10T19:40:55+00:00"
+            "time": "2026-10-10T22:32:48+00:00"
         },
         {
             "name": "elephentity/codegen-sqlite",
-            "version": "dev-fix/generated-phpstan-types",
+            "version": "v0.1.0-alpha.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hsimah-services/elephentity-codegen-sqlite.git",
-                "reference": "3ad8bd4bc60211dae4b96c1e5f2bb83cfa6b1e85"
+                "reference": "7c641dc4eb517d095662da33a0f14969f7914cfd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hsimah-services/elephentity-codegen-sqlite/zipball/3ad8bd4bc60211dae4b96c1e5f2bb83cfa6b1e85",
-                "reference": "3ad8bd4bc60211dae4b96c1e5f2bb83cfa6b1e85",
+                "url": "https://api.github.com/repos/hsimah-services/elephentity-codegen-sqlite/zipball/7c641dc4eb517d095662da33a0f14969f7914cfd",
+                "reference": "7c641dc4eb517d095662da33a0f14969f7914cfd",
                 "shasum": ""
             },
             "require": {
@@ -514,15 +496,16 @@
                 "bin/eleph-gen-sqlite"
             ],
             "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "Apache-2.0"
             ],
             "description": "SQLite storage manifest and schema generator for Elephentity. Build-time only.",
             "support": {
-                "source": "https://github.com/hsimah-services/elephentity-codegen-sqlite/tree/fix/generated-phpstan-types",
-                "issues": "https://github.com/hsimah-services/elephentity-codegen-sqlite/issues"
+                "issues": "https://github.com/hsimah-services/elephentity-codegen-sqlite/issues",
+                "source": "https://github.com/hsimah-services/elephentity-codegen-sqlite/tree/v0.1.0-alpha.3"
             },
-            "time": "2026-10-10T19:49:40+00:00"
+            "time": "2026-10-10T20:07:35+00:00"
         },
         {
             "name": "elephentity/schema",
@@ -3505,19 +3488,11 @@
             "time": "2025-11-17T20:03:58+00:00"
         }
     ],
-    "aliases": [
-        {
-            "package": "elephentity/runtime",
-            "version": "0.12.0.0",
-            "alias": "0.11.99",
-            "alias_normalized": "0.11.99.0"
-        }
-    ],
+    "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "elephentity/codegen-graphql-php": 20,
-        "elephentity/codegen-php": 20,
-        "elephentity/codegen-sqlite": 20,
+        "elephentity/codegen-graphql-php": 15,
+        "elephentity/codegen-sqlite": 15,
         "elephentity/graphql": 15,
         "elephentity/sqlite": 15
     },

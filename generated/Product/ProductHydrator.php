@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Product/ProductHydrator.php
- * digest: sha256:09ca266c3eb02466fe0523344d45ff5bcb231c39f36f092c8db1dec24fc1cbff
+ * digest: sha256:4471446685346b64afda392a64ac677e8cc5f07582ad24e20f5a1a55ece3f208
  */
 
 namespace Hsimah\Entity\Product;
@@ -56,7 +56,7 @@ final readonly class ProductHydrator implements Hydrator
         Record $record,
     ): string {
         $value = $record->value('title');
-        
+
         return $this->decode->string($value, 'Product.title');
     }
 
@@ -64,7 +64,7 @@ final readonly class ProductHydrator implements Hydrator
         Record $record,
     ): string {
         $value = $record->value('slug');
-        
+
         return $this->decode->string($value, 'Product.slug');
     }
 
@@ -72,7 +72,7 @@ final readonly class ProductHydrator implements Hydrator
         Record $record,
     ): string {
         $value = $record->value('content');
-        
+
         return $this->decode->string($value, 'Product.content');
     }
 
@@ -80,7 +80,7 @@ final readonly class ProductHydrator implements Hydrator
         Record $record,
     ): string {
         $value = $record->value('excerpt');
-        
+
         return $this->decode->string($value, 'Product.excerpt');
     }
 
@@ -88,7 +88,7 @@ final readonly class ProductHydrator implements Hydrator
         Record $record,
     ): PublicationStatus {
         $value = $record->value('status');
-        
+
         return $this->decode->enum(PublicationStatus::class, $value, 'Product.status');
     }
 
@@ -96,7 +96,7 @@ final readonly class ProductHydrator implements Hydrator
         Record $record,
     ): ?DateTimeImmutable {
         $value = $record->value('publishedAt');
-        
+
         return null === $value ? null : $this->decode->datetime($value, 'Product.publishedAt');
     }
 
@@ -104,7 +104,7 @@ final readonly class ProductHydrator implements Hydrator
         Record $record,
     ): DateTimeImmutable {
         $value = $record->value('createdAt');
-        
+
         return $this->decode->datetime($value, 'Product.createdAt');
     }
 
@@ -112,7 +112,7 @@ final readonly class ProductHydrator implements Hydrator
         Record $record,
     ): DateTimeImmutable {
         $value = $record->value('updatedAt');
-        
+
         return $this->decode->datetime($value, 'Product.updatedAt');
     }
 
@@ -120,7 +120,7 @@ final readonly class ProductHydrator implements Hydrator
         Record $record,
     ): ?string {
         $value = $record->value('enquiryUrl');
-        
+
         return null === $value ? null : $this->decode->string($value, 'Product.enquiryUrl');
     }
 }

@@ -75,9 +75,8 @@ Schema and reference checks passed all 10 model YAML files, expanded patterns,
 action writes, admin field allowlists and 22 routes grouped across 10 entrypoints.
 UI descriptor checks verify internal consistency only; Tsquid cannot consume admin.yml yet.
 
-## Remaining checks, not yet demonstrated gaps
+## Remaining implementation boundaries
 
-- Pin mutually compatible standalone packages and prove compiler/runtime wiring.
 - SSR/prerender and initial-HTML SEO are deferred beyond v1, per review. The
   public frontend remains a client-rendered Tsquid app.
 - SQLite upgrades remain application-owned reviewed migrations; the initial
@@ -85,36 +84,38 @@ UI descriptor checks verify internal consistency only; Tsquid cannot consume adm
 
 ## Implementation findings
 
-Runtime 0.12.0 fixes UTC timestamps and visible-row pagination. SQLite and GraphQL
-alpha.4 include the audited integration fixes; global IDs are type-checked. The
-coordinator is 0.6.1. PHP generator 0.6.1 supplies enum-name collision detection;
-its decoder follow-up is temporarily pinned by the lockfile to upstream PR #34.
+The implementation uses tagged releases: runtime/CLI 0.13.1, coordinator 0.6.1,
+PHP builder 0.7.0, SQLite runtime 0.1.0-alpha.5, GraphQL runtime 0.2.0-alpha.1,
+and SQLite/GraphQL builders 0.1.0-alpha.3. composer.lock records the release commits.
+No version aliases, development branches or custom VCS repositories remain.
 
-- [CLI #104](https://github.com/hsimah-services/elephentity/issues/104): release
-  metadata excludes runtime 0.12.0. Temporary explicit Composer alias; no vendored fork.
-- [Runtime #105](https://github.com/hsimah-services/elephentity/issues/105): singular
-  finder results conflict with the collection-only gateway. Schema assembly delegates
-  scalar lookups to the generated finder, which uses policy-aware runtime queries.
-- [Runtime #106](https://github.com/hsimah-services/elephentity/issues/106): declared
-  defaults do not reach generic create mutations. The create adapter supplies the
-  content defaults before invoking the generated resolver.
-- [Runtime #107](https://github.com/hsimah-services/elephentity/issues/107): nullable
-  field verification skips explicit nulls. The update adapter rejects changed
-  publication times, including null, non-nullable fields explicitly set to null,
-  and malformed dates before delegating to the gateway. Unexpected storage/parser
-  errors are logged server-side and return a generic message.
-- [PHP builder #33](https://github.com/hsimah-services/elephentity-codegen-php/issues/33):
-  action contexts lack original state. Publication adapters obtain the persisted
-  timestamp through the read gateway and scope it to the action call.
-- [PHP builder PR #34](https://github.com/hsimah-services/elephentity-codegen-php/pull/34):
-  declared enum input/hydration calls an uninjected processor. The upstream fix
-  dispatches enum decoding through ValueDecoder and has a regression test.
+- [CLI #104](https://github.com/hsimah-services/elephentity/issues/104) is closed:
+  CLI 0.13.1 permits runtime 0.13.1 without a version alias.
+- [Runtime #105](https://github.com/hsimah-services/elephentity/issues/105) is closed:
+  runtime 0.13 supports scalar gateway queries; GraphQL 0.2.0-alpha.1 handles them
+  directly. The scalar-finder schema adapter is removed.
+- [Runtime #106](https://github.com/hsimah-services/elephentity/issues/106) is closed:
+  PHP builder 0.7.0 seeds create defaults through decoders. The create adapter is removed.
+- [Runtime #107](https://github.com/hsimah-services/elephentity/issues/107) is closed:
+  runtime verifies final mutation state and nonnullable field presence; nullable
+  verifier contracts accept null. The publication/null schema adapter is removed.
+  Malformed decoder/storage exceptions are logged and return generic safe errors;
+  deliberate application errors and verification violations remain useful to clients.
+- [PHP builder #33](https://github.com/hsimah-services/elephentity-codegen-php/issues/33)
+  is closed: PHP builder 0.7.0 exposes read-only typed action context. Publication reads
+  its original timestamp directly, replacing request-scoped schema state.
+- [PHP builder PR #34](https://github.com/hsimah-services/elephentity-codegen-php/pull/34)
+  merged at `50182eb`, which is the v0.6.2 release commit and is included in v0.7.0.
+  Declared enum hydration/input dispatches through ValueDecoder.
 - [GraphQL builder PR #3](https://github.com/hsimah-services/elephentity-codegen-graphql-php/pull/3)
-  and [SQLite builder PR #3](https://github.com/hsimah-services/elephentity-codegen-sqlite/pull/3):
-  generated integration files need checked types at their PHP boundaries to pass
-  PHPStan max. Actual builder output includes those fixes, rather than excluded files.
+  merged at `716cb95`, the v0.1.0-alpha.3 release commit.
+  [SQLite builder PR #3](https://github.com/hsimah-services/elephentity-codegen-sqlite/pull/3)
+  merged at `7c641dc`, the v0.1.0-alpha.3 release commit. Both generated integration
+  type checks remain included in PHPStan max.
+- [PHP builder #35](https://github.com/hsimah-services/elephentity-codegen-php/issues/35)
+  is fixed in 0.7.0: regenerated PHP no longer contains trailing whitespace.
 
-These temporary branches are pinned by commit in composer.lock. Remove aliases,
-branch pins and adapters as compatible tagged fixes land. Generated artifacts remain
-machine-owned. Tsquid admin generation is still #7; the application's shared forms
-are handwritten and are not claimed as generated screens.
+Generated artifacts remain machine-owned. Tsquid admin generation is still #7;
+the application's shared forms are handwritten and are not claimed as generated.
+The client now owns queries, components and mutations per entrypoint/entity, with
+shared navigation supplied by a Relay fragment independent of collection cursors.

@@ -9,14 +9,16 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Product/ProductPublishContext.php
- * digest: sha256:e94bd2dc0605278dfa3e341c8cbc2a5720aa2e2f61d6c486c72793a43af9a072
+ * digest: sha256:81d2f9e50c79416174e6d4938c14e4fa632c787e28796938c5b4068303472415
  */
 
 namespace Hsimah\Entity\Product;
 
 use DateTimeImmutable;
 use Eleph\Runtime\Mutation\MutationBuffer;
+use Eleph\Runtime\Mutation\MutationContext;
 use Hsimah\Entity\Enum\PublicationStatus;
+use LogicException;
 
 /**
  * Everything Product::publish() is allowed to write, and nothing else.
@@ -29,11 +31,22 @@ final class ProductPublishContext
 
     }
 
+    /**
+     * Read original and pending state without widening the action's writes.
+     */
+    public function context(): ProductMutationContext {
+        if (!$this->buffer instanceof MutationContext) {
+            throw new LogicException('Action buffer must expose mutation state.');
+        }
+
+        return ProductMutationContext::of($this->buffer);
+    }
+
     public function setStatus(
         PublicationStatus $status,
     ): self {
         $this->buffer->set('status', $status);
-        
+
         return $this;
     }
 
@@ -41,7 +54,7 @@ final class ProductPublishContext
         ?DateTimeImmutable $publishedAt,
     ): self {
         $this->buffer->set('publishedAt', $publishedAt);
-        
+
         return $this;
     }
 

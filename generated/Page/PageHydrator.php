@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Page/PageHydrator.php
- * digest: sha256:55150f7936d13dd2574780a015f20ac03794445678d02db7b676755d1dad47ad
+ * digest: sha256:96a196cd2ee1a6ca78a8658ee8070ebbcdd1ff3c5db9a07daee9f7194de6a4d5
  */
 
 namespace Hsimah\Entity\Page;
@@ -55,7 +55,7 @@ final readonly class PageHydrator implements Hydrator
         Record $record,
     ): string {
         $value = $record->value('title');
-        
+
         return $this->decode->string($value, 'Page.title');
     }
 
@@ -63,7 +63,7 @@ final readonly class PageHydrator implements Hydrator
         Record $record,
     ): string {
         $value = $record->value('slug');
-        
+
         return $this->decode->string($value, 'Page.slug');
     }
 
@@ -71,7 +71,7 @@ final readonly class PageHydrator implements Hydrator
         Record $record,
     ): string {
         $value = $record->value('content');
-        
+
         return $this->decode->string($value, 'Page.content');
     }
 
@@ -79,7 +79,7 @@ final readonly class PageHydrator implements Hydrator
         Record $record,
     ): string {
         $value = $record->value('excerpt');
-        
+
         return $this->decode->string($value, 'Page.excerpt');
     }
 
@@ -87,7 +87,7 @@ final readonly class PageHydrator implements Hydrator
         Record $record,
     ): PublicationStatus {
         $value = $record->value('status');
-        
+
         return $this->decode->enum(PublicationStatus::class, $value, 'Page.status');
     }
 
@@ -95,7 +95,7 @@ final readonly class PageHydrator implements Hydrator
         Record $record,
     ): ?DateTimeImmutable {
         $value = $record->value('publishedAt');
-        
+
         return null === $value ? null : $this->decode->datetime($value, 'Page.publishedAt');
     }
 
@@ -103,7 +103,7 @@ final readonly class PageHydrator implements Hydrator
         Record $record,
     ): DateTimeImmutable {
         $value = $record->value('createdAt');
-        
+
         return $this->decode->datetime($value, 'Page.createdAt');
     }
 
@@ -111,7 +111,7 @@ final readonly class PageHydrator implements Hydrator
         Record $record,
     ): DateTimeImmutable {
         $value = $record->value('updatedAt');
-        
+
         return $this->decode->datetime($value, 'Page.updatedAt');
     }
 }

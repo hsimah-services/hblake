@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   User/UserWritePolicies.php
- * digest: sha256:3d11bf4332a6a913f395a43ae6da3a84f335c90c7f009f7798b67b4f1262b0e6
+ * digest: sha256:c88cabd2fcc37523110a49d7371015899f13090617100519573f22ec4e78efe4
  */
 
 namespace Hsimah\Entity\User;
@@ -43,7 +43,7 @@ final readonly class UserWritePolicies implements EntityWritePolicies
         if (PolicyOutcome::Skip !== $decision->outcome) {
             return $decision->withPolicy('adminAccounts');
         }
-        
+
         return PolicyDecision::deny('No policy allowed this write.')->withPolicy('terminal');
     }
 }

@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Product/ProductMutator.php
- * digest: sha256:f471f188d19bc1d0cce3cacebd7851eb2fd75f1fb1723c206324f3da020907ed
+ * digest: sha256:aac8a78312005d5c32058bd3d7fd10bf0db9da81b4ba57f2cbbaca3133d2c159
  */
 
 namespace Hsimah\Entity\Product;
@@ -40,7 +40,7 @@ final class ProductMutator
         string $title,
     ): self {
         $this->buffer->set('title', $title);
-        
+
         return $this;
     }
 
@@ -48,7 +48,7 @@ final class ProductMutator
         string $slug,
     ): self {
         $this->buffer->set('slug', $slug);
-        
+
         return $this;
     }
 
@@ -56,7 +56,7 @@ final class ProductMutator
         string $content,
     ): self {
         $this->buffer->set('content', $content);
-        
+
         return $this;
     }
 
@@ -64,7 +64,7 @@ final class ProductMutator
         string $excerpt,
     ): self {
         $this->buffer->set('excerpt', $excerpt);
-        
+
         return $this;
     }
 
@@ -72,7 +72,7 @@ final class ProductMutator
         PublicationStatus $status,
     ): self {
         $this->buffer->set('status', $status);
-        
+
         return $this;
     }
 
@@ -80,7 +80,7 @@ final class ProductMutator
         ?DateTimeImmutable $publishedAt,
     ): self {
         $this->buffer->set('publishedAt', $publishedAt);
-        
+
         return $this;
     }
 
@@ -88,7 +88,7 @@ final class ProductMutator
         ?string $enquiryUrl,
     ): self {
         $this->buffer->set('enquiryUrl', $enquiryUrl);
-        
+
         return $this;
     }
 

@@ -19,9 +19,8 @@ Deployment remains a separate operator action.
   detailed solutions, compatibility implications and acceptance checks. Link
   existing reports instead of duplicating them. User decisions on scope take
   precedence over framework guidance.
-- Use the temporary spec/provides.json snapshot for spec-only validation. Once
-  implementation supplies eleph.json and real builders, use live eleph validate
-  and remove both spec/provides.json and spec/provides.md in that change.
+- Use live eleph validate with eleph.json and the actual configured builders.
+  Do not restore the removed specification-review metadata snapshots.
 - Run validation/format checks appropriate to model changes. Build/run instructions
   belong in README once the actual implementation commands exist.
 - Business copy, claims, branding and contact details come from the owner.

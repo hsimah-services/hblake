@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Pattern/Publishable/PublishableMutatorTrait.php
- * digest: sha256:a45a4cd86d628f113883f586f6de11a4015c9209a9ca6b8513bb776ea60b1350
+ * digest: sha256:2c4f36797a0a9278d2c9fa209c9e845c83c8773f997047f276ca7c1ecdf2bc5e
  */
 
 namespace Hsimah\Entity\Pattern\Publishable;
@@ -29,7 +29,7 @@ trait PublishableMutatorTrait
         PublicationStatus $status,
     ): self {
         $this->buffer->set('status', $status);
-        
+
         return $this;
     }
 
@@ -37,7 +37,7 @@ trait PublishableMutatorTrait
         ?DateTimeImmutable $publishedAt,
     ): self {
         $this->buffer->set('publishedAt', $publishedAt);
-        
+
         return $this;
     }
 }

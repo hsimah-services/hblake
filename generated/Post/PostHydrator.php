@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Post/PostHydrator.php
- * digest: sha256:6458206817abd00304009007c5057b03b1426ec8e437fd930682b532cd2ee72a
+ * digest: sha256:586722dfc40f8191d97807b681100490c4f14706c65c6669b5d4a6834f951b40
  */
 
 namespace Hsimah\Entity\Post;
@@ -55,7 +55,7 @@ final readonly class PostHydrator implements Hydrator
         Record $record,
     ): string {
         $value = $record->value('title');
-        
+
         return $this->decode->string($value, 'Post.title');
     }
 
@@ -63,7 +63,7 @@ final readonly class PostHydrator implements Hydrator
         Record $record,
     ): string {
         $value = $record->value('slug');
-        
+
         return $this->decode->string($value, 'Post.slug');
     }
 
@@ -71,7 +71,7 @@ final readonly class PostHydrator implements Hydrator
         Record $record,
     ): string {
         $value = $record->value('content');
-        
+
         return $this->decode->string($value, 'Post.content');
     }
 
@@ -79,7 +79,7 @@ final readonly class PostHydrator implements Hydrator
         Record $record,
     ): string {
         $value = $record->value('excerpt');
-        
+
         return $this->decode->string($value, 'Post.excerpt');
     }
 
@@ -87,7 +87,7 @@ final readonly class PostHydrator implements Hydrator
         Record $record,
     ): PublicationStatus {
         $value = $record->value('status');
-        
+
         return $this->decode->enum(PublicationStatus::class, $value, 'Post.status');
     }
 
@@ -95,7 +95,7 @@ final readonly class PostHydrator implements Hydrator
         Record $record,
     ): ?DateTimeImmutable {
         $value = $record->value('publishedAt');
-        
+
         return null === $value ? null : $this->decode->datetime($value, 'Post.publishedAt');
     }
 
@@ -103,7 +103,7 @@ final readonly class PostHydrator implements Hydrator
         Record $record,
     ): DateTimeImmutable {
         $value = $record->value('createdAt');
-        
+
         return $this->decode->datetime($value, 'Post.createdAt');
     }
 
@@ -111,7 +111,7 @@ final readonly class PostHydrator implements Hydrator
         Record $record,
     ): DateTimeImmutable {
         $value = $record->value('updatedAt');
-        
+
         return $this->decode->datetime($value, 'Post.updatedAt');
     }
 }

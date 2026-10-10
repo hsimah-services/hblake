@@ -15,7 +15,6 @@ final readonly class App {
     public Runtime $runtime;
     public Container $container;
     public Catalogue $catalogue;
-    public Publish $publish;
     public function __construct(public Database $db, public Actor $actor) {
         $c = new Container(Wiring::registrations());
         $c->set(ValueDecoder::class, new ValueDecoder());
@@ -45,7 +44,7 @@ final readonly class App {
         $c->set(\Hsimah\Entity\User\Contract\UserAdminAccountsWritePolicy::class, new AdminAccounts());
         $c->set(\Hsimah\Entity\User\Contract\UserEmailVerifier::class, new EmailVerifier());
         $c->set(\Hsimah\Entity\User\Contract\UserDisplayNameVerifier::class, new DisplayNameVerifier());
-        $this->container=$c; $this->catalogue=$catalogue; $this->runtime=$runtime; $this->publish=$publish;
+        $this->container=$c; $this->catalogue=$catalogue; $this->runtime=$runtime;
     }
     public static function database(): Database { return new Database(getenv('HSIMAH_DATABASE') ?: dirname(__DIR__,2).'/.var/site.sqlite'); }
 }

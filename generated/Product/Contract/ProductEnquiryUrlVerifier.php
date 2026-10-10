@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Product/Contract/ProductEnquiryUrlVerifier.php
- * digest: sha256:cc5190848df0c0fb0d819b148d22394786cda49f01beb04bd7abcbc5f3cc533c
+ * digest: sha256:97905efd417fa610209af2389f104779702ed247c0a56cd26165e2f82e43aec0
  */
 
 namespace Hsimah\Entity\Product\Contract;
@@ -26,7 +26,7 @@ use Hsimah\Entity\Product\ProductMutationContext;
 interface ProductEnquiryUrlVerifier
 {
     public function verify(
-        string $value,
+        ?string $value,
         ProductMutationContext $context,
     ): Verification;
 }

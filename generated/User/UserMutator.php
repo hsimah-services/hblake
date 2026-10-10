@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   User/UserMutator.php
- * digest: sha256:8aaa7ba650b72557abe2e8d74cafa7b605cc08f87679bf1eb637b6e2a85af705
+ * digest: sha256:6b9a9b5b132edc1ffbeb963b5aac463116c176117d63e03d6f29683c8a61ba88
  */
 
 namespace Hsimah\Entity\User;
@@ -32,7 +32,7 @@ final class UserMutator
         string $email,
     ): self {
         $this->buffer->set('email', $email);
-        
+
         return $this;
     }
 
@@ -40,7 +40,7 @@ final class UserMutator
         string $displayName,
     ): self {
         $this->buffer->set('displayName', $displayName);
-        
+
         return $this;
     }
 
@@ -48,7 +48,7 @@ final class UserMutator
         UserRole $role,
     ): self {
         $this->buffer->set('role', $role);
-        
+
         return $this;
     }
 
@@ -56,7 +56,7 @@ final class UserMutator
         bool $active,
     ): self {
         $this->buffer->set('active', $active);
-        
+
         return $this;
     }
 }

@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Product/Contract/ProductPublishedAtVerifier.php
- * digest: sha256:198033eafdf0f9e2e44dd7fdd1f7d3014579f3d5bac7bb052e23a740cce62b26
+ * digest: sha256:46d5abe6f2a34e921d2d362e49e0a133dc6678aded1632d840cbf48ac1582e41
  */
 
 namespace Hsimah\Entity\Product\Contract;
@@ -27,7 +27,7 @@ use Hsimah\Entity\Product\ProductMutationContext;
 interface ProductPublishedAtVerifier
 {
     public function verify(
-        DateTimeImmutable $value,
+        ?DateTimeImmutable $value,
         ProductMutationContext $context,
     ): Verification;
 }

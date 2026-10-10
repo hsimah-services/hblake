@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Post/PostMutator.php
- * digest: sha256:b5a99052744f4bd8913fb98050e60b86f7c23549aa717c44314eebbbc29a77ae
+ * digest: sha256:3de53ad2f03debc1a5ac2cf7d7d813834c730affa1babc06696132526c76eba8
  */
 
 namespace Hsimah\Entity\Post;
@@ -40,7 +40,7 @@ final class PostMutator
         string $title,
     ): self {
         $this->buffer->set('title', $title);
-        
+
         return $this;
     }
 
@@ -48,7 +48,7 @@ final class PostMutator
         string $slug,
     ): self {
         $this->buffer->set('slug', $slug);
-        
+
         return $this;
     }
 
@@ -56,7 +56,7 @@ final class PostMutator
         string $content,
     ): self {
         $this->buffer->set('content', $content);
-        
+
         return $this;
     }
 
@@ -64,7 +64,7 @@ final class PostMutator
         string $excerpt,
     ): self {
         $this->buffer->set('excerpt', $excerpt);
-        
+
         return $this;
     }
 
@@ -72,7 +72,7 @@ final class PostMutator
         PublicationStatus $status,
     ): self {
         $this->buffer->set('status', $status);
-        
+
         return $this;
     }
 
@@ -80,7 +80,7 @@ final class PostMutator
         ?DateTimeImmutable $publishedAt,
     ): self {
         $this->buffer->set('publishedAt', $publishedAt);
-        
+
         return $this;
     }
 

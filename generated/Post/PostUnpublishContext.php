@@ -9,13 +9,15 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Post/PostUnpublishContext.php
- * digest: sha256:bb012e5d3f46f4c37565a5a2e12c8a47f4bfc3e343daa6256e9001bdd2b8a136
+ * digest: sha256:c054dfbd48456af358b86fa7d0597b1636b7f12439abda442adab02d9b6b8bd5
  */
 
 namespace Hsimah\Entity\Post;
 
 use Eleph\Runtime\Mutation\MutationBuffer;
+use Eleph\Runtime\Mutation\MutationContext;
 use Hsimah\Entity\Enum\PublicationStatus;
+use LogicException;
 
 /**
  * Everything Post::unpublish() is allowed to write, and nothing else.
@@ -28,11 +30,22 @@ final class PostUnpublishContext
 
     }
 
+    /**
+     * Read original and pending state without widening the action's writes.
+     */
+    public function context(): PostMutationContext {
+        if (!$this->buffer instanceof MutationContext) {
+            throw new LogicException('Action buffer must expose mutation state.');
+        }
+
+        return PostMutationContext::of($this->buffer);
+    }
+
     public function setStatus(
         PublicationStatus $status,
     ): self {
         $this->buffer->set('status', $status);
-        
+
         return $this;
     }
 

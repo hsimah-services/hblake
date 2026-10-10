@@ -28,7 +28,7 @@ tests/run.sh playwright
 tests/run.sh ops
 ```
 
-Verification currently passes all 200 Playwright checks, six operator-procedure checks and five application unit tests. The gates validate live builder metadata, generated artifact drift and accessor conformance, PHPStan at maximum level, application unit tests, Tsquid routes, Relay artifacts, ESLint/architecture, TypeScript and the production build. `tests/` remains owner-maintained; implementation tests live in `server/tests`.
+`tests/run.sh` passes. The gates validate live builder metadata, generated artifact drift and accessor conformance, PHPStan at maximum level, application unit tests, Tsquid routes, Relay artifacts, ESLint/architecture, TypeScript and the production build. `tests/` remains owner-maintained; implementation tests live in `server/tests`.
 
 GitHub Actions runs the same `tests/run.sh` on pushes and pull requests, and uploads Playwright results when a run fails.
 
@@ -38,7 +38,7 @@ GitHub Actions runs the same `tests/run.sh` on pushes and pull requests, and upl
 
 Tsquid currently generates routes, rather than content screens. The application shares its form, preview and detail behavior explicitly; it does not label these screens generated. [Tsquid #7](https://github.com/hsimah-services/tsquid/issues/7) tracks the metadata-driven admin generator.
 
-The PHP generator is temporarily pinned to [upstream PR #34](https://github.com/hsimah-services/elephentity-codegen-php/pull/34), including release 0.6.1's enum-case protection. Runtime 0.12 is installed with a Composer version alias while [CLI packaging #104](https://github.com/hsimah-services/elephentity/issues/104) is corrected. The lockfile pins the actual source; no private generator fork is kept here. [Singular query #105](https://github.com/hsimah-services/elephentity/issues/105) and [original action state #33](https://github.com/hsimah-services/elephentity-codegen-php/issues/33) have narrow application adapters in schema assembly. [Create defaults #106](https://github.com/hsimah-services/elephentity/issues/106) and [nullable verification #107](https://github.com/hsimah-services/elephentity/issues/107) are likewise handled explicitly. The GraphQL and SQLite builders are pinned to their respective upstream PR #3 type-boundary fixes, so generated files remain included in PHPStan. Remove the adapters and temporary pins when compatible releases land.
+The toolchain uses released Elephentity runtime/CLI 0.13.1, coordinator 0.6.1, PHP builder 0.7.0, SQLite runtime 0.1.0-alpha.5, GraphQL runtime 0.2.0-alpha.1 and integration builders 0.1.0-alpha.3. Composer locks tagged releases, with no branch pins, aliases or custom repositories. These releases include the upstream enum decoder and generated PHPStan fixes, scalar query support, create defaults, final-state nullable validation and read-only action context. Publication actions now read original state directly; the former schema adapters are removed. The schema gate exports the server schema and diffs normalized SDL against `client/schema.graphql` before Relay validation. See [upstream findings](spec/upstream.md) for release evidence and remaining framework gaps.
 
 ## Operator data procedures
 

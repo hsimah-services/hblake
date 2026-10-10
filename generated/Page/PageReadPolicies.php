@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Page/PageReadPolicies.php
- * digest: sha256:1058b050a013af9f2b2d8f2d0fd474dc7b6ffc8e530fb9b226c9dbf0f281373d
+ * digest: sha256:fd4282828af02ffe52e7819687700e10a0fe640e1c6f66d33b071dcad9127d77
  */
 
 namespace Hsimah\Entity\Page;
@@ -41,7 +41,7 @@ final readonly class PageReadPolicies implements EntityReadPolicies
         if (PolicyOutcome::Skip !== $decision->outcome) {
             return $decision->withPolicy('contentVisibility');
         }
-        
+
         return PolicyDecision::deny('No policy allowed this read.')->withPolicy('terminal');
     }
 }

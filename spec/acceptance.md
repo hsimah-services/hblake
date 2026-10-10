@@ -2,8 +2,7 @@
 
 The implementation is verified by the owner-maintained tests/run.sh plus the
 application tests in server/tests. The original acceptance tests are unchanged.
-The full pipeline passes all 200 Playwright tests, six operator-procedure tests
-and five application unit tests.
+`tests/run.sh` passes.
 
 1. Eleph fmt/validate accept every entity, type and pattern with the actual SQLite
    and GraphQL integrations installed. generate --check reports no artifact drift;
@@ -37,11 +36,9 @@ and five application unit tests.
 11. Install works on an empty SQLite database only. Reviewed upgrade preserves
     content; backup restore succeeds. Secrets/database are unreachable over HTTP.
 
-## Specification-only verification
+## Implementation verification
 
-Validate YAML shapes against the pinned upstream JSON Schemas and inspect pattern
-expansion, references, action writes, route uniqueness and UI field allowlists.
-This checks the proposal without generating application code. The real compiler
-and FormatChecker passed using Elephentity PR #101 and the snapshot metadata in
-provides.json. Live builder discovery, generated drift/conformance checks and all
-runtime/UI acceptance scenarios remain for implementation.
+Live `eleph validate spec` discovers the configured builders. Canonical formatting,
+generated drift/accessor checks, maximum-level PHPStan, application unit tests,
+Tsquid routes, server/client schema agreement, Relay artifacts, lint, TypeScript,
+production build and HTTP/UI/operator acceptance checks run through `tests/run.sh`.

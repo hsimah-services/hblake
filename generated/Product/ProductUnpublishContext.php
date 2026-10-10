@@ -9,13 +9,15 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Product/ProductUnpublishContext.php
- * digest: sha256:8737251c70c07bab543d62b1c7d7442647900bf354a111586eb9253a67499c2d
+ * digest: sha256:673c0a063c9f7bb67a0c935b7eded83aa2fa0d6a6d0434ebd53bd30f3c02a877
  */
 
 namespace Hsimah\Entity\Product;
 
 use Eleph\Runtime\Mutation\MutationBuffer;
+use Eleph\Runtime\Mutation\MutationContext;
 use Hsimah\Entity\Enum\PublicationStatus;
+use LogicException;
 
 /**
  * Everything Product::unpublish() is allowed to write, and nothing else.
@@ -28,11 +30,22 @@ final class ProductUnpublishContext
 
     }
 
+    /**
+     * Read original and pending state without widening the action's writes.
+     */
+    public function context(): ProductMutationContext {
+        if (!$this->buffer instanceof MutationContext) {
+            throw new LogicException('Action buffer must expose mutation state.');
+        }
+
+        return ProductMutationContext::of($this->buffer);
+    }
+
     public function setStatus(
         PublicationStatus $status,
     ): self {
         $this->buffer->set('status', $status);
-        
+
         return $this;
     }
 

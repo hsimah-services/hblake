@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Page/PageVerifiers.php
- * digest: sha256:38b04cb16ceda52cc225ab7963f50dd29f61d3e3bc4b269916f3acabaf87c6b5
+ * digest: sha256:b77d329add20c552556f575598391615cac55ad665189d1d205a39c0e4b6b82e
  */
 
 namespace Hsimah\Entity\Page;
@@ -67,7 +67,7 @@ final readonly class PageVerifiers implements EntityVerifiers
         MutationContext $context,
     ): Verification {
         assert(is_string($value));
-        
+
         return $this->titleVerifier->verify($value, PageMutationContext::of($context));
     }
 
@@ -76,7 +76,7 @@ final readonly class PageVerifiers implements EntityVerifiers
         MutationContext $context,
     ): Verification {
         assert(is_string($value));
-        
+
         return $this->slugVerifier->verify($value, PageMutationContext::of($context));
     }
 
@@ -85,7 +85,7 @@ final readonly class PageVerifiers implements EntityVerifiers
         MutationContext $context,
     ): Verification {
         assert(is_string($value));
-        
+
         return $this->contentVerifier->verify($value, PageMutationContext::of($context));
     }
 
@@ -94,7 +94,7 @@ final readonly class PageVerifiers implements EntityVerifiers
         MutationContext $context,
     ): Verification {
         assert($value instanceof PublicationStatus);
-        
+
         return $this->statusVerifier->verify($value, PageMutationContext::of($context));
     }
 
@@ -102,8 +102,8 @@ final readonly class PageVerifiers implements EntityVerifiers
         mixed $value,
         MutationContext $context,
     ): Verification {
-        assert($value instanceof DateTimeImmutable);
-        
+        assert(null === $value || $value instanceof DateTimeImmutable);
+
         return $this->publishedAtVerifier->verify($value, PageMutationContext::of($context));
     }
 }

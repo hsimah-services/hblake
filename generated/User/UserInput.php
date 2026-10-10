@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   User/UserInput.php
- * digest: sha256:a00334f79faebfef6809182b775fe5f1b9e009d68caae2626dd2a20663bac6c8
+ * digest: sha256:dc55af9c7f0e3b1cbc1183088ceb4be8332c203a8e11d14c62fa7f041d6e3a04
  */
 
 namespace Hsimah\Entity\User;
@@ -36,7 +36,7 @@ final readonly class UserInput
         if (null === $value) {
             return null;
         }
-        
+
         return $this->decode->string($value, 'User.email');
     }
 
@@ -46,7 +46,7 @@ final readonly class UserInput
         if (null === $value) {
             return null;
         }
-        
+
         return $this->decode->string($value, 'User.displayName');
     }
 
@@ -56,7 +56,7 @@ final readonly class UserInput
         if (null === $value) {
             return null;
         }
-        
+
         return $this->decode->enum(UserRole::class, $value, 'User.role');
     }
 
@@ -66,13 +66,13 @@ final readonly class UserInput
         if (null === $value) {
             return null;
         }
-        
+
         return $this->decode->bool($value, 'User.active');
     }
 
     /**
-     * Only what the caller supplied. A key that is absent is left alone,
-     * which is what makes a partial update partial.
+     * Seeds declared defaults on create and applies explicit input.
+     * Absent update keys and existing pending values are not reset by defaults.
      *
      * @param array<string, mixed> $input
      */
@@ -83,15 +83,23 @@ final readonly class UserInput
         if (array_key_exists('email', $input)) {
             $buffer->set('email', $this->email($input['email']));
         }
-        
+
         if (array_key_exists('displayName', $input)) {
             $buffer->set('displayName', $this->displayName($input['displayName']));
         }
-        
+
+        if (!$buffer->target()->isPersisted() && !$buffer->isChanged('role') && !array_key_exists('role', $input)) {
+            $buffer->set('role', $this->role(UserRole::Editor));
+        }
+
         if (array_key_exists('role', $input)) {
             $buffer->set('role', $this->role($input['role']));
         }
-        
+
+        if (!$buffer->target()->isPersisted() && !$buffer->isChanged('active') && !array_key_exists('active', $input)) {
+            $buffer->set('active', $this->active(true));
+        }
+
         if (array_key_exists('active', $input)) {
             $buffer->set('active', $this->active($input['active']));
         }
@@ -106,7 +114,7 @@ final readonly class UserInput
         array $args,
     ): array {
         return match ($action) {
-        
+
             default => throw new InvalidArgumentException(sprintf('Unknown action %s.', $action)),
         };
     }

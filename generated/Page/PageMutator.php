@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Page/PageMutator.php
- * digest: sha256:93e2c22ccb99da6507189426db0ca0dfb411ac0ce0bf67eb1addeedb4a167766
+ * digest: sha256:d5b4ee1033fae041d5ee7df196ee5f2f06f5b0b0b17233b3caed3e93bdd42442
  */
 
 namespace Hsimah\Entity\Page;
@@ -40,7 +40,7 @@ final class PageMutator
         string $title,
     ): self {
         $this->buffer->set('title', $title);
-        
+
         return $this;
     }
 
@@ -48,7 +48,7 @@ final class PageMutator
         string $slug,
     ): self {
         $this->buffer->set('slug', $slug);
-        
+
         return $this;
     }
 
@@ -56,7 +56,7 @@ final class PageMutator
         string $content,
     ): self {
         $this->buffer->set('content', $content);
-        
+
         return $this;
     }
 
@@ -64,7 +64,7 @@ final class PageMutator
         string $excerpt,
     ): self {
         $this->buffer->set('excerpt', $excerpt);
-        
+
         return $this;
     }
 
@@ -72,7 +72,7 @@ final class PageMutator
         PublicationStatus $status,
     ): self {
         $this->buffer->set('status', $status);
-        
+
         return $this;
     }
 
@@ -80,7 +80,7 @@ final class PageMutator
         ?DateTimeImmutable $publishedAt,
     ): self {
         $this->buffer->set('publishedAt', $publishedAt);
-        
+
         return $this;
     }
 

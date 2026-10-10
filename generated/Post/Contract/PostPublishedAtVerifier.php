@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Post/Contract/PostPublishedAtVerifier.php
- * digest: sha256:ead8588df2c60be1d7a7c1b9e83c18129f467b8743101dad6f9a7d498b0f9ff5
+ * digest: sha256:6303ecacede7dec5cae8d9e12c7e4c3fb29aa285f9a3be81ecb2a359db7d0484
  */
 
 namespace Hsimah\Entity\Post\Contract;
@@ -27,7 +27,7 @@ use Hsimah\Entity\Post\PostMutationContext;
 interface PostPublishedAtVerifier
 {
     public function verify(
-        DateTimeImmutable $value,
+        ?DateTimeImmutable $value,
         PostMutationContext $context,
     ): Verification;
 }

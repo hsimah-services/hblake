@@ -9,14 +9,16 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Post/PostPublishContext.php
- * digest: sha256:b982fcf7a66f7fa06e597ad46d694525585ec06f1302e4f5e87730e821b94155
+ * digest: sha256:599d8c3bb00c718fc3490ae88e50e52750294216c684a46fb655d1f9aafa2ce4
  */
 
 namespace Hsimah\Entity\Post;
 
 use DateTimeImmutable;
 use Eleph\Runtime\Mutation\MutationBuffer;
+use Eleph\Runtime\Mutation\MutationContext;
 use Hsimah\Entity\Enum\PublicationStatus;
+use LogicException;
 
 /**
  * Everything Post::publish() is allowed to write, and nothing else.
@@ -29,11 +31,22 @@ final class PostPublishContext
 
     }
 
+    /**
+     * Read original and pending state without widening the action's writes.
+     */
+    public function context(): PostMutationContext {
+        if (!$this->buffer instanceof MutationContext) {
+            throw new LogicException('Action buffer must expose mutation state.');
+        }
+
+        return PostMutationContext::of($this->buffer);
+    }
+
     public function setStatus(
         PublicationStatus $status,
     ): self {
         $this->buffer->set('status', $status);
-        
+
         return $this;
     }
 
@@ -41,7 +54,7 @@ final class PostPublishContext
         ?DateTimeImmutable $publishedAt,
     ): self {
         $this->buffer->set('publishedAt', $publishedAt);
-        
+
         return $this;
     }
 

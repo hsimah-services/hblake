@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Product/ProductWritePolicies.php
- * digest: sha256:f6418d2e49874fa1035b6e3f0bafe203015916762df0148ab4fda9e8a8273fd9
+ * digest: sha256:94176ad3c8007f8734cd1724e9abe67577b2f095b2f7e5de14f847cbc3d20e59
  */
 
 namespace Hsimah\Entity\Product;
@@ -43,7 +43,7 @@ final readonly class ProductWritePolicies implements EntityWritePolicies
         if (PolicyOutcome::Skip !== $decision->outcome) {
             return $decision->withPolicy('contentStaff');
         }
-        
+
         return PolicyDecision::deny('No policy allowed this write.')->withPolicy('terminal');
     }
 }

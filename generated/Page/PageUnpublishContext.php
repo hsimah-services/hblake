@@ -9,13 +9,15 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Page/PageUnpublishContext.php
- * digest: sha256:acaa8c654a2000c620bd3930c66d698dafeab2a7e009b256617b33074bf1e093
+ * digest: sha256:8b0f298eae76fbab29b2d8950d371d1b0ab8e742a341744b54519c22a1624d96
  */
 
 namespace Hsimah\Entity\Page;
 
 use Eleph\Runtime\Mutation\MutationBuffer;
+use Eleph\Runtime\Mutation\MutationContext;
 use Hsimah\Entity\Enum\PublicationStatus;
+use LogicException;
 
 /**
  * Everything Page::unpublish() is allowed to write, and nothing else.
@@ -28,11 +30,22 @@ final class PageUnpublishContext
 
     }
 
+    /**
+     * Read original and pending state without widening the action's writes.
+     */
+    public function context(): PageMutationContext {
+        if (!$this->buffer instanceof MutationContext) {
+            throw new LogicException('Action buffer must expose mutation state.');
+        }
+
+        return PageMutationContext::of($this->buffer);
+    }
+
     public function setStatus(
         PublicationStatus $status,
     ): self {
         $this->buffer->set('status', $status);
-        
+
         return $this;
     }
 

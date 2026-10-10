@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Post/PostVerifiers.php
- * digest: sha256:c069399a64426ee0ec8b2fa8d1d2c541ceddd3e4b84c474827e768a268d949ec
+ * digest: sha256:75355103746a9416c7eac2aef14bb59d13a4ad4d91f14479d54ef2fbe355b070
  */
 
 namespace Hsimah\Entity\Post;
@@ -67,7 +67,7 @@ final readonly class PostVerifiers implements EntityVerifiers
         MutationContext $context,
     ): Verification {
         assert(is_string($value));
-        
+
         return $this->titleVerifier->verify($value, PostMutationContext::of($context));
     }
 
@@ -76,7 +76,7 @@ final readonly class PostVerifiers implements EntityVerifiers
         MutationContext $context,
     ): Verification {
         assert(is_string($value));
-        
+
         return $this->slugVerifier->verify($value, PostMutationContext::of($context));
     }
 
@@ -85,7 +85,7 @@ final readonly class PostVerifiers implements EntityVerifiers
         MutationContext $context,
     ): Verification {
         assert(is_string($value));
-        
+
         return $this->contentVerifier->verify($value, PostMutationContext::of($context));
     }
 
@@ -94,7 +94,7 @@ final readonly class PostVerifiers implements EntityVerifiers
         MutationContext $context,
     ): Verification {
         assert($value instanceof PublicationStatus);
-        
+
         return $this->statusVerifier->verify($value, PostMutationContext::of($context));
     }
 
@@ -102,8 +102,8 @@ final readonly class PostVerifiers implements EntityVerifiers
         mixed $value,
         MutationContext $context,
     ): Verification {
-        assert($value instanceof DateTimeImmutable);
-        
+        assert(null === $value || $value instanceof DateTimeImmutable);
+
         return $this->publishedAtVerifier->verify($value, PostMutationContext::of($context));
     }
 }

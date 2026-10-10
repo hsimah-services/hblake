@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Product/ProductVerifiers.php
- * digest: sha256:8f22973055ceb7281d00e80a2b8ab7c5f6fd801328827540303dbe495091023c
+ * digest: sha256:8aa3b6960cd1ca9bf3402db9c5300515f034e334af83328381dd54760e60cabb
  */
 
 namespace Hsimah\Entity\Product;
@@ -70,7 +70,7 @@ final readonly class ProductVerifiers implements EntityVerifiers
         MutationContext $context,
     ): Verification {
         assert(is_string($value));
-        
+
         return $this->titleVerifier->verify($value, ProductMutationContext::of($context));
     }
 
@@ -79,7 +79,7 @@ final readonly class ProductVerifiers implements EntityVerifiers
         MutationContext $context,
     ): Verification {
         assert(is_string($value));
-        
+
         return $this->slugVerifier->verify($value, ProductMutationContext::of($context));
     }
 
@@ -88,7 +88,7 @@ final readonly class ProductVerifiers implements EntityVerifiers
         MutationContext $context,
     ): Verification {
         assert(is_string($value));
-        
+
         return $this->contentVerifier->verify($value, ProductMutationContext::of($context));
     }
 
@@ -97,7 +97,7 @@ final readonly class ProductVerifiers implements EntityVerifiers
         MutationContext $context,
     ): Verification {
         assert($value instanceof PublicationStatus);
-        
+
         return $this->statusVerifier->verify($value, ProductMutationContext::of($context));
     }
 
@@ -105,8 +105,8 @@ final readonly class ProductVerifiers implements EntityVerifiers
         mixed $value,
         MutationContext $context,
     ): Verification {
-        assert($value instanceof DateTimeImmutable);
-        
+        assert(null === $value || $value instanceof DateTimeImmutable);
+
         return $this->publishedAtVerifier->verify($value, ProductMutationContext::of($context));
     }
 
@@ -114,8 +114,8 @@ final readonly class ProductVerifiers implements EntityVerifiers
         mixed $value,
         MutationContext $context,
     ): Verification {
-        assert(is_string($value));
-        
+        assert(null === $value || is_string($value));
+
         return $this->enquiryUrlVerifier->verify($value, ProductMutationContext::of($context));
     }
 }

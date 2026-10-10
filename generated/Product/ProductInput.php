@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Product/ProductInput.php
- * digest: sha256:4dd543a7afb954a19845d783c41bf66db7956df676f1aa6881a7447e4a845d65
+ * digest: sha256:d1a66c22935292d4b2b37e247e81901fb6fb52328e37ffc594d319e590a4d00c
  */
 
 namespace Hsimah\Entity\Product;
@@ -37,7 +37,7 @@ final readonly class ProductInput
         if (null === $value) {
             return null;
         }
-        
+
         return $this->decode->string($value, 'Product.title');
     }
 
@@ -47,7 +47,7 @@ final readonly class ProductInput
         if (null === $value) {
             return null;
         }
-        
+
         return $this->decode->string($value, 'Product.slug');
     }
 
@@ -57,7 +57,7 @@ final readonly class ProductInput
         if (null === $value) {
             return null;
         }
-        
+
         return $this->decode->string($value, 'Product.content');
     }
 
@@ -67,7 +67,7 @@ final readonly class ProductInput
         if (null === $value) {
             return null;
         }
-        
+
         return $this->decode->string($value, 'Product.excerpt');
     }
 
@@ -77,7 +77,7 @@ final readonly class ProductInput
         if (null === $value) {
             return null;
         }
-        
+
         return $this->decode->enum(PublicationStatus::class, $value, 'Product.status');
     }
 
@@ -87,7 +87,7 @@ final readonly class ProductInput
         if (null === $value) {
             return null;
         }
-        
+
         return $this->decode->datetime($value, 'Product.publishedAt');
     }
 
@@ -97,13 +97,13 @@ final readonly class ProductInput
         if (null === $value) {
             return null;
         }
-        
+
         return $this->decode->string($value, 'Product.enquiryUrl');
     }
 
     /**
-     * Only what the caller supplied. A key that is absent is left alone,
-     * which is what makes a partial update partial.
+     * Seeds declared defaults on create and applies explicit input.
+     * Absent update keys and existing pending values are not reset by defaults.
      *
      * @param array<string, mixed> $input
      */
@@ -114,27 +114,39 @@ final readonly class ProductInput
         if (array_key_exists('title', $input)) {
             $buffer->set('title', $this->title($input['title']));
         }
-        
+
         if (array_key_exists('slug', $input)) {
             $buffer->set('slug', $this->slug($input['slug']));
         }
-        
+
+        if (!$buffer->target()->isPersisted() && !$buffer->isChanged('content') && !array_key_exists('content', $input)) {
+            $buffer->set('content', $this->content(''));
+        }
+
         if (array_key_exists('content', $input)) {
             $buffer->set('content', $this->content($input['content']));
         }
-        
+
+        if (!$buffer->target()->isPersisted() && !$buffer->isChanged('excerpt') && !array_key_exists('excerpt', $input)) {
+            $buffer->set('excerpt', $this->excerpt(''));
+        }
+
         if (array_key_exists('excerpt', $input)) {
             $buffer->set('excerpt', $this->excerpt($input['excerpt']));
         }
-        
+
+        if (!$buffer->target()->isPersisted() && !$buffer->isChanged('status') && !array_key_exists('status', $input)) {
+            $buffer->set('status', $this->status(PublicationStatus::Draft));
+        }
+
         if (array_key_exists('status', $input)) {
             $buffer->set('status', $this->status($input['status']));
         }
-        
+
         if (array_key_exists('publishedAt', $input)) {
             $buffer->set('publishedAt', $this->publishedAt($input['publishedAt']));
         }
-        
+
         if (array_key_exists('enquiryUrl', $input)) {
             $buffer->set('enquiryUrl', $this->enquiryUrl($input['enquiryUrl']));
         }

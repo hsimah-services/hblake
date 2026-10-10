@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   User/UserWriteContext.php
- * digest: sha256:8b2f7224b7dbc12c0899602d61fcea6fa9cff17425b29a51a91336263b7ea11c
+ * digest: sha256:51f5da2d7892a7efcdfcc1f6ee5f1ead30a12c30d6612879275a8208b3a9dc61
  */
 
 namespace Hsimah\Entity\User;
@@ -65,84 +65,84 @@ final readonly class UserWriteContext implements WriteContext
     public function originalCreatedAt(): ?DateTimeImmutable {
         $value = $this->context->mutation()?->original('createdAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
-        
+
         return $value;
     }
 
     public function pendingCreatedAt(): ?DateTimeImmutable {
         $value = $this->context->mutation()?->pending('createdAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
-        
+
         return $value;
     }
 
     public function originalUpdatedAt(): ?DateTimeImmutable {
         $value = $this->context->mutation()?->original('updatedAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
-        
+
         return $value;
     }
 
     public function pendingUpdatedAt(): ?DateTimeImmutable {
         $value = $this->context->mutation()?->pending('updatedAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
-        
+
         return $value;
     }
 
     public function originalEmail(): ?string {
         $value = $this->context->mutation()?->original('email');
         assert(null === $value || is_string($value));
-        
+
         return $value;
     }
 
     public function pendingEmail(): ?string {
         $value = $this->context->mutation()?->pending('email');
         assert(null === $value || is_string($value));
-        
+
         return $value;
     }
 
     public function originalDisplayName(): ?string {
         $value = $this->context->mutation()?->original('displayName');
         assert(null === $value || is_string($value));
-        
+
         return $value;
     }
 
     public function pendingDisplayName(): ?string {
         $value = $this->context->mutation()?->pending('displayName');
         assert(null === $value || is_string($value));
-        
+
         return $value;
     }
 
     public function originalRole(): ?UserRole {
         $value = $this->context->mutation()?->original('role');
         assert(null === $value || $value instanceof UserRole);
-        
+
         return $value;
     }
 
     public function pendingRole(): ?UserRole {
         $value = $this->context->mutation()?->pending('role');
         assert(null === $value || $value instanceof UserRole);
-        
+
         return $value;
     }
 
     public function originalActive(): ?bool {
         $value = $this->context->mutation()?->original('active');
         assert(null === $value || is_bool($value));
-        
+
         return $value;
     }
 
     public function pendingActive(): ?bool {
         $value = $this->context->mutation()?->pending('active');
         assert(null === $value || is_bool($value));
-        
+
         return $value;
     }
 }
