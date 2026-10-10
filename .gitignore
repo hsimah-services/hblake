@@ -1,0 +1,11 @@
+vendor/
+.cache/
+.var/
+client/node_modules/
+client/dist/
+*.log
+.pnpm-store/
+client/.pnpm-store/
+tests/acceptance/node_modules/
+tests/acceptance/test-results/
+tests/acceptance/playwright-report/

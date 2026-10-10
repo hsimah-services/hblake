@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+source "$(dirname "$0")/common"
+"$ENGINE" rm -f "$STACK" >/dev/null 2>&1 || true
+python3 - <<'PY'
+from pathlib import Path
+for name in ['site.sqlite','site.sqlite-wal','site.sqlite-shm']:
+    Path('.var',name).unlink(missing_ok=True)
+PY

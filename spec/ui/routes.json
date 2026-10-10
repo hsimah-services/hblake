@@ -1,0 +1,206 @@
+{
+  "runtime": "@tsquid/routes",
+  "routes": [
+    {
+      "name": "Home",
+      "entryPoint": "src/components/home/Home.entrypoint.ts",
+      "path": "/",
+      "fields": {}
+    },
+    {
+      "name": "Page",
+      "entryPoint": "src/components/page/Page.entrypoint.ts",
+      "path": "/pages/:slug",
+      "fields": {
+        "slug": {
+          "kind": "string"
+        }
+      }
+    },
+    {
+      "name": "PostList",
+      "entryPoint": "src/components/post/Post.entrypoint.ts",
+      "path": "/posts",
+      "fields": {
+        "after": {
+          "kind": "string",
+          "optional": true
+        }
+      }
+    },
+    {
+      "name": "Post",
+      "entryPoint": "src/components/post/Post.entrypoint.ts",
+      "path": "/posts/:slug",
+      "fields": {
+        "slug": {
+          "kind": "string"
+        }
+      }
+    },
+    {
+      "name": "ProductList",
+      "entryPoint": "src/components/product/Product.entrypoint.ts",
+      "path": "/products",
+      "fields": {
+        "after": {
+          "kind": "string",
+          "optional": true
+        }
+      }
+    },
+    {
+      "name": "Product",
+      "entryPoint": "src/components/product/Product.entrypoint.ts",
+      "path": "/products/:slug",
+      "fields": {
+        "slug": {
+          "kind": "string"
+        }
+      }
+    },
+    {
+      "name": "Login",
+      "entryPoint": "src/components/login/Login.entrypoint.ts",
+      "path": "/admin/login",
+      "fields": {}
+    },
+    {
+      "name": "AdminHome",
+      "entryPoint": "src/components/admin/Admin.entrypoint.ts",
+      "path": "/admin",
+      "fields": {}
+    },
+    {
+      "name": "AdminPageList",
+      "entryPoint": "src/components/admin-page/AdminPage.entrypoint.ts",
+      "path": "/admin/pages",
+      "fields": {
+        "after": {
+          "kind": "string",
+          "optional": true
+        }
+      }
+    },
+    {
+      "name": "AdminPageCreate",
+      "entryPoint": "src/components/admin-page/AdminPage.entrypoint.ts",
+      "path": "/admin/pages/new",
+      "fields": {}
+    },
+    {
+      "name": "AdminPageDetail",
+      "entryPoint": "src/components/admin-page/AdminPage.entrypoint.ts",
+      "path": "/admin/pages/:id",
+      "fields": {
+        "id": {
+          "kind": "string"
+        }
+      }
+    },
+    {
+      "name": "AdminPageEdit",
+      "entryPoint": "src/components/admin-page/AdminPage.entrypoint.ts",
+      "path": "/admin/pages/:id/edit",
+      "fields": {
+        "id": {
+          "kind": "string"
+        }
+      }
+    },
+    {
+      "name": "AdminPostList",
+      "entryPoint": "src/components/admin-post/AdminPost.entrypoint.ts",
+      "path": "/admin/posts",
+      "fields": {
+        "after": {
+          "kind": "string",
+          "optional": true
+        }
+      }
+    },
+    {
+      "name": "AdminPostCreate",
+      "entryPoint": "src/components/admin-post/AdminPost.entrypoint.ts",
+      "path": "/admin/posts/new",
+      "fields": {}
+    },
+    {
+      "name": "AdminPostDetail",
+      "entryPoint": "src/components/admin-post/AdminPost.entrypoint.ts",
+      "path": "/admin/posts/:id",
+      "fields": {
+        "id": {
+          "kind": "string"
+        }
+      }
+    },
+    {
+      "name": "AdminPostEdit",
+      "entryPoint": "src/components/admin-post/AdminPost.entrypoint.ts",
+      "path": "/admin/posts/:id/edit",
+      "fields": {
+        "id": {
+          "kind": "string"
+        }
+      }
+    },
+    {
+      "name": "AdminProductList",
+      "entryPoint": "src/components/admin-product/AdminProduct.entrypoint.ts",
+      "path": "/admin/products",
+      "fields": {
+        "after": {
+          "kind": "string",
+          "optional": true
+        }
+      }
+    },
+    {
+      "name": "AdminProductCreate",
+      "entryPoint": "src/components/admin-product/AdminProduct.entrypoint.ts",
+      "path": "/admin/products/new",
+      "fields": {}
+    },
+    {
+      "name": "AdminProductDetail",
+      "entryPoint": "src/components/admin-product/AdminProduct.entrypoint.ts",
+      "path": "/admin/products/:id",
+      "fields": {
+        "id": {
+          "kind": "string"
+        }
+      }
+    },
+    {
+      "name": "AdminProductEdit",
+      "entryPoint": "src/components/admin-product/AdminProduct.entrypoint.ts",
+      "path": "/admin/products/:id/edit",
+      "fields": {
+        "id": {
+          "kind": "string"
+        }
+      }
+    },
+    {
+      "name": "AdminUserDetail",
+      "entryPoint": "src/components/admin-user/AdminUser.entrypoint.ts",
+      "path": "/admin/users/:id",
+      "fields": {
+        "id": {
+          "kind": "string"
+        }
+      }
+    },
+    {
+      "name": "AdminUserEdit",
+      "entryPoint": "src/components/admin-user/AdminUser.entrypoint.ts",
+      "path": "/admin/users/:id/edit",
+      "fields": {
+        "id": {
+          "kind": "string"
+        }
+      }
+    }
+  ]
+}

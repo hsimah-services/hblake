@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+source "$(dirname "$0")/common"
+if "$ENGINE" container inspect "$STACK" >/dev/null 2>&1; then "$ENGINE" rm -f "$STACK" >/dev/null; fi
+python3 - <<'PY'
+from pathlib import Path
+root=Path('.var'); root.mkdir(exist_ok=True); root.chmod(0o700)
+for name in ['site.sqlite','site.sqlite-wal','site.sqlite-shm']:
+    (root/name).unlink(missing_ok=True)
+PY
+scripts/php php server/console.php install
+scripts/php php server/console.php bootstrap
+start_stack

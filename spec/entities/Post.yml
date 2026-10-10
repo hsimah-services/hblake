@@ -1,0 +1,25 @@
+entity: Post
+description: Consulting article or business update.
+use: [Content, Publishable, Timestamps]
+integrations:
+  graphql:
+    singular: Post
+    plural: Posts
+storage:
+  table: post
+policies:
+  terminalRule:
+    read: deny
+    write: deny
+queries:
+  bySlug:
+    description: Look up one content record by exact canonical slug under read policies.
+    args:
+      slug: { type: string }
+    returns:
+      type: Post
+      cardinality: one
+    integrations:
+      graphql:
+        field: postBySlug
+    handler: true
