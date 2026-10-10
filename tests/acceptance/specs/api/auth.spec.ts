@@ -122,3 +122,61 @@ test('authenticated responses are never cacheable by shared caches', async () =>
   expect(csrf.headers()['cache-control'] ?? '', 'GET /auth/csrf').toMatch(/no-store/);
   await api.dispose();
 });
+
+test.describe('sessions are created only when needed', () => {
+  test('anonymous reads do not create a session', async () => {
+    // Crawlers and first-time visitors must not each leave a session row behind.
+    const api = await Api.anonymous();
+    const query = await api.ctx.post('/graphql', { data: { query: '{ posts(first: 1) { totalCount } }' } });
+    expect(query.status()).toBe(200);
+    expect(setCookies(query).map(cookie => cookie.name), 'Set-Cookie on an anonymous GraphQL query').toEqual([]);
+    for (const path of ['/', '/posts', '/admin/login']) {
+      const response = await api.ctx.get(path);
+      expect(setCookies(response).map(cookie => cookie.name), `Set-Cookie on GET ${path}`).toEqual([]);
+    }
+    await api.dispose();
+  });
+
+  test('a cookieless mutation is refused without creating a session', async () => {
+    const api = await Api.anonymous();
+    const input = defaults('Post');
+    const response = await api.ctx.post('/graphql', {
+      data: { query: 'mutation($input: CreatePostInput!) { createPost(input: $input) { post { id } } }', variables: { input } },
+      headers: { 'X-CSRF-Token': 'not-a-token' },
+    });
+    expect(response.status()).toBe(403);
+    expect(setCookies(response).map(cookie => cookie.name)).toEqual([]);
+    await api.dispose();
+  });
+});
+
+test.describe('session cookies are Secure outside loopback HTTP', () => {
+  // tests/README.md: cookies omit Secure only for plain-HTTP requests to a loopback host,
+  // so a deployment behind a TLS proxy is safe without extra configuration. The Host
+  // header stands in for a public hostname that reached the app over a proxy.
+  const PUBLIC_HOST = { Host: 'www.example.test' };
+
+  test('the anonymous CSRF session cookie is Secure for a public host', async () => {
+    const api = await Api.anonymous();
+    const response = await api.ctx.get('/auth/csrf', { headers: PUBLIC_HOST });
+    expect(response.status()).toBe(200);
+    const cookies = setCookies(response);
+    expect(cookies.length, 'GET /auth/csrf starts a session').toBeGreaterThan(0);
+    for (const cookie of cookies) expect(cookie.attributes.has('secure'), `${cookie.name} Secure`).toBe(true);
+    await api.dispose();
+  });
+
+  test('the signed-in session cookie is Secure for a public host', async () => {
+    const api = await Api.anonymous();
+    const token = await api.csrfToken();
+    const response = await api.ctx.post('/auth/login', {
+      data: { email: OPERATOR.email, password: OPERATOR.password },
+      headers: { ...PUBLIC_HOST, 'X-CSRF-Token': token },
+    });
+    expect(response.status(), await response.text()).toBe(200);
+    const session = setCookies(response).filter(cookie => cookie.attributes.has('httponly'));
+    expect(session.length).toBeGreaterThan(0);
+    for (const cookie of session) expect(cookie.attributes.has('secure'), `${cookie.name} Secure`).toBe(true);
+    await api.dispose();
+  });
+});

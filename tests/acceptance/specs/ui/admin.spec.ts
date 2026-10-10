@@ -273,3 +273,55 @@ test.describe('forms in detail', () => {
     await anonymous.dispose();
   });
 });
+
+test.describe('dialogs and routing', () => {
+  test.beforeEach(async ({ page }) => {
+    await signIn(page);
+  });
+
+  test('the delete confirmation is a modal dialog', async ({ page }) => {
+    // WAI-ARIA modal dialog pattern: focus moves in, stays in, Escape closes, focus returns.
+    const row = await createOk(api, 'Post');
+    await page.goto(`${adminPath('Post')}/${encodeURIComponent(row.id)}`);
+    const trigger = page.getByRole('button', { name: /^delete/i });
+    await trigger.focus();
+    await page.keyboard.press('Enter');
+    const dialog = page.getByRole('alertdialog').or(page.getByRole('dialog'));
+    await expect(dialog).toBeVisible();
+    const focusInDialog = (): Promise<boolean> =>
+      dialog.evaluate(element => element.contains(document.activeElement));
+
+    await expect.poll(focusInDialog, 'focus moves into the dialog').toBe(true);
+    for (let i = 0; i < 6; i += 1) {
+      await page.keyboard.press('Tab');
+      expect(await focusInDialog(), `focus stays in the dialog after Tab ${i + 1}`).toBe(true);
+    }
+    for (let i = 0; i < 6; i += 1) {
+      await page.keyboard.press('Shift+Tab');
+      expect(await focusInDialog(), `focus stays in the dialog after Shift+Tab ${i + 1}`).toBe(true);
+    }
+    await page.keyboard.press('Escape');
+    await expect(dialog, 'Escape closes the dialog').toBeHidden();
+    await expect(trigger, 'focus returns to the Delete button').toBeFocused();
+    expect(await byId(api, 'Post', row.id), 'Escape deletes nothing').not.toBeNull();
+  });
+
+  test('admin links do not reload the document', async ({ page }) => {
+    const row = await createOk(api, 'Post');
+    await page.goto('/admin');
+    await page.evaluate(() => ((window as unknown as { __document?: string }).__document = 'first-load'));
+    const sameDocument = (): Promise<boolean> =>
+      page.evaluate(() => (window as unknown as { __document?: string }).__document === 'first-load');
+
+    await page.getByRole('main').getByRole('link', { name: /^posts$/i }).click();
+    await expect(page).toHaveURL(`${BASE_URL}${adminPath('Post')}`);
+    expect(await sameDocument(), 'section link handled by the router').toBe(true);
+
+    await page.goto(`${adminPath('Post')}/${encodeURIComponent(row.id)}`);
+    await page.evaluate(() => ((window as unknown as { __document?: string }).__document = 'first-load'));
+    await page.getByRole('link', { name: /^edit$/i }).click();
+    await expect(page).toHaveURL(`${BASE_URL}${adminPath('Post')}/${encodeURIComponent(row.id)}/edit`);
+    await expect(page.getByLabel('Title')).toHaveValue(row.title);
+    expect(await sameDocument(), 'edit link handled by the router').toBe(true);
+  });
+});

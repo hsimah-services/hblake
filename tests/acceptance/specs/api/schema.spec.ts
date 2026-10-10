@@ -1,7 +1,11 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
 import { expect, test } from '@playwright/test';
 
 import { Api } from '../../lib/api.ts';
 import { KINDS, collection, field } from '../../lib/content.ts';
+import { REPO_ROOT } from '../../lib/env.ts';
 
 // The GraphQL surface: generated content operations, the application-owned viewer and
 // operator profile, and nothing that exposes User or credentials (architecture.md,
@@ -153,3 +157,54 @@ test('content types are Relay nodes', () => {
   const node = (queryType.fields ?? []).find(f => f.name === 'node');
   expect(node?.args?.map(arg => arg.name)).toEqual(['id']);
 });
+
+test('the client schema snapshot matches the running server', () => {
+  // relay-compiler validates operations against client/schema.graphql only, so a server
+  // change that is not re-exported would otherwise pass every gate.
+  const sdl = fs.readFileSync(path.join(REPO_ROOT, 'client/schema.graphql'), 'utf8');
+  const missing = (have: Set<string>, want: Set<string>): string[] => [...want].filter(item => !have.has(item)).sort();
+  const client = sdlSignatures(sdl);
+  const server = serverSignatures();
+  expect({ onlyOnServer: missing(client, server), onlyInClient: missing(server, client) }).toEqual({ onlyOnServer: [], onlyInClient: [] });
+});
+
+const BUILT_IN_SCALARS = new Set(['String', 'Int', 'Float', 'Boolean', 'ID']);
+const render = (ref: TypeRef): string =>
+  ref.kind === 'NON_NULL' ? `${render(ref.ofType!)}!` : ref.kind === 'LIST' ? `[${render(ref.ofType!)}]` : ref.name!;
+
+function serverSignatures(): Set<string> {
+  const out = new Set<string>();
+  for (const type of types.values()) {
+    if (type.name.startsWith('__') || BUILT_IN_SCALARS.has(type.name)) continue;
+    if (type.kind === 'SCALAR') out.add(`scalar ${type.name}`);
+    for (const value of type.enumValues ?? []) out.add(`${type.name}.${value.name}`);
+    for (const f of type.inputFields ?? []) out.add(`${type.name}.${f.name}: ${render(f.type)}`);
+    for (const f of type.fields ?? []) {
+      const args = (f.args ?? []).map(arg => `${arg.name}: ${render(arg.type)}`).join(', ');
+      out.add(`${type.name}.${f.name}${args ? `(${args})` : ''}: ${render(f.type)}`);
+    }
+  }
+  return out;
+}
+
+function sdlSignatures(sdl: string): Set<string> {
+  const out = new Set<string>();
+  const text = sdl.replace(/"""[\s\S]*?"""/g, '').replace(/"(?:[^"\\\n]|\\.)*"/g, '').replace(/#[^\n]*/g, '');
+  for (const [, name] of text.matchAll(/^scalar\s+(\w+)/gm)) out.add(`scalar ${name}`);
+  for (const [, keyword, name, body] of text.matchAll(/^(type|interface|input|enum)\s+(\w+)[^{]*\{([^}]*)\}/gm)) {
+    if (keyword === 'enum') {
+      for (const [value] of body.matchAll(/\w+/g)) out.add(`${name}.${value}`);
+      continue;
+    }
+    for (const [, fieldName, rawArgs, result] of body.matchAll(/(\w+)\s*(?:\(([^)]*)\))?\s*:\s*([\w!\[\]]+)/g)) {
+      const args = (rawArgs ?? '')
+        .split(/[,\n]/)
+        .map(arg => arg.trim().replace(/\s*=.*$/, ''))
+        .filter(Boolean)
+        .map(arg => arg.replace(/\s*:\s*/, ': '))
+        .join(', ');
+      out.add(`${name}.${fieldName}${args ? `(${args})` : ''}: ${result}`);
+    }
+  }
+  return out;
+}

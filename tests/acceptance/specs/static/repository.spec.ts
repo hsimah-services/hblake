@@ -105,3 +105,39 @@ test('the acceptance harness scripts exist and are executable', () => {
   });
   expect(missing, 'scripts/acceptance/* (tests/README.md)').toEqual([]);
 });
+
+test('Elephentity dependencies are released versions, not branch pins, aliases or forks', () => {
+  // spec/upstream.md: temporary pins are removed once compatible tagged fixes land.
+  const composer = readJson(path.join(REPO_ROOT, 'composer.json'));
+  const constraints: Record<string, string> = { ...composer.require, ...composer['require-dev'] };
+  const pinned = Object.entries(constraints)
+    .filter(([name]) => name.startsWith('elephentity/'))
+    .filter(([, constraint]) => /(^|\s|\|)dev-|\sas\s|#/.test(constraint))
+    .map(([name, constraint]) => `${name}: ${constraint}`);
+  expect(pinned, 'composer.json constraints').toEqual([]);
+  const repositories = (composer.repositories ?? []) as { type?: string; url?: string }[];
+  expect(repositories.filter(repository => repository.type !== 'composer').map(repository => repository.url), 'extra Composer repositories').toEqual([]);
+
+  const lock = readJson(path.join(REPO_ROOT, 'composer.lock'));
+  const locked = [...(lock.packages ?? []), ...(lock['packages-dev'] ?? [])] as { name: string; version: string }[];
+  const unreleased = locked
+    .filter(entry => entry.name.startsWith('elephentity/') && !/^v?\d+\.\d+\.\d+(-[\w.]+)?$/.test(entry.version))
+    .map(entry => `${entry.name}@${entry.version}`);
+  expect(unreleased, 'composer.lock versions').toEqual([]);
+});
+
+test('the specification describes the implementation as it is', () => {
+  const docs = ['spec/README.md', 'spec/acceptance.md', 'spec/architecture.md', 'spec/upstream.md', 'README.md'];
+  const problems = docs.flatMap(doc => {
+    const text = fs.readFileSync(path.join(REPO_ROOT, doc), 'utf8');
+    const found: string[] = [];
+    // spec/upstream.md keeps the historical validation command; other docs describe the present.
+    if (doc !== 'spec/upstream.md' && /provides\.(json|md)\b/.test(text)) found.push(`${doc} still refers to the removed provides snapshot`);
+    // Test counts go stale with the next test; "tests/run.sh passes" is the claim.
+    for (const match of text.matchAll(/\b\d+\s+(Playwright|operator[- ]procedure|application unit|PHP unit|unit)\s+(tests|checks)\b/gi)) {
+      found.push(`${doc} hardcodes a test count: "${match[0]}"`);
+    }
+    return found;
+  });
+  expect(problems).toEqual([]);
+});

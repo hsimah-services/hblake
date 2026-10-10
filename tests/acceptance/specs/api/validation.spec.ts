@@ -179,3 +179,27 @@ test('omitting a field on update leaves it unchanged', async () => {
     if (kind === 'Product') expect(updated.enquiryUrl).toBe('https://example.com/keep');
   }
 });
+
+test.describe('error messages are safe', () => {
+  // Acceptance 6: rejections produce safe errors. Messages may explain the rule that was
+  // broken; they must not echo storage, SQL, PHP or stack details.
+  const INTERNAL = /SQLSTATE|constraint failed|integrity constraint|PDO|sqlite|hsimah_\w+|\.php\b|stack trace|#\d+ \/|timezone could not be found|failed to parse time string|at position \d+/i;
+
+  for (const kind of KINDS) {
+    test(`${kind}: nulls for required fields and malformed times are refused without internals`, async () => {
+      const row = await createOk(api, kind);
+      const attempts: [string, Record<string, unknown>][] = [
+        ['title: null', { title: null }],
+        ['slug: null', { slug: null }],
+        ['content: null', { content: null }],
+        ['publishedAt: malformed', { publishedAt: 'not a date' }],
+      ];
+      for (const [label, input] of attempts) {
+        const result = await update(api, kind, row.id, input);
+        expectRejected(result, label);
+        expect(result.body, `${label} response`).not.toMatch(INTERNAL);
+      }
+      expect(await byId(api, kind, row.id), 'the row is unchanged').toEqual(row);
+    });
+  }
+});

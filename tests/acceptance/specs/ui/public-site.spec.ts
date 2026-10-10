@@ -10,6 +10,7 @@ import {
   publicPath,
   uniqueSlug,
   unpublishOk,
+  walk,
 } from '../../lib/content.ts';
 import { BASE_URL, RUN_ID } from '../../lib/env.ts';
 import { notFound, signIn, xssFired } from '../../lib/ui.ts';
@@ -186,5 +187,48 @@ test.describe('navigation', () => {
       await expect(page.getByRole('navigation').first(), `${path} navigation`).toBeVisible();
       await expect(page.getByRole('contentinfo'), `${path} footer`).toBeVisible();
     }
+  });
+});
+
+test.describe('navigation across list pages', () => {
+  test('later pages of a list keep the same site navigation', async ({ page }) => {
+    // website.md: the Products link depends only on whether published products exist,
+    // not on how far through the post list the visitor has paged.
+    if ((await walk(api, 'Product')).nodes.every(node => node.status !== 'PUBLISHED')) await createPublished(api, 'Product');
+    const products = (await walk(api, 'Product')).totalCount;
+    const pagesPastProducts = Math.ceil(products / 20) + 1;
+    const posts = async (): Promise<number> => (await walk(api, 'Post')).nodes.filter(node => node.status === 'PUBLISHED').length;
+    for (let i = await posts(); i < pagesPastProducts * 20 + 1; i += 1) await createPublished(api, 'Post');
+
+    await page.goto('/posts');
+    const productsLink = page.locator('nav a[href="/products"]').first();
+    await expect(productsLink, '/posts links to /products').toBeVisible();
+    for (let step = 1; step <= pagesPastProducts; step += 1) {
+      const url = page.url();
+      await page.getByRole('link', { name: /next|older|more/i }).or(page.getByRole('button', { name: /next|older|more/i })).first().click();
+      await expect(page).not.toHaveURL(url);
+      await expect(page).toHaveURL(/[?&]after=/);
+      await expect(page.getByRole('main').getByRole('link').first()).toBeVisible();
+      await expect(productsLink, `post list page ${step + 1} still links to /products`).toBeVisible();
+    }
+  });
+});
+
+test.describe('client-side routing', () => {
+  test('following site links does not reload the document', async ({ page }) => {
+    const post = await createPublished(api, 'Post');
+    await page.goto('/');
+    await page.evaluate(() => ((window as unknown as { __document?: string }).__document = 'first-load'));
+    const sameDocument = (): Promise<boolean> =>
+      page.evaluate(() => (window as unknown as { __document?: string }).__document === 'first-load');
+
+    await page.locator('nav a[href="/posts"]').first().click();
+    await expect(page).toHaveURL(`${BASE_URL}/posts`);
+    expect(await sameDocument(), 'navigation link handled by the router').toBe(true);
+
+    await page.getByRole('main').locator(`a[href="${publicPath('Post', post.slug)}"]`).first().click();
+    await expect(page).toHaveURL(`${BASE_URL}${publicPath('Post', post.slug)}`);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(post.title);
+    expect(await sameDocument(), 'list link handled by the router').toBe(true);
   });
 });

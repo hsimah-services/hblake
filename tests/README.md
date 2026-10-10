@@ -49,7 +49,13 @@ The spec says "server sessions" and "CSRF protection on writes" without fixing t
 endpoints. The tests fix them as follows:
 
 - `GET /auth/csrf` → `200 {"token": "<string>"}`. The token belongs to the current
-  session, anonymous or signed in. `Cache-Control: no-store`.
+  session, anonymous or signed in. `Cache-Control: no-store`. This is the only place
+  an anonymous session starts: GraphQL queries, static files and refused requests from
+  a visitor without a session set no cookie.
+- Session cookies carry `Secure` unless the request is plain HTTP to a loopback host
+  (`localhost`, `127.0.0.1`, `[::1]`). The decision comes from the request, not from
+  `BASE_URL` or other environment that a deployment might not set. The tests send
+  `Host: www.example.test` to stand in for a public host behind a TLS proxy.
 - `POST /auth/login` with JSON `{"email", "password"}` and header `X-CSRF-Token`:
   - Success → `200 {"viewer": {"id", "displayName", "role"}}`. It sets an HttpOnly,
     `SameSite=Lax|Strict`, `Path=/` session cookie (plus `Secure` when `BASE_URL` is
@@ -65,6 +71,9 @@ endpoints. The tests fix them as follows:
   - Mutations need `X-CSRF-Token`. Without it, or with a wrong one, → `403` and
     nothing is applied. Queries need no token.
   - Responses to signed-in requests send `Cache-Control` with `no-store` or `private`.
+  - Error messages may say which rule was broken. They never contain SQL, storage,
+    PHP or stack details (`SQLSTATE`, constraint text, table names, file paths,
+    date-parser output). Unexpected exceptions get a generic message.
   - Introspection stays enabled; `pnpm schema` needs it too.
 
 ## GraphQL contract
@@ -91,6 +100,9 @@ Application-owned, with names fixed by these tests:
 - `updateAdminUser(input: {id, email, displayName})` returning `{ adminUser }`. Email is
   trimmed and lowercased.
 
+`client/schema.graphql` matches the running server's schema exactly (types, fields,
+arguments, input fields and enum values; descriptions are ignored).
+
 Nothing else may mention users: there is no `User` type and no user create, list or
 delete operations. No field anywhere looks like a password, credential, secret or
 session.
@@ -105,7 +117,9 @@ The browser tests find elements by accessible role and name, not by test ids:
 - The empty post and product lists say "No posts" and "No products".
 - A product's enquiry link is named `/enquir/i`.
 - List pagination is a link or button named `/next|older|more/i` that puts `?after=`
-  in the URL.
+  in the URL. Paging one list never changes the site navigation.
+- Links between routes are handled by the client router: following a navigation,
+  list or admin link keeps the same document (no full page load).
 - Login: fields labelled `Email` and `Password`, and a `Sign in`/`Log in` button.
   Signed-out visits to `/admin*` redirect to `/admin/login`. Sign-out is a button or
   link named `/sign out|log out/i`.
@@ -113,7 +127,9 @@ The browser tests find elements by accessible role and name, not by test ids:
   and, for products, `Enquiry URL`, with a `Save`/`Create` button. They have no
   inputs for id, status, publication time or timestamps.
 - Detail views have `Publish`/`Unpublish` and `Delete` buttons. Delete opens a
-  `dialog`/`alertdialog` with a cancel button and a confirm button.
+  `dialog`/`alertdialog` with a cancel button and a confirm button. It is modal:
+  focus moves into it, Tab and Shift+Tab stay inside it, Escape closes it without
+  deleting, and focus returns to the Delete button.
 - Invalid fields get `aria-invalid="true"`, and the first invalid field receives focus.
   Errors appear in a `role="alert"` region, and save confirmations in
   `role="status"`/`alert` (text matching `/saved|created|updated/i`).
@@ -121,6 +137,24 @@ The browser tests find elements by accessible role and name, not by test ids:
 - The profile form has fields labelled `Display name` and `Email` only.
 - A dirty form warns before in-app navigation, through `confirm()` or a dialog with a
   stay/cancel button.
+
+## Repository rules
+
+`static/client.spec.ts` and `static/repository.spec.ts` also check that:
+
+- each entrypoint in `client/routes.json` preloads its own query, defined in its own
+  directory and named after its module (`PostQuery`, `AdminPostQuery`, …); no two
+  entrypoints share a query;
+- `client/src` builds route paths with the generated URI builders: no string or
+  template literal starting with `/admin`, `/pages`, `/posts` or `/products`;
+- every `__generated__/*.graphql.ts` belongs to an operation or fragment defined in
+  the directory above it;
+- the client contains no business description the owner has not supplied (the word
+  "consult" in any form);
+- `elephentity/*` packages are released versions: no `dev-` branches, `as` aliases or
+  extra VCS repositories, and tagged versions in `composer.lock`;
+- spec and README docs don't refer to the removed provides snapshot or hardcode test
+  counts.
 
 ## Coverage
 
@@ -133,10 +167,12 @@ Spec acceptance checks and where they are tested:
 | 3 publication rules | `api/publication.spec.ts` |
 | 4 visibility and authorization | `api/visibility.spec.ts`, `api/profile.spec.ts`, `ops` (bootstrap, inactive, expired) |
 | 5 no User exposure | `api/schema.spec.ts`, `api/visibility.spec.ts`, `static/repository.spec.ts` |
-| 6 validation and safe output | `api/validation.spec.ts`, `api/profile.spec.ts`, `ui/public-site.spec.ts` |
+| 6 validation and safe output | `api/validation.spec.ts` (including safe error messages), `api/profile.spec.ts`, `ui/public-site.spec.ts` |
 | 7 keyboard admin | `ui/admin.spec.ts`, `ui/admin-profile.spec.ts` |
-| 8 auth over HTTP | `api/auth.spec.ts`, `ops` (rate limit) |
+| 8 auth over HTTP | `api/auth.spec.ts` (including lazy sessions and `Secure`), `ops` (rate limit) |
 | 9 404s, empty states, ordering, paging | `fresh/empty-site.spec.ts`, `api/pagination.spec.ts`, `ui/public-site.spec.ts` |
+| Frontend architecture (architecture.md) | `static/client.spec.ts`, `api/schema.spec.ts`, `ui/public-site.spec.ts`, `ui/admin.spec.ts` |
+| Upstream pins (upstream.md) | `static/repository.spec.ts` |
 | 10 client rendering, metadata, caching | `ui/public-site.spec.ts`, `api/auth.spec.ts`, `api/publication.spec.ts` |
 | 11 install, backup, secrets | `ops`, `api/http.spec.ts` |
 
@@ -149,6 +185,8 @@ Not covered, and why:
   verifier with a unit test.
 - **Session expiring mid-edit while the form keeps its text,** and multi-tab
   overwrites (accepted in v1).
+- **Purging expired sessions and login-failure rows.** There's no black-box view of the
+  session table. Cover the purge with a PHP unit test.
 - **Reviewed upgrade migrations.** There is no prior schema yet. Add a test with the
   first migration.
 - **SSR and initial-HTML SEO** (deferred), **concurrency conflicts** (deferred,
