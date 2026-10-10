@@ -6,7 +6,7 @@ import { PublicContent } from '../public-content/PublicContent';
 
 export function Home({ queryRef }: HomeProps) {
   const data = usePreloadedQuery<HomeQuery>(HOME_QUERY, queryRef);
-  
+
   return <Layout data={data} row={data.pageBySlug}><PublicContent row={data.pageBySlug} home /></Layout>;
 }
 

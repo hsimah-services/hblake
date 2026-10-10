@@ -4,4 +4,3 @@ export async function authRequest(action: string, body?: Record<string, string>,
   const response = await fetch(`/auth/${action}`, { method: 'POST', credentials: 'same-origin', keepalive: true, headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': token.token }, body: JSON.stringify(body ?? {}) });
   if (!response.ok) throw new Error(response.status === 429 ? 'Too many attempts. Try again later.' : 'Invalid email or password.');
 }
-
