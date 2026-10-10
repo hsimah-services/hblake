@@ -25,8 +25,6 @@ entities:
     actions: [publish, unpublish, delete]
   User:
     source: privateAdminDto
-    list: [displayName, email, role, active, updatedAt]
     detail: [displayName, email, role, active, createdAt, updatedAt]
-    create: [displayName, email, role]
-    edit: [displayName, email, role, active]
+    edit: [displayName, email]
     actions: []

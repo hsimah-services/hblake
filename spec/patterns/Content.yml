@@ -17,5 +17,6 @@ fields:
     default: ''
     verify: true
   excerpt:
-    type: text
+    type: string
     default: ''
+    maxLength: 300

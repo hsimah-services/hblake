@@ -9,26 +9,29 @@ These are future implementation checks, not tests claimed to pass in this PR.
    supplies UTC createdAt/updatedAt; client attempts to set managed fields fail.
 3. Publish commits status/time together; repeated publish retains first time.
    Unpublish removes public visibility immediately. Invalid direct updates cannot
-   bypass title/body/status/time invariants.
+   bypass title/body/status/time invariants. Create requires draft/null; changes
+   to status/publishedAt require the appropriate action in actions().
 4. Anonymous collection, count, by-slug and node requests cannot reveal drafts.
-   Editors can manage all content but cannot delete or modify users. Admins can
-   manage users; inactive users and expired sessions cannot operate the API.
+   Editor policy permits content changes but no deletion or profile changes. The
+   single admin can update their email/displayName; bootstrap refuses additional
+   accounts. Inactive users and expired sessions cannot operate the API.
 5. User has no generated GraphQL exposure. Public content queries do not expose
    email, credentials or account links. Viewer/admin DTOs enforce their allowlists.
 6. Duplicate/invalid slugs, normalized duplicate emails, unsafe enquiry URLs,
-   oversized bodies and injected HTML/script Markdown produce safe errors/output.
-7. Every admin list/detail/create/edit works by keyboard. Validation retains input,
-   fields can be cleared, errors are announced and successful saves refresh Relay.
-8. Two clients editing one record cause one stale write to fail without data loss,
-   including publish/delete. Concurrent admin deactivations cannot remove the last
-   active admin. Verify races with independent database connections.
-9. Login/logout, CSRF, cookie settings, session rotation, rate limits and
-   deactivation/session revocation are verified through HTTP-level checks.
-10. Unknown/draft pages return public 404; home canonicalization works. Empty
-    posts/products render cleanly. Cursor limits/order remain stable for ties.
-11. Initial HTML contains published body and metadata without requiring JavaScript.
-    Admin/draft responses avoid shared caching; unpublish invalidates public output.
-12. Install works on an empty SQLite database only. Reviewed upgrade preserves
+   oversized bodies/excerpts and injected HTML/script Markdown produce safe
+   errors/output.
+7. Every content list/detail/create/edit and operator profile detail/edit works
+   by keyboard. Validation retains input, fields can be cleared, errors are announced and successful saves refresh Relay.
+8. Login/logout, CSRF, cookie settings, session rotation, rate limits and
+   session revocation are verified through HTTP-level checks.
+9. Unknown/draft pages return public 404; home canonicalization works. Empty
+   posts/products render cleanly. Ordering has ID tie-breakers.
+   V1 accepts short/empty policy-filtered pages and slow counts; continuation
+   remains available through pageInfo without exposing drafts.
+10. The client renders published content and updates document metadata. SSR and
+    initial-HTML SEO are deferred. Admin/draft responses avoid shared caching;
+    unpublish invalidates public content responses.
+11. Install works on an empty SQLite database only. Reviewed upgrade preserves
     content; backup restore succeeds. Secrets/database are unreachable over HTTP.
 
 ## Specification-only verification

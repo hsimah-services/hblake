@@ -14,15 +14,20 @@ Documentation and source were inspected at these commits on 2026-10-10:
 
 ## Confirmed enhancements filed for this project
 
-| Gap | Issue | Required resolution |
+| Gap | Issue | V1 decision / resolution |
 | --- | --- | --- |
 | Tsquid generates routes, not admin views/forms | [tsquid #7](https://github.com/hsimah-services/tsquid/issues/7) | Separate metadata-driven generator for explicit list/detail/create/edit allowlists, Astryx widgets, Relay bindings, validation and deterministic checks |
-| Gateway/storage has no expected-version mutation contract | [elephentity #100](https://github.com/hsimah-services/elephentity/issues/100) | Opaque storage versions, atomic conditional updates/actions/deletes, typed conflicts and adapter conformance tests |
+| Gateway/storage has no expected-version mutation contract | [elephentity #100](https://github.com/hsimah-services/elephentity/issues/100) | Deferred: the single-editor v1 has no conflict detection; future support uses opaque versions and atomic conditional mutations |
+| Policy-filtered paging and counts | [elephentity #102](https://github.com/hsimah-services/elephentity/issues/102) | Accepted for the small v1 dataset; upstream keyset paging resumes after the last visible row |
+| Publication fields appear in generic client inputs | [elephentity #103](https://github.com/hsimah-services/elephentity/issues/103) | Accepted framework limitation; explicit action-aware verifiers protect v1, future write visibility removes these fields from generic inputs |
 
-Each new issue includes evidence, a concrete solution, acceptance checks and
-compatibility implications. Admin generation is a blocker for claiming generated
-forms. Portable concurrency support is an enhancement; an application-specific
-SQLite solution is acceptable only with demonstrated atomic race protection.
+The reports include evidence, concrete solutions, acceptance checks and compatibility
+implications. Admin generation remains a blocker for claiming generated forms.
+Neither concurrency support nor improved paging blocks v1. Publication fields stay
+in generated inputs until #103; v1 verifiers require draft/null on create and the
+appropriate declared action for field changes. No unsupported write-visibility key
+is added to this model. Single-account operation removes the need for a last-admin
+transactional invariant and multi-account credential provisioning.
 
 ## Existing reports relevant to implementation
 
@@ -51,16 +56,17 @@ the finding, not new bugs proven by running this specification-only change.
 
 ## Validation without generation
 
-Existing `eleph validate` does not generate application code, but it discovers
-capabilities by invoking configured builders. The follow-up Elephentity PR adds
-`--provides <saved-describe-json>` to use the same compiler with explicit snapshot
-metadata and no builder execution or `eleph.json`. The snapshot must carry source
-revisions and be refreshed with dependencies; it does not prove build compatibility.
-Submitted: [Elephentity PR #101](https://github.com/hsimah-services/elephentity/pull/101),
-commit `b295fe0`. The website includes [provides.json](provides.json) with
-[source provenance](provides.md), copied from the reviewed builders' declarations.
+[Elephentity PR #101](https://github.com/hsimah-services/elephentity/pull/101) is
+merged. It adds `--provides <saved-describe-json>` to run the compiler with explicit
+snapshot metadata and no builder execution or eleph.json.
 
-Using that PR's CLI, the actual command passed without generating files:
+The website's [provides.json](provides.json) and [provides.md](provides.md) are
+**temporary spec-review files** copied from reviewed builder declarations. Once the
+implementation adds eleph.json and real builders, live `eleph validate spec`
+replaces them and both files are removed. The snapshot is not permanent project
+configuration or proof of builder compatibility.
+
+Using the merged change's CLI, the actual command passed without generating files:
 
 ```text
 eleph validate spec --provides spec/provides.json
@@ -69,14 +75,13 @@ Specs are valid: 4 entities, 2 types.
 
 The upstream FormatChecker also passed canonical formatting. Independent JSON
 Schema and reference checks passed all 10 model YAML files, expanded patterns,
-action writes, admin field allowlists and 24 unique routes. UI descriptor checks
-verify internal consistency only; Tsquid cannot consume admin.yml yet.
+action writes, admin field allowlists and 22 routes grouped across 10 entrypoints.
+UI descriptor checks verify internal consistency only; Tsquid cannot consume admin.yml yet.
 
 ## Remaining checks, not yet demonstrated gaps
 
 - Pin mutually compatible standalone packages and prove compiler/runtime wiring.
-- Verify Tsquid-compatible initial HTML rendering for public content. If an actual
-  compatibility spike demonstrates a missing feature, file a focused upstream issue
-  with its reproduction and proposed adapter rather than guessing now.
+- SSR/prerender and initial-HTML SEO are deferred beyond v1, per review. The
+  public frontend remains a client-rendered Tsquid app.
 - SQLite upgrades remain application-owned reviewed migrations; the initial
   installer is not an upgrade engine.

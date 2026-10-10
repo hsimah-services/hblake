@@ -19,7 +19,7 @@
     },
     {
       "name": "PostList",
-      "entryPoint": "src/components/postList/PostList.entrypoint.ts",
+      "entryPoint": "src/components/post/Post.entrypoint.ts",
       "path": "/posts",
       "fields": {
         "after": {
@@ -40,7 +40,7 @@
     },
     {
       "name": "ProductList",
-      "entryPoint": "src/components/productList/ProductList.entrypoint.ts",
+      "entryPoint": "src/components/product/Product.entrypoint.ts",
       "path": "/products",
       "fields": {
         "after": {
@@ -67,13 +67,13 @@
     },
     {
       "name": "AdminHome",
-      "entryPoint": "src/components/adminHome/AdminHome.entrypoint.ts",
+      "entryPoint": "src/components/admin/Admin.entrypoint.ts",
       "path": "/admin",
       "fields": {}
     },
     {
       "name": "AdminPageList",
-      "entryPoint": "src/components/adminPageList/AdminPageList.entrypoint.ts",
+      "entryPoint": "src/components/admin-page/AdminPage.entrypoint.ts",
       "path": "/admin/pages",
       "fields": {
         "after": {
@@ -84,13 +84,13 @@
     },
     {
       "name": "AdminPageCreate",
-      "entryPoint": "src/components/adminPageCreate/AdminPageCreate.entrypoint.ts",
+      "entryPoint": "src/components/admin-page/AdminPage.entrypoint.ts",
       "path": "/admin/pages/new",
       "fields": {}
     },
     {
       "name": "AdminPageDetail",
-      "entryPoint": "src/components/adminPageDetail/AdminPageDetail.entrypoint.ts",
+      "entryPoint": "src/components/admin-page/AdminPage.entrypoint.ts",
       "path": "/admin/pages/:id",
       "fields": {
         "id": {
@@ -100,7 +100,7 @@
     },
     {
       "name": "AdminPageEdit",
-      "entryPoint": "src/components/adminPageEdit/AdminPageEdit.entrypoint.ts",
+      "entryPoint": "src/components/admin-page/AdminPage.entrypoint.ts",
       "path": "/admin/pages/:id/edit",
       "fields": {
         "id": {
@@ -110,7 +110,7 @@
     },
     {
       "name": "AdminPostList",
-      "entryPoint": "src/components/adminPostList/AdminPostList.entrypoint.ts",
+      "entryPoint": "src/components/admin-post/AdminPost.entrypoint.ts",
       "path": "/admin/posts",
       "fields": {
         "after": {
@@ -121,13 +121,13 @@
     },
     {
       "name": "AdminPostCreate",
-      "entryPoint": "src/components/adminPostCreate/AdminPostCreate.entrypoint.ts",
+      "entryPoint": "src/components/admin-post/AdminPost.entrypoint.ts",
       "path": "/admin/posts/new",
       "fields": {}
     },
     {
       "name": "AdminPostDetail",
-      "entryPoint": "src/components/adminPostDetail/AdminPostDetail.entrypoint.ts",
+      "entryPoint": "src/components/admin-post/AdminPost.entrypoint.ts",
       "path": "/admin/posts/:id",
       "fields": {
         "id": {
@@ -137,7 +137,7 @@
     },
     {
       "name": "AdminPostEdit",
-      "entryPoint": "src/components/adminPostEdit/AdminPostEdit.entrypoint.ts",
+      "entryPoint": "src/components/admin-post/AdminPost.entrypoint.ts",
       "path": "/admin/posts/:id/edit",
       "fields": {
         "id": {
@@ -147,7 +147,7 @@
     },
     {
       "name": "AdminProductList",
-      "entryPoint": "src/components/adminProductList/AdminProductList.entrypoint.ts",
+      "entryPoint": "src/components/admin-product/AdminProduct.entrypoint.ts",
       "path": "/admin/products",
       "fields": {
         "after": {
@@ -158,13 +158,13 @@
     },
     {
       "name": "AdminProductCreate",
-      "entryPoint": "src/components/adminProductCreate/AdminProductCreate.entrypoint.ts",
+      "entryPoint": "src/components/admin-product/AdminProduct.entrypoint.ts",
       "path": "/admin/products/new",
       "fields": {}
     },
     {
       "name": "AdminProductDetail",
-      "entryPoint": "src/components/adminProductDetail/AdminProductDetail.entrypoint.ts",
+      "entryPoint": "src/components/admin-product/AdminProduct.entrypoint.ts",
       "path": "/admin/products/:id",
       "fields": {
         "id": {
@@ -174,7 +174,7 @@
     },
     {
       "name": "AdminProductEdit",
-      "entryPoint": "src/components/adminProductEdit/AdminProductEdit.entrypoint.ts",
+      "entryPoint": "src/components/admin-product/AdminProduct.entrypoint.ts",
       "path": "/admin/products/:id/edit",
       "fields": {
         "id": {
@@ -183,25 +183,8 @@
       }
     },
     {
-      "name": "AdminUserList",
-      "entryPoint": "src/components/adminUserList/AdminUserList.entrypoint.ts",
-      "path": "/admin/users",
-      "fields": {
-        "after": {
-          "kind": "string",
-          "optional": true
-        }
-      }
-    },
-    {
-      "name": "AdminUserCreate",
-      "entryPoint": "src/components/adminUserCreate/AdminUserCreate.entrypoint.ts",
-      "path": "/admin/users/new",
-      "fields": {}
-    },
-    {
       "name": "AdminUserDetail",
-      "entryPoint": "src/components/adminUserDetail/AdminUserDetail.entrypoint.ts",
+      "entryPoint": "src/components/admin-user/AdminUser.entrypoint.ts",
       "path": "/admin/users/:id",
       "fields": {
         "id": {
@@ -211,7 +194,7 @@
     },
     {
       "name": "AdminUserEdit",
-      "entryPoint": "src/components/adminUserEdit/AdminUserEdit.entrypoint.ts",
+      "entryPoint": "src/components/admin-user/AdminUser.entrypoint.ts",
       "path": "/admin/users/:id/edit",
       "fields": {
         "id": {

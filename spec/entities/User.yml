@@ -31,5 +31,5 @@ readPolicies:
     handler: true
 writePolicies:
   adminAccounts:
-    description: Active admins manage accounts; preserve at least one active admin.
+    description: Active admins may update account profiles.
     handler: true

@@ -5,10 +5,10 @@ services and products, and gives visitors a clear way to enquire. Launch content
 can be limited to Home, Services, About and Contact Pages. Posts and Products can
 remain empty, with useful empty states and no fabricated content.
 
-Use a consistent header, navigation, footer and content layout. The owner supplies
+The site has a consistent header, navigation, footer and content layout. The owner supplies
 business name, positioning, services, contact details and any legal copy before
-launch. Public typography and spacing prioritize readable content. Follow Tsquid's
-Astryx/StyleX UI conventions, keyboard access, visible focus and responsive layouts.
+launch. Public typography and spacing prioritize readable content. Its UI follows Tsquid's Astryx/StyleX conventions with keyboard access, visible
+focus and responsive layouts.
 
 | Route | Behavior |
 | --- | --- |
@@ -19,8 +19,9 @@ Astryx/StyleX UI conventions, keyboard access, visible focus and responsive layo
 | `/products` | Published offerings, title ascending then ID, pagination |
 | `/products/:slug` | Published offering, optional safe enquiry link, or 404 |
 | `/admin/login` | Staff login |
-| `/admin` | Links to content management; Users link for admins |
-| `/admin/{pages,posts,products,users}` | Authorized generated management views |
+| `/admin` | Links to content management and the operator account profile |
+| `/admin/{pages,posts,products}` | Authorized generated content management views |
+| `/admin/users/:id` and `/admin/users/:id/edit` | Operator profile detail and edit |
 
 Navigation omits a link whose backing page is missing or draft. Show Posts and
 Products navigation when published records exist. No arbitrary user-defined route
@@ -35,19 +36,38 @@ outside this version and the edit screen must make the consequence clear.
 Markdown bodies store source text. Render with raw HTML disabled and sanitize
 output and URLs. Draft content may be blank. Published content requires a nonblank
 title and body. Limit request/body size to 1 MiB and enforce it on the server.
-Titles are nonblank after trimming; excerpts are plain text for cards and metadata.
+Titles are nonblank after trimming; excerpts are plain text for cards and metadata,
+limited to 300 characters in the shared schema and form.
 `publish` sets status and first `publishedAt` together; repeat publication retains
-that timestamp. `unpublish` retains it. Verifiers enforce these invariants even
-when a caller uses a direct generated update rather than an action.
+that timestamp. `unpublish` retains it. On create, verifiers require `draft` status
+and null `publishedAt`. On update, changes to either field require the corresponding
+`publish`/`unpublish` action in the mutation context's `actions()`; unchanged values
+are allowed during ordinary saves. `unpublish` changes status only; `publish` stamps
+first publication time from the server clock, using the persisted original timestamp
+rather than a client-supplied pending value. Unpublish preserves the persisted
+timestamp. Verifiers check those outcomes as well as action presence, so attaching
+an action cannot authorize arbitrary timestamps. Arbitrary direct field changes are
+rejected even though current generated inputs include those fields. The six generated
+field-verifier contracts (two fields per content entity) share application logic.
+Action-only field inputs are tracked in Elephentity #103 and are deferred for v1.
 
 Public lists, counts, node lookups and by-slug queries all enforce publication
 policies. Draft detail requests return the same public 404 as unknown content.
-Staff can open an authenticated draft preview using the detail rendering; that
+The operator can open an authenticated draft preview using the detail rendering; that
 preview must not enter shared caches or public search metadata.
 
-Public pages need content-specific document title, description from excerpt,
-canonical URL and social metadata. Content must be available in initial HTML for
-search and link previews. Architecture verification must resolve SSR/prerender
-support before launch. Cache public HTML only; invalidate changed content and
-list/home outputs on update or unpublish. Never cache admin/session responses in
-shared caches. No analytics, newsletter, uploads, search, comments or checkout.
+Public pages have content-specific document title, description from excerpt,
+canonical URL and social metadata updated by the client. V1 uses Tsquid's client
+rendering with no SSR or prerender requirement. Initial HTML contains the app shell;
+slow first loads and reduced search/link-preview metadata are accepted before the
+business launches. Initial-HTML SEO is deferred to a later rendering enhancement.
+
+V1 accepts policy-filtered paging that may produce short or empty pages and slow
+counts on the small content dataset. Draft visibility remains enforced; clients use
+pageInfo to offer continuation even from an empty page. Consistent keyset paging is
+tracked upstream in Elephentity #102. There is no v1 published-query workaround.
+
+Public content responses may be cached with invalidation on update or unpublish;
+admin/session/draft responses are excluded from shared caches. The static app shell
+contains no private content. V1 includes no analytics, newsletter, uploads, search,
+comments or checkout.
