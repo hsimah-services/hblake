@@ -5,13 +5,13 @@ description: I Built a Code Generator Because Agents Are Too Creative
 ---
 Much of reliable application engineering is boring. That is a feature. A good feature. Users should not be surprised by inconsistent behavior, and data integrity should not depend on which day a particular getter was written.
 
-Most application plumbing is largely identical. Aside from the particulars of an entity, its getters, setters, mutations, relationships and queries differ primarily by type, name and storage key. A quick audit of one of my personal projects found that Elephentity generates nearly 80% of its shipped first-party backend PHP.
+Most application plumbing is largely identical. Aside from the particulars of an entity, its getters, setters, mutations, relationships and queries differ primarily by type, name and storage key. A quick audit of one of my personal projects found that nearly 80% of its shipped first-party backend PHP was consistent, repeatable boilerplate.
 
 Generative coding agents are very good at solving the problem in front of them, but they do not have to deal with the consequences of the code they write. That is squarely on my shoulders. In the past two years of working with coding agents, I have seen them be consistently inconsistent with how they complete a given task - on one day an agent may generate a getter with one signature; on another, it may choose a different one. Is it a big deal? I think so. In time these divergent methods may cause issues - more time to reason about the project when starting future work, more context lost to tracking these unique changes. Over time they compound, requiring more conditional branches, more tests and allowing more edge cases.
 
 Agents work fast, and at a scale which can overwhelm humans trying to review all the PRs for the project. As a project grows, this headache multiplies. Often we end up scanning the bulk of the changes, playing “spot the inconsistency” rather than having a solid comprehension of the changes. Such is the downside of using probabilistic tools for deterministic work.
 ## YAML In, Boring Code Out
-![Elephentity logo](https://github.com/hsimah-services/elephentity/blob/main/assets/elephentity.svg)
+![Elephentity logo](/assets/elephentity.svg)
 Along with my own agents, I built my own code generator framework - say hello to [Elephentity](https://github.com/hsimah-services/elephentity). As I adopted agentic coding for my personal projects I found myself dismayed at the lack of code quality I was seeing. I am pedantic about what I write, and I was struggling to get the agents to write like me. So, I made sure the agents could only write code like me.
 
 Elephentity turns a concise YAML entity specification into deterministic, signed application code. I picked YAML due to its balance of flexibility and structure, and because it is both readable to humans and agents. Markdown can become overwhelming to humans and agents, config-in-code requires significantly more framework support than I wanted to invest.
