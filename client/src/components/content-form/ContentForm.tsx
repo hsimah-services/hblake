@@ -1,14 +1,13 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useBlocker } from 'react-router';
 import { Button, Heading, Stack, TextInput, TextArea } from '@astryxdesign/core';
 import { Markdown } from '../markdown/Markdown';
-import { WebsiteMutation } from '../website/WebsiteMutation';
 
 const CONTENT_FIELDS = ['title', 'slug', 'content', 'excerpt', 'enquiryUrl'];
 const PROFILE_FIELDS = ['displayName', 'email'];
 
-export function ContentForm({ kind, row }: ContentFormProps) {
-  const form = useContentForm(kind, row);
+export function ContentForm({ kind, row, save, detail }: ContentFormProps) {
+  const form = useContentForm(kind, row, save, detail);
   return <form ref={form.element} onSubmit={form.submit} noValidate>
     <Stack gap={4} align="stretch">
       {form.error && <p role="alert">{form.error}</p>}
@@ -29,7 +28,7 @@ export function ContentForm({ kind, row }: ContentFormProps) {
   </form>;
 }
 
-function useContentForm(kind: string, row: ContentFormRow | null | undefined) {
+function useContentForm(kind: string, row: ContentFormRow | null | undefined, save: ContentFormProps['save'], detail: ContentFormProps['detail']) {
   const initial = initialValues(row);
   const [values, setValues] = useState(initial);
   const [invalid, setInvalid] = useState<Record<string, boolean>>({});
@@ -39,19 +38,17 @@ function useContentForm(kind: string, row: ContentFormRow | null | undefined) {
   const clean = useRef(JSON.stringify(initial));
   const dirty = JSON.stringify(values) !== clean.current;
   const navigate = useNavigate();
-  const mutation = WebsiteMutation();
+  const blocker = useBlocker(() => JSON.stringify(values) !== clean.current);
+  useEffect(() => {
+    if (blocker.state !== 'blocked') return;
+    if (window.confirm('Discard unsaved changes?')) blocker.proceed();
+    else blocker.reset();
+  }, [blocker]);
   useEffect(() => {
     if (!dirty) return;
     const before = (event: BeforeUnloadEvent) => { event.preventDefault(); };
-    const click = (event: MouseEvent) => {
-      const link = event.target instanceof Element ? event.target.closest('a') : null;
-      if (link?.href && link.origin === window.location.origin && !window.confirm('Discard unsaved changes?')) {
-        event.preventDefault(); event.stopPropagation();
-      }
-    };
     window.addEventListener('beforeunload', before);
-    document.addEventListener('click', click, true);
-    return () => { window.removeEventListener('beforeunload', before); document.removeEventListener('click', click, true); };
+    return () => { window.removeEventListener('beforeunload', before); };
   }, [dirty]);
   function change(field: string, value: string) { setValues(previous => ({ ...previous, [field]: value })); }
   async function submit(event: FormEvent) {
@@ -65,12 +62,9 @@ function useContentForm(kind: string, row: ContentFormRow | null | undefined) {
       const fields = kind === 'User' ? PROFILE_FIELDS : kind === 'Product' ? CONTENT_FIELDS : CONTENT_FIELDS.slice(0, 4);
       const input: Record<string, unknown> = Object.fromEntries(fields.map(field => [field, field === 'enquiryUrl' ? values[field] || null : values[field]]));
       if (row) input.id = row.id;
-      const action = row ? 'update' : 'create';
-      const response = await mutation(action, kind, input);
-      const payload = response[kind === 'User' ? 'updateAdminUser' : action + kind] as Record<string, { id: string }>;
-      const saved = payload[kind === 'User' ? 'adminUser' : kind.toLowerCase()];
+      const id = await save(input);
       clean.current = JSON.stringify(values);
-      navigate(`/admin/${kind.toLowerCase()}s/${encodeURIComponent(saved.id)}`, { state: { notice: row ? 'Saved successfully.' : 'Created successfully.' } });
+      navigate(detail(id), { state: { notice: row ? 'Saved successfully.' : 'Created successfully.' } });
     } catch (reason) { setError(reason instanceof Error ? reason.message : 'Save failed. Your edits have been kept.'); }
     finally { setPending(false); }
   }
@@ -101,4 +95,4 @@ function isSafeEnquiry(value: string): boolean {
 }
 
 type ContentFormRow = { readonly id: string; readonly [field: string]: unknown };
-type ContentFormProps = { kind: string; row?: ContentFormRow | null };
+type ContentFormProps = { kind: string; row?: ContentFormRow | null; save: (input: Record<string, unknown>) => Promise<string>; detail: (id: string) => string };

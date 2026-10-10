@@ -62,4 +62,4 @@ scripts/acceptance/restore /private/path/site-backup.sqlite
 
 Backup uses SQLite `VACUUM INTO` for a consistent snapshot. Restore validates integrity, stops the server, replaces the database and restarts before returning. Run the equivalent procedure under maintenance mode in production. Do not rerun the initial installer as an upgrade; future schema changes require a reviewed migration and a tested backup/restore.
 
-V1 is client-rendered. Initial-HTML SEO, concurrent edit protection, additional accounts and commerce are deferred, as recorded in the specification. Owner-provided branding, content and contact details are still required before a public launch.
+V1 is client-rendered. Initial-HTML SEO, concurrent edit protection, additional accounts and commerce are deferred, as recorded in the specification. Owner-provided site name (replacing the neutral Website placeholder), branding, content and contact details are still required before a public launch.

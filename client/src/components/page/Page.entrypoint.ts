@@ -1,17 +1,16 @@
 import { createElement } from 'react';
 import { resource, type EntryPointProps, type RouteEntryPoint } from '@tsquid/routes/entrypoint';
-import { Website } from '../website/Website';
-import { WebsiteQueryVariables, type WebsiteQueryRoute } from '../website/WebsiteQuery';
-import WEBSITE_QUERY_NODE, { type WebsiteQuery } from '../website/__generated__/WebsiteQuery.graphql';
+import { Page } from './Page';
+import { PageQueryVariables } from './PageQuery';
+import QUERY_NODE, { type PageQuery } from './__generated__/PageQuery.graphql';
+import type { EntryRoute } from '../../routes/EntryRoute';
 
-export function PageEntryPoint({ queries, extraProps }: EntryPointProps<Queries, Empty, Empty, WebsiteQueryRoute>) {
-  return createElement(Website, { queryRef: queries.website, route: extraProps });
-}
+export function PageEntryPoint({ queries }: EntryPointProps<Queries, Empty, Empty, Empty>) { return createElement(Page, { queryRef: queries.content }); }
 
-export const PAGE_ENTRY_POINT: RouteEntryPoint<WebsiteQueryRoute, Queries, Empty, Empty, WebsiteQueryRoute> = {
+export const PAGE_ENTRY_POINT: RouteEntryPoint<EntryRoute, Queries, Empty, Empty, Empty> = {
   root: resource('Page', PageEntryPoint),
-  getPreloadProps: (route) => ({ queries: { website: { parameters: WEBSITE_QUERY_NODE, variables: WebsiteQueryVariables(route), options: { fetchPolicy: 'network-only' } } }, extraProps: route }),
+  getPreloadProps: route => ({ queries: { content: { parameters: QUERY_NODE, variables: PageQueryVariables(route), options: { fetchPolicy: 'network-only' } } } }),
 };
 
-type Queries = { website: WebsiteQuery };
+type Queries = { content: PageQuery };
 type Empty = Record<string, never>;

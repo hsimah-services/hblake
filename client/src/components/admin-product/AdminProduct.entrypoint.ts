@@ -1,17 +1,16 @@
 import { createElement } from 'react';
 import { resource, type EntryPointProps, type RouteEntryPoint } from '@tsquid/routes/entrypoint';
-import { Website } from '../website/Website';
-import { WebsiteQueryVariables, type WebsiteQueryRoute } from '../website/WebsiteQuery';
-import WEBSITE_QUERY_NODE, { type WebsiteQuery } from '../website/__generated__/WebsiteQuery.graphql';
+import { AdminProduct } from './AdminProduct';
+import { AdminProductQueryVariables } from './AdminProductQuery';
+import QUERY_NODE, { type AdminProductQuery } from './__generated__/AdminProductQuery.graphql';
+import type { EntryRoute } from '../../routes/EntryRoute';
 
-export function AdminProductEntryPoint({ queries, extraProps }: EntryPointProps<Queries, Empty, Empty, WebsiteQueryRoute>) {
-  return createElement(Website, { queryRef: queries.website, route: extraProps });
-}
+export function AdminProductEntryPoint({ queries }: EntryPointProps<Queries, Empty, Empty, Empty>) { return createElement(AdminProduct, { queryRef: queries.content }); }
 
-export const ADMIN_PRODUCT_ENTRY_POINT: RouteEntryPoint<WebsiteQueryRoute, Queries, Empty, Empty, WebsiteQueryRoute> = {
+export const ADMIN_PRODUCT_ENTRY_POINT: RouteEntryPoint<EntryRoute, Queries, Empty, Empty, Empty> = {
   root: resource('AdminProduct', AdminProductEntryPoint),
-  getPreloadProps: (route) => ({ queries: { website: { parameters: WEBSITE_QUERY_NODE, variables: WebsiteQueryVariables(route), options: { fetchPolicy: 'network-only' } } }, extraProps: route }),
+  getPreloadProps: route => ({ queries: { content: { parameters: QUERY_NODE, variables: AdminProductQueryVariables(route), options: { fetchPolicy: 'network-only' } } } }),
 };
 
-type Queries = { website: WebsiteQuery };
+type Queries = { content: AdminProductQuery };
 type Empty = Record<string, never>;
