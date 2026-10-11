@@ -1,2 +1,23 @@
-body { margin: 0; background: var(--color-bg-primary); color: var(--color-text-primary); }
+/* Site palette: each light/dark value keeps AA contrast against --site-canvas. */
+:root {
+  --site-canvas: light-dark(#f7f6fb, #14152b);
+  --site-green: light-dark(#1f6b33, #6ee49a);
+  --site-orange: light-dark(#a3400f, #ffa36b);
+  --site-blue: light-dark(#0f6680, #5cc8f0);
+  --site-red: light-dark(#ad193c, #ff7a98);
+  --site-violet: light-dark(#6b2fd1, #b89cff);
+  --site-hairline: color-mix(in srgb, var(--color-text-primary) 14%, transparent);
+}
+
+body {
+  margin: 0;
+  color: var(--color-text-primary);
+  background-color: var(--site-canvas);
+  background-image:
+    radial-gradient(ellipse 60% 50% at 0% 0%, light-dark(#12677e2e, #12677e59), transparent),
+    radial-gradient(ellipse 50% 45% at 100% 10%, light-dark(#ad193c24, #ad193c4d), transparent),
+    radial-gradient(ellipse 70% 50% at 50% 100%, light-dark(#6b2fd11f, #6b2fd147), transparent);
+  background-attachment: fixed;
+}
+
 :focus-visible { outline: 2px solid var(--color-text-primary); outline-offset: 3px; }

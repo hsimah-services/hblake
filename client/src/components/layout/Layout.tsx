@@ -8,6 +8,9 @@ import { SITE_NAME } from '../../SiteName';
 import { authRequest } from '../../authRequest';
 import type { LayoutFragment$key } from './__generated__/LayoutFragment.graphql';
 
+// Navigation hover colours match the home page destination tiles.
+const NAVIGATION_TONES: Readonly<Record<string, NavigationTone>> = { about: 'green', frameworks: 'orange', portfolio: 'blue', contact: 'red' };
+
 const LAYOUT_FRAGMENT = graphql`fragment LayoutFragment on RootQuery {
   viewer { id displayName role }
   navigationPages: pages(first: 100) { nodes { id title slug status } }
@@ -19,14 +22,14 @@ export function Layout({ data, row, title, admin = false, children }: LayoutProp
   const layout = useLayout(data, row, title, admin);
   return <Stack gap={6} align="stretch" xstyle={styles.shell}>
     <header {...stylex.props(styles.header)}><Stack direction="horizontal" gap={4} align="center" xstyle={styles.headerRow}>
-      <Link href={HomeURI.getURI({})}>{SITE_NAME}</Link>
-      <nav aria-label="Main navigation"><Stack direction="horizontal" gap={4} xstyle={styles.navigation}>
-        <Link href="/" label="Home">
+      <Link href={HomeURI.getURI({})} weight="bold" color="inherit" xstyle={styles.siteName}>{SITE_NAME}</Link>
+      <nav aria-label="Main navigation"><Stack direction="horizontal" gap={1} xstyle={styles.navigation}>
+        <Link href="/" label="Home" color="inherit" xstyle={[styles.navigationLink, styles.violet]}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9" />
           </svg>
         </Link>
-        {layout.navigation.map(link => <Link key={link.href} href={link.href}>{link.href === PageURI.getURI({ slug: 'contact' }) ? 'Contact' : link.title}</Link>)}
+        {layout.navigation.map(link => <Link key={link.href} href={link.href} color="inherit" xstyle={[styles.navigationLink, styles[link.tone]]}>{link.href === PageURI.getURI({ slug: 'contact' }) ? 'Contact' : link.title}</Link>)}
       </Stack></nav>
       {layout.viewer && <Button label="Sign out" clickAction={layout.signOut} isDisabled={!layout.csrf} />}
     </Stack></header>
@@ -55,14 +58,14 @@ function useLayout(key: LayoutFragment$key, row: LayoutRow | null | undefined, t
   const data = useFragment(LAYOUT_FRAGMENT, key);
   const location = useLocation(); const navigate = useNavigate();
   const [csrf, setCsrf] = useState(''); const [error, setError] = useState('');
-  const navigation = data.navigationPages?.nodes?.filter(value => value?.status === 'PUBLISHED' && value.slug !== 'home').map(value => ({ title: value!.title, href: PageURI.getURI({ slug: value!.slug }) })) ?? [];
+  const navigation: NavigationLink[] = data.navigationPages?.nodes?.filter(value => value?.status === 'PUBLISHED' && value.slug !== 'home').map(value => ({ title: value!.title, href: PageURI.getURI({ slug: value!.slug }), tone: NAVIGATION_TONES[value!.slug] ?? 'violet' })) ?? [];
   const order = ['about', 'frameworks', 'portfolio', 'contact'].map(slug => PageURI.getURI({ slug }));
   navigation.sort((a, b) => {
     const first = order.indexOf(a.href); const second = order.indexOf(b.href);
     return (first < 0 ? order.length : first) - (second < 0 ? order.length : second);
   });
-  if (data.navigationPosts?.nodes?.some(value => value?.status === 'PUBLISHED')) navigation.push({ title: 'Posts', href: PostListURI.getURI({}) });
-  if (data.navigationProducts?.nodes?.some(value => value?.status === 'PUBLISHED')) navigation.push({ title: 'Products', href: ProductListURI.getURI({}) });
+  if (data.navigationPosts?.nodes?.some(value => value?.status === 'PUBLISHED')) navigation.push({ title: 'Posts', href: PostListURI.getURI({}), tone: 'violet' });
+  if (data.navigationProducts?.nodes?.some(value => value?.status === 'PUBLISHED')) navigation.push({ title: 'Products', href: ProductListURI.getURI({}), tone: 'violet' });
   useEffect(() => { updateMetadata(row, title, location.pathname, admin); }, [row, title, location.pathname, admin]);
   useEffect(() => {
     if (!data.viewer) return;
@@ -94,14 +97,46 @@ function setMeta(name: string, content: string, property = false) {
   tag.content = content;
 }
 
+type NavigationTone = 'green' | 'orange' | 'blue' | 'red' | 'violet';
+type NavigationLink = { title: string; href: string; tone: NavigationTone };
 type LayoutRow = { readonly title?: unknown; readonly excerpt?: unknown; readonly status?: unknown };
 type LayoutProps = { data: LayoutFragment$key; row?: LayoutRow | null; title?: string; admin?: boolean; children: ReactNode };
 
 const styles = stylex.create({
   shell: { width: '100%', maxWidth: '72rem', minHeight: '100vh', marginInline: 'auto', padding: 'var(--spacing-6)' },
-  header: { borderBottom: '1px solid var(--color-text-primary)', paddingBlock: '1rem', fontSize: '0.9rem' },
+  // Translucent so the page shows through, blurred so the menu stays legible over content.
+  header: {
+    position: 'sticky', top: 'var(--spacing-3)', zIndex: 10, paddingBlock: '0.75rem', paddingInline: '1.25rem', fontSize: '0.9rem',
+    backgroundColor: 'color-mix(in srgb, var(--site-canvas) 72%, transparent)', backdropFilter: 'blur(14px) saturate(160%)',
+    border: '1px solid var(--site-hairline)', borderRadius: '1rem', boxShadow: '0 10px 30px -18px rgb(0 0 0 / 0.5)',
+  },
+  siteName: { fontSize: '1.05rem', letterSpacing: '0.02em' },
+  navigationLink: {
+    display: 'inline-flex', alignItems: 'center', minHeight: '2.25rem', paddingInline: '0.75rem', borderRadius: '999px', textDecoration: 'none',
+    transitionProperty: 'color, background-color', transitionDuration: 'var(--duration-fast)', transitionTimingFunction: 'var(--ease-standard)',
+  },
+  green: {
+    color: { default: 'var(--color-text-primary)', ':hover': 'var(--site-green)', ':focus-visible': 'var(--site-green)' },
+    backgroundColor: { default: 'transparent', ':hover': 'color-mix(in srgb, var(--site-green) 14%, transparent)', ':focus-visible': 'color-mix(in srgb, var(--site-green) 14%, transparent)' },
+  },
+  orange: {
+    color: { default: 'var(--color-text-primary)', ':hover': 'var(--site-orange)', ':focus-visible': 'var(--site-orange)' },
+    backgroundColor: { default: 'transparent', ':hover': 'color-mix(in srgb, var(--site-orange) 14%, transparent)', ':focus-visible': 'color-mix(in srgb, var(--site-orange) 14%, transparent)' },
+  },
+  blue: {
+    color: { default: 'var(--color-text-primary)', ':hover': 'var(--site-blue)', ':focus-visible': 'var(--site-blue)' },
+    backgroundColor: { default: 'transparent', ':hover': 'color-mix(in srgb, var(--site-blue) 14%, transparent)', ':focus-visible': 'color-mix(in srgb, var(--site-blue) 14%, transparent)' },
+  },
+  red: {
+    color: { default: 'var(--color-text-primary)', ':hover': 'var(--site-red)', ':focus-visible': 'var(--site-red)' },
+    backgroundColor: { default: 'transparent', ':hover': 'color-mix(in srgb, var(--site-red) 14%, transparent)', ':focus-visible': 'color-mix(in srgb, var(--site-red) 14%, transparent)' },
+  },
+  violet: {
+    color: { default: 'var(--color-text-primary)', ':hover': 'var(--site-violet)', ':focus-visible': 'var(--site-violet)' },
+    backgroundColor: { default: 'transparent', ':hover': 'color-mix(in srgb, var(--site-violet) 14%, transparent)', ':focus-visible': 'color-mix(in srgb, var(--site-violet) 14%, transparent)' },
+  },
   headerRow: { flexWrap: 'wrap', justifyContent: 'space-between' },
-  footer: { marginTop: 'auto', paddingBlock: '1.5rem', borderTop: '1px solid var(--color-text-primary)', fontSize: '0.85rem', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: '1rem' },
+  footer: { marginTop: 'auto', paddingBlock: '1.5rem', borderTop: '1px solid var(--site-hairline)', fontSize: '0.85rem', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: '1rem' },
   footerLinks: { flexWrap: 'wrap' },
   navigation: { flexWrap: 'wrap' },
   iconLink: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '44px', height: '44px' },

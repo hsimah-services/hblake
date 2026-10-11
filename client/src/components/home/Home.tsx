@@ -53,7 +53,14 @@ type HomeProps = { queryRef: PreloadedQuery<HomeQuery> };
 
 const styles = stylex.create({
   grid: { display: 'grid', gridTemplateColumns: { default: 'repeat(4, minmax(0, 1fr))', '@media (max-width: 900px)': 'repeat(2, minmax(0, 1fr))', '@media (max-width: 480px)': '1fr' }, gap: '1rem', marginBlock: '3rem' },
-  tile: { display: 'flex', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'space-between', gap: '1.25rem', minHeight: '17rem', padding: '1.5rem', color: '#ffffff', textDecoration: 'none', borderRadius: 0, boxShadow: { default: 'none', ':hover': '0 5px 0 currentColor' } },
+  // Hover and keyboard focus grow the tile; reduced motion keeps the change without animating it.
+  tile: {
+    position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'space-between', gap: '1.25rem', minHeight: '17rem', padding: '1.5rem', color: '#ffffff', textDecoration: 'none', borderRadius: 0,
+    zIndex: { default: 0, ':hover': 1, ':focus-visible': 1 },
+    transform: { default: 'none', ':hover': 'scale(1.04)', ':focus-visible': 'scale(1.04)' },
+    boxShadow: { default: '0 6px 16px -12px rgb(0 0 0 / 0.5)', ':hover': '0 22px 40px -18px rgb(0 0 0 / 0.65)', ':focus-visible': '0 22px 40px -18px rgb(0 0 0 / 0.65)' },
+    transitionProperty: 'transform, box-shadow', transitionDuration: { default: 'var(--duration-medium-min)', '@media (prefers-reduced-motion: reduce)': '0s' }, transitionTimingFunction: 'var(--ease-standard)',
+  },
   tileContent: { display: 'flex', flexDirection: 'column', gap: '1.25rem', minHeight: '14rem' },
   green: { backgroundColor: '#246b35' },
   orange: { backgroundColor: '#a64218' },
@@ -62,5 +69,5 @@ const styles = stylex.create({
   number: { fontSize: '3rem', lineHeight: 1, fontWeight: 300 },
   label: { fontSize: '1.4rem', fontWeight: 700 },
   excerpt: { fontSize: '0.9rem', lineHeight: 1.6 },
-  latest: { marginBlock: '3rem', paddingBlock: '2rem', borderTop: '1px solid var(--color-text-primary)' },
+  latest: { marginBlock: '3rem', paddingBlock: '2rem', borderTop: '1px solid var(--site-hairline)' },
 });
