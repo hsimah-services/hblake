@@ -8,7 +8,7 @@ export function HomeEntryPoint({ queries }: EntryPointProps<Queries>) { return c
 
 export const HOME_ENTRY_POINT: RouteEntryPoint<HomeEntryPointParams, Queries> = {
   root: resource('Home', HomeEntryPoint),
-  getPreloadProps: route => ({ queries: { content: { parameters: QUERY_NODE, variables: HomeRouteQuery.getVariables(route.input), options: { fetchPolicy: 'network-only' } } } }),
+  getPreloadProps: route => ({ queries: { content: { parameters: QUERY_NODE, variables: HomeRouteQuery.getVariables(route.input) } } }),
 };
 
 type Queries = { content: HomeQuery };

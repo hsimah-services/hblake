@@ -131,7 +131,10 @@ unions. These replace the application's handwritten URL adapters and variable
 functions. Tsquid's `tsquid-schema` and `tsquid-relay` commands replace local
 schema fetch/normalization and persisted-query scripts. Runtime network and mutation
 helpers replace the local transport and callback-to-promise wrapper, with application
-CSRF headers retained. Astryx links use the Tsquid preloading provider to satisfy
-the updated lint rules. Route queries retain network-only navigation so publication
-and deletion changes also refresh collection and navigation data.
+CSRF headers and strict GraphQL error handling retained. A shared mutation dispatcher
+invalidates cached route queries after successful writes. Astryx links use the Tsquid preloading provider to satisfy
+the updated lint rules. Route queries use store-or-network so hover preloads are reused during navigation;
+write invalidation refreshes collection and navigation data on the next load.
+Successful sign-in/sign-out invalidates the root record so route queries reload for
+the current session.
 Admin UI generation remains tracked in #7; these releases do not generate forms.

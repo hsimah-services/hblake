@@ -4,7 +4,7 @@ import { AdminPost } from './AdminPost';
 import LIST_NODE, { type AdminPostListQuery } from './__generated__/AdminPostListQuery.graphql';
 import QUERY_NODE, { type AdminPostQuery } from './__generated__/AdminPostQuery.graphql';
 import CREATE_NODE, { type AdminPostCreateQuery } from './__generated__/AdminPostCreateQuery.graphql';
-import { AdminPostListRouteQuery, AdminPostCreateRouteQuery, AdminPostDetailRouteQuery, AdminPostEditRouteQuery, RouteName, type AdminPostEntryPointParams } from '../../routes/__generated__/routes';
+import { AdminPostListRouteQuery, AdminPostCreateRouteQuery, AdminPostDetailRouteQuery, RouteName, type AdminPostEntryPointParams } from '../../routes/__generated__/routes';
 
 export function AdminPostEntryPoint({ queries }: EntryPointProps<Queries>) { return createElement(AdminPost, { list: queries.list, create: queries.create, content: queries.content }); }
 
@@ -12,10 +12,10 @@ export function AdminPostEntryPoint({ queries }: EntryPointProps<Queries>) { ret
 export const ADMIN_POST_ENTRY_POINT: RouteEntryPoint<AdminPostEntryPointParams, Queries> = {
   root: resource('AdminPost', AdminPostEntryPoint),
   getPreloadProps: route => ({ queries: route.currentRoute === RouteName.AdminPostList
-    ? { list: { parameters: LIST_NODE, variables: AdminPostListRouteQuery.getVariables(route.input), options: { fetchPolicy: 'network-only' } } }
+    ? { list: { parameters: LIST_NODE, variables: AdminPostListRouteQuery.getVariables(route.input) } }
     : route.currentRoute === RouteName.AdminPostCreate
-      ? { create: { parameters: CREATE_NODE, variables: AdminPostCreateRouteQuery.getVariables(route.input), options: { fetchPolicy: 'network-only' } } }
-      : { content: { parameters: QUERY_NODE, variables: (route.currentRoute === RouteName.AdminPostDetail ? AdminPostDetailRouteQuery.getVariables(route.input) : AdminPostEditRouteQuery.getVariables(route.input)), options: { fetchPolicy: 'network-only' } } } }),
+      ? { create: { parameters: CREATE_NODE, variables: AdminPostCreateRouteQuery.getVariables(route.input) } }
+      : { content: { parameters: QUERY_NODE, variables: AdminPostDetailRouteQuery.getVariables(route.input) } } }),
 };
 
 type Queries = { list?: AdminPostListQuery; create?: AdminPostCreateQuery; content?: AdminPostQuery };

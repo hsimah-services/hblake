@@ -29,7 +29,8 @@ function AdminPost_List({ queryRef }: { queryRef: PreloadedQuery<AdminPostListQu
 
 function AdminPost_Create({ queryRef }: { queryRef: PreloadedQuery<AdminPostCreateQuery> }) {
   const data = usePreloadedQuery<AdminPostCreateQuery>(ADMIN_POST_CREATE_QUERY, queryRef);
-  const save = useAdminPost_Save(null);
+  const mutate = AdminPostMutation();
+  const save = useAdminPost_Save(null, mutate);
   return <Layout data={data} title="Create Post" admin>
     <Heading level={1}>Create Post</Heading>
     <ContentForm key="new" kind="Post" save={save} detail={id => AdminPostDetailURI.getURI({ id })} />
@@ -39,7 +40,7 @@ function AdminPost_Create({ queryRef }: { queryRef: PreloadedQuery<AdminPostCrea
 function AdminPost_Content({ queryRef }: { queryRef: PreloadedQuery<AdminPostQuery> }) {
   const data = usePreloadedQuery<AdminPostQuery>(ADMIN_POST_QUERY, queryRef);
   const route = useAdminPostRouteContext(); const mutate = AdminPostMutation(); const row = data.post;
-  const save = useAdminPost_Save(row);
+  const save = useAdminPost_Save(row, mutate);
   const editing = route.currentRoute === RouteName.AdminPostEdit && row != null;
   return <Layout data={data} row={row} title={editing ? `Edit ${row.title}` : undefined} admin>
     {editing ? <>
@@ -49,8 +50,7 @@ function AdminPost_Content({ queryRef }: { queryRef: PreloadedQuery<AdminPostQue
   </Layout>;
 }
 
-function useAdminPost_Save(row: { readonly id: string } | null | undefined) {
-  const mutate = AdminPostMutation();
+function useAdminPost_Save(row: { readonly id: string } | null | undefined, mutate: ReturnType<typeof AdminPostMutation>) {
   return async function save(input: Record<string, unknown>): Promise<string> {
     const action = row ? 'update' : 'create'; const response = await mutate(action, input);
     return (response[action + 'Post'] as { post: { id: string } }).post.id;

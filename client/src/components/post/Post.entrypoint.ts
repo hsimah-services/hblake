@@ -11,8 +11,8 @@ export function PostEntryPoint({ queries }: EntryPointProps<Queries>) { return c
 export const POST_ENTRY_POINT: RouteEntryPoint<PostEntryPointParams, Queries> = {
   root: resource('Post', PostEntryPoint),
   getPreloadProps: route => ({ queries: route.currentRoute === RouteName.PostList
-    ? { list: { parameters: LIST_NODE, variables: PostListRouteQuery.getVariables(route.input), options: { fetchPolicy: 'network-only' } } }
-    : { content: { parameters: QUERY_NODE, variables: PostRouteQuery.getVariables(route.input), options: { fetchPolicy: 'network-only' } } } }),
+    ? { list: { parameters: LIST_NODE, variables: PostListRouteQuery.getVariables(route.input) } }
+    : { content: { parameters: QUERY_NODE, variables: PostRouteQuery.getVariables(route.input) } } }),
 };
 
 type Queries = { list?: PostListQuery; content?: PostQuery };

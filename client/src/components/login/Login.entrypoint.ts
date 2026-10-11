@@ -8,7 +8,7 @@ export function LoginEntryPoint({ queries }: EntryPointProps<Queries>) { return 
 
 export const LOGIN_ENTRY_POINT: RouteEntryPoint<LoginEntryPointParams, Queries> = {
   root: resource('Login', LoginEntryPoint),
-  getPreloadProps: route => ({ queries: { content: { parameters: QUERY_NODE, variables: LoginRouteQuery.getVariables(route.input), options: { fetchPolicy: 'network-only' } } } }),
+  getPreloadProps: route => ({ queries: { content: { parameters: QUERY_NODE, variables: LoginRouteQuery.getVariables(route.input) } } }),
 };
 
 type Queries = { content: LoginQuery };

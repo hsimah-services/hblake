@@ -8,7 +8,7 @@ export function AdminEntryPoint({ queries }: EntryPointProps<Queries>) { return 
 
 export const ADMIN_ENTRY_POINT: RouteEntryPoint<AdminEntryPointParams, Queries> = {
   root: resource('Admin', AdminEntryPoint),
-  getPreloadProps: route => ({ queries: { content: { parameters: QUERY_NODE, variables: AdminHomeRouteQuery.getVariables(route.input), options: { fetchPolicy: 'network-only' } } } }),
+  getPreloadProps: route => ({ queries: { content: { parameters: QUERY_NODE, variables: AdminHomeRouteQuery.getVariables(route.input) } } }),
 };
 
 type Queries = { content: AdminQuery };

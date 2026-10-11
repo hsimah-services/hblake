@@ -11,8 +11,8 @@ export function ProductEntryPoint({ queries }: EntryPointProps<Queries>) { retur
 export const PRODUCT_ENTRY_POINT: RouteEntryPoint<ProductEntryPointParams, Queries> = {
   root: resource('Product', ProductEntryPoint),
   getPreloadProps: route => ({ queries: route.currentRoute === RouteName.ProductList
-    ? { list: { parameters: LIST_NODE, variables: ProductListRouteQuery.getVariables(route.input), options: { fetchPolicy: 'network-only' } } }
-    : { content: { parameters: QUERY_NODE, variables: ProductRouteQuery.getVariables(route.input), options: { fetchPolicy: 'network-only' } } } }),
+    ? { list: { parameters: LIST_NODE, variables: ProductListRouteQuery.getVariables(route.input) } }
+    : { content: { parameters: QUERY_NODE, variables: ProductRouteQuery.getVariables(route.input) } } }),
 };
 
 type Queries = { list?: ProductListQuery; content?: ProductQuery };

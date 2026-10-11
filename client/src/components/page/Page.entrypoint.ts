@@ -8,7 +8,7 @@ export function PageEntryPoint({ queries }: EntryPointProps<Queries>) { return c
 
 export const PAGE_ENTRY_POINT: RouteEntryPoint<PageEntryPointParams, Queries> = {
   root: resource('Page', PageEntryPoint),
-  getPreloadProps: route => ({ queries: { content: { parameters: QUERY_NODE, variables: PageRouteQuery.getVariables(route.input), options: { fetchPolicy: 'network-only' } } } }),
+  getPreloadProps: route => ({ queries: { content: { parameters: QUERY_NODE, variables: PageRouteQuery.getVariables(route.input) } } }),
 };
 
 type Queries = { content: PageQuery };
