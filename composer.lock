@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c4623291a111c462c2acb4a4ddc9f7ad",
+    "content-hash": "f42946b1fd10f2ad998a08fe4e1cda92",
     "packages": [
         {
             "name": "elephentity/codegen-tsquid",
