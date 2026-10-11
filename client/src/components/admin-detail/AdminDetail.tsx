@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
-import { Link, useNavigate } from 'react-router';
-import { Button, Heading, Stack } from '@astryxdesign/core';
+import { useNavigate } from 'react-router';
+import { Link, Button, Heading, Stack } from '@astryxdesign/core';
 import { Markdown } from '../markdown/Markdown';
 
 export function AdminDetail({ kind, row, edit, list, mutate }: AdminDetailProps) {
@@ -8,7 +8,7 @@ export function AdminDetail({ kind, row, edit, list, mutate }: AdminDetailProps)
   return row ? <article><Heading level={1}>{row.title}</Heading>
     {detail.error && <p role="alert">{detail.error}</p>}
     <p>Status: {row.status}</p><p>Created: {row.createdAt}. Updated: {row.updatedAt}.</p>
-    <Stack direction="horizontal" gap={4}><Link to={edit}>Edit</Link>
+    <Stack direction="horizontal" gap={4}><Link href={edit}>Edit</Link>
       <Button label={row.status === 'PUBLISHED' ? 'Unpublish' : 'Publish'} clickAction={detail.publish} isLoading={detail.pending} />
       <Button label="Delete" onClick={detail.openDelete} />
     </Stack><Markdown content={row.content ?? ''} />{row.enquiryUrl && <a href={row.enquiryUrl}>Enquire</a>}

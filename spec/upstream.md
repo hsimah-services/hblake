@@ -79,7 +79,7 @@ UI descriptor checks verify internal consistency only; Tsquid cannot consume adm
 
 - SSR/prerender and initial-HTML SEO are deferred beyond v1, per review. The
   public frontend remains a client-rendered Tsquid app; route queries are hydrated
-  from inlined initial data using Tsquid 0.2.0 (PR #8) and
+  from inlined initial data using Tsquid 0.3.0 (including PR #8) and
   elephentity/codegen-tsquid 0.1.0.
 - SQLite upgrades remain application-owned reviewed migrations; the initial
   installer is not an upgrade engine.
@@ -121,3 +121,17 @@ Generated artifacts remain machine-owned. Tsquid admin generation is still #7;
 the application's shared forms are handwritten and are not claimed as generated.
 The client now owns queries, components and mutations per entrypoint/entity, with
 shared navigation supplied by a Relay fragment independent of collection cursors.
+
+## Tsquid 0.3.0 migration
+
+Verified npm release tags on 2026-10-11: `@tsquid/routes` and `@tsquid/codegen`
+0.3.0, `@tsquid/eslint-plugin` 0.2.0, and `@tsquid/vite` 0.1.1.
+The published generator emits route-query variable helpers and entrypoint parameter
+unions. These replace the application's handwritten URL adapters and variable
+functions. Tsquid's `tsquid-schema` and `tsquid-relay` commands replace local
+schema fetch/normalization and persisted-query scripts. Runtime network and mutation
+helpers replace the local transport and callback-to-promise wrapper, with application
+CSRF headers retained. Astryx links use the Tsquid preloading provider to satisfy
+the updated lint rules. Route queries retain network-only navigation so publication
+and deletion changes also refresh collection and navigation data.
+Admin UI generation remains tracked in #7; these releases do not generate forms.

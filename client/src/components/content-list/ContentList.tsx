@@ -1,12 +1,11 @@
-import { Heading, Stack } from '@astryxdesign/core';
-import { Link } from 'react-router';
+import { Link, Heading, Stack } from '@astryxdesign/core';
 
 export function ContentList({ title, rows, next, create, detail }: ContentListProps) {
   const list = useContentList(rows);
-  return <><Heading level={1}>{title}</Heading>{create && <Link to={create}>Create {title.slice(0, -1)}</Link>}
+  return <><Heading level={1}>{title}</Heading>{create && <Link href={create}>Create {title.slice(0, -1)}</Link>}
     {list.length === 0 && <p>No {title.toLowerCase()}.</p>}
-    {next && <Link to={next}>Next</Link>}
-    <Stack gap={4}>{list.map(row => <article key={row.id}><Heading level={2}><Link to={detail(row)}>{row.title}</Link></Heading><p>{row.excerpt}</p></article>)}</Stack>
+    {next && <Link href={next}>Next</Link>}
+    <Stack gap={4}>{list.map(row => <article key={row.id}><Heading level={2}><Link href={detail(row)}>{row.title}</Link></Heading><p>{row.excerpt}</p></article>)}</Stack>
   </>;
 }
 

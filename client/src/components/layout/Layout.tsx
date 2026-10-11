@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import { graphql, useFragment } from 'react-relay';
-import { Button, Stack } from '@astryxdesign/core';
+import { Link, Button, Stack } from '@astryxdesign/core';
 import * as stylex from '@stylexjs/stylex';
 import { HomeURI, PageURI, PostListURI, ProductListURI, AdminHomeURI, LoginURI } from '../../routes/__generated__/routes';
 import { SITE_NAME } from '../../SiteName';
@@ -19,10 +19,10 @@ export function Layout({ data, row, title, admin = false, children }: LayoutProp
   const layout = useLayout(data, row, title, admin);
   return <Stack gap={6} align="stretch" xstyle={styles.shell}>
     <header><Stack direction="horizontal" gap={4} align="center">
-      <Link to={HomeURI.getURI({})}>{SITE_NAME}</Link>
+      <Link href={HomeURI.getURI({})}>{SITE_NAME}</Link>
       <nav aria-label="Main navigation"><Stack direction="horizontal" gap={4}>
-        {layout.navigation.map(link => <Link key={link.href} to={link.href}>{link.title}</Link>)}
-        <Link to={AdminHomeURI.getURI({})}>Admin</Link>
+        {layout.navigation.map(link => <Link key={link.href} href={link.href}>{link.title}</Link>)}
+        <Link href={AdminHomeURI.getURI({})}>Admin</Link>
       </Stack></nav>
       {layout.viewer && <Button label="Sign out" clickAction={layout.signOut} isDisabled={!layout.csrf} />}
     </Stack></header>

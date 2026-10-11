@@ -10,11 +10,10 @@ scripts/php vendor/bin/phpstan analyse --no-progress
 scripts/php vendor/bin/phpunit
 scripts/node install --frozen-lockfile
 HSIMAH_DATABASE=:memory: scripts/php php server/console.php schema > .cache/server-schema.graphql
-scripts/node exec node scripts/check-schema.mjs
-diff -u .cache/client-schema.normalized.graphql .cache/server-schema.normalized.graphql
+scripts/node schema:check
 scripts/node routes:check
 scripts/node exec relay-compiler --validate
-scripts/node exec node scripts/check-persisted.mjs
+scripts/node relay:check
 scripts/node lint
 scripts/node exec tsc --noEmit
 scripts/node build
