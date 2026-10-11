@@ -1,11 +1,14 @@
 /**
- * @generated SignedSource<<6e3bfdf2056dac4e7396c693146f0fe0>>
+ * @generated SignedSource<<87ba51ae1609606cf114bceb31fb95d5>>
+ * @relayHash 43db37ab0ce359ef573e08a0b6089030
  * @lightSyntaxTransform
  */
 
 /* tslint:disable */
 /* eslint-disable */
 // @ts-nocheck
+
+// @relayRequestID 43db37ab0ce359ef573e08a0b6089030
 
 import { ConcreteRequest } from 'relay-runtime';
 export type PublicationStatus = "DRAFT" | "PUBLISHED" | "%future added value";
@@ -164,7 +167,7 @@ return {
   },
   "params": {
     "cacheID": "43db37ab0ce359ef573e08a0b6089030",
-    "id": null,
+    "id": "43db37ab0ce359ef573e08a0b6089030",
     "metadata": {},
     "name": "AdminProductUnpublishMutation",
     "operationKind": "mutation",

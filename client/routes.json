@@ -1,11 +1,13 @@
 {
   "runtime": "@tsquid/routes",
+  "persistedQueries": "persisted_queries.json",
   "routes": [
     {
       "name": "Home",
       "entryPoint": "src/components/home/Home.entrypoint.ts",
       "path": "/",
-      "fields": {}
+      "fields": {},
+      "query": "HomeQuery"
     },
     {
       "name": "Page",
@@ -15,7 +17,8 @@
         "slug": {
           "kind": "string"
         }
-      }
+      },
+      "query": "PageQuery"
     },
     {
       "name": "PostList",
@@ -26,7 +29,8 @@
           "kind": "string",
           "optional": true
         }
-      }
+      },
+      "query": "PostListQuery"
     },
     {
       "name": "Post",
@@ -36,7 +40,8 @@
         "slug": {
           "kind": "string"
         }
-      }
+      },
+      "query": "PostQuery"
     },
     {
       "name": "ProductList",
@@ -47,7 +52,8 @@
           "kind": "string",
           "optional": true
         }
-      }
+      },
+      "query": "ProductListQuery"
     },
     {
       "name": "Product",
@@ -57,19 +63,22 @@
         "slug": {
           "kind": "string"
         }
-      }
+      },
+      "query": "ProductQuery"
     },
     {
       "name": "Login",
       "entryPoint": "src/components/login/Login.entrypoint.ts",
       "path": "/admin/login",
-      "fields": {}
+      "fields": {},
+      "query": "LoginQuery"
     },
     {
       "name": "AdminHome",
       "entryPoint": "src/components/admin/Admin.entrypoint.ts",
       "path": "/admin",
-      "fields": {}
+      "fields": {},
+      "query": "AdminQuery"
     },
     {
       "name": "AdminPageList",
@@ -80,13 +89,15 @@
           "kind": "string",
           "optional": true
         }
-      }
+      },
+      "query": "AdminPageListQuery"
     },
     {
       "name": "AdminPageCreate",
       "entryPoint": "src/components/admin-page/AdminPage.entrypoint.ts",
       "path": "/admin/pages/new",
-      "fields": {}
+      "fields": {},
+      "query": "AdminPageCreateQuery"
     },
     {
       "name": "AdminPageDetail",
@@ -96,7 +107,8 @@
         "id": {
           "kind": "string"
         }
-      }
+      },
+      "query": "AdminPageQuery"
     },
     {
       "name": "AdminPageEdit",
@@ -106,7 +118,8 @@
         "id": {
           "kind": "string"
         }
-      }
+      },
+      "query": "AdminPageQuery"
     },
     {
       "name": "AdminPostList",
@@ -117,13 +130,15 @@
           "kind": "string",
           "optional": true
         }
-      }
+      },
+      "query": "AdminPostListQuery"
     },
     {
       "name": "AdminPostCreate",
       "entryPoint": "src/components/admin-post/AdminPost.entrypoint.ts",
       "path": "/admin/posts/new",
-      "fields": {}
+      "fields": {},
+      "query": "AdminPostCreateQuery"
     },
     {
       "name": "AdminPostDetail",
@@ -133,7 +148,8 @@
         "id": {
           "kind": "string"
         }
-      }
+      },
+      "query": "AdminPostQuery"
     },
     {
       "name": "AdminPostEdit",
@@ -143,7 +159,8 @@
         "id": {
           "kind": "string"
         }
-      }
+      },
+      "query": "AdminPostQuery"
     },
     {
       "name": "AdminProductList",
@@ -154,13 +171,15 @@
           "kind": "string",
           "optional": true
         }
-      }
+      },
+      "query": "AdminProductListQuery"
     },
     {
       "name": "AdminProductCreate",
       "entryPoint": "src/components/admin-product/AdminProduct.entrypoint.ts",
       "path": "/admin/products/new",
-      "fields": {}
+      "fields": {},
+      "query": "AdminProductCreateQuery"
     },
     {
       "name": "AdminProductDetail",
@@ -170,7 +189,8 @@
         "id": {
           "kind": "string"
         }
-      }
+      },
+      "query": "AdminProductQuery"
     },
     {
       "name": "AdminProductEdit",
@@ -180,7 +200,8 @@
         "id": {
           "kind": "string"
         }
-      }
+      },
+      "query": "AdminProductQuery"
     },
     {
       "name": "AdminUserDetail",
@@ -190,7 +211,8 @@
         "id": {
           "kind": "string"
         }
-      }
+      },
+      "query": "AdminUserQuery"
     },
     {
       "name": "AdminUserEdit",
@@ -200,7 +222,8 @@
         "id": {
           "kind": "string"
         }
-      }
+      },
+      "query": "AdminUserQuery"
     }
   ]
 }

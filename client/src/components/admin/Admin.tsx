@@ -8,7 +8,7 @@ import { AdminPageListURI, AdminPostListURI, AdminProductListURI, AdminUserDetai
 
 export function Admin({ queryRef }: AdminProps) {
   const data = usePreloadedQuery<AdminQuery>(ADMIN_QUERY, queryRef);
-  return <Layout data={data} admin><Heading level={1}>Administration</Heading><Stack gap={4}>
+  return <Layout data={data} title="Administration" admin><Heading level={1}>Administration</Heading><Stack gap={4}>
     <Link to={AdminPageListURI.getURI({})}>Pages</Link><Link to={AdminPostListURI.getURI({})}>Posts</Link><Link to={AdminProductListURI.getURI({})}>Products</Link>
     {data.viewer && <Link to={AdminUserDetailURI.getURI({ id: data.viewer.id ?? '' })}>Operator profile</Link>}
   </Stack></Layout>;

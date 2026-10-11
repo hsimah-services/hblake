@@ -1,7 +1,10 @@
 import { Environment, Network, RecordSource, Store, type FetchFunction } from 'relay-runtime';
+import { readInitialData, withInitialData } from '@tsquid/routes/initialData';
 
+// The PHP server inlines the initial route's query response as #tsquid-data
+// (routes.json `query`, generated/tsquid); later requests go to /graphql.
 export const ENVIRONMENT = new Environment({
-  network: Network.create(fetchGraphQL),
+  network: Network.create(withInitialData(fetchGraphQL, readInitialData(), { warn: import.meta.env.DEV })),
   store: new Store(new RecordSource()),
 });
 

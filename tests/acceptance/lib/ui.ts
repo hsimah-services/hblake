@@ -52,3 +52,40 @@ export function announcedError(page: Page): Locator {
 export async function xssFired(page: Page): Promise<boolean> {
   return page.evaluate(() => (window as unknown as { __xss?: unknown }).__xss !== undefined);
 }
+
+/**
+ * WCAG contrast ratio between an element's text colour and the colour actually painted
+ * behind it: the nearest opaque ancestor background, else the canvas for the page's
+ * colour scheme.
+ */
+export async function contrastOf(target: Locator): Promise<number> {
+  return target.evaluate(element => {
+    const rgb = (value: string): [number, number, number, number] => {
+      const parts = value.match(/[\d.]+/g)!.map(Number);
+      return [parts[0], parts[1], parts[2], parts[3] ?? 1];
+    };
+    // The page canvas follows the root element's colour scheme, not the element's.
+    const canvas = (): string => {
+      const probe = document.createElement('span');
+      probe.style.setProperty('background-color', 'Canvas');
+      document.documentElement.append(probe);
+      const resolved = getComputedStyle(probe).backgroundColor;
+      probe.remove();
+      return resolved;
+    };
+    let background = rgb(canvas());
+    for (let node: Element | null = element; node; node = node.parentElement) {
+      const value = rgb(getComputedStyle(node).backgroundColor);
+      if (value[3] > 0.99) {
+        background = value;
+        break;
+      }
+    }
+    const luminance = ([r, g, b]: number[]): number => {
+      const channel = (c: number): number => ((c /= 255) <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+      return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+    };
+    const [a, b] = [luminance(rgb(getComputedStyle(element).color)), luminance(background)].sort((x, y) => y - x);
+    return (a + 0.05) / (b + 0.05);
+  });
+}

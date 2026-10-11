@@ -10,7 +10,7 @@ import { AdminUserMutation } from './AdminUserMutation';
 
 export function AdminUser({ queryRef }: AdminUserProps) {
   const screen = useAdminUser(queryRef);
-  return <Layout data={screen.data} admin>{screen.row ? screen.route.currentRoute === RouteName.AdminUserEdit ? <>
+  return <Layout data={screen.data} title={screen.title} admin>{screen.row ? screen.route.currentRoute === RouteName.AdminUserEdit ? <>
     <Heading level={1}>Edit User</Heading><ContentForm kind="User" row={screen.row} save={screen.save} detail={id => AdminUserDetailURI.getURI({ id })} />
   </> : <><Heading level={1}>{screen.row.displayName}</Heading><p>Email: {screen.row.email}</p><p>Role: {screen.row.role}. Active: {String(screen.row.active)}.</p>
     <Link to={AdminUserEditURI.getURI({ id: screen.row.id })}>Edit profile</Link></> : <Heading level={1}>Not found</Heading>}</Layout>;
@@ -23,7 +23,9 @@ function useAdminUser(queryRef: PreloadedQuery<AdminUserQuery>) {
     const response = await mutate('update', input);
     return (response.updateAdminUser as { adminUser: { id: string } }).adminUser.id;
   }
-  return { data, route, row: data.adminUser, save };
+  const row = data.adminUser;
+  const title = row ? (route.currentRoute === RouteName.AdminUserEdit ? 'Edit profile' : row.displayName ?? undefined) : undefined;
+  return { data, route, row, save, title };
 }
 
 type AdminUserProps = { queryRef: PreloadedQuery<AdminUserQuery> };

@@ -15,8 +15,8 @@ const LAYOUT_FRAGMENT = graphql`fragment LayoutFragment on RootQuery {
   navigationProducts: products(first: 100) { nodes { status } }
 }`;
 
-export function Layout({ data, row, admin = false, children }: LayoutProps) {
-  const layout = useLayout(data, row, admin);
+export function Layout({ data, row, title, admin = false, children }: LayoutProps) {
+  const layout = useLayout(data, row, title, admin);
   return <Stack gap={6} align="stretch" xstyle={styles.shell}>
     <header><Stack direction="horizontal" gap={4} align="center">
       <Link to={HomeURI.getURI({})}>{SITE_NAME}</Link>
@@ -31,14 +31,14 @@ export function Layout({ data, row, admin = false, children }: LayoutProps) {
   </Stack>;
 }
 
-function useLayout(key: LayoutFragment$key, row: LayoutRow | null | undefined, admin: boolean) {
+function useLayout(key: LayoutFragment$key, row: LayoutRow | null | undefined, title: string | undefined, admin: boolean) {
   const data = useFragment(LAYOUT_FRAGMENT, key);
   const location = useLocation(); const navigate = useNavigate();
   const [csrf, setCsrf] = useState(''); const [error, setError] = useState('');
   const navigation = data.navigationPages?.nodes?.filter(value => value?.status === 'PUBLISHED' && value.slug !== 'home').map(value => ({ title: value!.title, href: PageURI.getURI({ slug: value!.slug }) })) ?? [];
   if (data.navigationPosts?.nodes?.some(value => value?.status === 'PUBLISHED')) navigation.push({ title: 'Posts', href: PostListURI.getURI({}) });
   if (data.navigationProducts?.nodes?.some(value => value?.status === 'PUBLISHED')) navigation.push({ title: 'Products', href: ProductListURI.getURI({}) });
-  useEffect(() => { updateMetadata(row, location.pathname, admin); }, [row, location.pathname, admin]);
+  useEffect(() => { updateMetadata(row, title, location.pathname, admin); }, [row, title, location.pathname, admin]);
   useEffect(() => {
     if (!data.viewer) return;
     let active = true;
@@ -49,8 +49,10 @@ function useLayout(key: LayoutFragment$key, row: LayoutRow | null | undefined, a
   return { navigation, viewer: data.viewer, csrf, error, signOut, notice: (location.state as { notice?: string } | null)?.notice };
 }
 
-function updateMetadata(row: LayoutRow | null | undefined, path: string, admin: boolean) {
-  const title = typeof row?.title === 'string' ? row.title : path === '/' ? SITE_NAME : 'Not found';
+// `heading` names screens without a content row (lists, forms, admin home); a missing
+// row on a content route is the only "Not found".
+function updateMetadata(row: LayoutRow | null | undefined, heading: string | undefined, path: string, admin: boolean) {
+  const title = heading ?? (typeof row?.title === 'string' ? row.title : path === '/' ? SITE_NAME : 'Not found');
   document.title = `${title} | ${SITE_NAME}`;
   setMeta('description', typeof row?.excerpt === 'string' ? row.excerpt : '');
   setMeta('og:title', title, true);
@@ -68,6 +70,6 @@ function setMeta(name: string, content: string, property = false) {
 }
 
 type LayoutRow = { readonly title?: unknown; readonly excerpt?: unknown; readonly status?: unknown };
-type LayoutProps = { data: LayoutFragment$key; row?: LayoutRow | null; admin?: boolean; children: ReactNode };
+type LayoutProps = { data: LayoutFragment$key; row?: LayoutRow | null; title?: string; admin?: boolean; children: ReactNode };
 
 const styles = stylex.create({ shell: { width: '100%', maxWidth: '72rem', marginInline: 'auto', padding: 'var(--spacing-6)' } });

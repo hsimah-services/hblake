@@ -10,7 +10,7 @@ import { authRequest } from '../../authRequest';
 
 export function Login({ queryRef }: LoginProps) {
   const data = usePreloadedQuery<LoginQuery>(LOGIN_QUERY, queryRef); const login = useLogin();
-  return <Layout data={data} admin><Heading level={1}>Sign in</Heading><form onSubmit={login.submit} noValidate><Stack gap={4} align="stretch">
+  return <Layout data={data} title="Sign in" admin><Heading level={1}>Sign in</Heading><form onSubmit={login.submit} noValidate><Stack gap={4} align="stretch">
     {login.error && <p role="alert">{login.error}</p>}
     <TextInput label="Email" htmlName="email" type="email" value={login.email} onChange={login.setEmail} />
     <TextInput label="Password" htmlName="password" type="password" value={login.password} onChange={login.setPassword} />

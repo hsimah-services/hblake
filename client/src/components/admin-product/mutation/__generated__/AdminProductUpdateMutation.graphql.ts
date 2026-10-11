@@ -1,11 +1,14 @@
 /**
- * @generated SignedSource<<bb3b68698619c0d1fa012f40b1365e32>>
+ * @generated SignedSource<<cd7ba4c8b058523bebc76a70e0f0f8d1>>
+ * @relayHash e61e77a890c06eac243970475edaa4fc
  * @lightSyntaxTransform
  */
 
 /* tslint:disable */
 /* eslint-disable */
 // @ts-nocheck
+
+// @relayRequestID e61e77a890c06eac243970475edaa4fc
 
 import { ConcreteRequest } from 'relay-runtime';
 export type PublicationStatus = "DRAFT" | "PUBLISHED" | "%future added value";
@@ -171,7 +174,7 @@ return {
   },
   "params": {
     "cacheID": "e61e77a890c06eac243970475edaa4fc",
-    "id": null,
+    "id": "e61e77a890c06eac243970475edaa4fc",
     "metadata": {},
     "name": "AdminProductUpdateMutation",
     "operationKind": "mutation",

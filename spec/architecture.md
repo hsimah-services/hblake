@@ -85,7 +85,9 @@ entrypoints, Astryx and StyleX. The spec route catalogue becomes the client
 Post list/detail use post/Post.entrypoint.ts; each admin content entity groups
 list/create/detail/edit under admin-page, admin-post or admin-product. Login, Home,
 Page, Admin and the operator profile each have their own module: 22 routes across
-10 entrypoints. Component directories are lowercase kebab-case and module names
+10 entrypoints. Each route names one Relay query whose variables come only from its
+URL (`query` in routes.json): list, create and detail routes of one entity use
+separate queries, and the entrypoint preloads the query for the current route. Component directories are lowercase kebab-case and module names
 start with the directory's PascalCase entity name.
 
 Tsquid currently generates routes only. Proposed content UI generation consumes
@@ -96,9 +98,17 @@ Until that upstream capability exists, shared application components own the for
 they are not generated output. Application modules own authentication, business rules
 and page design.
 
-V1 remains a client Vite/Relay app for public content and administration. SSR and
-prerender are deferred, so initial-HTML SEO is not a launch requirement. No PHP
-public rendering path or Tsquid SSR adapter is included in v1.
+V1 remains a client Vite/Relay app for public content and administration, with
+initial-data hydration. Relay persists operations to `client/persisted_queries.json`;
+`tsquid-codegen` resolves each route's query into `routes.manifest.json`; the
+`tsquid` Elephentity target (elephentity/codegen-tsquid) compiles that manifest into
+`generated/tsquid/tsquid-manifest.php`. For HTML requests the PHP router matches the
+URL, executes the route query through the same GraphQL endpoint, viewer, policies and
+error formatting as `POST /graphql`, and inlines the response as `#tsquid-data` with
+`Cache-Control: private, no-store`. The client's Relay network answers the matching
+first request from it with `withInitialData`. Failures serve the plain shell and the
+client fetches as before. HTML rendering (SSR/prerender) and initial-HTML SEO remain
+deferred.
 
 ## Implementation sequence after specification approval
 

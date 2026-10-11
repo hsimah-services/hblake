@@ -34,7 +34,7 @@ GitHub Actions runs the same `tests/run.sh` on pushes and pull requests, and upl
 
 ## Generation and implementation boundaries
 
-`spec/` is the model source; `eleph.json` configures the actual PHP, SQLite and GraphQL builders. `generated/`, `client/src/routes/__generated__/` and Relay `__generated__/` directories are machine-owned. Regenerate using `scripts/php vendor/bin/eleph generate`, `scripts/node routes` and `scripts/node relay`. Never edit the generated output. `client/schema.graphql` is exported from the assembled schema through `scripts/php php server/console.php schema`, or from a running server with `scripts/node schema`. Set `GRAPHQL_SCHEMA_ENDPOINT` to introspect another development endpoint.
+`spec/` is the model source; `eleph.json` configures the actual PHP, SQLite, GraphQL and tsquid builders. `generated/`, `client/persisted_queries.json`, `client/src/routes/__generated__/` and Relay `__generated__/` directories are machine-owned. Regenerate in dependency order: `scripts/node relay` (persisted queries), `scripts/node routes` (routes and `routes.manifest.json`), then `scripts/php vendor/bin/eleph generate` (which compiles the route manifest into `generated/tsquid/`). Never edit the generated output. `client/schema.graphql` is exported from the assembled schema through `scripts/php php server/console.php schema`, or from a running server with `scripts/node schema`. Set `GRAPHQL_SCHEMA_ENDPOINT` to introspect another development endpoint.
 
 Tsquid currently generates routes, rather than content screens. The application shares its form, preview and detail behavior explicitly; it does not label these screens generated. [Tsquid #7](https://github.com/hsimah-services/tsquid/issues/7) tracks the metadata-driven admin generator.
 
@@ -42,7 +42,7 @@ The toolchain uses released Elephentity runtime/CLI 0.13.1, coordinator 0.6.1, P
 
 ## Operator data procedures
 
-SQLite, credentials, sessions and dependency caches live outside `server/public` and the built static client. A deployment must serve only those public roots, route `/graphql` and `/auth/*` to PHP, use HTTPS, and give the private data directory mode 0700. Backups include credential hashes and sessions; protect them as private data. Session cookies use Secure for HTTPS and all public hosts; plain HTTP loopback requests are the only exception. Login throttling uses REMOTE_ADDR: configure trusted-proxy address handling before deploying behind a reverse proxy so clients do not share one failure bucket. No production deployment is configured here.
+SQLite, credentials, sessions and dependency caches live outside `server/public` and the built static client. A deployment must serve only those public roots, route `/graphql`, `/auth/*` and every HTML (non-asset) request to PHP so route data can be inlined, use HTTPS, and give the private data directory mode 0700. Backups include credential hashes and sessions; protect them as private data. Session cookies use Secure for HTTPS and all public hosts; plain HTTP loopback requests are the only exception. Login throttling uses REMOTE_ADDR: configure trusted-proxy address handling before deploying behind a reverse proxy so clients do not share one failure bucket. No production deployment is configured here.
 
 Initial installation is explicit and refuses existing tables:
 
@@ -62,4 +62,4 @@ scripts/acceptance/restore /private/path/site-backup.sqlite
 
 Backup uses SQLite `VACUUM INTO` for a consistent snapshot. Restore validates integrity, stops the server, replaces the database and restarts before returning. Run the equivalent procedure under maintenance mode in production. Do not rerun the initial installer as an upgrade; future schema changes require a reviewed migration and a tested backup/restore.
 
-V1 is client-rendered. Initial-HTML SEO, concurrent edit protection, additional accounts and commerce are deferred, as recorded in the specification. Owner-provided site name (replacing the neutral Website placeholder), branding, content and contact details are still required before a public launch.
+V1 is client-rendered; each route's HTML carries its query response as Tsquid initial data (`#tsquid-data`), executed as the requesting viewer. Initial-HTML SEO, concurrent edit protection, additional accounts and commerce are deferred, as recorded in the specification. Owner-provided site name (replacing the neutral Website placeholder), branding, content and contact details are still required before a public launch.

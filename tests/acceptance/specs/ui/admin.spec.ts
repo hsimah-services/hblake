@@ -325,3 +325,27 @@ test.describe('dialogs and routing', () => {
     expect(await sameDocument(), 'edit link handled by the router').toBe(true);
   });
 });
+
+test.describe('document titles', () => {
+  test.beforeEach(async ({ page }) => {
+    await signIn(page);
+  });
+
+  test('admin screens are titled for what they show, never "Not found"', async ({ page }) => {
+    const row = await createOk(api, 'Post');
+    const screens: [string, RegExp][] = [
+      ['/admin', /^Administration\b/],
+      ['/admin/pages', /^Pages\b/],
+      ['/admin/posts', /^Posts\b/],
+      ['/admin/products', /^Products\b/],
+      ['/admin/posts/new', /^Create Post\b/],
+      [`/admin/posts/${encodeURIComponent(row.id)}`, new RegExp(`^${row.title}\\b`)],
+      [`/admin/posts/${encodeURIComponent(row.id)}/edit`, new RegExp(`^Edit ${row.title}\\b`)],
+    ];
+    for (const [path, title] of screens) {
+      await page.goto(path);
+      await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+      await expect(page, path).toHaveTitle(title);
+    }
+  });
+});

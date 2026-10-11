@@ -1,11 +1,14 @@
 /**
- * @generated SignedSource<<c80710ce59fa427f304811f778209594>>
+ * @generated SignedSource<<0c39a3a597a83a861def9eda58c34eb4>>
+ * @relayHash 07e9ef4efac3c77c9cdb598b7573f940
  * @lightSyntaxTransform
  */
 
 /* tslint:disable */
 /* eslint-disable */
 // @ts-nocheck
+
+// @relayRequestID 07e9ef4efac3c77c9cdb598b7573f940
 
 import { ConcreteRequest } from 'relay-runtime';
 export type PublicationStatus = "DRAFT" | "PUBLISHED" | "%future added value";
@@ -161,7 +164,7 @@ return {
   },
   "params": {
     "cacheID": "07e9ef4efac3c77c9cdb598b7573f940",
-    "id": null,
+    "id": "07e9ef4efac3c77c9cdb598b7573f940",
     "metadata": {},
     "name": "AdminPageCreateMutation",
     "operationKind": "mutation",
