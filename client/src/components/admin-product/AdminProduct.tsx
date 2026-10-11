@@ -29,7 +29,8 @@ function AdminProduct_List({ queryRef }: { queryRef: PreloadedQuery<AdminProduct
 
 function AdminProduct_Create({ queryRef }: { queryRef: PreloadedQuery<AdminProductCreateQuery> }) {
   const data = usePreloadedQuery<AdminProductCreateQuery>(ADMIN_PRODUCT_CREATE_QUERY, queryRef);
-  const save = useAdminProduct_Save(null);
+  const mutate = AdminProductMutation();
+  const save = useAdminProduct_Save(null, mutate);
   return <Layout data={data} title="Create Product" admin>
     <Heading level={1}>Create Product</Heading>
     <ContentForm key="new" kind="Product" save={save} detail={id => AdminProductDetailURI.getURI({ id })} />
@@ -39,7 +40,7 @@ function AdminProduct_Create({ queryRef }: { queryRef: PreloadedQuery<AdminProdu
 function AdminProduct_Content({ queryRef }: { queryRef: PreloadedQuery<AdminProductQuery> }) {
   const data = usePreloadedQuery<AdminProductQuery>(ADMIN_PRODUCT_QUERY, queryRef);
   const route = useAdminProductRouteContext(); const mutate = AdminProductMutation(); const row = data.product;
-  const save = useAdminProduct_Save(row);
+  const save = useAdminProduct_Save(row, mutate);
   const editing = route.currentRoute === RouteName.AdminProductEdit && row != null;
   return <Layout data={data} row={row} title={editing ? `Edit ${row.title}` : undefined} admin>
     {editing ? <>
@@ -49,8 +50,7 @@ function AdminProduct_Content({ queryRef }: { queryRef: PreloadedQuery<AdminProd
   </Layout>;
 }
 
-function useAdminProduct_Save(row: { readonly id: string } | null | undefined) {
-  const mutate = AdminProductMutation();
+function useAdminProduct_Save(row: { readonly id: string } | null | undefined, mutate: ReturnType<typeof AdminProductMutation>) {
   return async function save(input: Record<string, unknown>): Promise<string> {
     const action = row ? 'update' : 'create'; const response = await mutate(action, input);
     return (response[action + 'Product'] as { product: { id: string } }).product.id;

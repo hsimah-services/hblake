@@ -90,7 +90,7 @@ URL (`query` in routes.json): list, create and detail routes of one entity use
 separate queries, and the entrypoint preloads the query for the current route. Component directories are lowercase kebab-case and module names
 start with the directory's PascalCase entity name.
 
-Tsquid currently generates routes only. Proposed content UI generation consumes
+Tsquid 0.3.0 generates routes, URL query-variable helpers and entrypoint parameter unions. Entrypoints use those generated helpers directly; application route adapters and duplicate query-variable functions are removed. Schema and persisted-query checks, Relay persistence, the GraphQL network transport and promise-based mutations use Tsquid utilities. Application code supplies CSRF headers and selects entity operations. Astryx links route and preload through Tsquid’s link provider. Proposed content UI generation consumes
 an explicit normalized metadata manifest plus ui/admin.yml and GraphQL schema,
 not PHP or application TypeScript. The upstream issue defines its implementation
 contract. The proposed generator will own field rendering and mechanical mutation binding.

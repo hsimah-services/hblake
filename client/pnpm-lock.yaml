@@ -176,8 +176,8 @@ importers:
         specifier: ^0.19.0
         version: 0.19.1
       '@tsquid/routes':
-        specifier: 0.2.0
-        version: 0.2.0(react-relay@21.0.1(react@19.3.0))(react-router@8.4.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react@19.3.0)(relay-runtime@21.0.1)
+        specifier: 0.3.0
+        version: 0.3.0(react-relay@21.0.1(react@19.3.0))(react-router@8.4.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react@19.3.0)(relay-runtime@21.0.1)
       react:
         specifier: ^19.3.0
         version: 19.3.0
@@ -204,11 +204,11 @@ importers:
         specifier: 0.6.0
         version: 0.6.0(@astryxdesign/core@0.6.0(@stylexjs/stylex@0.19.1)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(@astryxdesign/theme-neutral@0.6.0(@astryxdesign/core@0.6.0(@stylexjs/stylex@0.19.1)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(@types/react@19.3.0)(react@19.3.0))(gpt-tokenizer@3.4.0)
       '@tsquid/codegen':
-        specifier: 0.2.0
-        version: 0.2.0
+        specifier: 0.3.0
+        version: 0.3.0
       '@tsquid/eslint-plugin':
-        specifier: 0.1.1
-        version: 0.1.1(@typescript/typescript6@6.0.2)(eslint@10.12.0(jiti@2.7.0))
+        specifier: 0.2.0
+        version: 0.2.0(@typescript/typescript6@6.0.2)(eslint@10.12.0(jiti@2.7.0))
       '@tsquid/vite':
         specifier: 0.1.1
         version: 0.1.1(@stylexjs/stylex@0.19.1)(babel-plugin-relay@21.0.1)(rolldown@1.2.13)(vite@8.3.4(jiti@2.7.0))
@@ -227,9 +227,6 @@ importers:
       eslint:
         specifier: ^10.10.0
         version: 10.12.0(jiti@2.7.0)
-      graphql:
-        specifier: ^17.0.2
-        version: 17.0.2
       relay-compiler:
         specifier: ^21.0.1
         version: 21.0.1
@@ -675,21 +672,21 @@ packages:
   '@stylexjs/stylex@0.19.1':
     resolution: {integrity: sha512-JwNFm0MOYPqi+M4Ax5Un4ZxfZp4HEAX2sAWetZ88KALFcv1eEiHNJs75oO3V3U7RVWnzfkiM8i9eBowC3hqgUw==}
 
-  '@tsquid/codegen@0.2.0':
-    resolution: {integrity: sha512-xPAsoBDYyZMcKTTFJuBW66Ala1q4IC0/qsZBaH7fGilQCDSFVWQfTzPt1VK4wUyoKJcKwk1yeIE6Kx4wDMKXOA==}
+  '@tsquid/codegen@0.3.0':
+    resolution: {integrity: sha512-m3SmpZDSFwiqkivgE5V0QnQFijaOwcsufadx/XSozmqzTaujTjMmr9JDTHVH3agL+Iu6TEYFuk7bqpADtBJH0A==}
     engines: {node: '>=22'}
     hasBin: true
 
-  '@tsquid/eslint-plugin@0.1.1':
-    resolution: {integrity: sha512-f9ghwbOZbdoH8N9wG8zBHI5p41Z9UIAzLIK3Z6JpCrcsILQDE8rI1++ZsudtTWxSiZwOp4jvPvnKm57QVVkfQA==}
+  '@tsquid/eslint-plugin@0.2.0':
+    resolution: {integrity: sha512-CwICT1JRrZ9IydWaPFsEsVkgbpNdZG5PPW/bZHKABL+mFnypZCAL/JOgjOmW/ElrPQX/LFzIhwW8zUsl3V1XfA==}
     engines: {node: '>=22'}
     hasBin: true
     peerDependencies:
       eslint: ^10.0.0
       typescript: '>=6'
 
-  '@tsquid/routes@0.2.0':
-    resolution: {integrity: sha512-6YITKyxVpdbRo6bmrGfSm5hIXFtwg/fNOh+XLt3X/DGdnlOBea1Wq6MBY1rfiU2s/BjXJAXCJgtFEdlYGNXMkg==}
+  '@tsquid/routes@0.3.0':
+    resolution: {integrity: sha512-ybzyQor/rTdUUNioUnsZ2eS36TeWgXGX9KymoyOvb2dh2pepsZu7gEsXFRHYuWtTFXJ/2UwC3+LHXkA9qaatvg==}
     engines: {node: '>=22'}
     peerDependencies:
       react: ^19.0.0
@@ -2560,9 +2557,11 @@ snapshots:
       invariant: 2.2.4
       styleq: 0.2.1
 
-  '@tsquid/codegen@0.2.0': {}
+  '@tsquid/codegen@0.3.0':
+    dependencies:
+      graphql: 17.0.2
 
-  '@tsquid/eslint-plugin@0.1.1(@typescript/typescript6@6.0.2)(eslint@10.12.0(jiti@2.7.0))':
+  '@tsquid/eslint-plugin@0.2.0(@typescript/typescript6@6.0.2)(eslint@10.12.0(jiti@2.7.0))':
     dependencies:
       '@typescript-eslint/parser': 8.71.1(@typescript/typescript6@6.0.2)(eslint@10.12.0(jiti@2.7.0))
       eslint: 10.12.0(jiti@2.7.0)
@@ -2571,7 +2570,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@tsquid/routes@0.2.0(react-relay@21.0.1(react@19.3.0))(react-router@8.4.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react@19.3.0)(relay-runtime@21.0.1)':
+  '@tsquid/routes@0.3.0(react-relay@21.0.1(react@19.3.0))(react-router@8.4.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react@19.3.0)(relay-runtime@21.0.1)':
     dependencies:
       react: 19.3.0
       react-relay: 21.0.1(react@19.3.0)

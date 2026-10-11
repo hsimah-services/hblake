@@ -29,7 +29,8 @@ function AdminPage_List({ queryRef }: { queryRef: PreloadedQuery<AdminPageListQu
 
 function AdminPage_Create({ queryRef }: { queryRef: PreloadedQuery<AdminPageCreateQuery> }) {
   const data = usePreloadedQuery<AdminPageCreateQuery>(ADMIN_PAGE_CREATE_QUERY, queryRef);
-  const save = useAdminPage_Save(null);
+  const mutate = AdminPageMutation();
+  const save = useAdminPage_Save(null, mutate);
   return <Layout data={data} title="Create Page" admin>
     <Heading level={1}>Create Page</Heading>
     <ContentForm key="new" kind="Page" save={save} detail={id => AdminPageDetailURI.getURI({ id })} />
@@ -39,7 +40,7 @@ function AdminPage_Create({ queryRef }: { queryRef: PreloadedQuery<AdminPageCrea
 function AdminPage_Content({ queryRef }: { queryRef: PreloadedQuery<AdminPageQuery> }) {
   const data = usePreloadedQuery<AdminPageQuery>(ADMIN_PAGE_QUERY, queryRef);
   const route = useAdminPageRouteContext(); const mutate = AdminPageMutation(); const row = data.page;
-  const save = useAdminPage_Save(row);
+  const save = useAdminPage_Save(row, mutate);
   const editing = route.currentRoute === RouteName.AdminPageEdit && row != null;
   return <Layout data={data} row={row} title={editing ? `Edit ${row.title}` : undefined} admin>
     {editing ? <>
@@ -49,8 +50,7 @@ function AdminPage_Content({ queryRef }: { queryRef: PreloadedQuery<AdminPageQue
   </Layout>;
 }
 
-function useAdminPage_Save(row: { readonly id: string } | null | undefined) {
-  const mutate = AdminPageMutation();
+function useAdminPage_Save(row: { readonly id: string } | null | undefined, mutate: ReturnType<typeof AdminPageMutation>) {
   return async function save(input: Record<string, unknown>): Promise<string> {
     const action = row ? 'update' : 'create'; const response = await mutate(action, input);
     return (response[action + 'Page'] as { page: { id: string } }).page.id;

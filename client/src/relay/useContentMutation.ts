@@ -1,18 +1,13 @@
-import { useRelayEnvironment } from 'react-relay';
-import { commitMutation, type GraphQLTaggedNode } from 'relay-runtime';
+import type { useMutationAction } from '@tsquid/routes/mutation';
 
-export function useContentMutation(operations: Record<string, GraphQLTaggedNode>) {
-  const environment = useRelayEnvironment();
-  return (action: string, input: Record<string, unknown>): Promise<Record<string, unknown>> => new Promise((resolve, reject) => {
-    const mutation = operations[action];
-    if (!mutation) { reject(new Error('Unsupported content operation.')); return; }
-    commitMutation<{ response: Record<string, unknown>; variables: { input: Record<string, unknown> } }>(environment, {
-      mutation, variables: { input },
-      onCompleted: (response, errors) => {
-        if (errors?.length) reject(new Error(errors.map(error => error.message).join(' ')));
-        else resolve(response);
-      },
-      onError: reject,
-    });
-  });
+// Tsquid commits handle pending promises; successful writes invalidate cached route queries.
+export function useContentMutation(operations: Record<string, MutationAction>) {
+  return async (action: string, input: Record<string, unknown>): Promise<Record<string, unknown>> => {
+    const commit = operations[action];
+    if (!commit) throw new Error('Unsupported content operation.');
+    return commit({ variables: { input }, updater: store => { store.invalidateStore(); } });
+  };
 }
+
+export type useContentMutationOperation = { response: Record<string, unknown>; variables: { input: Record<string, unknown> } };
+type MutationAction = ReturnType<typeof useMutationAction<useContentMutationOperation>>[0];

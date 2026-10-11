@@ -143,6 +143,9 @@ The browser tests find elements by accessible role and name, not by test ids:
   in the URL. Paging one list never changes the site navigation.
 - Links between routes are handled by the client router: following a navigation,
   list or admin link keeps the same document (no full page load).
+- Following a link fetches its route query once, even when hovering it preloaded the
+  route first.
+- A route query that returns GraphQL errors shows an error, never the not-found state.
 - Login: fields labelled `Email` and `Password`, and a `Sign in`/`Log in` button.
   Signed-out visits to `/admin*` redirect to `/admin/login`. Sign-out is a button or
   link named `/sign out|log out/i`.
@@ -156,6 +159,8 @@ The browser tests find elements by accessible role and name, not by test ids:
 - Invalid fields get `aria-invalid="true"`, and the first invalid field receives focus.
   Errors appear in a `role="alert"` region, and save confirmations in
   `role="status"`/`alert` (text matching `/saved|created|updated/i`).
+- A write the server refuses (for example `403` for a stale CSRF token) shows an
+  announced error without transport details (`GraphQL`, status codes) and keeps input.
 - The Markdown preview may sit behind a `Preview` tab or button.
 - The profile form has fields labelled `Display name` and `Email` only.
 - A dirty form warns before in-app navigation, through `confirm()` or a dialog with a

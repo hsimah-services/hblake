@@ -220,6 +220,20 @@ test.describe('forms in detail', () => {
     await expect.poll(async () => byId(api, 'Post', row.id)).toMatchObject({ excerpt: '', title: row.title, content: row.content });
   });
 
+  test('a refused write explains itself without transport details and keeps input', async ({ page }) => {
+    // A stale CSRF token makes the real server answer 403 (tests/README.md, HTTP contract).
+    const row = await createOk(api, 'Page');
+    await page.goto(`/admin/pages/${encodeURIComponent(row.id)}/edit`);
+    await page.route('**/auth/csrf', route => route.fulfill({ json: { token: `stale-${RUN_ID}` } }));
+    await page.getByLabel('Title').fill(`${row.title} refused`);
+    await page.getByRole('button', { name: /^save/i }).click();
+    const error = announcedError(page).first();
+    await expect(error).toHaveText(/\w/);
+    await expect(error).not.toHaveText(/graphql|request failed|\b403\b/i);
+    await expect(page.getByLabel('Title')).toHaveValue(`${row.title} refused`);
+    expect((await byId(api, 'Page', row.id))?.title).toBe(row.title);
+  });
+
   test('the edit screen explains that changing the slug changes the URL', async ({ page }) => {
     const row = await createOk(api, 'Page');
     await page.goto(`/admin/pages/${encodeURIComponent(row.id)}/edit`);
