@@ -64,15 +64,16 @@ export async function contrastOf(target: Locator): Promise<number> {
       const parts = value.match(/[\d.]+/g)!.map(Number);
       return [parts[0], parts[1], parts[2], parts[3] ?? 1];
     };
-    const resolve = (property: 'color' | 'background-color', value: string): string => {
+    // The page canvas follows the root element's colour scheme, not the element's.
+    const canvas = (): string => {
       const probe = document.createElement('span');
-      probe.style.setProperty(property, value);
-      element.append(probe);
-      const resolved = getComputedStyle(probe).getPropertyValue(property);
+      probe.style.setProperty('background-color', 'Canvas');
+      document.documentElement.append(probe);
+      const resolved = getComputedStyle(probe).backgroundColor;
       probe.remove();
       return resolved;
     };
-    let background = rgb(resolve('background-color', 'Canvas'));
+    let background = rgb(canvas());
     for (let node: Element | null = element; node; node = node.parentElement) {
       const value = rgb(getComputedStyle(node).backgroundColor);
       if (value[3] > 0.99) {
