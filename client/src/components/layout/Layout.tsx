@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router';
 import { graphql, useFragment } from 'react-relay';
 import { Link, Button, Stack } from '@astryxdesign/core';
 import * as stylex from '@stylexjs/stylex';
-import { HomeURI, PageURI, PostListURI, ProductListURI, AdminHomeURI, LoginURI } from '../../routes/__generated__/routes';
+import { HomeURI, PageURI, PostListURI, ProductListURI, LoginURI } from '../../routes/__generated__/routes';
 import { SITE_NAME } from '../../SiteName';
 import { authRequest } from '../../authRequest';
 import type { LayoutFragment$key } from './__generated__/LayoutFragment.graphql';
@@ -21,8 +21,12 @@ export function Layout({ data, row, title, admin = false, children }: LayoutProp
     <header {...stylex.props(styles.header)}><Stack direction="horizontal" gap={4} align="center" xstyle={styles.headerRow}>
       <Link href={HomeURI.getURI({})}>{SITE_NAME}</Link>
       <nav aria-label="Main navigation"><Stack direction="horizontal" gap={4} xstyle={styles.navigation}>
-        {layout.navigation.map(link => <Link key={link.href} href={link.href}>{link.title}</Link>)}
-        <Link href={AdminHomeURI.getURI({})}>Admin</Link>
+        <Link href="/" label="Home">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9" />
+          </svg>
+        </Link>
+        {layout.navigation.map(link => <Link key={link.href} href={link.href}>{link.href === PageURI.getURI({ slug: 'contact' }) ? 'Contact' : link.title}</Link>)}
       </Stack></nav>
       {layout.viewer && <Button label="Sign out" clickAction={layout.signOut} isDisabled={!layout.csrf} />}
     </Stack></header>
