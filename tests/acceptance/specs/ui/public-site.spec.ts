@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Request } from '@playwright/test';
 
 import { Api } from '../../lib/api.ts';
 import {
@@ -230,6 +230,47 @@ test.describe('client-side routing', () => {
     await expect(page).toHaveURL(`${BASE_URL}${publicPath('Post', post.slug)}`);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(post.title);
     expect(await sameDocument(), 'list link handled by the router').toBe(true);
+  });
+
+  // Whether a /graphql request body carries the named operation, by name or by its text.
+  const isOperation = (body: string | null, name: string): boolean =>
+    new RegExp(`"operationName":"${name}"|\\b(query|mutation) ${name}\\b`).test(body ?? '');
+
+  test('hovering a link before following it fetches the route query once', async ({ page }) => {
+    await createPublished(api, 'Post');
+    const isPostList = (request: Request): boolean =>
+      new URL(request.url()).pathname === '/graphql' && isOperation(request.postData(), 'PostListQuery');
+    const postLists: Request[] = [];
+    page.on('request', request => { if (isPostList(request)) postLists.push(request); });
+    await page.goto('/');
+    const link = page.locator('nav a[href="/posts"]').first();
+    await link.hover();
+    // Let any hover preload finish before following the link.
+    await page.waitForResponse(response => isPostList(response.request()), { timeout: 3_000 }).catch(() => undefined);
+    await link.click();
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Posts');
+    await page.waitForLoadState('networkidle');
+    expect(postLists, 'one PostListQuery request for one navigation').toHaveLength(1);
+  });
+
+  test('a route query that returns errors is not shown as missing content', async ({ page }) => {
+    // A resolver failure yields partial data: every route field null, plus errors.
+    const post = await createPublished(api, 'Post');
+    await page.route('**/graphql', async route => {
+      if (!isOperation(route.request().postData(), 'PostQuery')) return route.continue();
+      const response = await route.fetch();
+      const { data } = await response.json() as { data: Record<string, unknown> };
+      await route.fulfill({ response, json: {
+        data: Object.fromEntries(Object.keys(data).map(field => [field, null])),
+        errors: [{ message: 'Internal server error' }],
+      } });
+    });
+    await page.goto('/posts');
+    await page.getByRole('main').locator(`a[href="${publicPath('Post', post.slug)}"]`).first().click();
+    await expect(page).toHaveURL(`${BASE_URL}${publicPath('Post', post.slug)}`);
+    await expect(page.getByText(/error|went wrong|try again|could not/i).first()).toBeVisible();
+    await expect(notFound(page)).toHaveCount(0);
+    expect(await page.title()).not.toMatch(/not found/i);
   });
 });
 
