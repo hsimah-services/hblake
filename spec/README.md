@@ -24,7 +24,8 @@ Contributor instructions live in [AGENTS.md](../AGENTS.md).
 - No public registration. Staff login uses server sessions and operator bootstrap.
 - Two publication states, draft and published; no scheduled publication or revisions.
 - UTC creation/update timestamps and first publication timestamp.
-- V1 is client-rendered; SSR/prerender and initial-HTML SEO are deferred.
+- V1 is client-rendered with Tsquid initial-data hydration of each route's query;
+  SSR/prerender and initial-HTML SEO are deferred.
 - Policy-filtered paging limitations are accepted for the small v1 dataset.
 - Concurrent edit detection is deferred until Elephentity #100 is available.
 - Brand copy, logo, domain, contact address, hosting and final visual treatment are

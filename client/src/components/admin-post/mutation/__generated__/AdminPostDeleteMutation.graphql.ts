@@ -1,11 +1,14 @@
 /**
- * @generated SignedSource<<e7a0a22218457de2d6eee6c32bf54a83>>
+ * @generated SignedSource<<eecb1a00c7eb2f4ec19fedafc781e8b4>>
+ * @relayHash 6e104b5e053e8c430db8b7505edbd373
  * @lightSyntaxTransform
  */
 
 /* tslint:disable */
 /* eslint-disable */
 // @ts-nocheck
+
+// @relayRequestID 6e104b5e053e8c430db8b7505edbd373
 
 import { ConcreteRequest } from 'relay-runtime';
 export type DeletePostInput = {
@@ -78,7 +81,7 @@ return {
   },
   "params": {
     "cacheID": "6e104b5e053e8c430db8b7505edbd373",
-    "id": null,
+    "id": "6e104b5e053e8c430db8b7505edbd373",
     "metadata": {},
     "name": "AdminPostDeleteMutation",
     "operationKind": "mutation",

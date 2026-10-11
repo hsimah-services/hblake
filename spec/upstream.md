@@ -78,7 +78,9 @@ UI descriptor checks verify internal consistency only; Tsquid cannot consume adm
 ## Remaining implementation boundaries
 
 - SSR/prerender and initial-HTML SEO are deferred beyond v1, per review. The
-  public frontend remains a client-rendered Tsquid app.
+  public frontend remains a client-rendered Tsquid app; route queries are hydrated
+  from inlined initial data using Tsquid 0.2.0 (PR #8) and
+  elephentity/codegen-tsquid 0.1.0.
 - SQLite upgrades remain application-owned reviewed migrations; the initial
   installer is not an upgrade engine.
 

@@ -57,10 +57,15 @@ The operator can open an authenticated draft preview using the detail rendering;
 preview must not enter shared caches or public search metadata.
 
 Public pages have content-specific document title, description from excerpt,
-canonical URL and social metadata updated by the client. V1 uses Tsquid's client
-rendering with no SSR or prerender requirement. Initial HTML contains the app shell;
-slow first loads and reduced search/link-preview metadata are accepted before the
-business launches. Initial-HTML SEO is deferred to a later rendering enhancement.
+canonical URL and social metadata updated by the client. V1 renders on the client
+with no SSR or prerender requirement. The HTML for each route carries that route's
+query response as Tsquid initial data, so the first render does not wait on a GraphQL
+round trip. Initial HTML still contains only the app shell markup; reduced
+search/link-preview metadata is accepted before the business launches, and
+initial-HTML SEO is deferred to a later rendering enhancement.
+
+Text stays legible in both light and dark system colour schemes. Every screen's
+document title names what it shows; only a missing record is titled "Not found".
 
 V1 accepts policy-filtered paging that may produce short or empty pages and slow
 counts on the small content dataset. Draft visibility remains enforced; clients use

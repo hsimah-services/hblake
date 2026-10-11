@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 source "$(dirname "$0")/common"
 scripts/php composer install --no-interaction --prefer-dist
-scripts/php sh -c 'for package in codegen codegen-php codegen-sqlite codegen-graphql-php; do cargo build --release --locked --manifest-path vendor/elephentity/$package/Cargo.toml || exit; done'
+scripts/php sh -c 'for package in codegen codegen-php codegen-sqlite codegen-graphql-php codegen-tsquid; do cargo build --release --locked --manifest-path vendor/elephentity/$package/Cargo.toml || exit; done'
 scripts/php vendor/bin/eleph fmt
 scripts/php vendor/bin/eleph validate spec
 scripts/php vendor/bin/eleph generate --check
@@ -14,6 +14,7 @@ scripts/node exec node scripts/check-schema.mjs
 diff -u .cache/client-schema.normalized.graphql .cache/server-schema.normalized.graphql
 scripts/node routes:check
 scripts/node exec relay-compiler --validate
+scripts/node exec node scripts/check-persisted.mjs
 scripts/node lint
 scripts/node exec tsc --noEmit
 scripts/node build

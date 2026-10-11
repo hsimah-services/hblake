@@ -1,8 +1,8 @@
 <?php
 declare(strict_types=1);
 require dirname(__DIR__,2).'/vendor/autoload.php';
-use Hsimah\{App, Auth, Schema, Http};
-use GraphQL\GraphQL;
+use Hsimah\{App, Auth, GraphQLEndpoint, Http};
+use Eleph\Tsquid\{InitialData, Manifest};
 use GraphQL\Language\Parser;
 
 $path=parse_url(Http::server('REQUEST_URI') ?: '/',PHP_URL_PATH);
@@ -25,18 +25,7 @@ if ($path==='/graphql' || str_starts_with((string)$path,'/auth/')) {
             if ($definition instanceof \GraphQL\Language\AST\OperationDefinitionNode && $definition->operation==='mutation') $auth->requireCsrf();
         }
         $app=new App(App::database(),$auth->actor());
-        $result=GraphQL::executeQuery(Schema::build($app),$document,null,null,isset($input['variables']) ? Http::object($input['variables']) : null,is_string($input['operationName'] ?? null) ? $input['operationName'] : null);
-        $result->setErrorFormatter(static function(\Throwable $error): array {
-            $previous=$error->getPrevious();
-            if ($previous instanceof \Eleph\Runtime\Verification\CommitRejected || $previous instanceof \Hsimah\UserError) {
-                $message=$previous->getMessage();
-            } else {
-                error_log((string)$error);
-                $message='The request could not be processed.';
-            }
-            return ['message'=>$message];
-        });
-        Auth::respond(200,$result->toArray());
+        Auth::respond(200,GraphQLEndpoint::execute($app,$document,isset($input['variables']) ? Http::object($input['variables']) : null,is_string($input['operationName'] ?? null) ? $input['operationName'] : null));
     } catch (\Throwable $error) {
         error_log((string)$error); Auth::respond(400,['errors'=>[['message'=>'The request could not be processed.']]]);
     }
@@ -48,4 +37,20 @@ if ($file!==false && str_starts_with($file,$dist.'/') && is_file($file)) {
     header('Content-Type: '.($types[pathinfo($file,PATHINFO_EXTENSION)] ?? 'application/octet-stream')); readfile($file); return;
 }
 if (preg_match('#^/(?:\.git|vendor|spec|generated|server|\.var|\.env|composer\.)#',(string)$path)) { http_response_code(404); echo 'Not found'; return; }
-header('Content-Type: text/html; charset=utf-8'); readfile($dist.'/index.html');
+header('Content-Type: text/html; charset=utf-8');
+$shell=(string)file_get_contents($dist.'/index.html');
+// Inline the initial route's query as #tsquid-data, executed as this request's viewer.
+// Any failure serves the plain shell; the client then fetches the route query itself.
+try {
+    $auth=new Auth(App::database());
+    $app=new App(App::database(),$auth->actor());
+    $initial=new InitialData(
+        Manifest::fromFile(dirname(__DIR__,2).'/generated/tsquid/tsquid-manifest.php'),
+        static fn(string $text, array $variables, string $operation): array => GraphQLEndpoint::execute($app,$text,Http::object($variables),$operation),
+    );
+    $response=$initial->render(Http::server('REQUEST_URI') ?: '/',$shell);
+    foreach($response->headers as $name=>$value) header($name.': '.$value);
+    echo $response->body;
+} catch (\Throwable $error) {
+    error_log((string)$error); echo $shell;
+}

@@ -1,0 +1,429 @@
+{
+  "version": 1,
+  "routes": [
+    {
+      "name": "Home",
+      "path": "/",
+      "ssr": true,
+      "fields": {},
+      "query": {
+        "operation": "HomeQuery",
+        "id": "8d77ac639678bfb06785cc406b8d7fb2",
+        "text": "query HomeQuery {\n  ...LayoutFragment\n  pageBySlug(slug: \"home\") {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n",
+        "variables": {}
+      }
+    },
+    {
+      "name": "Page",
+      "path": "/pages/:slug",
+      "ssr": true,
+      "fields": {
+        "slug": {
+          "kind": "string",
+          "optional": false,
+          "in": "path"
+        }
+      },
+      "query": {
+        "operation": "PageQuery",
+        "id": "59635ecb28e63620884dd9a2e291d18d",
+        "text": "query PageQuery(\n  $slug: String!\n) {\n  ...LayoutFragment\n  pageBySlug(slug: $slug) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n",
+        "variables": {
+          "slug": {
+            "input": "slug"
+          }
+        }
+      }
+    },
+    {
+      "name": "PostList",
+      "path": "/posts",
+      "ssr": true,
+      "fields": {
+        "after": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        }
+      },
+      "query": {
+        "operation": "PostListQuery",
+        "id": "2f2bc11533eac7f3e47d5bd851ba653c",
+        "text": "query PostListQuery(\n  $after: String\n) {\n  ...LayoutFragment\n  posts(first: 20, after: $after) {\n    nodes {\n      id\n      title\n      slug\n      excerpt\n      status\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n",
+        "variables": {
+          "after": {
+            "input": "after"
+          }
+        }
+      }
+    },
+    {
+      "name": "Post",
+      "path": "/posts/:slug",
+      "ssr": true,
+      "fields": {
+        "slug": {
+          "kind": "string",
+          "optional": false,
+          "in": "path"
+        }
+      },
+      "query": {
+        "operation": "PostQuery",
+        "id": "547225e28d01162ab5aff675cf840a2c",
+        "text": "query PostQuery(\n  $slug: String!\n) {\n  ...LayoutFragment\n  postBySlug(slug: $slug) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n",
+        "variables": {
+          "slug": {
+            "input": "slug"
+          }
+        }
+      }
+    },
+    {
+      "name": "ProductList",
+      "path": "/products",
+      "ssr": true,
+      "fields": {
+        "after": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        }
+      },
+      "query": {
+        "operation": "ProductListQuery",
+        "id": "a2f76738bf63a8efee99d333af72f2d5",
+        "text": "query ProductListQuery(\n  $after: String\n) {\n  ...LayoutFragment\n  products(first: 20, after: $after) {\n    nodes {\n      id\n      title\n      slug\n      excerpt\n      status\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n",
+        "variables": {
+          "after": {
+            "input": "after"
+          }
+        }
+      }
+    },
+    {
+      "name": "Product",
+      "path": "/products/:slug",
+      "ssr": true,
+      "fields": {
+        "slug": {
+          "kind": "string",
+          "optional": false,
+          "in": "path"
+        }
+      },
+      "query": {
+        "operation": "ProductQuery",
+        "id": "28dadc4c2d14dfd811b4d065d121b2f2",
+        "text": "query ProductQuery(\n  $slug: String!\n) {\n  ...LayoutFragment\n  productBySlug(slug: $slug) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    enquiryUrl\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n",
+        "variables": {
+          "slug": {
+            "input": "slug"
+          }
+        }
+      }
+    },
+    {
+      "name": "Login",
+      "path": "/admin/login",
+      "ssr": true,
+      "fields": {},
+      "query": {
+        "operation": "LoginQuery",
+        "id": "ff0ea7e03054c8055d11e27878bb8e72",
+        "text": "query LoginQuery {\n  ...LayoutFragment\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n",
+        "variables": {}
+      }
+    },
+    {
+      "name": "AdminHome",
+      "path": "/admin",
+      "ssr": true,
+      "fields": {},
+      "query": {
+        "operation": "AdminQuery",
+        "id": "58666bd5fa5dd8e215fc1e0ce80b6545",
+        "text": "query AdminQuery {\n  ...LayoutFragment\n  viewer {\n    id\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n",
+        "variables": {}
+      }
+    },
+    {
+      "name": "AdminPageList",
+      "path": "/admin/pages",
+      "ssr": true,
+      "fields": {
+        "after": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        }
+      },
+      "query": {
+        "operation": "AdminPageListQuery",
+        "id": "871cc871620e805c36a8486336cd6a7d",
+        "text": "query AdminPageListQuery(\n  $after: String\n) {\n  ...LayoutFragment\n  pages(first: 20, after: $after) {\n    nodes {\n      id\n      title\n      slug\n      excerpt\n      status\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n",
+        "variables": {
+          "after": {
+            "input": "after"
+          }
+        }
+      }
+    },
+    {
+      "name": "AdminPageCreate",
+      "path": "/admin/pages/new",
+      "ssr": true,
+      "fields": {},
+      "query": {
+        "operation": "AdminPageCreateQuery",
+        "id": "39f6abee2d5dde6d19efe5ca23fc0809",
+        "text": "query AdminPageCreateQuery {\n  ...LayoutFragment\n  viewer {\n    id\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n",
+        "variables": {}
+      }
+    },
+    {
+      "name": "AdminPageDetail",
+      "path": "/admin/pages/:id",
+      "ssr": true,
+      "fields": {
+        "id": {
+          "kind": "string",
+          "optional": false,
+          "in": "path"
+        }
+      },
+      "query": {
+        "operation": "AdminPageQuery",
+        "id": "882298eb384f668b2a13eead8e835499",
+        "text": "query AdminPageQuery(\n  $id: ID!\n) {\n  ...LayoutFragment\n  page(id: $id) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n",
+        "variables": {
+          "id": {
+            "input": "id"
+          }
+        }
+      }
+    },
+    {
+      "name": "AdminPageEdit",
+      "path": "/admin/pages/:id/edit",
+      "ssr": true,
+      "fields": {
+        "id": {
+          "kind": "string",
+          "optional": false,
+          "in": "path"
+        }
+      },
+      "query": {
+        "operation": "AdminPageQuery",
+        "id": "882298eb384f668b2a13eead8e835499",
+        "text": "query AdminPageQuery(\n  $id: ID!\n) {\n  ...LayoutFragment\n  page(id: $id) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n",
+        "variables": {
+          "id": {
+            "input": "id"
+          }
+        }
+      }
+    },
+    {
+      "name": "AdminPostList",
+      "path": "/admin/posts",
+      "ssr": true,
+      "fields": {
+        "after": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        }
+      },
+      "query": {
+        "operation": "AdminPostListQuery",
+        "id": "c9abcb1d83b0d5f8451d79b3d62e22c2",
+        "text": "query AdminPostListQuery(\n  $after: String\n) {\n  ...LayoutFragment\n  posts(first: 20, after: $after) {\n    nodes {\n      id\n      title\n      slug\n      excerpt\n      status\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n",
+        "variables": {
+          "after": {
+            "input": "after"
+          }
+        }
+      }
+    },
+    {
+      "name": "AdminPostCreate",
+      "path": "/admin/posts/new",
+      "ssr": true,
+      "fields": {},
+      "query": {
+        "operation": "AdminPostCreateQuery",
+        "id": "9311a6a8e2e12480151d0605f5a97cc1",
+        "text": "query AdminPostCreateQuery {\n  ...LayoutFragment\n  viewer {\n    id\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n",
+        "variables": {}
+      }
+    },
+    {
+      "name": "AdminPostDetail",
+      "path": "/admin/posts/:id",
+      "ssr": true,
+      "fields": {
+        "id": {
+          "kind": "string",
+          "optional": false,
+          "in": "path"
+        }
+      },
+      "query": {
+        "operation": "AdminPostQuery",
+        "id": "aa4ce48104c3bf6f79b656b2e7331612",
+        "text": "query AdminPostQuery(\n  $id: ID!\n) {\n  ...LayoutFragment\n  post(id: $id) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n",
+        "variables": {
+          "id": {
+            "input": "id"
+          }
+        }
+      }
+    },
+    {
+      "name": "AdminPostEdit",
+      "path": "/admin/posts/:id/edit",
+      "ssr": true,
+      "fields": {
+        "id": {
+          "kind": "string",
+          "optional": false,
+          "in": "path"
+        }
+      },
+      "query": {
+        "operation": "AdminPostQuery",
+        "id": "aa4ce48104c3bf6f79b656b2e7331612",
+        "text": "query AdminPostQuery(\n  $id: ID!\n) {\n  ...LayoutFragment\n  post(id: $id) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n",
+        "variables": {
+          "id": {
+            "input": "id"
+          }
+        }
+      }
+    },
+    {
+      "name": "AdminProductList",
+      "path": "/admin/products",
+      "ssr": true,
+      "fields": {
+        "after": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        }
+      },
+      "query": {
+        "operation": "AdminProductListQuery",
+        "id": "2d0b3371ab170c3fe43d4f47bf581ee9",
+        "text": "query AdminProductListQuery(\n  $after: String\n) {\n  ...LayoutFragment\n  products(first: 20, after: $after) {\n    nodes {\n      id\n      title\n      slug\n      excerpt\n      status\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n",
+        "variables": {
+          "after": {
+            "input": "after"
+          }
+        }
+      }
+    },
+    {
+      "name": "AdminProductCreate",
+      "path": "/admin/products/new",
+      "ssr": true,
+      "fields": {},
+      "query": {
+        "operation": "AdminProductCreateQuery",
+        "id": "fae72bd615ed872e7c91a92fb7f6868f",
+        "text": "query AdminProductCreateQuery {\n  ...LayoutFragment\n  viewer {\n    id\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n",
+        "variables": {}
+      }
+    },
+    {
+      "name": "AdminProductDetail",
+      "path": "/admin/products/:id",
+      "ssr": true,
+      "fields": {
+        "id": {
+          "kind": "string",
+          "optional": false,
+          "in": "path"
+        }
+      },
+      "query": {
+        "operation": "AdminProductQuery",
+        "id": "a45ec5d2e3149eea62f96b6f196ff091",
+        "text": "query AdminProductQuery(\n  $id: ID!\n) {\n  ...LayoutFragment\n  product(id: $id) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    enquiryUrl\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n",
+        "variables": {
+          "id": {
+            "input": "id"
+          }
+        }
+      }
+    },
+    {
+      "name": "AdminProductEdit",
+      "path": "/admin/products/:id/edit",
+      "ssr": true,
+      "fields": {
+        "id": {
+          "kind": "string",
+          "optional": false,
+          "in": "path"
+        }
+      },
+      "query": {
+        "operation": "AdminProductQuery",
+        "id": "a45ec5d2e3149eea62f96b6f196ff091",
+        "text": "query AdminProductQuery(\n  $id: ID!\n) {\n  ...LayoutFragment\n  product(id: $id) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    enquiryUrl\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n",
+        "variables": {
+          "id": {
+            "input": "id"
+          }
+        }
+      }
+    },
+    {
+      "name": "AdminUserDetail",
+      "path": "/admin/users/:id",
+      "ssr": true,
+      "fields": {
+        "id": {
+          "kind": "string",
+          "optional": false,
+          "in": "path"
+        }
+      },
+      "query": {
+        "operation": "AdminUserQuery",
+        "id": "ecf115956bfe23995711b6b5253abbb8",
+        "text": "query AdminUserQuery(\n  $id: ID!\n) {\n  ...LayoutFragment\n  adminUser(id: $id) {\n    id\n    email\n    displayName\n    role\n    active\n    createdAt\n    updatedAt\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n",
+        "variables": {
+          "id": {
+            "input": "id"
+          }
+        }
+      }
+    },
+    {
+      "name": "AdminUserEdit",
+      "path": "/admin/users/:id/edit",
+      "ssr": true,
+      "fields": {
+        "id": {
+          "kind": "string",
+          "optional": false,
+          "in": "path"
+        }
+      },
+      "query": {
+        "operation": "AdminUserQuery",
+        "id": "ecf115956bfe23995711b6b5253abbb8",
+        "text": "query AdminUserQuery(\n  $id: ID!\n) {\n  ...LayoutFragment\n  adminUser(id: $id) {\n    id\n    email\n    displayName\n    role\n    active\n    createdAt\n    updatedAt\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n",
+        "variables": {
+          "id": {
+            "input": "id"
+          }
+        }
+      }
+    }
+  ]
+}

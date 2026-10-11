@@ -1,11 +1,14 @@
 /**
- * @generated SignedSource<<a0290fce1534e27ddf853fc75e2dc19c>>
+ * @generated SignedSource<<823c7c6562e9abac12489f4a3d06b8f4>>
+ * @relayHash 39a49e7327cee3fc6384452af4cf2f9b
  * @lightSyntaxTransform
  */
 
 /* tslint:disable */
 /* eslint-disable */
 // @ts-nocheck
+
+// @relayRequestID 39a49e7327cee3fc6384452af4cf2f9b
 
 import { ConcreteRequest } from 'relay-runtime';
 export type DeletePageInput = {
@@ -78,7 +81,7 @@ return {
   },
   "params": {
     "cacheID": "39a49e7327cee3fc6384452af4cf2f9b",
-    "id": null,
+    "id": "39a49e7327cee3fc6384452af4cf2f9b",
     "metadata": {},
     "name": "AdminPageDeleteMutation",
     "operationKind": "mutation",

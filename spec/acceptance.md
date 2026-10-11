@@ -30,9 +30,12 @@ application tests in server/tests. The original acceptance tests are unchanged.
    posts/products render cleanly. Ordering has ID tie-breakers.
    V1 accepts short/empty policy-filtered pages and slow counts; continuation
    remains available through pageInfo without exposing drafts.
-10. The client renders published content and updates document metadata. SSR and
-    initial-HTML SEO are deferred. Admin/draft responses avoid shared caching;
-    unpublish invalidates public content responses.
+10. The client renders published content and updates document metadata. Route HTML
+    inlines the route query response for the requesting viewer, which the client uses
+    without a GraphQL request; drafts and private profile data are never inlined for
+    visitors. SSR and initial-HTML SEO are deferred. Admin/draft responses and HTML
+    carrying data avoid shared caching; unpublish invalidates public content responses.
+    Text is legible in light and dark colour schemes, and document titles name each screen.
 11. Install works on an empty SQLite database only. Reviewed upgrade preserves
     content; backup restore succeeds. Secrets/database are unreachable over HTTP.
 

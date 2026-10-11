@@ -13,7 +13,7 @@ import {
   walk,
 } from '../../lib/content.ts';
 import { BASE_URL, RUN_ID } from '../../lib/env.ts';
-import { notFound, signIn, xssFired } from '../../lib/ui.ts';
+import { contrastOf, notFound, signIn, xssFired } from '../../lib/ui.ts';
 
 // The public site (website.md): client-rendered pages, lists, navigation, safe
 // Markdown, metadata and the not-found state (acceptance 9 and 10).
@@ -230,5 +230,66 @@ test.describe('client-side routing', () => {
     await expect(page).toHaveURL(`${BASE_URL}${publicPath('Post', post.slug)}`);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(post.title);
     expect(await sameDocument(), 'list link handled by the router').toBe(true);
+  });
+});
+
+for (const colorScheme of ['light', 'dark'] as const) {
+  test.describe(`readable in ${colorScheme} mode`, () => {
+    test.use({ colorScheme });
+
+    test('headings, body text, links and buttons meet WCAG AA contrast', async ({ page }) => {
+      // website.md: public and admin UI follow the system colour scheme legibly.
+      const post = await createPublished(api, 'Post');
+      for (const path of ['/', '/posts', publicPath('Post', post.slug), '/admin/login']) {
+        await page.goto(path);
+        const targets = [
+          page.getByRole('heading', { level: 1 }),
+          page.getByRole('banner').getByRole('link').first(),
+          page.getByRole('contentinfo').locator('p, a').first(),
+        ];
+        if (path === '/admin/login') targets.push(page.getByRole('button', { name: /sign in|log in/i }));
+        else targets.push(page.getByRole('main').locator('p').first());
+        for (const target of targets) {
+          await expect(target).toBeVisible();
+          const label = `${path} ${(await target.textContent())?.trim().slice(0, 30)}`;
+          expect(await contrastOf(target), `${label} contrast`).toBeGreaterThanOrEqual(4.5);
+        }
+      }
+    });
+  });
+}
+
+test.describe('document titles', () => {
+  test('lists and the home page have descriptive titles', async ({ page }) => {
+    await createPublished(api, 'Post');
+    await createPublished(api, 'Product');
+    for (const [path, title] of [['/posts', /^Posts\b/], ['/products', /^Products\b/], ['/admin/login', /^Sign in\b/]] as const) {
+      await page.goto(path);
+      await expect(page, path).toHaveTitle(title);
+    }
+  });
+});
+
+test.describe('initial data', () => {
+  test('public routes render from inlined data without a GraphQL request', async ({ page }) => {
+    const post = await createPublished(api, 'Post');
+    const product = await createPublished(api, 'Product');
+    const routes: [string, string][] = [
+      [publicPath('Post', post.slug), post.title],
+      [publicPath('Product', product.slug), product.title],
+      ['/posts', 'Posts'],
+    ];
+    for (const [path, heading] of routes) {
+      const requests: string[] = [];
+      const listener = (request: { url(): string; method(): string }) => {
+        if (new URL(request.url()).pathname === '/graphql') requests.push(`${request.method()} ${request.url()}`);
+      };
+      page.on('request', listener);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { level: 1 })).toHaveText(heading);
+      await page.waitForLoadState('networkidle');
+      page.off('request', listener);
+      expect(requests, `${path} rendered without fetching its route query`).toEqual([]);
+    }
   });
 });

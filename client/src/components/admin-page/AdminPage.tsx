@@ -1,36 +1,60 @@
 import { usePreloadedQuery, type PreloadedQuery } from 'react-relay';
-import { Layout } from '../layout/Layout';
-import { ADMIN_PAGE_QUERY } from './AdminPageQuery';
-import type { AdminPageQuery } from './__generated__/AdminPageQuery.graphql';
 import { Heading } from '@astryxdesign/core';
+import { Layout } from '../layout/Layout';
+import { ADMIN_PAGE_LIST_QUERY } from './AdminPageListQuery';
+import { ADMIN_PAGE_QUERY } from './AdminPageQuery';
+import { ADMIN_PAGE_CREATE_QUERY } from './AdminPageCreateQuery';
+import type { AdminPageListQuery } from './__generated__/AdminPageListQuery.graphql';
+import type { AdminPageQuery } from './__generated__/AdminPageQuery.graphql';
+import type { AdminPageCreateQuery } from './__generated__/AdminPageCreateQuery.graphql';
 import { useAdminPageRouteContext, RouteName, AdminPageListURI, AdminPageCreateURI, AdminPageDetailURI, AdminPageEditURI } from '../../routes/__generated__/routes';
 import { ContentList } from '../content-list/ContentList';
 import { ContentForm } from '../content-form/ContentForm';
 import { AdminDetail } from '../admin-detail/AdminDetail';
 import { AdminPageMutation } from './AdminPageMutation';
 
-export function AdminPage({ queryRef }: AdminPageProps) {
-  const screen = useAdminPage(queryRef);
-  return <Layout data={screen.data} row={screen.row} admin>
-    {screen.route.currentRoute === RouteName.AdminPageList ? <ContentList title="Pages" rows={screen.data.pages?.nodes}
+// Each route renders from its own URL-only query, which a server may inline (routes.json `query`).
+export function AdminPage({ list, create, content }: AdminPageProps) {
+  return list ? <AdminPage_List queryRef={list} /> : create ? <AdminPage_Create queryRef={create} /> : content ? <AdminPage_Content queryRef={content} /> : null;
+}
+
+function AdminPage_List({ queryRef }: { queryRef: PreloadedQuery<AdminPageListQuery> }) {
+  const data = usePreloadedQuery<AdminPageListQuery>(ADMIN_PAGE_LIST_QUERY, queryRef);
+  return <Layout data={data} title="Pages" admin>
+    <ContentList title="Pages" rows={data.pages?.nodes}
       create={AdminPageCreateURI.getURI({})} detail={row => AdminPageDetailURI.getURI({ id: row.id })}
-      next={screen.data.pages?.pageInfo.hasNextPage ? AdminPageListURI.getURI({ after: screen.data.pages.pageInfo.endCursor ?? undefined }) : undefined} />
-      : screen.route.currentRoute === RouteName.AdminPageCreate || screen.route.currentRoute === RouteName.AdminPageEdit ? <>
-        <Heading level={1}>{screen.row ? 'Edit' : 'Create'} Page</Heading>
-        <ContentForm key={screen.row?.id ?? 'new'} kind="Page" row={screen.row} save={screen.save} detail={id => AdminPageDetailURI.getURI({ id })} />
-      </> : <AdminDetail kind="Page" row={screen.row} edit={AdminPageEditURI.getURI({ id: screen.row?.id ?? '' })} list={AdminPageListURI.getURI({})} mutate={screen.mutate} />}
+      next={data.pages?.pageInfo.hasNextPage ? AdminPageListURI.getURI({ after: data.pages.pageInfo.endCursor ?? undefined }) : undefined} />
   </Layout>;
 }
 
-function useAdminPage(queryRef: PreloadedQuery<AdminPageQuery>) {
-  const data = usePreloadedQuery<AdminPageQuery>(ADMIN_PAGE_QUERY, queryRef); const route = useAdminPageRouteContext();
-  const mutate = AdminPageMutation(); const row = data.page;
-  async function save(input: Record<string, unknown>): Promise<string> {
-    const action = row ? 'update' : 'create'; const response = await mutate(action, input);
-    const payload = response[action + 'Page'] as { page: { id: string } };
-    return payload.page.id;
-  }
-  return { data, route, row, mutate, save };
+function AdminPage_Create({ queryRef }: { queryRef: PreloadedQuery<AdminPageCreateQuery> }) {
+  const data = usePreloadedQuery<AdminPageCreateQuery>(ADMIN_PAGE_CREATE_QUERY, queryRef);
+  const save = useAdminPage_Save(null);
+  return <Layout data={data} title="Create Page" admin>
+    <Heading level={1}>Create Page</Heading>
+    <ContentForm key="new" kind="Page" save={save} detail={id => AdminPageDetailURI.getURI({ id })} />
+  </Layout>;
 }
 
-type AdminPageProps = { queryRef: PreloadedQuery<AdminPageQuery> };
+function AdminPage_Content({ queryRef }: { queryRef: PreloadedQuery<AdminPageQuery> }) {
+  const data = usePreloadedQuery<AdminPageQuery>(ADMIN_PAGE_QUERY, queryRef);
+  const route = useAdminPageRouteContext(); const mutate = AdminPageMutation(); const row = data.page;
+  const save = useAdminPage_Save(row);
+  const editing = route.currentRoute === RouteName.AdminPageEdit && row != null;
+  return <Layout data={data} row={row} title={editing ? `Edit ${row.title}` : undefined} admin>
+    {editing ? <>
+      <Heading level={1}>Edit Page</Heading>
+      <ContentForm key={row.id} kind="Page" row={row} save={save} detail={id => AdminPageDetailURI.getURI({ id })} />
+    </> : <AdminDetail kind="Page" row={row} edit={AdminPageEditURI.getURI({ id: row?.id ?? '' })} list={AdminPageListURI.getURI({})} mutate={mutate} />}
+  </Layout>;
+}
+
+function useAdminPage_Save(row: { readonly id: string } | null | undefined) {
+  const mutate = AdminPageMutation();
+  return async function save(input: Record<string, unknown>): Promise<string> {
+    const action = row ? 'update' : 'create'; const response = await mutate(action, input);
+    return (response[action + 'Page'] as { page: { id: string } }).page.id;
+  };
+}
+
+type AdminPageProps = { list?: PreloadedQuery<AdminPageListQuery>; create?: PreloadedQuery<AdminPageCreateQuery>; content?: PreloadedQuery<AdminPageQuery> };

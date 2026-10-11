@@ -1,11 +1,14 @@
 /**
- * @generated SignedSource<<f678806b9eaa776ac1b703202810f38d>>
+ * @generated SignedSource<<beb757eae1fa1c7fb2b220d22a33be8c>>
+ * @relayHash 51fe0f05a167f4580285d040902256b0
  * @lightSyntaxTransform
  */
 
 /* tslint:disable */
 /* eslint-disable */
 // @ts-nocheck
+
+// @relayRequestID 51fe0f05a167f4580285d040902256b0
 
 import { ConcreteRequest } from 'relay-runtime';
 export type DeleteProductInput = {
@@ -78,7 +81,7 @@ return {
   },
   "params": {
     "cacheID": "51fe0f05a167f4580285d040902256b0",
-    "id": null,
+    "id": "51fe0f05a167f4580285d040902256b0",
     "metadata": {},
     "name": "AdminProductDeleteMutation",
     "operationKind": "mutation",

@@ -5,3 +5,4 @@ storage:
   tablePrefix: hsimah_
 integrations:
   graphql: {}
+  tsquid: {}

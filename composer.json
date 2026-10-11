@@ -3,11 +3,12 @@
   "type": "project",
   "require": {
     "php": ">=8.3",
-    "ext-pdo_sqlite": "*",
     "ext-mbstring": "*",
+    "ext-pdo_sqlite": "*",
+    "elephentity/codegen-tsquid": "^0.1",
+    "elephentity/graphql": "0.2.0-alpha.1",
     "elephentity/runtime": "0.13.1",
     "elephentity/sqlite": "0.1.0-alpha.5",
-    "elephentity/graphql": "0.2.0-alpha.1",
     "psr/container": "^2.0",
     "psr/log": "^3.0"
   },
