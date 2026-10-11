@@ -1,5 +1,5 @@
 {
-  "name": "hsimah-services/hsimah",
+  "name": "hsimah-services/hblake",
   "type": "project",
   "require": {
     "php": ">=8.3",

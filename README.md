@@ -1,6 +1,6 @@
 # Consulting website
 
-A standalone PHP/SQLite content backend built from the [Elephentity specifications](spec/README.md), with a React client using Tsquid routes, Relay, Astryx and StyleX. The initial site has no fabricated business copy. Pages, posts and products start as drafts; a single operator account manages them through `/admin`.
+The site for hbla.ke: a standalone PHP/SQLite content backend built from the [Elephentity specifications](spec/README.md), with a React client using Tsquid routes, Relay, Astryx and StyleX. The initial site has no fabricated business copy. Pages, posts and products start as drafts; a single operator account manages them through `/admin`.
 
 ## Verify and run locally
 
