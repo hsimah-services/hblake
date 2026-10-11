@@ -8,12 +8,13 @@ with sqlite3.connect('file:'+sys.argv[1]+'?mode=ro',uri=True) as db:
     assert db.execute('SELECT COUNT(*) FROM hsimah_user').fetchone()[0]==1
 PY
 "$ENGINE" rm -f "$STACK" >/dev/null
-python3 - "$1" <<'PY'
+python3 - "$1" "$DATA" <<'PY'
 import sys,shutil
 from pathlib import Path
+data=Path(sys.argv[2])
 for name in ['site.sqlite-wal','site.sqlite-shm']:
-    Path('.var',name).unlink(missing_ok=True)
-shutil.copyfile(sys.argv[1],'.var/site.sqlite')
-Path('.var/site.sqlite').chmod(0o600)
+    (data/name).unlink(missing_ok=True)
+shutil.copyfile(sys.argv[1],data/'site.sqlite')
+(data/'site.sqlite').chmod(0o600)
 PY
 start_stack

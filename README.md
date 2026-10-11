@@ -16,7 +16,7 @@ scripts/acceptance/up
 scripts/acceptance/down
 ```
 
-`up` creates a **fresh database**, and `down` discards it: these are development/acceptance commands, not production start/stop procedures. Set `BASE_URL` to choose the local origin/port. Use a password of at least 12 characters. Never put operator credentials in the repository or command history.
+`up` creates a **fresh database**, and `down` discards it: these are development/acceptance commands, not production start/stop procedures. The acceptance stack's database is `.var/acceptance/site.sqlite`; the harness and `tests/run.sh` never touch the default local database, `.var/site.sqlite`, which the console commands and any server started without `HSIMAH_DATABASE` use. Set `BASE_URL` to choose the local origin/port. Use a password of at least 12 characters. Never put operator credentials in the repository or command history.
 
 Run the owner-provided verification unchanged:
 
