@@ -1,14 +1,23 @@
 # Website behavior
 
-The site introduces a software engineering consulting business, explains its
-services and products, and gives visitors a clear way to enquire. Launch content
-can be limited to Home, Services, About and Contact Pages. Posts and Products can
-remain empty, with useful empty states and no fabricated content.
+The hblake site introduces Hamish Blake and the open frameworks behind his work.
+Owner-provided launch content consists of Home, About, Frameworks, Portfolio and
+Contact us. The homepage shows four large coloured links to those pages, followed
+by the latest published post when one exists. Posts and Products may remain empty.
 
-The site has a consistent header, navigation, footer and content layout. The owner supplies
-business name, positioning, services, contact details and any legal copy before
-launch. Public typography and spacing prioritize readable content. Its UI follows Tsquid's Astryx/StyleX conventions with keyboard access, visible
-focus and responsive layouts.
+The header provides understated page navigation. The footer includes copyright,
+icon links to hsimah.com, hsimah-services on GitHub and Hamish’s LinkedIn.
+The icons use assets from the owner’s hsimah repository, have accessible names,
+and open in a new tab. Contact links point to
+GitHub and LinkedIn; no email address or contact form is published. The portfolio
+explains that customer permission is pending, without publishing customer details.
+Public typography and spacing prioritize readable content. The UI follows Tsquid’s
+Astryx/StyleX conventions with keyboard access, visible focus and responsive layouts.
+
+Owner-approved content lives in content/pages.json and can replace existing Page,
+Post and Product records with the explicit operator command `replace-content`.
+That command preserves accounts, credentials and sessions, and publishes the five
+pages through the normal runtime contracts in one transaction.
 
 | Route | Behavior |
 | --- | --- |

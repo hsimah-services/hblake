@@ -18,16 +18,32 @@ const LAYOUT_FRAGMENT = graphql`fragment LayoutFragment on RootQuery {
 export function Layout({ data, row, title, admin = false, children }: LayoutProps) {
   const layout = useLayout(data, row, title, admin);
   return <Stack gap={6} align="stretch" xstyle={styles.shell}>
-    <header><Stack direction="horizontal" gap={4} align="center">
+    <header {...stylex.props(styles.header)}><Stack direction="horizontal" gap={4} align="center" xstyle={styles.headerRow}>
       <Link href={HomeURI.getURI({})}>{SITE_NAME}</Link>
-      <nav aria-label="Main navigation"><Stack direction="horizontal" gap={4}>
+      <nav aria-label="Main navigation"><Stack direction="horizontal" gap={4} xstyle={styles.navigation}>
         {layout.navigation.map(link => <Link key={link.href} href={link.href}>{link.title}</Link>)}
         <Link href={AdminHomeURI.getURI({})}>Admin</Link>
       </Stack></nav>
       {layout.viewer && <Button label="Sign out" clickAction={layout.signOut} isDisabled={!layout.csrf} />}
     </Stack></header>
     <main>{layout.notice && <p role="status">{layout.notice}</p>}{layout.error && <p role="alert">{layout.error}</p>}{children}</main>
-    <footer><p>{SITE_NAME}</p></footer>
+    <footer {...stylex.props(styles.footer)}>
+      <p>© {new Date().getFullYear()} {SITE_NAME}</p>
+      <Stack direction="horizontal" gap={4} xstyle={styles.footerLinks}>
+        <Link href="https://hsimah.com" label="hsimah.com — personal blog" target="_blank" rel="noopener noreferrer" xstyle={styles.iconLink}>
+          <picture>
+            <source srcSet="/assets/hsimah-dark.svg" media="(prefers-color-scheme: dark)" />
+            <img src="/assets/hsimah-light.svg" alt="" width={28} height={28} />
+          </picture>
+        </Link>
+        <Link href="https://github.com/hsimah-services" label="hsimah-services on GitHub" target="_blank" rel="noopener noreferrer" xstyle={styles.iconLink}>
+          <img src="/assets/github.svg" alt="" width={28} height={28} {...stylex.props(styles.githubIcon)} />
+        </Link>
+        <Link href="https://www.linkedin.com/in/hamishblake/" label="Hamish Blake on LinkedIn" target="_blank" rel="noopener noreferrer" xstyle={styles.iconLink}>
+          <img src="/assets/linkedin.svg" alt="" width={28} height={28} />
+        </Link>
+      </Stack>
+    </footer>
   </Stack>;
 }
 
@@ -36,6 +52,11 @@ function useLayout(key: LayoutFragment$key, row: LayoutRow | null | undefined, t
   const location = useLocation(); const navigate = useNavigate();
   const [csrf, setCsrf] = useState(''); const [error, setError] = useState('');
   const navigation = data.navigationPages?.nodes?.filter(value => value?.status === 'PUBLISHED' && value.slug !== 'home').map(value => ({ title: value!.title, href: PageURI.getURI({ slug: value!.slug }) })) ?? [];
+  const order = ['about', 'frameworks', 'portfolio', 'contact'].map(slug => PageURI.getURI({ slug }));
+  navigation.sort((a, b) => {
+    const first = order.indexOf(a.href); const second = order.indexOf(b.href);
+    return (first < 0 ? order.length : first) - (second < 0 ? order.length : second);
+  });
   if (data.navigationPosts?.nodes?.some(value => value?.status === 'PUBLISHED')) navigation.push({ title: 'Posts', href: PostListURI.getURI({}) });
   if (data.navigationProducts?.nodes?.some(value => value?.status === 'PUBLISHED')) navigation.push({ title: 'Products', href: ProductListURI.getURI({}) });
   useEffect(() => { updateMetadata(row, title, location.pathname, admin); }, [row, title, location.pathname, admin]);
@@ -72,4 +93,13 @@ function setMeta(name: string, content: string, property = false) {
 type LayoutRow = { readonly title?: unknown; readonly excerpt?: unknown; readonly status?: unknown };
 type LayoutProps = { data: LayoutFragment$key; row?: LayoutRow | null; title?: string; admin?: boolean; children: ReactNode };
 
-const styles = stylex.create({ shell: { width: '100%', maxWidth: '72rem', marginInline: 'auto', padding: 'var(--spacing-6)' } });
+const styles = stylex.create({
+  shell: { width: '100%', maxWidth: '72rem', minHeight: '100vh', marginInline: 'auto', padding: 'var(--spacing-6)' },
+  header: { borderBottom: '1px solid var(--color-text-primary)', paddingBlock: '1rem', fontSize: '0.9rem' },
+  headerRow: { flexWrap: 'wrap', justifyContent: 'space-between' },
+  footer: { marginTop: 'auto', paddingBlock: '1.5rem', borderTop: '1px solid var(--color-text-primary)', fontSize: '0.85rem', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: '1rem' },
+  footerLinks: { flexWrap: 'wrap' },
+  navigation: { flexWrap: 'wrap' },
+  iconLink: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '44px', height: '44px' },
+  githubIcon: { backgroundColor: '#24292f', borderRadius: '50%', padding: '3px', boxSizing: 'content-box' },
+});

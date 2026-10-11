@@ -1,6 +1,6 @@
 # Consulting website
 
-The site for hbla.ke: a standalone PHP/SQLite content backend built from the [Elephentity specifications](spec/README.md), with a React client using Tsquid routes, Relay, Astryx and StyleX. The initial site has no fabricated business copy. Pages, posts and products start as drafts; a single operator account manages them through `/admin`.
+The site for hbla.ke: a standalone PHP/SQLite content backend built from the [Elephentity specifications](spec/README.md), with a React client using Tsquid routes, Relay, Astryx and StyleX. The public site uses owner-provided copy, four coloured navigation blocks and a latest-post feature. Pages, posts and products start as drafts; a single operator account manages them through `/admin`.
 
 ## Verify and run locally
 
@@ -62,4 +62,20 @@ scripts/acceptance/restore /private/path/site-backup.sqlite
 
 Backup uses SQLite `VACUUM INTO` for a consistent snapshot. Restore validates integrity, stops the server, replaces the database and restarts before returning. Run the equivalent procedure under maintenance mode in production. Do not rerun the initial installer as an upgrade; future schema changes require a reviewed migration and a tested backup/restore.
 
-V1 is client-rendered; each route's HTML carries its query response as Tsquid initial data (`#tsquid-data`), executed as the requesting viewer. Initial-HTML SEO, concurrent edit protection, additional accounts and commerce are deferred, as recorded in the specification. Owner-provided site name (replacing the neutral Website placeholder), branding, content and contact details are still required before a public launch.
+V1 is client-rendered; each route's HTML carries its query response as Tsquid initial data (`#tsquid-data`), executed as the requesting viewer. Initial-HTML SEO, concurrent edit protection, additional accounts and commerce are deferred, as recorded in the specification. The site name is hblake; launch copy and public contact links are supplied by the owner. Deployment remains a separate operator action.
+
+## Launch content
+
+`content/pages.json` contains the owner-approved Home, About, Frameworks, Portfolio
+and Contact us copy. After installation, replace all Page, Post and Product content
+with these five published pages:
+
+```sh
+scripts/php php server/console.php replace-content
+```
+
+This command is destructive to existing content and runs atomically. Accounts,
+credentials and sessions are preserved. It is explicit and never runs during
+acceptance startup, which requires an empty content database. Subsequent edits can
+be made through the admin screens. The homepage displays the latest published
+post when available and omits the blog section while no posts exist.

@@ -28,9 +28,10 @@ Contributor instructions live in [AGENTS.md](../AGENTS.md).
   SSR/prerender and initial-HTML SEO are deferred.
 - Policy-filtered paging limitations are accepted for the small v1 dataset.
 - Concurrent edit detection is deferred until Elephentity #100 is available.
-- Brand copy, logo, domain, contact address, hosting and final visual treatment are
-  not yet selected; business claims and contact details come from the owner.
+- Owner-provided launch copy is in content/pages.json; the site name is hblake.
+  Public contact uses GitHub and LinkedIn. Hosting and deployment remain operator work.
 
 The root README documents the application toolchain and operator procedures.
 Live builder validation replaces the removed temporary provides snapshot.
-Content is still owner-provided; the initial database is empty.
+Owner-provided launch content is installed explicitly with `replace-content`;
+acceptance startup continues to use an empty content database.

@@ -1,0 +1,32 @@
+[
+  {
+    "title": "Home",
+    "slug": "home",
+    "excerpt": "Software engineering, open platforms, and tools built to last.",
+    "content": "## Software built with care\n\nScalable backend systems. Clean, efficient interfaces. Open tools and platforms.\n\nExplore our frameworks, get to know the person behind them, or connect to talk about your project."
+  },
+  {
+    "title": "About",
+    "slug": "about",
+    "excerpt": "Meet Hamish Blake: software engineer, Australian expat, and transplant Seattleite.",
+    "content": "## G’day, I’m Hamish Blake\n\nI’m a software engineer at Meta, Australian expat, and transplant Seattleite.\n\n### What I do\n\nI work on the Ent Framework in Meta’s Core Data organisation. My bread and butter is scalable backend systems — the kind where data integrity isn’t optional and you’re thinking about what the schema looks like in five years, not five sprints. I also enjoy putting together a clean, efficient UI. There’s something satisfying about a well-laid-out interface that just works.\n\nI’ve been doing this for over 15 years. It started with messing around in mIRC: writing scripts in mSL, discovering I liked making computers do things, and finding my way into a software engineering degree.\n\n### Committed to open platforms\n\nWe’re committed to open platforms and contributing back to the projects we rely on. While some parts of our systems remain closed source, we make every effort to share what we create through reusable tools, improvements, and contributions to the wider community.\n\n### Outside the terminal\n\nWhen I’m not at a keyboard, you’ll find me on one of my four bikes, reading, enjoying a coffee, or adding to my vinyl and felt hat collections. I’m also learning Spanish and French, and doing neither particularly well.\n\nMy two pomskies, Laiko and Belki, are the real stars of the household. They’re spoiled beyond reason, and I have zero regrets about it.\n\n[Read my personal blog](https://hsimah.com) · [Find me on LinkedIn](https://www.linkedin.com/in/hamishblake/)\n"
+  },
+  {
+    "title": "Frameworks",
+    "slug": "frameworks",
+    "excerpt": "Explore Elephentity, Tsquid, and Markr: tools for business logic, application structure, and publishing.",
+    "content": "## Open tools, shared foundations\n\nThese projects reflect our commitment to making useful tools available to others.\n\n### Elephentity\n\nA framework for building PHP business logic from readable specifications. It generates the surrounding code for data models and storage, with explicit contracts for application-specific rules.\n\n[Explore Elephentity on GitHub](https://github.com/hsimah-services/elephentity)\n\n### Tsquid\n\nTools for structuring React applications, connecting routes and their data, and checking that application architecture stays consistent.\n\n[Explore Tsquid on GitHub](https://github.com/hsimah-services/tsquid)\n\n### Markr\n\nA minimal static blog engine. Markdown posts are prerendered to plain HTML at build time, with no JavaScript required to read them. Markr powers my personal blog.\n\n[Explore Markr on GitHub](https://github.com/hsimah-services/markr) · [See Markr in action](https://hsimah.com)\n"
+  },
+  {
+    "title": "Portfolio",
+    "slug": "portfolio",
+    "excerpt": "Customer projects will be shared with their permission.",
+    "content": "## Under construction\n\nWe’re seeking permission from existing customers to share their projects. Check back for examples of our work.\n\nIn the meantime, [explore our open frameworks](/pages/frameworks)."
+  },
+  {
+    "title": "Contact us",
+    "slug": "contact",
+    "excerpt": "Connect with Hamish Blake on LinkedIn or explore our work on GitHub.",
+    "content": "## Let’s connect\n\nTo get in touch about a project, connect with me on LinkedIn. You can also find our frameworks and follow their development on GitHub.\n\n- [Hamish Blake on LinkedIn](https://www.linkedin.com/in/hamishblake/)\n- [Hamish Blake on GitHub](https://github.com/hsimah)\n- [hsimah-services on GitHub](https://github.com/hsimah-services)"
+  }
+]

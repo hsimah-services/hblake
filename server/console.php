@@ -19,6 +19,9 @@ try {
                 $result=$app->runtime->create('User',['email'=>$email,'displayName'=>getenv('ADMIN_DISPLAY_NAME') ?: 'Site Operator','role'=>'admin','active'=>true]);
                 $db->insert('auth_credential',['user_id'=>(int)$result->id->raw(),'password_hash'=>password_hash($password,PASSWORD_DEFAULT)]);
             }); break;
+        case 'replace-content':
+            \Hsimah\SiteContent::replace(new App($db,new Actor(bootstrap:true)));
+            echo "Site content replaced.\n"; break;
         case 'backup':
             $path=$argv[2] ?? ''; if ($path==='' || file_exists($path)) throw new RuntimeException('Choose a new backup path.');
             $db->pdo->exec('VACUUM INTO '.$db->pdo->quote($path)); chmod($path,0600); break;

@@ -9,11 +9,30 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   tsquid-manifest.php
- * digest: sha256:99e5f9b1a4fbf479a996f2d6854d28b65275d627c94817f8eb40f4c7155f0c71
+ * digest: sha256:0ba32ae55347ab6c770bc21f9c4984dfd1823774dd980f3bb1978ec1f01089e4
  */
 
-return new \Eleph\Tsquid\Manifest((object) ['routes' => [(object) ['fields' => (object) [], 'name' => 'Home', 'path' => '/', 'query' => (object) ['id' => '8d77ac639678bfb06785cc406b8d7fb2', 'operation' => 'HomeQuery', 'text' => 'query HomeQuery {
+return new \Eleph\Tsquid\Manifest((object) ['routes' => [(object) ['fields' => (object) [], 'name' => 'Home', 'path' => '/', 'query' => (object) ['id' => '8377941fd17bab39b9523077363b7cf4', 'operation' => 'HomeQuery', 'text' => 'query HomeQuery {
   ...LayoutFragment
+  homePages: pages(first: 100) {
+    nodes {
+      id
+      title
+      slug
+      excerpt
+      status
+    }
+  }
+  latestPosts: posts(first: 100) {
+    nodes {
+      id
+      title
+      slug
+      excerpt
+      status
+      publishedAt
+    }
+  }
   pageBySlug(slug: "home") {
     id
     title
