@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router';
 import { graphql, useFragment } from 'react-relay';
 import { Link, Button, Stack } from '@astryxdesign/core';
 import * as stylex from '@stylexjs/stylex';
-import { HomeURI, PageURI, PostListURI, ProductListURI, LoginURI } from '../../routes/__generated__/routes';
+import { HomeURI, PageURI, PostListURI, ProductListURI, LoginURI, AdminHomeURI } from '../../routes/__generated__/routes';
 import { SITE_NAME } from '../../SiteName';
 import { authRequest } from '../../authRequest';
 import type { LayoutFragment$key } from './__generated__/LayoutFragment.graphql';
@@ -22,7 +22,15 @@ export function Layout({ data, row, title, admin = false, children }: LayoutProp
   const layout = useLayout(data, row, title, admin);
   return <Stack gap={6} align="stretch" xstyle={styles.shell}>
     <header {...stylex.props(styles.header)}><Stack direction="horizontal" gap={4} align="center" xstyle={styles.headerRow}>
-      <Link href={HomeURI.getURI({})} weight="bold" color="inherit" xstyle={styles.siteName}>{SITE_NAME}</Link>
+      <Stack direction="horizontal" gap={1} align="center">
+        <Link href={HomeURI.getURI({})} weight="bold" color="inherit" xstyle={styles.siteName}>{SITE_NAME}</Link>
+        {/* Only the signed-in operator sees the way into the admin; the server still authorizes it. */}
+        {layout.viewer && <Link href={AdminHomeURI.getURI({})} label="Admin" tooltip="Admin" color="inherit" xstyle={[styles.navigationLink, styles.violet]}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="7" height="9" rx="1" /><rect x="14" y="3" width="7" height="5" rx="1" /><rect x="14" y="12" width="7" height="9" rx="1" /><rect x="3" y="16" width="7" height="5" rx="1" />
+          </svg>
+        </Link>}
+      </Stack>
       <nav aria-label="Main navigation"><Stack direction="horizontal" gap={1} xstyle={styles.navigation}>
         <Link href="/" label="Home" color="inherit" xstyle={[styles.navigationLink, styles.violet]}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
