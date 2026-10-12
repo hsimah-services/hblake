@@ -1,0 +1,32 @@
+<svg width="680" height="680" viewBox="0 0 680 680" xmlns="http://www.w3.org/2000/svg">
+<title>PHP elephant logo</title>
+<desc>A stylized elephant peeking out of an open box, with a tapered trunk starting below the eyes and curling above the box front, in the visual style of the Dropbox logo, rendered in purple tones for a PHP framework brand</desc>
+<defs>
+<clipPath id="bgclip"><rect x="60" y="60" width="560" height="560" rx="120"/></clipPath>
+</defs>
+
+<rect x="60" y="60" width="560" height="560" rx="120" fill="#777BB4"/>
+
+<g clip-path="url(#bgclip)">
+<polygon points="240,430 340,430 300,300 170,340" fill="#5C5A96"/>
+<polygon points="440,430 340,430 380,300 510,340" fill="#5C5A96"/>
+
+<ellipse cx="255" cy="320" rx="55" ry="70" fill="#EDEBF7"/>
+<ellipse cx="425" cy="320" rx="55" ry="70" fill="#EDEBF7"/>
+<ellipse cx="255" cy="320" rx="38" ry="50" fill="#D8D4EE"/>
+<ellipse cx="425" cy="320" rx="38" ry="50" fill="#D8D4EE"/>
+
+<ellipse cx="340" cy="335" rx="98" ry="92" fill="#EDEBF7"/>
+
+<polygon points="220,590 460,590 440,430 240,430" fill="#3C3966"/>
+
+<path d="M340,322 L320,372" fill="none" stroke="#C7C2E0" stroke-width="42" stroke-linecap="round"/>
+<path d="M320,372 L302,412" fill="none" stroke="#C7C2E0" stroke-width="30" stroke-linecap="round"/>
+<path d="M302,412 C290,428 292,444 308,450 C318,453 324,446 318,440" fill="none" stroke="#C7C2E0" stroke-width="20" stroke-linecap="round"/>
+
+<circle cx="305" cy="315" r="9" fill="#3C3966"/>
+<circle cx="375" cy="315" r="9" fill="#3C3966"/>
+</g>
+
+<rect x="60" y="60" width="560" height="560" rx="120" fill="none" stroke="#2C2A4D" stroke-width="4"/>
+</svg>

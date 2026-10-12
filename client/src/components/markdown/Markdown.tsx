@@ -4,7 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import rehypeSanitize from 'rehype-sanitize';
 
 export function Markdown({ content }: { content: string }) {
-  return <ReactMarkdown skipHtml rehypePlugins={[rehypeSanitize]} components={{ h1: Markdown_Heading, h2: Markdown_Heading, h3: Markdown_Subheading, p: Markdown_Paragraph, a: Markdown_Link }}>{content}</ReactMarkdown>;
+  return <ReactMarkdown skipHtml rehypePlugins={[rehypeSanitize]} components={{ h1: Markdown_Heading, h2: Markdown_Heading, h3: Markdown_Subheading, p: Markdown_Paragraph, a: Markdown_Link, img: Markdown_Image }}>{content}</ReactMarkdown>;
 }
 
 function Markdown_Heading({ children }: { children?: React.ReactNode }) {
@@ -20,11 +20,17 @@ function Markdown_Link({ href, children }: { href?: string; children?: React.Rea
   return <Link href={href} hasUnderline>{children}</Link>;
 }
 
+// Images in Markdown are small inline marks, such as a logo beside a heading.
+function Markdown_Image({ src, alt }: { src?: string; alt?: string }) {
+  return <img src={src} alt={alt ?? ''} width={56} height={56} {...stylex.props(styles.image)} />;
+}
+
 function Markdown_Paragraph({ children }: { children?: React.ReactNode }) {
   return <p {...stylex.props(styles.paragraph)}>{children}</p>;
 }
 
 const styles = stylex.create({
   heading: { marginTop: '1.5rem', marginBottom: '0.75rem' },
+  image: { verticalAlign: 'middle', marginInlineEnd: '0.75rem', objectFit: 'contain' },
   paragraph: { marginBlock: '1rem', lineHeight: 1.8 },
 });
