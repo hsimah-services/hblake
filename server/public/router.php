@@ -46,7 +46,12 @@ try {
     $app=new App(App::database(),$auth->actor());
     $initial=new InitialData(
         Manifest::fromFile(dirname(__DIR__,2).'/generated/tsquid/tsquid-manifest.php'),
-        static fn(string $text, array $variables, string $operation): array => GraphQLEndpoint::execute($app,$text,Http::object($variables),$operation),
+        // A response with errors is not inlined: withInitialData would hand it to Relay without
+        // the client's error handling (tsquid#40), so the client fetches the route query itself.
+        static function(string $text, array $variables, string $operation) use ($app): ?array {
+            $result=GraphQLEndpoint::execute($app,$text,Http::object($variables),$operation);
+            return ($result['errors'] ?? []) === [] ? $result : null;
+        },
     );
     $response=$initial->render(Http::server('REQUEST_URI') ?: '/',$shell);
     foreach($response->headers as $name=>$value) header($name.': '.$value);
