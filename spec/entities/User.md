@@ -2,14 +2,20 @@
 
 V1 has one private operator account, provisioned as admin. The reusable model
 retains editor/admin roles; multiple accounts and account lifecycle screens are
-outside v1. The account UI shows profile detail and edits email/displayName only.
-Email is trimmed and normalized to lowercase before persistence, with uniqueness
-on that value. Display name cannot be blank. Role/active are read-only in the UI.
+outside v1. The account has no email. Its username is the login: 3–32 lowercase
+letters, digits, dots, hyphens or underscores, starting with a letter or digit,
+unique, set at bootstrap and not editable in the UI. The display name is the public
+author name on posts and cannot be blank. Settings show the username and display
+name, edit only the display name, and change the password. Role/active are internal
+and not shown.
 
 There is no public registration or HTTP account-creation endpoint. The explicit
 operator bootstrap command refuses to create another account when one exists.
 Credentials, password hashes, reset tokens and sessions live in a separate
 server-owned authentication store, outside the entity and generated profile form.
+The signed-in account changes its password over `POST /auth/password` with the
+current password and a new one of at least 12 characters; success revokes its other
+sessions, and a wrong current password counts against the login rate limit.
 Bootstrap is complete only when credentials have been stored; login requires both
 valid credentials and an active account. A partial bootstrap is retried/repaired
 through the operator procedure rather than an assumed cross-store atomic write.

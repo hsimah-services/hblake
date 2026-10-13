@@ -98,7 +98,7 @@ for (const kind of KINDS) {
 
     test('public content never exposes account details', async () => {
       const result = await bySlugRaw(anonymous, kind, published.slug);
-      expect(result.body).not.toContain(OPERATOR.email);
+      expect(result.body).not.toContain(OPERATOR.username);
     });
   });
 }
@@ -119,10 +119,18 @@ test('ids of one kind never resolve as another kind', async () => {
 
 test('the operator profile is not readable anonymously', async () => {
   const viewerId = (await operator.viewer())!.id;
-  const result = await anonymous.graphql('query Profile($id: ID!) { adminUser(id: $id) { id email displayName } }', {
+  const result = await anonymous.graphql('query Profile($id: ID!) { adminUser(id: $id) { id username displayName } }', {
     id: viewerId,
   });
   expect(result.data?.adminUser ?? null).toBeNull();
-  expect(result.body).not.toContain(OPERATOR.email);
+  expect(result.body).not.toContain(OPERATOR.username);
   expect(await anonymous.viewer()).toBeNull();
+});
+
+test('visitors see a post author by display name only', async () => {
+  const post = await createPublished(operator, 'Post');
+  const result = await anonymous.graphql('query Byline($slug: String!) { postBySlug(slug: $slug) { author { displayName } } }', { slug: post.slug });
+  expect(result.errors).toEqual([]);
+  expect(result.data?.postBySlug?.author).toEqual({ displayName: OPERATOR.displayName });
+  expect(result.body).not.toContain(OPERATOR.username);
 });

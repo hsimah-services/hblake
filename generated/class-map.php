@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   class-map.php
- * digest: sha256:cd9023312fc567e09d35d9adf1055f19bfda9769f33220322c8b910e131408b8
+ * digest: sha256:ac020a3739317ebfe67d5036f474b53db8ac3aa85cd76ffbc3b07b03bfba143e
  */
 
 return [
@@ -105,8 +105,8 @@ return [
         'Hsimah\\Entity\\Product\\ProductWritePolicies' => 'Product/ProductWritePolicies.php',
         'Hsimah\\Entity\\User\\Contract\\UserAdminAccountsWritePolicy' => 'User/Contract/UserAdminAccountsWritePolicy.php',
         'Hsimah\\Entity\\User\\Contract\\UserDisplayNameVerifier' => 'User/Contract/UserDisplayNameVerifier.php',
-        'Hsimah\\Entity\\User\\Contract\\UserEmailVerifier' => 'User/Contract/UserEmailVerifier.php',
         'Hsimah\\Entity\\User\\Contract\\UserStaffProfileReadPolicy' => 'User/Contract/UserStaffProfileReadPolicy.php',
+        'Hsimah\\Entity\\User\\Contract\\UserUsernameVerifier' => 'User/Contract/UserUsernameVerifier.php',
         'Hsimah\\Entity\\User\\User' => 'User/User.php',
         'Hsimah\\Entity\\User\\UserDeleter' => 'User/UserDeleter.php',
         'Hsimah\\Entity\\User\\UserHydrator' => 'User/UserHydrator.php',

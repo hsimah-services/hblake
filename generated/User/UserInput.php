@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   User/UserInput.php
- * digest: sha256:dc55af9c7f0e3b1cbc1183088ceb4be8332c203a8e11d14c62fa7f041d6e3a04
+ * digest: sha256:b1a3cc56330bb0e909eb91f3e4d1e58c885bfcc41bfcc5f06215679f125c8702
  */
 
 namespace Hsimah\Entity\User;
@@ -30,14 +30,14 @@ final readonly class UserInput
 
     }
 
-    private function email(
+    private function username(
         mixed $value,
     ): ?string {
         if (null === $value) {
             return null;
         }
 
-        return $this->decode->string($value, 'User.email');
+        return $this->decode->string($value, 'User.username');
     }
 
     private function displayName(
@@ -80,8 +80,8 @@ final readonly class UserInput
         MutationBuffer $buffer,
         array $input,
     ): void {
-        if (array_key_exists('email', $input)) {
-            $buffer->set('email', $this->email($input['email']));
+        if (array_key_exists('username', $input)) {
+            $buffer->set('username', $this->username($input['username']));
         }
 
         if (array_key_exists('displayName', $input)) {

@@ -23,7 +23,7 @@ import uuid
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 HARNESS = os.path.join(ROOT, "scripts", "acceptance")
 BASE_URL = os.environ.get("BASE_URL", "http://localhost:8080").rstrip("/")
-EMAIL = os.environ.get("ADMIN_EMAIL", "")
+USERNAME = os.environ.get("ADMIN_USERNAME", "")
 PASSWORD = os.environ.get("ADMIN_PASSWORD", "")
 RUN = uuid.uuid4().hex[:8]
 
@@ -68,8 +68,8 @@ class Client:
         self.token = json.loads(body)["token"]
         return self.token
 
-    def login(self, email: str = EMAIL, password: str = PASSWORD) -> int:
-        status, _ = self.request("POST", "/auth/login", {"email": email, "password": password}, {"X-CSRF-Token": self.csrf()})
+    def login(self, username: str = USERNAME, password: str = PASSWORD) -> int:
+        status, _ = self.request("POST", "/auth/login", {"username": username, "password": password}, {"X-CSRF-Token": self.csrf()})
         self.token = None
         return status
 
@@ -113,12 +113,12 @@ def operator() -> Client:
 class OperatorProcedures(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        if not EMAIL or not PASSWORD:
-            raise unittest.SkipTest("ADMIN_EMAIL and ADMIN_PASSWORD must be set; run tests/run.sh")
+        if not USERNAME or not PASSWORD:
+            raise unittest.SkipTest("ADMIN_USERNAME and ADMIN_PASSWORD must be set; run tests/run.sh")
 
     def test_10_bootstrap_refuses_a_second_account(self) -> None:
-        other = f"second-{RUN}@example.test"
-        result = harness("bootstrap", env={"ADMIN_EMAIL": other, "ADMIN_PASSWORD": "second-account-password", "ADMIN_DISPLAY_NAME": "Second"})
+        other = f"second-{RUN}"
+        result = harness("bootstrap", env={"ADMIN_USERNAME": other, "ADMIN_PASSWORD": "second-account-password", "ADMIN_DISPLAY_NAME": "Second"})
         self.assertNotEqual(result.returncode, 0, f"bootstrap must refuse when an account exists:\n{result.stdout}{result.stderr}")
         self.assertEqual(Client().login(other, "second-account-password"), 401)
         self.assertEqual(Client().login(), 200, "the original operator still signs in")
@@ -171,7 +171,7 @@ class OperatorProcedures(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIsNone(client.viewer(), "an existing session stops working once the account is inactive")
             self.assertTrue(rejected(client.create_page(f"inactive-{RUN}", "Inactive")))
-            wrong = Client().login(EMAIL, PASSWORD + "-wrong")
+            wrong = Client().login(USERNAME, PASSWORD + "-wrong")
             inactive = Client().login()
             self.assertEqual(inactive, 401, "inactive accounts get the generic login failure")
             self.assertEqual(wrong, inactive)
@@ -182,10 +182,10 @@ class OperatorProcedures(unittest.TestCase):
 
     def test_90_login_attempts_are_rate_limited(self) -> None:
         client = Client()
-        statuses = [client.login(f"limit-{RUN}@example.test", "wrong-password") for _ in range(30)]
+        statuses = [client.login(f"limit-{RUN}", "wrong-password") for _ in range(30)]
         self.assertIn(429, statuses, f"30 failed logins never returned 429: {statuses}")
         first = statuses.index(429)
-        self.assertGreater(first, 0, "the first attempt of a fresh email is not already blocked")
+        self.assertGreater(first, 0, "the first attempt of a fresh username is not already blocked")
         self.assertTrue(all(status == 401 for status in statuses[:first]), statuses)
 
 

@@ -8,11 +8,11 @@ policies:
     read: deny
     write: deny
 fields:
-  email:
+  username:
     type: string
     required: true
     unique: true
-    maxLength: 254
+    maxLength: 32
     verify: true
   displayName:
     type: string

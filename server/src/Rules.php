@@ -38,7 +38,10 @@ final class Rules {
             || str_starts_with($value, 'mailto:') && filter_var(substr($value, 7), FILTER_VALIDATE_EMAIL) !== false);
         return self::check($valid, 'Use a valid HTTPS URL or mailto email address.');
     }
-    public static function email(string $value): Verification {
-        return self::check(strlen($value) <= 254 && $value === strtolower(trim($value)) && filter_var($value, FILTER_VALIDATE_EMAIL) !== false, 'A normalized email address is required.');
+    public static function username(string $value): Verification {
+        return self::check(preg_match('/^[a-z0-9][a-z0-9._-]{2,31}$/D', $value) === 1, 'Use 3–32 lowercase letters, digits, dots, hyphens or underscores, starting with a letter or digit.');
+    }
+    public static function password(string $value): Verification {
+        return self::check(strlen($value) >= 12 && strlen($value) <= 4096, 'Use a password of at least 12 characters.');
     }
 }

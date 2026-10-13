@@ -10,7 +10,10 @@ final class RulesTest extends TestCase {
         foreach(['javascript:alert(1)','http://example.test','mailto:broken','https://'] as $url) self::assertFalse(Rules::enquiry($url)->isOk());
         self::assertTrue(Rules::enquiry('https://example.test/contact')->isOk());
         self::assertTrue(Rules::enquiry('mailto:operator@example.test')->isOk());
-        self::assertFalse(Rules::email(' OPERATOR@example.test ')->isOk());
+        self::assertTrue(Rules::username('adminhabl')->isOk());
+        foreach([' adminhabl ','AdminHabl','ab','-admin','admin@example.test','admin habl',str_repeat('a',33)] as $username) self::assertFalse(Rules::username($username)->isOk());
+        self::assertFalse(Rules::password(str_repeat('a',11))->isOk());
+        self::assertTrue(Rules::password(str_repeat('a',12))->isOk());
         self::assertFalse(Rules::title('   ')->isOk());
     }
 }

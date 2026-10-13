@@ -28,9 +28,9 @@ pages through the normal runtime contracts in one transaction.
 | `/products` | Published offerings, title ascending then ID, pagination |
 | `/products/:slug` | Published offering, optional safe enquiry link, or 404 |
 | `/admin/login` | Staff login |
-| `/admin` | Links to content management and the operator account profile |
+| `/admin` | Links to content management and the operator's settings |
 | `/admin/{pages,posts,products}` | Authorized generated content management views |
-| `/admin/users/:id` and `/admin/users/:id/edit` | Operator profile detail and edit |
+| `/admin/users/:id` and `/admin/users/:id/edit` | Settings (username, display name, password change) and display-name edit |
 
 Navigation omits a link whose backing page is missing or draft. Show Posts and
 Products navigation when published records exist. No arbitrary user-defined route

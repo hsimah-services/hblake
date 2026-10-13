@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Wiring.php
- * digest: sha256:31f1bca54e30ec0809c73e436fb223b3371f608ab15e226711abb64cbc665e31
+ * digest: sha256:2e51f32f9de40cd443a12eb97853f5192bbfa4393cb5b626a827e5613b4a284f
  */
 
 namespace Hsimah\Entity;
@@ -60,8 +60,8 @@ use Hsimah\Entity\Product\ProductVerifiers;
 use Hsimah\Entity\Product\ProductWritePolicies;
 use Hsimah\Entity\User\Contract\UserAdminAccountsWritePolicy;
 use Hsimah\Entity\User\Contract\UserDisplayNameVerifier;
-use Hsimah\Entity\User\Contract\UserEmailVerifier;
 use Hsimah\Entity\User\Contract\UserStaffProfileReadPolicy;
+use Hsimah\Entity\User\Contract\UserUsernameVerifier;
 use Hsimah\Entity\User\UserHydrator;
 use Hsimah\Entity\User\UserInput;
 use Hsimah\Entity\User\UserReadPolicies;
@@ -107,7 +107,7 @@ final class Wiring
             UserHydrator::class => static fn (ContainerInterface $c): object => new UserHydrator(self::resolve($c, ValueDecoder::class)),
             UserInput::class => static fn (ContainerInterface $c): object => new UserInput(self::resolve($c, ValueDecoder::class)),
             UserSideEffects::class => static fn (ContainerInterface $c): object => new UserSideEffects(),
-            UserVerifiers::class => static fn (ContainerInterface $c): object => new UserVerifiers(self::resolve($c, UserEmailVerifier::class), self::resolve($c, UserDisplayNameVerifier::class)),
+            UserVerifiers::class => static fn (ContainerInterface $c): object => new UserVerifiers(self::resolve($c, UserUsernameVerifier::class), self::resolve($c, UserDisplayNameVerifier::class)),
             UserReadPolicies::class => static fn (ContainerInterface $c): object => new UserReadPolicies(self::resolve($c, UserStaffProfileReadPolicy::class)),
             UserWritePolicies::class => static fn (ContainerInterface $c): object => new UserWritePolicies(self::resolve($c, UserAdminAccountsWritePolicy::class)),
         ];

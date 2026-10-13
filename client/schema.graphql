@@ -4,29 +4,24 @@ schema {
 }
 
 type RootQuery {
-  """One Page by id."""
+  "One Page by id."
   page(id: ID!): Page
 
-  """One Post by id."""
+  "One Post by id."
   post(id: ID!): Post
 
-  """One Product by id."""
+  "One Product by id."
   product(id: ID!): Product
 
-  """
-  Look up one content record by exact canonical slug under read policies.
-  """
+  "Look up one content record by exact canonical slug under read policies."
   pageBySlug(slug: String!): Page
 
-  """
-  Look up one content record by exact canonical slug under read policies.
-  """
+  "Look up one content record by exact canonical slug under read policies."
   postBySlug(slug: String!): Post
 
-  """
-  Look up one content record by exact canonical slug under read policies.
-  """
+  "Look up one content record by exact canonical slug under read policies."
   productBySlug(slug: String!): Product
+
   pages(first: Int, after: String, last: Int, before: String): RootQueryToPageConnection
   posts(first: Int, after: String, last: Int, before: String): RootQueryToPostConnection
   products(first: Int, after: String, last: Int, before: String): RootQueryToProductConnection
@@ -75,96 +70,102 @@ type PageInfo {
   endCursor: String
 }
 
-"""Durable consulting page."""
+type Author {
+  displayName: String!
+}
+
+"Durable consulting page."
 type Page implements Node {
-  """The globally unique identifier, opaque and safe to use as a cache key."""
+  "The globally unique identifier, opaque and safe to use as a cache key."
   id: ID!
 
-  """"""
+  ""
   title: String!
 
-  """"""
+  ""
   slug: String!
 
-  """"""
+  ""
   content: String!
 
-  """"""
+  ""
   excerpt: String!
 
-  """"""
+  ""
   status: PublicationStatus!
 
-  """"""
+  ""
   publishedAt: String
 
-  """"""
+  ""
   createdAt: String!
 
-  """"""
+  ""
   updatedAt: String!
 }
 
-"""Consulting article or business update."""
+"Consulting article or business update."
 type Post implements Node {
-  """The globally unique identifier, opaque and safe to use as a cache key."""
+  "The globally unique identifier, opaque and safe to use as a cache key."
   id: ID!
 
-  """"""
+  ""
   title: String!
 
-  """"""
+  ""
   slug: String!
 
-  """"""
+  ""
   content: String!
 
-  """"""
+  ""
   excerpt: String!
 
-  """"""
+  ""
   status: PublicationStatus!
 
-  """"""
+  ""
   publishedAt: String
 
-  """"""
+  ""
   createdAt: String!
 
-  """"""
+  ""
   updatedAt: String!
+
+  author: Author
 }
 
-"""Software product or consulting offering."""
+"Software product or consulting offering."
 type Product implements Node {
-  """The globally unique identifier, opaque and safe to use as a cache key."""
+  "The globally unique identifier, opaque and safe to use as a cache key."
   id: ID!
 
-  """"""
+  ""
   title: String!
 
-  """"""
+  ""
   slug: String!
 
-  """"""
+  ""
   content: String!
 
-  """"""
+  ""
   excerpt: String!
 
-  """"""
+  ""
   status: PublicationStatus!
 
-  """"""
+  ""
   publishedAt: String
 
-  """"""
+  ""
   createdAt: String!
 
-  """"""
+  ""
   updatedAt: String!
 
-  """"""
+  ""
   enquiryUrl: String
 }
 
@@ -178,7 +179,7 @@ type RootQueryToPageConnection {
   edges: [RootQueryToPageConnectionEdge]
   pageInfo: PageInfo!
 
-  """How many match, ignoring pagination."""
+  "How many match, ignoring pagination."
   totalCount: Int
 }
 
@@ -192,7 +193,7 @@ type RootQueryToPostConnection {
   edges: [RootQueryToPostConnectionEdge]
   pageInfo: PageInfo!
 
-  """How many match, ignoring pagination."""
+  "How many match, ignoring pagination."
   totalCount: Int
 }
 
@@ -206,7 +207,7 @@ type RootQueryToProductConnection {
   edges: [RootQueryToProductConnectionEdge]
   pageInfo: PageInfo!
 
-  """How many match, ignoring pagination."""
+  "How many match, ignoring pagination."
   totalCount: Int
 }
 
@@ -403,17 +404,12 @@ type Viewer {
 
 type AdminUser {
   id: ID!
-  email: String
+  username: String
   displayName: String
-  role: UserRole
-  active: Boolean
-  createdAt: String
-  updatedAt: String
 }
 
 input UpdateAdminUserInput {
   id: ID!
-  email: String
   displayName: String
   clientMutationId: String
 }

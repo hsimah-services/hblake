@@ -75,9 +75,9 @@ test('drafts are inlined only for staff', async () => {
 test('private profile data is inlined only for the operator', async () => {
   const viewer = await operator.viewer();
   const path = `/admin/users/${encodeURIComponent(viewer!.id)}`;
-  expect((await html(visitor, path)).body, 'a visitor never receives the operator email').not.toContain(OPERATOR.email);
+  expect((await html(visitor, path)).body, 'a visitor never receives the operator username').not.toContain(OPERATOR.username);
   const signedIn = await html(operator, path);
-  expect(JSON.stringify(signedIn.payload?.responses[0]?.response.data ?? null)).toContain(OPERATOR.email);
+  expect(JSON.stringify(signedIn.payload?.responses[0]?.response.data ?? null)).toContain(OPERATOR.username);
   expect(signedIn.response.headers()['cache-control'] ?? '').toMatch(/private|no-store/);
 });
 

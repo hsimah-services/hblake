@@ -4,7 +4,7 @@ import { Button, Heading, Stack, TextInput, TextArea } from '@astryxdesign/core'
 import { Markdown } from '../markdown/Markdown';
 
 const CONTENT_FIELDS = ['title', 'slug', 'content', 'excerpt', 'enquiryUrl'];
-const PROFILE_FIELDS = ['displayName', 'email'];
+const PROFILE_FIELDS = ['displayName'];
 
 export function ContentForm({ kind, row, save, detail }: ContentFormProps) {
   const form = useContentForm(kind, row, save, detail);
@@ -12,9 +12,7 @@ export function ContentForm({ kind, row, save, detail }: ContentFormProps) {
     <Stack gap={4} align="stretch">
       {form.error && <p role="alert">{form.error}</p>}
       {kind === 'User' ? <>
-        <TextInput label="Display name" htmlName="displayName" value={form.values.displayName} onChange={value => form.change('displayName', value)} status={form.invalid.displayName ? { type: 'error' } : undefined} />
-        <TextInput label="Email" htmlName="email" type="email" value={form.values.email} onChange={value => form.change('email', value)} status={form.invalid.email ? { type: 'error' } : undefined} />
-        <p>Role: {String(row?.role)}. Active: {String(row?.active)}.</p>
+        <TextInput label="Display name" htmlName="displayName" description="Shown as the author of posts." value={form.values.displayName} onChange={value => form.change('displayName', value)} status={form.invalid.displayName ? { type: 'error' } : undefined} />
       </> : <>
         <TextInput label="Title" htmlName="title" value={form.values.title} onChange={value => form.change('title', value)} status={form.invalid.title ? { type: 'error' } : undefined} />
         <TextInput label="Slug" htmlName="slug" value={form.values.slug} onChange={value => form.change('slug', value)} status={form.invalid.slug ? { type: 'error' } : undefined} description={row ? 'Changing the slug changes the public URL.' : 'Lowercase letters and numbers separated by hyphens.'} />
@@ -79,7 +77,6 @@ function validateValues(kind: string, values: Record<string, string>): Record<st
   const errors: Record<string, boolean> = {};
   if (kind === 'User') {
     if (!values.displayName.trim() || values.displayName.length > 100) errors.displayName = true;
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim())) errors.email = true;
   } else {
     if (!values.title.trim() || values.title.length > 200) errors.title = true;
     if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(values.slug) || values.slug.length > 160) errors.slug = true;

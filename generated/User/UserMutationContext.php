@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   User/UserMutationContext.php
- * digest: sha256:0fd2966bb1bf7cdba903ccb1ecef4e17c39bcf865b450d4229adc1eb3e03a8f1
+ * digest: sha256:2b542c093d14ca2be856c784e810aabd8f497e984c961937c1927e797ca7f076
  */
 
 namespace Hsimah\Entity\User;
@@ -122,15 +122,15 @@ final readonly class UserMutationContext implements MutationContext
         return $value;
     }
 
-    public function originalEmail(): ?string {
-        $value = $this->context->original('email');
+    public function originalUsername(): ?string {
+        $value = $this->context->original('username');
         assert(null === $value || is_string($value));
 
         return $value;
     }
 
-    public function pendingEmail(): ?string {
-        $value = $this->context->pending('email');
+    public function pendingUsername(): ?string {
+        $value = $this->context->pending('username');
         assert(null === $value || is_string($value));
 
         return $value;

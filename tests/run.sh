@@ -14,7 +14,7 @@ STAGES="${1:-all}"
 PLAYWRIGHT_IMAGE="mcr.microsoft.com/playwright:v1.63.0-noble"
 
 export BASE_URL="${BASE_URL:-http://localhost:8080}"
-export ADMIN_EMAIL="${ADMIN_EMAIL:-operator@example.test}"
+export ADMIN_USERNAME="${ADMIN_USERNAME:-acceptance-operator}"
 export ADMIN_PASSWORD="${ADMIN_PASSWORD:-$(python3 -c 'import secrets; print(secrets.token_urlsafe(18))')}"
 export ADMIN_DISPLAY_NAME="${ADMIN_DISPLAY_NAME:-Site Operator}"
 
@@ -53,7 +53,7 @@ if want playwright; then
   stage "Playwright"
   run playwright "$ENGINE" run --rm --network host --ipc host \
     -v "$ROOT:/repo:z" -w /repo/tests/acceptance \
-    -e BASE_URL -e ADMIN_EMAIL -e ADMIN_PASSWORD -e ADMIN_DISPLAY_NAME -e REPO_ROOT=/repo -e CI=1 \
+    -e BASE_URL -e ADMIN_USERNAME -e ADMIN_PASSWORD -e ADMIN_DISPLAY_NAME -e REPO_ROOT=/repo -e CI=1 \
     "$PLAYWRIGHT_IMAGE" \
     bash -c "npm ci --no-audit --no-fund --loglevel=error && npx playwright test ${PLAYWRIGHT_ARGS:-}"
 fi

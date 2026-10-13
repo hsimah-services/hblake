@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Catalogue.php
- * digest: sha256:30918e307d12551e5264c78d7abf3dd1f724512a57f419177bfa08337857917c
+ * digest: sha256:0800833a6d7542d06a6041f9c1ab79a185912db8dc78e01bdeab4d677d8d7572
  */
 
 namespace Hsimah\Entity;
@@ -249,7 +249,7 @@ final readonly class Catalogue implements EntityCatalogue
             'Page' => ['title', 'slug', 'content', 'excerpt', 'status', 'publishedAt', 'createdAt', 'updatedAt'],
             'Post' => ['title', 'slug', 'content', 'excerpt', 'status', 'publishedAt', 'createdAt', 'updatedAt'],
             'Product' => ['title', 'slug', 'content', 'excerpt', 'status', 'publishedAt', 'createdAt', 'updatedAt', 'enquiryUrl'],
-            'User' => ['createdAt', 'updatedAt', 'email', 'displayName', 'role', 'active'],
+            'User' => ['createdAt', 'updatedAt', 'username', 'displayName', 'role', 'active'],
             default => [],
         };
     }
@@ -264,7 +264,7 @@ final readonly class Catalogue implements EntityCatalogue
             'Page' => ['title', 'slug'],
             'Post' => ['title', 'slug'],
             'Product' => ['title', 'slug'],
-            'User' => ['email', 'displayName'],
+            'User' => ['username', 'displayName'],
             default => [],
         };
     }
@@ -279,7 +279,7 @@ final readonly class Catalogue implements EntityCatalogue
             'Page' => ['title', 'slug', 'content', 'excerpt', 'status', 'createdAt', 'updatedAt'],
             'Post' => ['title', 'slug', 'content', 'excerpt', 'status', 'createdAt', 'updatedAt'],
             'Product' => ['title', 'slug', 'content', 'excerpt', 'status', 'createdAt', 'updatedAt'],
-            'User' => ['createdAt', 'updatedAt', 'email', 'displayName', 'role', 'active'],
+            'User' => ['createdAt', 'updatedAt', 'username', 'displayName', 'role', 'active'],
             default => [],
         };
     }
@@ -309,7 +309,7 @@ final readonly class Catalogue implements EntityCatalogue
             'Page' => ['slug'],
             'Post' => ['slug'],
             'Product' => ['slug'],
-            'User' => ['email'],
+            'User' => ['username'],
             default => [],
         };
     }
@@ -511,7 +511,7 @@ final readonly class Catalogue implements EntityCatalogue
      * @return list<string>
      */
     public function contracts(): array {
-        return ['Hsimah\\Entity\\Page\\Contract\\PageBySlugQuery', 'Hsimah\\Entity\\Page\\Contract\\PageContentVerifier', 'Hsimah\\Entity\\Page\\Contract\\PagePublishAction', 'Hsimah\\Entity\\Page\\Contract\\PagePublishedAtVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageSlugVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageStatusVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageTitleVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageUnpublishAction', 'Hsimah\\Entity\\Pattern\\Publishable\\Contract\\PublishableContentStaffWritePolicy', 'Hsimah\\Entity\\Pattern\\Publishable\\Contract\\PublishableContentVisibilityReadPolicy', 'Hsimah\\Entity\\Post\\Contract\\PostBySlugQuery', 'Hsimah\\Entity\\Post\\Contract\\PostContentVerifier', 'Hsimah\\Entity\\Post\\Contract\\PostPublishAction', 'Hsimah\\Entity\\Post\\Contract\\PostPublishedAtVerifier', 'Hsimah\\Entity\\Post\\Contract\\PostSlugVerifier', 'Hsimah\\Entity\\Post\\Contract\\PostStatusVerifier', 'Hsimah\\Entity\\Post\\Contract\\PostTitleVerifier', 'Hsimah\\Entity\\Post\\Contract\\PostUnpublishAction', 'Hsimah\\Entity\\Product\\Contract\\ProductBySlugQuery', 'Hsimah\\Entity\\Product\\Contract\\ProductContentVerifier', 'Hsimah\\Entity\\Product\\Contract\\ProductEnquiryUrlVerifier', 'Hsimah\\Entity\\Product\\Contract\\ProductPublishAction', 'Hsimah\\Entity\\Product\\Contract\\ProductPublishedAtVerifier', 'Hsimah\\Entity\\Product\\Contract\\ProductSlugVerifier', 'Hsimah\\Entity\\Product\\Contract\\ProductStatusVerifier', 'Hsimah\\Entity\\Product\\Contract\\ProductTitleVerifier', 'Hsimah\\Entity\\Product\\Contract\\ProductUnpublishAction', 'Hsimah\\Entity\\User\\Contract\\UserAdminAccountsWritePolicy', 'Hsimah\\Entity\\User\\Contract\\UserDisplayNameVerifier', 'Hsimah\\Entity\\User\\Contract\\UserEmailVerifier', 'Hsimah\\Entity\\User\\Contract\\UserStaffProfileReadPolicy'];
+        return ['Hsimah\\Entity\\Page\\Contract\\PageBySlugQuery', 'Hsimah\\Entity\\Page\\Contract\\PageContentVerifier', 'Hsimah\\Entity\\Page\\Contract\\PagePublishAction', 'Hsimah\\Entity\\Page\\Contract\\PagePublishedAtVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageSlugVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageStatusVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageTitleVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageUnpublishAction', 'Hsimah\\Entity\\Pattern\\Publishable\\Contract\\PublishableContentStaffWritePolicy', 'Hsimah\\Entity\\Pattern\\Publishable\\Contract\\PublishableContentVisibilityReadPolicy', 'Hsimah\\Entity\\Post\\Contract\\PostBySlugQuery', 'Hsimah\\Entity\\Post\\Contract\\PostContentVerifier', 'Hsimah\\Entity\\Post\\Contract\\PostPublishAction', 'Hsimah\\Entity\\Post\\Contract\\PostPublishedAtVerifier', 'Hsimah\\Entity\\Post\\Contract\\PostSlugVerifier', 'Hsimah\\Entity\\Post\\Contract\\PostStatusVerifier', 'Hsimah\\Entity\\Post\\Contract\\PostTitleVerifier', 'Hsimah\\Entity\\Post\\Contract\\PostUnpublishAction', 'Hsimah\\Entity\\Product\\Contract\\ProductBySlugQuery', 'Hsimah\\Entity\\Product\\Contract\\ProductContentVerifier', 'Hsimah\\Entity\\Product\\Contract\\ProductEnquiryUrlVerifier', 'Hsimah\\Entity\\Product\\Contract\\ProductPublishAction', 'Hsimah\\Entity\\Product\\Contract\\ProductPublishedAtVerifier', 'Hsimah\\Entity\\Product\\Contract\\ProductSlugVerifier', 'Hsimah\\Entity\\Product\\Contract\\ProductStatusVerifier', 'Hsimah\\Entity\\Product\\Contract\\ProductTitleVerifier', 'Hsimah\\Entity\\Product\\Contract\\ProductUnpublishAction', 'Hsimah\\Entity\\User\\Contract\\UserAdminAccountsWritePolicy', 'Hsimah\\Entity\\User\\Contract\\UserDisplayNameVerifier', 'Hsimah\\Entity\\User\\Contract\\UserStaffProfileReadPolicy', 'Hsimah\\Entity\\User\\Contract\\UserUsernameVerifier'];
     }
 
     /**

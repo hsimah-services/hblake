@@ -12,7 +12,7 @@ import {
   unpublishOk,
   walk,
 } from '../../lib/content.ts';
-import { BASE_URL, RUN_ID } from '../../lib/env.ts';
+import { BASE_URL, OPERATOR, RUN_ID } from '../../lib/env.ts';
 import { contrastOf, notFound, signIn, xssFired } from '../../lib/ui.ts';
 
 // The public site (website.md): client-rendered pages, lists, navigation, safe
@@ -59,6 +59,7 @@ test.describe('content pages', () => {
     await expect(main.getByRole('heading', { name: post.title, level: 1 })).toBeVisible();
     await expect(main.getByRole('heading', { name: `Section ${RUN_ID}`, level: 2 })).toBeVisible();
     await expect(main.locator('strong', { hasText: 'strong' })).toBeVisible();
+    await expect(main.getByText(`By ${OPERATOR.displayName}`), 'the author byline').toBeVisible();
     await expect(main.getByRole('link', { name: 'link' })).toHaveAttribute('href', 'https://example.com/');
 
     await expect(page).toHaveTitle(new RegExp(post.title));
@@ -153,6 +154,7 @@ test.describe('post list', () => {
     const ours = main.getByRole('link', { name: new RegExp(`Listed (older|newer|draft) ${RUN_ID}`) });
     await expect(ours).toContainText([newer.title, older.title]);
     await expect(main.getByText(draft.title)).toHaveCount(0);
+    await expect(main.locator('article', { has: page.getByRole('link', { name: newer.title }) })).toContainText(`By ${OPERATOR.displayName}`);
     await ours.first().click();
     await expect(page).toHaveURL(`${BASE_URL}${publicPath('Post', newer.slug)}`);
   });

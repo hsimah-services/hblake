@@ -1,6 +1,6 @@
 /**
- * @generated SignedSource<<4e40575962c3864a4b815b590da72efe>>
- * @relayHash ecf115956bfe23995711b6b5253abbb8
+ * @generated SignedSource<<12122db66d851fb34b6334fc3f72876d>>
+ * @relayHash 1422e44144ed4b9951d1a15489de37bd
  * @lightSyntaxTransform
  */
 
@@ -8,23 +8,18 @@
 /* eslint-disable */
 // @ts-nocheck
 
-// @relayRequestID ecf115956bfe23995711b6b5253abbb8
+// @relayRequestID 1422e44144ed4b9951d1a15489de37bd
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
-export type UserRole = "ADMIN" | "EDITOR" | "%future added value";
 export type AdminUserQuery$variables = {
   id: string;
 };
 export type AdminUserQuery$data = {
   readonly adminUser: {
-    readonly active: boolean | null | undefined;
-    readonly createdAt: string | null | undefined;
     readonly displayName: string | null | undefined;
-    readonly email: string | null | undefined;
     readonly id: string;
-    readonly role: UserRole | null | undefined;
-    readonly updatedAt: string | null | undefined;
+    readonly username: string | null | undefined;
   } | null | undefined;
   readonly " $fragmentSpreads": FragmentRefs<"LayoutFragment">;
 };
@@ -57,13 +52,6 @@ v2 = {
 },
 v3 = {
   "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "role",
-  "storageKey": null
-},
-v4 = {
-  "alias": null,
   "args": [
     {
       "kind": "Variable",
@@ -81,51 +69,29 @@ v4 = {
       "alias": null,
       "args": null,
       "kind": "ScalarField",
-      "name": "email",
+      "name": "username",
       "storageKey": null
     },
-    (v2/*:: as any*/),
-    (v3/*:: as any*/),
-    {
-      "alias": null,
-      "args": null,
-      "kind": "ScalarField",
-      "name": "active",
-      "storageKey": null
-    },
-    {
-      "alias": null,
-      "args": null,
-      "kind": "ScalarField",
-      "name": "createdAt",
-      "storageKey": null
-    },
-    {
-      "alias": null,
-      "args": null,
-      "kind": "ScalarField",
-      "name": "updatedAt",
-      "storageKey": null
-    }
+    (v2/*:: as any*/)
   ],
   "storageKey": null
 },
-v5 = [
+v4 = [
   {
     "kind": "Literal",
     "name": "first",
     "value": 100
   }
 ],
-v6 = {
+v5 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "status",
   "storageKey": null
 },
-v7 = [
-  (v6/*:: as any*/),
+v6 = [
+  (v5/*:: as any*/),
   (v1/*:: as any*/)
 ];
 return {
@@ -140,7 +106,7 @@ return {
         "kind": "FragmentSpread",
         "name": "LayoutFragment"
       },
-      (v4/*:: as any*/)
+      (v3/*:: as any*/)
     ],
     "type": "RootQuery",
     "abstractKey": null
@@ -161,13 +127,19 @@ return {
         "selections": [
           (v1/*:: as any*/),
           (v2/*:: as any*/),
-          (v3/*:: as any*/)
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "role",
+            "storageKey": null
+          }
         ],
         "storageKey": null
       },
       {
         "alias": "navigationPages",
-        "args": (v5/*:: as any*/),
+        "args": (v4/*:: as any*/),
         "concreteType": "RootQueryToPageConnection",
         "kind": "LinkedField",
         "name": "pages",
@@ -196,7 +168,7 @@ return {
                 "name": "slug",
                 "storageKey": null
               },
-              (v6/*:: as any*/)
+              (v5/*:: as any*/)
             ],
             "storageKey": null
           }
@@ -205,7 +177,7 @@ return {
       },
       {
         "alias": "navigationPosts",
-        "args": (v5/*:: as any*/),
+        "args": (v4/*:: as any*/),
         "concreteType": "RootQueryToPostConnection",
         "kind": "LinkedField",
         "name": "posts",
@@ -218,7 +190,7 @@ return {
             "kind": "LinkedField",
             "name": "nodes",
             "plural": true,
-            "selections": (v7/*:: as any*/),
+            "selections": (v6/*:: as any*/),
             "storageKey": null
           }
         ],
@@ -226,7 +198,7 @@ return {
       },
       {
         "alias": "navigationProducts",
-        "args": (v5/*:: as any*/),
+        "args": (v4/*:: as any*/),
         "concreteType": "RootQueryToProductConnection",
         "kind": "LinkedField",
         "name": "products",
@@ -239,26 +211,26 @@ return {
             "kind": "LinkedField",
             "name": "nodes",
             "plural": true,
-            "selections": (v7/*:: as any*/),
+            "selections": (v6/*:: as any*/),
             "storageKey": null
           }
         ],
         "storageKey": "products(first:100)"
       },
-      (v4/*:: as any*/)
+      (v3/*:: as any*/)
     ]
   },
   "params": {
-    "cacheID": "ecf115956bfe23995711b6b5253abbb8",
-    "id": "ecf115956bfe23995711b6b5253abbb8",
+    "cacheID": "1422e44144ed4b9951d1a15489de37bd",
+    "id": "1422e44144ed4b9951d1a15489de37bd",
     "metadata": {},
     "name": "AdminUserQuery",
     "operationKind": "query",
-    "text": "query AdminUserQuery(\n  $id: ID!\n) {\n  ...LayoutFragment\n  adminUser(id: $id) {\n    id\n    email\n    displayName\n    role\n    active\n    createdAt\n    updatedAt\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n"
+    "text": "query AdminUserQuery(\n  $id: ID!\n) {\n  ...LayoutFragment\n  adminUser(id: $id) {\n    id\n    username\n    displayName\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "65ed0e5ce28c32ffae0fba4af21e3646";
+(node as any).hash = "4b0cedcd750223501b91b4e8d5bb6a1f";
 
 export default node;

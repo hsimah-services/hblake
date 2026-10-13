@@ -18,6 +18,7 @@ if ($path==='/graphql' || str_starts_with((string)$path,'/auth/')) {
         $input=Http::object(json_decode($raw==='' ? '{}' : $raw,true,512,JSON_THROW_ON_ERROR));
         if ($path==='/auth/login') $auth->login($input);
         if ($path==='/auth/logout') $auth->logout();
+        if ($path==='/auth/password') $auth->changePassword($input);
         if ($path!=='/graphql') Auth::respond(404,['error'=>'Not found.']);
         if (!is_string($input['query'] ?? null)) Auth::respond(400,['error'=>'Query required.']);
         $document=Parser::parse($input['query']);

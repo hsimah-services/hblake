@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   User/User.php
- * digest: sha256:ac7a60e0bce73a45e21bd7150826d171017c070e94ccc65557bbc1c35e678567
+ * digest: sha256:8e1e71183e8cdd9578988c0164d5452185fbd76114220412f04fbfc36c3737da
  */
 
 namespace Hsimah\Entity\User;
@@ -27,7 +27,7 @@ final class User
         private readonly EntityId $id,
         private readonly DateTimeImmutable $createdAt,
         private readonly DateTimeImmutable $updatedAt,
-        private readonly string $email,
+        private readonly string $username,
         private readonly string $displayName,
         private readonly UserRole $role,
         private readonly bool $active,
@@ -47,8 +47,8 @@ final class User
         return $this->updatedAt;
     }
 
-    public function getEmail(): string {
-        return $this->email;
+    public function getUsername(): string {
+        return $this->username;
     }
 
     public function getDisplayName(): string {
@@ -67,11 +67,11 @@ final class User
         EntityId $id,
         DateTimeImmutable $createdAt,
         DateTimeImmutable $updatedAt,
-        string $email,
+        string $username,
         string $displayName,
         UserRole $role,
         bool $active,
     ): self {
-        return new self($id, $createdAt, $updatedAt, $email, $displayName, $role, $active);
+        return new self($id, $createdAt, $updatedAt, $username, $displayName, $role, $active);
     }
 }

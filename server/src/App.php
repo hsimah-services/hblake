@@ -42,7 +42,7 @@ final readonly class App {
         $c->set(\Hsimah\Entity\Product\Contract\ProductEnquiryUrlVerifier::class, new EnquiryUrlVerifier());
         $c->set(\Hsimah\Entity\User\Contract\UserStaffProfileReadPolicy::class, new StaffProfile());
         $c->set(\Hsimah\Entity\User\Contract\UserAdminAccountsWritePolicy::class, new AdminAccounts());
-        $c->set(\Hsimah\Entity\User\Contract\UserEmailVerifier::class, new EmailVerifier());
+        $c->set(\Hsimah\Entity\User\Contract\UserUsernameVerifier::class, new UsernameVerifier());
         $c->set(\Hsimah\Entity\User\Contract\UserDisplayNameVerifier::class, new DisplayNameVerifier());
         $this->container=$c; $this->catalogue=$catalogue; $this->runtime=$runtime;
     }

@@ -12,7 +12,7 @@ final class SiteContentTest extends TestCase {
         $install=require dirname(__DIR__,2).'/generated/sqlite/install.php';
         $install($db->pdo); Auth::install($db);
         $app=new App($db,new Actor(bootstrap:true));
-        $user=$app->runtime->create('User',['email'=>'operator@example.test','displayName'=>'Operator','role'=>'admin','active'=>true]);
+        $user=$app->runtime->create('User',['username'=>'operator','displayName'=>'Operator','role'=>'admin','active'=>true]);
         $db->insert('auth_credential',['user_id'=>(int)$user->id->raw(),'password_hash'=>'preserved']);
         $app->runtime->create('Post',['title'=>'Old post','slug'=>'old-post']);
         $app->runtime->create('Product',['title'=>'Old product','slug'=>'old-product']);

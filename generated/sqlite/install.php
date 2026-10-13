@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   install.php
- * digest: sha256:0e8965642ce16a9f1ba69ef0621d3b78e0e9077f8b41047748f11c3eb878bd19
+ * digest: sha256:0bbdb8be6cfee9609ec50c2ceb94fa8268e06cd3547578aebe48e5a49268bbe8
  */
 
 /**
@@ -74,12 +74,12 @@ return static function (\PDO $database, string $prefix = ''): void {
     ' . '"id" INTEGER PRIMARY KEY AUTOINCREMENT' . ',
     ' . '"created_at" TEXT NOT NULL' . ',
     ' . '"updated_at" TEXT NOT NULL' . ',
-    ' . '"email" TEXT NOT NULL CHECK (length("email") <= 254)' . ',
+    ' . '"username" TEXT NOT NULL CHECK (length("username") <= 32)' . ',
     ' . '"display_name" TEXT NOT NULL CHECK (length("display_name") <= 100)' . ',
     ' . '"role" TEXT NOT NULL CHECK ("role" IN (\'editor\', \'admin\'))' . ',
     ' . '"active" INTEGER NOT NULL CHECK ("active" IN (0, 1))' . '
 )',
-        'CREATE UNIQUE INDEX ' . $table('hsimah_user_email_uniq') . ' ON ' . $table('hsimah_user') . ' ("email")',
+        'CREATE UNIQUE INDEX ' . $table('hsimah_user_username_uniq') . ' ON ' . $table('hsimah_user') . ' ("username")',
     ];
     $database->beginTransaction();
     try {

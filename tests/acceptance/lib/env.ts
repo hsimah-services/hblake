@@ -7,8 +7,8 @@ export const REPO_ROOT = process.env.REPO_ROOT ?? path.resolve(path.dirname(file
 
 // Read lazily so the static project can run without operator credentials.
 export const OPERATOR = {
-  get email(): string {
-    return required('ADMIN_EMAIL');
+  get username(): string {
+    return required('ADMIN_USERNAME');
   },
   get password(): string {
     return required('ADMIN_PASSWORD');

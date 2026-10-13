@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   User/UserMutator.php
- * digest: sha256:6b9a9b5b132edc1ffbeb963b5aac463116c176117d63e03d6f29683c8a61ba88
+ * digest: sha256:30dc04238a7de51099231413d666d39ba9c2f1938f04af48ca687dd9379d38c0
  */
 
 namespace Hsimah\Entity\User;
@@ -28,10 +28,10 @@ final class UserMutator
 
     }
 
-    public function setEmail(
-        string $email,
+    public function setUsername(
+        string $username,
     ): self {
-        $this->buffer->set('email', $email);
+        $this->buffer->set('username', $username);
 
         return $this;
     }

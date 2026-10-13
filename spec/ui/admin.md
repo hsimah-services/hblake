@@ -30,7 +30,8 @@ server permission checks and remove list/cache entries. Editors see no delete.
 
 The operator account is provisioned by an explicit bootstrap procedure with its
 separate server-owned credentials; credentials never appear in the generated
-profile form. No email service, additional-account workflow, role/deactivation
+profile form. Settings change the password through the authentication endpoint,
+not GraphQL. No email service, additional-account workflow, role/deactivation
 controls or last-admin invariant is required for v1.
 
 Generation must provide deterministic list/detail/form components, Relay operations

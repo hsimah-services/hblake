@@ -12,7 +12,7 @@ export HSIMAH_DATABASE=/app/$DATA/site.sqlite
 start_stack() {
   local port
   port=$(python3 -c 'import os,urllib.parse; print(urllib.parse.urlparse(os.environ["BASE_URL"]).port or 8080)')
-  "$ENGINE" run -d --stop-timeout 1 --name "$STACK" --network host -v "$PWD:/app:z" -w /app -e ADMIN_EMAIL -e ADMIN_PASSWORD -e ADMIN_DISPLAY_NAME -e BASE_URL -e HSIMAH_DATABASE "$IMAGE" php -S "0.0.0.0:$port" -t server/public server/public/router.php >/dev/null
+  "$ENGINE" run -d --stop-timeout 1 --name "$STACK" --network host -v "$PWD:/app:z" -w /app -e ADMIN_USERNAME -e ADMIN_PASSWORD -e ADMIN_DISPLAY_NAME -e BASE_URL -e HSIMAH_DATABASE "$IMAGE" php -S "0.0.0.0:$port" -t server/public server/public/router.php >/dev/null
   for attempt in {1..60}; do
     if python3 -c 'import os,urllib.request; urllib.request.urlopen(os.environ["BASE_URL"]+"/auth/csrf", timeout=1)' >/dev/null 2>&1; then return; fi
     sleep 0.5

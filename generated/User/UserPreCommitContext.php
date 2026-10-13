@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   User/UserPreCommitContext.php
- * digest: sha256:ae379329704408058df4602a64d45ed080f2f255d6a04442ec6d1bde3c08f16f
+ * digest: sha256:f96f5ff9f76c9aeac968e23dfc564d2bc419f99c45fe4afcbe1a7908897dd3f2
  */
 
 namespace Hsimah\Entity\User;
@@ -72,10 +72,10 @@ final readonly class UserPreCommitContext implements MutableMutationContext
         $this->context->set('updatedAt', $value);
     }
 
-    public function setEmail(
+    public function setUsername(
         string $value,
     ): void {
-        $this->context->set('email', $value);
+        $this->context->set('username', $value);
     }
 
     public function setDisplayName(
@@ -176,15 +176,15 @@ final readonly class UserPreCommitContext implements MutableMutationContext
         return $value;
     }
 
-    public function originalEmail(): ?string {
-        $value = $this->context->original('email');
+    public function originalUsername(): ?string {
+        $value = $this->context->original('username');
         assert(null === $value || is_string($value));
 
         return $value;
     }
 
-    public function pendingEmail(): ?string {
-        $value = $this->context->pending('email');
+    public function pendingUsername(): ?string {
+        $value = $this->context->pending('username');
         assert(null === $value || is_string($value));
 
         return $value;

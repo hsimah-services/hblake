@@ -37,25 +37,55 @@ final class Auth {
     public function login(array $input): never {
         $this->requireCsrf();
         $this->purgeExpired();
-        $address=Http::server('REMOTE_ADDR') ?: 'local';
-        /** @var array{started_at:int,attempts:int}|null $fail */
-        $fail=$this->db->select('SELECT * FROM auth_failure WHERE address=?',[$address])[0] ?? null;
-        if ($fail && (int)$fail['started_at'] > time()-900 && (int)$fail['attempts'] >= 12) self::respond(429,['error'=>'Try again later.']);
-        $email=is_string($input['email'] ?? null) ? strtolower(trim($input['email'])) : '';
+        $address=$this->throttle();
+        $username=is_string($input['username'] ?? null) ? strtolower(trim($input['username'])) : '';
         $password=is_string($input['password'] ?? null) ? $input['password'] : '';
         /** @var array{id:int,active:int,password_hash:string}|null $row */
-        $row=$this->db->select('SELECT u.id,u.active,c.password_hash FROM hsimah_user u JOIN auth_credential c ON c.user_id=u.id WHERE u.email=?',[$email])[0] ?? null;
+        $row=$this->db->select('SELECT u.id,u.active,c.password_hash FROM hsimah_user u JOIN auth_credential c ON c.user_id=u.id WHERE u.username=?',[$username])[0] ?? null;
         // Always verify a hash, including unknown accounts.
         $hash=$row['password_hash'] ?? '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi';
         $valid=password_verify($password,(string)$hash);
-        if (!$row || !$valid || !(bool)$row['active']) {
-            $this->db->execute('INSERT INTO auth_failure(address,attempts,started_at) VALUES (?,1,?) ON CONFLICT(address) DO UPDATE SET attempts=CASE WHEN started_at < ? THEN 1 ELSE attempts+1 END, started_at=CASE WHEN started_at < ? THEN excluded.started_at ELSE started_at END',[$address,time(),time()-900,time()-900]);
-            self::respond(401,['error'=>'Invalid email or password.']);
-        }
+        if (!$row || !$valid || !(bool)$row['active']) $this->fail($address,'Invalid username or password.');
         $this->db->execute('DELETE FROM auth_failure WHERE address=?',[$address]);
         $this->rotate((int)$row['id']);
         $viewer=Schema::viewer($this->actor()); if ($viewer!==null) $viewer['role']=strtoupper($viewer['role']);
         self::respond(200,['viewer'=>$viewer]);
+    }
+    /**
+     * Changes the signed-in operator's password. A wrong current password counts as a
+     * failed login; success revokes every other session of the account.
+     * @param array<string,mixed> $input
+     */
+    public function changePassword(array $input): never {
+        $this->requireCsrf();
+        $this->purgeExpired();
+        $user=$this->actor()->user;
+        if ($user===null) self::respond(401,['error'=>'Sign in to change the password.']);
+        $address=$this->throttle();
+        $current=is_string($input['currentPassword'] ?? null) ? $input['currentPassword'] : '';
+        $next=is_string($input['newPassword'] ?? null) ? $input['newPassword'] : '';
+        $id=(int)$user->getId()->raw();
+        $hash=$this->db->scalar('SELECT password_hash FROM auth_credential WHERE user_id=?',[$id]);
+        if (!is_string($hash) || !password_verify($current,$hash)) $this->fail($address,'The current password is incorrect.');
+        if (!Rules::password($next)->isOk()) self::respond(400,['error'=>'Use a password of at least 12 characters.']);
+        assert($this->session!==null);
+        $this->db->transaction(function() use($id,$next): void {
+            $this->db->execute('UPDATE auth_credential SET password_hash=? WHERE user_id=?',[password_hash($next,PASSWORD_DEFAULT),$id]);
+            $this->db->execute('DELETE FROM auth_session WHERE user_id=? AND token_hash<>?',[$id,$this->session['token_hash'] ?? '']);
+        });
+        self::respond(200,['ok'=>true]);
+    }
+    /** Refuses the request once this address has too many recent failures; returns the address. */
+    private function throttle(): string {
+        $address=Http::server('REMOTE_ADDR') ?: 'local';
+        /** @var array{started_at:int,attempts:int}|null $fail */
+        $fail=$this->db->select('SELECT * FROM auth_failure WHERE address=?',[$address])[0] ?? null;
+        if ($fail && (int)$fail['started_at'] > time()-900 && (int)$fail['attempts'] >= 12) self::respond(429,['error'=>'Try again later.']);
+        return $address;
+    }
+    private function fail(string $address, string $message): never {
+        $this->db->execute('INSERT INTO auth_failure(address,attempts,started_at) VALUES (?,1,?) ON CONFLICT(address) DO UPDATE SET attempts=CASE WHEN started_at < ? THEN 1 ELSE attempts+1 END, started_at=CASE WHEN started_at < ? THEN excluded.started_at ELSE started_at END',[$address,time(),time()-900,time()-900]);
+        self::respond(401,['error'=>$message]);
     }
     public function logout(): never { $this->requireCsrf(); $this->rotate(null); self::respond(200,['ok'=>true]); }
     public function purgeExpired(): void {

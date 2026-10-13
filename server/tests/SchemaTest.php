@@ -22,12 +22,19 @@ final class SchemaTest extends TestCase {
         $repeated=GraphQL::executeQuery($schema,'mutation($id:ID!) { publishPage(input:{id:$id}) { page { publishedAt } } }',variableValues:['id'=>$row['id']])->toArray();
         self::assertSame($time,$repeated['data']['publishPage']['page']['publishedAt']);
     }
-    public function testNormalizedEmailCollisionIsRejectedAtomically(): void {
+    public function testDuplicateUsernameIsRejectedAtomically(): void {
         $app=self::app();
-        $input=['email'=>'operator@example.test','displayName'=>'Operator','role'=>'admin','active'=>true];
+        $input=['username'=>'operator','displayName'=>'Operator','role'=>'admin','active'=>true];
         $app->runtime->create('User',$input);
         $this->expectException(CommitRejected::class);
-        $app->runtime->create('User',[...$input,'email'=>strtolower(trim(' OPERATOR@EXAMPLE.TEST '))]);
+        $app->runtime->create('User',$input);
+    }
+    public function testPostAuthorIsTheAccountDisplayNameOnly(): void {
+        $app=self::app();
+        $app->runtime->create('User',['username'=>'adminhabl','displayName'=>'hblake','role'=>'admin','active'=>true]);
+        $app->runtime->create('Post',['title'=>'Hello','slug'=>'hello']);
+        $result=GraphQL::executeQuery(Schema::build($app),'{ postBySlug(slug:"hello") { author { displayName } } }')->toArray();
+        self::assertSame(['postBySlug'=>['author'=>['displayName'=>'hblake']]],$result['data'] ?? null);
     }
     private static function app(): App {
         $db=new Database(':memory:'); $install=require dirname(__DIR__,2).'/generated/sqlite/install.php'; $install($db->pdo);

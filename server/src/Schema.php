@@ -22,7 +22,13 @@ final class Schema {
             'startCursor'=>['type'=>'String'], 'endCursor'=>['type'=>'String']]]);
         foreach($r->enumConfigs() as $name=>$config) $b->enum($name,$config);
         $b->enum('UserRole',['values'=>['EDITOR'=>['value'=>'editor'],'ADMIN'=>['value'=>'admin']]]);
-        foreach($r->objectConfigs() as $name=>$config) { assert(is_array($config['fields'])); unset($config['fields']['databaseId']); $b->object($name,$config); }
+        // Posts have one author, the site's account. Only its display name is public.
+        $b->object('Author',['fields'=>['displayName'=>['type'=>['non_null'=>'String']]]]);
+        foreach($r->objectConfigs() as $name=>$config) {
+            assert(is_array($config['fields'])); unset($config['fields']['databaseId']);
+            if ($name==='Post') $config['fields']['author']=['type'=>'Author','resolve'=>static fn(): ?array => self::author($app)];
+            $b->object($name,$config);
+        }
         foreach($r->rootFieldConfigs() as $field) {
             $b->field('RootQuery',$field['name'],$field['field']);
         }
@@ -48,8 +54,7 @@ final class Schema {
         $b->object('Viewer',['fields'=>['id'=>['type'=>'ID'],'displayName'=>['type'=>'String'],'role'=>['type'=>'UserRole']]]);
         $b->field('RootQuery','viewer',['type'=>'Viewer','resolve'=>static fn()=>self::viewer($app->actor)]);
         $b->object('AdminUser',['fields'=>[
-            'id'=>['type'=>['non_null'=>'ID']], 'email'=>['type'=>'String'],'displayName'=>['type'=>'String'],
-            'role'=>['type'=>'UserRole'],'active'=>['type'=>'Boolean'],'createdAt'=>['type'=>'String'],'updatedAt'=>['type'=>'String']]]);
+            'id'=>['type'=>['non_null'=>'ID']],'username'=>['type'=>'String'],'displayName'=>['type'=>'String']]]);
         $b->field('RootQuery','adminUser',['type'=>'AdminUser','args'=>['id'=>['type'=>['non_null'=>'ID']]],'resolve'=>static function($source,array $args) use($app): ?array {
             self::requireAdmin($app);
             $id=GlobalId::entityId($args['id'],'User');
@@ -57,16 +62,13 @@ final class Schema {
             return $user instanceof User ? self::profile($user) : null;
         }]);
         $b->mutation('updateAdminUser',[
-            'inputFields'=>['id'=>['type'=>['non_null'=>'ID']],'email'=>['type'=>'String'],'displayName'=>['type'=>'String']],
+            'inputFields'=>['id'=>['type'=>['non_null'=>'ID']],'displayName'=>['type'=>'String']],
             'outputFields'=>['adminUser'=>['type'=>'AdminUser']],
             'mutateAndGetPayload'=>static function(array $input) use($app): array {
                 self::requireAdmin($app);
                 $id=GlobalId::entityId($input['id'],'User') ?? throw new UserError('Invalid profile id.');
                 unset($input['id']);
-                foreach (['email','displayName'] as $field) {
-                    if (array_key_exists($field,$input) && $input[$field]===null) throw new UserError('Profile fields cannot be null.');
-                }
-                if (isset($input['email']) && is_string($input['email'])) $input['email']=strtolower(trim($input['email']));
+                if (array_key_exists('displayName',$input) && $input['displayName']===null) throw new UserError('Profile fields cannot be null.');
                 $result=$app->runtime->update('User',$id,Http::object($input));
                 return ['adminUser'=>$result->entity instanceof User ? self::profile($result->entity) : null];
             }]);
@@ -77,8 +79,16 @@ final class Schema {
     public static function viewer(Actor $actor): ?array {
         return $actor->user===null || !$actor->isAuthenticated() ? null : ['id'=>GlobalId::encode('User',(string)$actor->user->getId()),'displayName'=>$actor->user->getDisplayName(),'role'=>$actor->user->getRole()->value];
     }
-    /** @return array<string,mixed> */
+    /** @return array{id:string,username:string,displayName:string} */
     private static function profile(User $user): array {
-        return ['id'=>GlobalId::encode('User',(string)$user->getId()),'email'=>$user->getEmail(),'displayName'=>$user->getDisplayName(),'role'=>$user->getRole()->value,'active'=>$user->getActive(),'createdAt'=>$user->getCreatedAt()->format(DATE_ATOM),'updatedAt'=>$user->getUpdatedAt()->format(DATE_ATOM)];
+        return ['id'=>GlobalId::encode('User',(string)$user->getId()),'username'=>$user->getUsername(),'displayName'=>$user->getDisplayName()];
+    }
+    /**
+     * Read from trusted storage: visitors cannot read User, and the projection is the display name only.
+     * @return array{displayName:string}|null
+     */
+    private static function author(App $app): ?array {
+        $name=$app->db->scalar('SELECT display_name FROM hsimah_user WHERE active=1 ORDER BY id LIMIT 1');
+        return is_string($name) ? ['displayName'=>$name] : null;
     }
 }

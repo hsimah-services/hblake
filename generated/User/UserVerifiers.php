@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   User/UserVerifiers.php
- * digest: sha256:82dedae059503ac14823965252a0c70fc64de60084dbc85a6f957df887c19149
+ * digest: sha256:981ce06a004f25fc019e076d1dd922a9243c8b8480c07b9fb919379026070d54
  */
 
 namespace Hsimah\Entity\User;
@@ -18,7 +18,7 @@ use Eleph\Runtime\Mutation\MutationContext;
 use Eleph\Runtime\Verification\EntityVerifiers;
 use Eleph\Runtime\Verification\Verification;
 use Hsimah\Entity\User\Contract\UserDisplayNameVerifier;
-use Hsimah\Entity\User\Contract\UserEmailVerifier;
+use Hsimah\Entity\User\Contract\UserUsernameVerifier;
 
 /**
  * Dispatches to User's field verifiers.
@@ -26,7 +26,7 @@ use Hsimah\Entity\User\Contract\UserEmailVerifier;
 final readonly class UserVerifiers implements EntityVerifiers
 {
     public function __construct(
-        private UserEmailVerifier $emailVerifier,
+        private UserUsernameVerifier $usernameVerifier,
         private UserDisplayNameVerifier $displayNameVerifier,
     ) {
 
@@ -36,7 +36,7 @@ final readonly class UserVerifiers implements EntityVerifiers
      * @return list<string>
      */
     public function verifiedFields(): array {
-        return ['email', 'displayName'];
+        return ['username', 'displayName'];
     }
 
     public function verify(
@@ -45,19 +45,19 @@ final readonly class UserVerifiers implements EntityVerifiers
         MutationContext $context,
     ): Verification {
         return match ($field) {
-            'email' => $this->verifyEmail($value, $context),
+            'username' => $this->verifyUsername($value, $context),
             'displayName' => $this->verifyDisplayName($value, $context),
             default => Verification::ok(),
         };
     }
 
-    private function verifyEmail(
+    private function verifyUsername(
         mixed $value,
         MutationContext $context,
     ): Verification {
         assert(is_string($value));
 
-        return $this->emailVerifier->verify($value, UserMutationContext::of($context));
+        return $this->usernameVerifier->verify($value, UserMutationContext::of($context));
     }
 
     private function verifyDisplayName(

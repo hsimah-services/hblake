@@ -13,10 +13,10 @@ try {
         case 'bootstrap':
             $db->transaction(function() use($db): void {
                 if ((int)$db->scalar('SELECT COUNT(*) FROM hsimah_user')!==0) throw new RuntimeException('An account already exists.');
-                $email=strtolower(trim(getenv('ADMIN_EMAIL') ?: '')); $password=getenv('ADMIN_PASSWORD') ?: '';
-                if (strlen($password)<12) throw new RuntimeException('Operator password must contain at least 12 characters.');
+                $username=strtolower(trim(getenv('ADMIN_USERNAME') ?: '')); $password=getenv('ADMIN_PASSWORD') ?: '';
+                if (!\Hsimah\Rules::password($password)->isOk()) throw new RuntimeException('Operator password must contain at least 12 characters.');
                 $app=new App($db,new Actor(bootstrap:true));
-                $result=$app->runtime->create('User',['email'=>$email,'displayName'=>getenv('ADMIN_DISPLAY_NAME') ?: 'Site Operator','role'=>'admin','active'=>true]);
+                $result=$app->runtime->create('User',['username'=>$username,'displayName'=>getenv('ADMIN_DISPLAY_NAME') ?: 'Site Operator','role'=>'admin','active'=>true]);
                 $db->insert('auth_credential',['user_id'=>(int)$result->id->raw(),'password_hash'=>password_hash($password,PASSWORD_DEFAULT)]);
             }); break;
         case 'replace-content':

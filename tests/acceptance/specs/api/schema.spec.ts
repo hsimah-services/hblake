@@ -104,14 +104,17 @@ test('no type exposes credentials or session secrets', () => {
   expect(offending).toEqual([]);
 });
 
-test('content types expose the specified fields and no account links', () => {
+test('content types expose the specified fields; posts link only an author display name', () => {
   const common = ['id', 'title', 'slug', 'content', 'excerpt', 'status', 'publishedAt', 'createdAt', 'updatedAt'];
+  const extra: Record<string, string[]> = { Page: [], Post: ['author'], Product: ['enquiryUrl'] };
   for (const kind of KINDS) {
     const type = types.get(kind);
     expect(type, `GraphQL type ${kind}`).toBeTruthy();
-    const expected = kind === 'Product' ? [...common, 'enquiryUrl'] : common;
-    expect(fieldNames(type).sort()).toEqual(expected.sort());
+    expect(fieldNames(type).sort()).toEqual([...common, ...extra[kind]].sort());
   }
+  const author = typeOf(types.get('Post')!, 'author');
+  expect(author?.kind).toBe('OBJECT');
+  expect(fieldNames(author), 'the public author projection').toEqual(['displayName']);
 });
 
 test('create and update inputs never accept ids or managed timestamps', () => {
@@ -147,9 +150,9 @@ test('viewer exposes only id, displayName and role', () => {
 test('the operator profile DTO and its input are allowlisted', () => {
   const profile = typeOf(queryType, 'adminUser');
   expect(profile, 'adminUser type').toBeTruthy();
-  expect(fieldNames(profile).sort()).toEqual(['active', 'createdAt', 'displayName', 'email', 'id', 'role', 'updatedAt']);
+  expect(fieldNames(profile).sort()).toEqual(['displayName', 'id', 'username']);
   const input = fieldNames(argInput('updateAdminUser')).filter(name => name !== 'clientMutationId');
-  expect(input.sort()).toEqual(['displayName', 'email', 'id']);
+  expect(input.sort()).toEqual(['displayName', 'id']);
 });
 
 test('content types are Relay nodes', () => {

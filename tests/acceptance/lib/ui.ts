@@ -8,7 +8,7 @@ export async function signIn(page: Page): Promise<void> {
   expect(csrf.status()).toBe(200);
   const { token } = await csrf.json();
   const response = await page.request.post('/auth/login', {
-    data: { email: OPERATOR.email, password: OPERATOR.password },
+    data: { username: OPERATOR.username, password: OPERATOR.password },
     headers: { 'X-CSRF-Token': token },
   });
   expect(response.status(), `operator login failed: ${await response.text()}`).toBe(200);

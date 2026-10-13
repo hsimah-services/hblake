@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   tsquid-manifest.php
- * digest: sha256:0ba32ae55347ab6c770bc21f9c4984dfd1823774dd980f3bb1978ec1f01089e4
+ * digest: sha256:8c58d03e079202cdf4b6157ada2f78dc6a82c492e8a110020ffa23d5e1a13f12
  */
 
 return new \Eleph\Tsquid\Manifest((object) ['routes' => [(object) ['fields' => (object) [], 'name' => 'Home', 'path' => '/', 'query' => (object) ['id' => '8377941fd17bab39b9523077363b7cf4', 'operation' => 'HomeQuery', 'text' => 'query HomeQuery {
@@ -117,7 +117,7 @@ fragment LayoutFragment on RootQuery {
     }
   }
 }
-', 'variables' => (object) ['slug' => (object) ['input' => 'slug']]], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'PostList', 'path' => '/posts', 'query' => (object) ['id' => '2f2bc11533eac7f3e47d5bd851ba653c', 'operation' => 'PostListQuery', 'text' => 'query PostListQuery(
+', 'variables' => (object) ['slug' => (object) ['input' => 'slug']]], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'PostList', 'path' => '/posts', 'query' => (object) ['id' => '5c0947501fc7618f64548214828e1f09', 'operation' => 'PostListQuery', 'text' => 'query PostListQuery(
   $after: String
 ) {
   ...LayoutFragment
@@ -128,6 +128,9 @@ fragment LayoutFragment on RootQuery {
       slug
       excerpt
       status
+      author {
+        displayName
+      }
     }
     pageInfo {
       hasNextPage
@@ -163,7 +166,7 @@ fragment LayoutFragment on RootQuery {
     }
   }
 }
-', 'variables' => (object) ['after' => (object) ['input' => 'after']]], 'ssr' => true], (object) ['fields' => (object) ['slug' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'Post', 'path' => '/posts/:slug', 'query' => (object) ['id' => '547225e28d01162ab5aff675cf840a2c', 'operation' => 'PostQuery', 'text' => 'query PostQuery(
+', 'variables' => (object) ['after' => (object) ['input' => 'after']]], 'ssr' => true], (object) ['fields' => (object) ['slug' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'Post', 'path' => '/posts/:slug', 'query' => (object) ['id' => '460afd8126de35665089ff76542d2a9e', 'operation' => 'PostQuery', 'text' => 'query PostQuery(
   $slug: String!
 ) {
   ...LayoutFragment
@@ -177,6 +180,9 @@ fragment LayoutFragment on RootQuery {
     publishedAt
     createdAt
     updatedAt
+    author {
+      displayName
+    }
   }
 }
 
@@ -869,18 +875,14 @@ fragment LayoutFragment on RootQuery {
     }
   }
 }
-', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminUserDetail', 'path' => '/admin/users/:id', 'query' => (object) ['id' => 'ecf115956bfe23995711b6b5253abbb8', 'operation' => 'AdminUserQuery', 'text' => 'query AdminUserQuery(
+', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminUserDetail', 'path' => '/admin/users/:id', 'query' => (object) ['id' => '1422e44144ed4b9951d1a15489de37bd', 'operation' => 'AdminUserQuery', 'text' => 'query AdminUserQuery(
   $id: ID!
 ) {
   ...LayoutFragment
   adminUser(id: $id) {
     id
-    email
+    username
     displayName
-    role
-    active
-    createdAt
-    updatedAt
   }
 }
 
@@ -911,18 +913,14 @@ fragment LayoutFragment on RootQuery {
     }
   }
 }
-', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminUserEdit', 'path' => '/admin/users/:id/edit', 'query' => (object) ['id' => 'ecf115956bfe23995711b6b5253abbb8', 'operation' => 'AdminUserQuery', 'text' => 'query AdminUserQuery(
+', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminUserEdit', 'path' => '/admin/users/:id/edit', 'query' => (object) ['id' => '1422e44144ed4b9951d1a15489de37bd', 'operation' => 'AdminUserQuery', 'text' => 'query AdminUserQuery(
   $id: ID!
 ) {
   ...LayoutFragment
   adminUser(id: $id) {
     id
-    email
+    username
     displayName
-    role
-    active
-    createdAt
-    updatedAt
   }
 }
 

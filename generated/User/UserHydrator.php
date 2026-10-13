@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   User/UserHydrator.php
- * digest: sha256:57d114179757b2e4bfb2837f0eb9a18971b0fb1ede0eeed08c44a27d75b07e75
+ * digest: sha256:26b6e2e6fa976ed573f4247f382b7f59c7065177279c571150fed792eab394c0
  */
 
 namespace Hsimah\Entity\User;
@@ -42,7 +42,7 @@ final readonly class UserHydrator implements Hydrator
             $record->id,
             $this->createdAt($record),
             $this->updatedAt($record),
-            $this->email($record),
+            $this->username($record),
             $this->displayName($record),
             $this->role($record),
             $this->active($record),
@@ -65,12 +65,12 @@ final readonly class UserHydrator implements Hydrator
         return $this->decode->datetime($value, 'User.updatedAt');
     }
 
-    private function email(
+    private function username(
         Record $record,
     ): string {
-        $value = $record->value('email');
+        $value = $record->value('username');
 
-        return $this->decode->string($value, 'User.email');
+        return $this->decode->string($value, 'User.username');
     }
 
     private function displayName(

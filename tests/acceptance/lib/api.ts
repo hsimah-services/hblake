@@ -39,7 +39,7 @@ export class Api {
 
   static async operator(): Promise<Api> {
     const api = await Api.anonymous();
-    const response = await api.login(OPERATOR.email, OPERATOR.password);
+    const response = await api.login(OPERATOR.username, OPERATOR.password);
     expect(response.status(), `operator login failed: ${await response.text()}`).toBe(200);
     return api;
   }
@@ -55,13 +55,20 @@ export class Api {
     return this.csrf!;
   }
 
-  async login(email: string, password: string, options: { csrf?: boolean } = {}): Promise<APIResponse> {
+  async login(username: string, password: string, options: { csrf?: boolean } = {}): Promise<APIResponse> {
     const headers: Record<string, string> = {};
     if (options.csrf !== false) headers['X-CSRF-Token'] = await this.csrfToken(true);
-    const response = await this.ctx.post('/auth/login', { data: { email, password }, headers });
+    const response = await this.ctx.post('/auth/login', { data: { username, password }, headers });
     // The token may rotate with the session; fetch a fresh one for the next write.
     this.csrf = undefined;
     return response;
+  }
+
+  /** POST /auth/password for the signed-in account; sends the CSRF token unless `csrf` is false. */
+  async changePassword(currentPassword: string, newPassword: string, options: { csrf?: boolean } = {}): Promise<APIResponse> {
+    const headers: Record<string, string> = {};
+    if (options.csrf !== false) headers['X-CSRF-Token'] = await this.csrfToken(true);
+    return this.ctx.post('/auth/password', { data: { currentPassword, newPassword }, headers });
   }
 
   async logout(options: { csrf?: boolean } = {}): Promise<APIResponse> {

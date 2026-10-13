@@ -43,18 +43,18 @@ test.describe('access', () => {
 
   test('a wrong password shows an announced error and keeps the visitor on the login page', async ({ page }) => {
     await page.goto('/admin/login');
-    await page.getByLabel('Email').fill(OPERATOR.email);
+    await page.getByLabel('Username').fill(OPERATOR.username);
     await page.getByLabel('Password').fill(`${OPERATOR.password}-wrong`);
     await page.getByRole('button', { name: /sign in|log in/i }).click();
     await expect(announcedError(page)).toBeVisible();
     await expect(page).toHaveURL(`${BASE_URL}/admin/login`);
-    await expect(page.getByLabel('Email')).toHaveValue(OPERATOR.email);
+    await expect(page.getByLabel('Username')).toHaveValue(OPERATOR.username);
   });
 
   test('signing in with the keyboard reaches the admin home with every section linked', async ({ page }) => {
     await page.goto('/admin/login');
-    await page.getByLabel('Email').focus();
-    await page.keyboard.type(OPERATOR.email);
+    await page.getByLabel('Username').focus();
+    await page.keyboard.type(OPERATOR.username);
     await tabTo(page, page.getByLabel('Password'));
     await page.keyboard.type(OPERATOR.password);
     await page.keyboard.press('Enter');

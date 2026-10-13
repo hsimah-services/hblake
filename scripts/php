@@ -7,4 +7,4 @@ if ! "$engine" image inspect "$image" >/dev/null 2>&1; then
   "$engine" build -t "$image" -f .docker/php.Dockerfile .docker
 fi
 mkdir -p .cache/composer .cache/cargo
-exec "$engine" run --rm --network host -v "$PWD:/app:z" -w /app -e ADMIN_EMAIL -e ADMIN_PASSWORD -e ADMIN_DISPLAY_NAME -e BASE_URL -e HSIMAH_DATABASE -e COMPOSER_HOME=/app/.cache/composer -e CARGO_HOME=/app/.cache/cargo "$image" "$@"
+exec "$engine" run --rm --network host -v "$PWD:/app:z" -w /app -e ADMIN_USERNAME -e ADMIN_PASSWORD -e ADMIN_DISPLAY_NAME -e BASE_URL -e HSIMAH_DATABASE -e COMPOSER_HOME=/app/.cache/composer -e CARGO_HOME=/app/.cache/cargo "$image" "$@"

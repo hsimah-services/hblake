@@ -9,7 +9,7 @@ export function Admin({ queryRef }: AdminProps) {
   const data = usePreloadedQuery<AdminQuery>(ADMIN_QUERY, queryRef);
   return <Layout data={data} title="Administration" admin><Heading level={1}>Administration</Heading><Stack gap={4}>
     <Link href={AdminPageListURI.getURI({})}>Pages</Link><Link href={AdminPostListURI.getURI({})}>Posts</Link><Link href={AdminProductListURI.getURI({})}>Products</Link>
-    {data.viewer && <Link href={AdminUserDetailURI.getURI({ id: data.viewer.id ?? '' })}>Operator profile</Link>}
+    {data.viewer && <Link href={AdminUserDetailURI.getURI({ id: data.viewer.id ?? '' })}>Settings</Link>}
   </Stack></Layout>;
 }
 

@@ -12,23 +12,23 @@ export function Login({ queryRef }: LoginProps) {
   const data = usePreloadedQuery<LoginQuery>(LOGIN_QUERY, queryRef); const login = useLogin();
   return <Layout data={data} title="Sign in" admin><Heading level={1}>Sign in</Heading><form onSubmit={login.submit} noValidate><Stack gap={4} align="stretch">
     {login.error && <p role="alert">{login.error}</p>}
-    <TextInput label="Email" htmlName="email" type="email" value={login.email} onChange={login.setEmail} />
-    <TextInput label="Password" htmlName="password" type="password" value={login.password} onChange={login.setPassword} />
+    <TextInput label="Username" htmlName="username" autoComplete="username" value={login.username} onChange={login.setUsername} />
+    <TextInput label="Password" htmlName="password" type="password" autoComplete="current-password" value={login.password} onChange={login.setPassword} />
     <Button type="submit" label="Sign in" isLoading={login.pending} />
   </Stack></form></Layout>;
 }
 
 function useLogin() {
-  const [email, setEmail] = useState(''); const [password, setPassword] = useState('');
+  const [username, setUsername] = useState(''); const [password, setPassword] = useState('');
   const [error, setError] = useState(''); const [pending, setPending] = useState(false);
   const navigate = useNavigate();
   async function submit(event: React.FormEvent) {
     event.preventDefault(); if (pending) return; setPending(true); setError('');
-    try { await authRequest('login', { email, password }); navigate(AdminHomeURI.getURI({})); }
+    try { await authRequest('login', { username, password }); navigate(AdminHomeURI.getURI({})); }
     catch (reason) { setError(reason instanceof Error ? reason.message : 'Sign in failed.'); }
     finally { setPending(false); }
   }
-  return { email, password, setEmail, setPassword, error, pending, submit };
+  return { username, password, setUsername, setPassword, error, pending, submit };
 }
 
 

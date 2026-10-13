@@ -41,10 +41,10 @@ maximum 100. Relay Node/PageInfo and identifier adaptation are explicitly wired.
 omits the automatic databaseId field to retain the specified content allowlist.
 
 User is excluded from the generic GraphQL manifest. Safe application-owned
-User admin fields: id, email, displayName, role, active, createdAt, updatedAt,
-restricted to admins. `viewer` returns id, displayName, role to the authenticated
+User admin fields: id, username, displayName, restricted to admins. `viewer` returns id, displayName, role to the authenticated
 user. Credentials never occur in generated model fields or Relay query artifacts.
-Any future public author projection needs an explicit allowlist.
+The public author projection, `Post.author`, is an explicit allowlist of
+displayName, read from trusted storage for the single account.
 
 ## Shared behavior
 
@@ -58,7 +58,7 @@ helpers while implementing every generated interface. Spec patterns are sealed.
 active staff. `ContentStaff` permits editor/admin create, update and publish actions;
 only admin may delete. User policies check active status and role from trusted
 server state. Deny is the fallback. V1 has one operator-provisioned admin; the
-account UI edits only email/displayName. Role changes, deactivation, additional
+account UI edits only displayName and changes the password. Role changes, deactivation, additional
 accounts and a last-admin invariant are outside v1. The account write policy
 authorizes the caller; it is not a transactional cross-account invariant.
 

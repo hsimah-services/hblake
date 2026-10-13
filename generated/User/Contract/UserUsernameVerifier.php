@@ -8,8 +8,8 @@ declare(strict_types=1);
  * Regenerate with `eleph generate`. This file is machine-owned: edits are
  * detected by the build and rejected.
  *
- * path:   User/Contract/UserEmailVerifier.php
- * digest: sha256:d6dd0d3fd06e18aca5a67c3244a70955aade72df9b0120800acebf633f814d99
+ * path:   User/Contract/UserUsernameVerifier.php
+ * digest: sha256:6a8357f4d5955ab02d42b9babf8f2e7790bda3ccc1bce001e460aba13edb9d20
  */
 
 namespace Hsimah\Entity\User\Contract;
@@ -18,12 +18,12 @@ use Eleph\Runtime\Verification\Verification;
 use Hsimah\Entity\User\UserMutationContext;
 
 /**
- * Entity-specific rules for User::email.
+ * Entity-specific rules for User::username.
  *
  * Runs before the type processor, and both run even when this fails, so
  * violations from both tiers arrive together.
  */
-interface UserEmailVerifier
+interface UserUsernameVerifier
 {
     public function verify(
         string $value,

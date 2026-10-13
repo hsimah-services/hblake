@@ -1,6 +1,6 @@
 /**
- * @generated SignedSource<<d2fd6d8db17344698db0ae49903537df>>
- * @relayHash 547225e28d01162ab5aff675cf840a2c
+ * @generated SignedSource<<72c8fc3ca6b114ad0562c5bb320b7e1f>>
+ * @relayHash 460afd8126de35665089ff76542d2a9e
  * @lightSyntaxTransform
  */
 
@@ -8,7 +8,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-// @relayRequestID 547225e28d01162ab5aff675cf840a2c
+// @relayRequestID 460afd8126de35665089ff76542d2a9e
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
@@ -18,6 +18,9 @@ export type PostQuery$variables = {
 };
 export type PostQuery$data = {
   readonly postBySlug: {
+    readonly author: {
+      readonly displayName: string;
+    } | null | undefined;
     readonly content: string;
     readonly createdAt: string;
     readonly excerpt: string;
@@ -73,6 +76,13 @@ v4 = {
 },
 v5 = {
   "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "displayName",
+  "storageKey": null
+},
+v6 = {
+  "alias": null,
   "args": [
     {
       "kind": "Variable",
@@ -123,18 +133,30 @@ v5 = {
       "kind": "ScalarField",
       "name": "updatedAt",
       "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "concreteType": "Author",
+      "kind": "LinkedField",
+      "name": "author",
+      "plural": false,
+      "selections": [
+        (v5/*:: as any*/)
+      ],
+      "storageKey": null
     }
   ],
   "storageKey": null
 },
-v6 = [
+v7 = [
   {
     "kind": "Literal",
     "name": "first",
     "value": 100
   }
 ],
-v7 = [
+v8 = [
   (v4/*:: as any*/),
   (v1/*:: as any*/)
 ];
@@ -150,7 +172,7 @@ return {
         "kind": "FragmentSpread",
         "name": "LayoutFragment"
       },
-      (v5/*:: as any*/)
+      (v6/*:: as any*/)
     ],
     "type": "RootQuery",
     "abstractKey": null
@@ -170,13 +192,7 @@ return {
         "plural": false,
         "selections": [
           (v1/*:: as any*/),
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "displayName",
-            "storageKey": null
-          },
+          (v5/*:: as any*/),
           {
             "alias": null,
             "args": null,
@@ -189,7 +205,7 @@ return {
       },
       {
         "alias": "navigationPages",
-        "args": (v6/*:: as any*/),
+        "args": (v7/*:: as any*/),
         "concreteType": "RootQueryToPageConnection",
         "kind": "LinkedField",
         "name": "pages",
@@ -215,7 +231,7 @@ return {
       },
       {
         "alias": "navigationPosts",
-        "args": (v6/*:: as any*/),
+        "args": (v7/*:: as any*/),
         "concreteType": "RootQueryToPostConnection",
         "kind": "LinkedField",
         "name": "posts",
@@ -228,7 +244,7 @@ return {
             "kind": "LinkedField",
             "name": "nodes",
             "plural": true,
-            "selections": (v7/*:: as any*/),
+            "selections": (v8/*:: as any*/),
             "storageKey": null
           }
         ],
@@ -236,7 +252,7 @@ return {
       },
       {
         "alias": "navigationProducts",
-        "args": (v6/*:: as any*/),
+        "args": (v7/*:: as any*/),
         "concreteType": "RootQueryToProductConnection",
         "kind": "LinkedField",
         "name": "products",
@@ -249,26 +265,26 @@ return {
             "kind": "LinkedField",
             "name": "nodes",
             "plural": true,
-            "selections": (v7/*:: as any*/),
+            "selections": (v8/*:: as any*/),
             "storageKey": null
           }
         ],
         "storageKey": "products(first:100)"
       },
-      (v5/*:: as any*/)
+      (v6/*:: as any*/)
     ]
   },
   "params": {
-    "cacheID": "547225e28d01162ab5aff675cf840a2c",
-    "id": "547225e28d01162ab5aff675cf840a2c",
+    "cacheID": "460afd8126de35665089ff76542d2a9e",
+    "id": "460afd8126de35665089ff76542d2a9e",
     "metadata": {},
     "name": "PostQuery",
     "operationKind": "query",
-    "text": "query PostQuery(\n  $slug: String!\n) {\n  ...LayoutFragment\n  postBySlug(slug: $slug) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n"
+    "text": "query PostQuery(\n  $slug: String!\n) {\n  ...LayoutFragment\n  postBySlug(slug: $slug) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    author {\n      displayName\n    }\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "84afa36ef315bd664695d6bfe4278cc5";
+(node as any).hash = "ffd1c8cfb1cad2149ee32e3351727e77";
 
 export default node;

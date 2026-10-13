@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   storage-manifest.php
- * digest: sha256:e2498734bb8d4690fd7d1ecb6d2a2fe50c387ed1eb5590d2c515c9a757ed6bee
+ * digest: sha256:1c9f04e1713be8e4fc2f3439300346892a2751857c364147f68bcaf5289d05b0
  */
 
 namespace Eleph\SQLite\Manifest;
@@ -83,13 +83,13 @@ return new StorageManifest(
                 'id' => new Column('id', 'INTEGER', false, true, null),
                 'created_at' => new Column('created_at', 'TEXT', false, false, null),
                 'updated_at' => new Column('updated_at', 'TEXT', false, false, null),
-                'email' => new Column('email', 'TEXT', false, false, null),
+                'username' => new Column('username', 'TEXT', false, false, null),
                 'display_name' => new Column('display_name', 'TEXT', false, false, null),
                 'role' => new Column('role', 'TEXT', false, false, null),
                 'active' => new Column('active', 'INTEGER', false, false, null),
             ],
             [
-                'hsimah_user_email_uniq' => new Index('hsimah_user_email_uniq', ['email'], true),
+                'hsimah_user_username_uniq' => new Index('hsimah_user_username_uniq', ['username'], true),
             ],
             'id',
         ),
@@ -101,7 +101,7 @@ return new StorageManifest(
         'Page' => ['title' => 'title', 'slug' => 'slug', 'content' => 'content', 'excerpt' => 'excerpt', 'status' => 'status', 'publishedAt' => 'published_at', 'createdAt' => 'created_at', 'updatedAt' => 'updated_at'],
         'Post' => ['title' => 'title', 'slug' => 'slug', 'content' => 'content', 'excerpt' => 'excerpt', 'status' => 'status', 'publishedAt' => 'published_at', 'createdAt' => 'created_at', 'updatedAt' => 'updated_at'],
         'Product' => ['title' => 'title', 'slug' => 'slug', 'content' => 'content', 'excerpt' => 'excerpt', 'status' => 'status', 'publishedAt' => 'published_at', 'createdAt' => 'created_at', 'updatedAt' => 'updated_at', 'enquiryUrl' => 'enquiry_url'],
-        'User' => ['createdAt' => 'created_at', 'updatedAt' => 'updated_at', 'email' => 'email', 'displayName' => 'display_name', 'role' => 'role', 'active' => 'active'],
+        'User' => ['createdAt' => 'created_at', 'updatedAt' => 'updated_at', 'username' => 'username', 'displayName' => 'display_name', 'role' => 'role', 'active' => 'active'],
     ],
     joinTables: [
 

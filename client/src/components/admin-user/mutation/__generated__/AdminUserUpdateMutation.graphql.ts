@@ -1,6 +1,6 @@
 /**
- * @generated SignedSource<<07fa7880863b5037cbf33f23ba01ace0>>
- * @relayHash 2d81f67730f1ac8bd555095359a1baae
+ * @generated SignedSource<<331322d83a52acfde0ce34b500386e25>>
+ * @relayHash f7b858a5a008ff91f186c8aac62c34c9
  * @lightSyntaxTransform
  */
 
@@ -8,14 +8,12 @@
 /* eslint-disable */
 // @ts-nocheck
 
-// @relayRequestID 2d81f67730f1ac8bd555095359a1baae
+// @relayRequestID f7b858a5a008ff91f186c8aac62c34c9
 
 import { ConcreteRequest } from 'relay-runtime';
-export type UserRole = "ADMIN" | "EDITOR" | "%future added value";
 export type UpdateAdminUserInput = {
   clientMutationId?: string | null | undefined;
   displayName?: string | null | undefined;
-  email?: string | null | undefined;
   id: string;
 };
 export type AdminUserUpdateMutation$variables = {
@@ -24,13 +22,9 @@ export type AdminUserUpdateMutation$variables = {
 export type AdminUserUpdateMutation$data = {
   readonly updateAdminUser: {
     readonly adminUser: {
-      readonly active: boolean | null | undefined;
-      readonly createdAt: string | null | undefined;
       readonly displayName: string | null | undefined;
-      readonly email: string | null | undefined;
       readonly id: string;
-      readonly role: UserRole | null | undefined;
-      readonly updatedAt: string | null | undefined;
+      readonly username: string | null | undefined;
     } | null | undefined;
   } | null | undefined;
 };
@@ -81,7 +75,7 @@ v1 = [
             "alias": null,
             "args": null,
             "kind": "ScalarField",
-            "name": "email",
+            "name": "username",
             "storageKey": null
           },
           {
@@ -89,34 +83,6 @@ v1 = [
             "args": null,
             "kind": "ScalarField",
             "name": "displayName",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "role",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "active",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "createdAt",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "updatedAt",
             "storageKey": null
           }
         ],
@@ -144,16 +110,16 @@ return {
     "selections": (v1/*:: as any*/)
   },
   "params": {
-    "cacheID": "2d81f67730f1ac8bd555095359a1baae",
-    "id": "2d81f67730f1ac8bd555095359a1baae",
+    "cacheID": "f7b858a5a008ff91f186c8aac62c34c9",
+    "id": "f7b858a5a008ff91f186c8aac62c34c9",
     "metadata": {},
     "name": "AdminUserUpdateMutation",
     "operationKind": "mutation",
-    "text": "mutation AdminUserUpdateMutation(\n  $input: UpdateAdminUserInput!\n) {\n  updateAdminUser(input: $input) {\n    adminUser {\n      id\n      email\n      displayName\n      role\n      active\n      createdAt\n      updatedAt\n    }\n  }\n}\n"
+    "text": "mutation AdminUserUpdateMutation(\n  $input: UpdateAdminUserInput!\n) {\n  updateAdminUser(input: $input) {\n    adminUser {\n      id\n      username\n      displayName\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "d86bee5a9bf51882711b965213e2e1ed";
+(node as any).hash = "95c6739b46e8011d333a03d29afccd43";
 
 export default node;

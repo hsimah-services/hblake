@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   User/UserWriteContext.php
- * digest: sha256:51f5da2d7892a7efcdfcc1f6ee5f1ead30a12c30d6612879275a8208b3a9dc61
+ * digest: sha256:f8788164eb90f693452a03c6416f101e0e78ecf0de5c95c2ae524ce3dcb8ab78
  */
 
 namespace Hsimah\Entity\User;
@@ -90,15 +90,15 @@ final readonly class UserWriteContext implements WriteContext
         return $value;
     }
 
-    public function originalEmail(): ?string {
-        $value = $this->context->mutation()?->original('email');
+    public function originalUsername(): ?string {
+        $value = $this->context->mutation()?->original('username');
         assert(null === $value || is_string($value));
 
         return $value;
     }
 
-    public function pendingEmail(): ?string {
-        $value = $this->context->mutation()?->pending('email');
+    public function pendingUsername(): ?string {
+        $value = $this->context->mutation()?->pending('username');
         assert(null === $value || is_string($value));
 
         return $value;

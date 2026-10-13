@@ -15,11 +15,12 @@ application tests in server/tests. The original acceptance tests are unchanged.
    to status/publishedAt require the appropriate action in actions().
 4. Anonymous collection, count, by-slug and node requests cannot reveal drafts.
    Editor policy permits content changes but no deletion or profile changes. The
-   single admin can update their email/displayName; bootstrap refuses additional
+   single admin can update their displayName and password; bootstrap refuses additional
    accounts. Inactive users and expired sessions cannot operate the API.
 5. User has no generated GraphQL exposure. Public content queries do not expose
-   email, credentials or account links. Viewer/admin DTOs enforce their allowlists.
-6. Duplicate/invalid slugs, normalized duplicate emails, unsafe enquiry URLs,
+   the username, credentials or account links; posts carry only the author display
+   name. Viewer/admin/author DTOs enforce their allowlists.
+6. Duplicate/invalid slugs, duplicate or invalid usernames, unsafe enquiry URLs,
    oversized bodies/excerpts and injected HTML/script Markdown produce safe
    errors/output.
 7. Every content list/detail/create/edit and operator profile detail/edit works

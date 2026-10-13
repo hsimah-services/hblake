@@ -10,7 +10,7 @@ import { BASE_URL, OPERATOR } from '../../lib/env.ts';
 
 test('a successful login returns the viewer and sets a hardened session cookie', async () => {
   const api = await Api.anonymous();
-  const response = await api.login(OPERATOR.email, OPERATOR.password);
+  const response = await api.login(OPERATOR.username, OPERATOR.password);
   expect(response.status()).toBe(200);
   expect((await response.json()).viewer).toMatchObject({ displayName: OPERATOR.displayName, role: 'ADMIN' });
   expect(response.headers()['cache-control'] ?? '').toMatch(/no-store/);
@@ -28,8 +28,8 @@ test('a successful login returns the viewer and sets a hardened session cookie',
 
 test('failed logins are generic and do not reveal whether the account exists', async () => {
   const api = await Api.anonymous();
-  const wrongPassword = await api.login(OPERATOR.email, `${OPERATOR.password}-wrong`);
-  const unknownAccount = await api.login(`nobody-${Date.now()}@example.test`, OPERATOR.password);
+  const wrongPassword = await api.login(OPERATOR.username, `${OPERATOR.password}-wrong`);
+  const unknownAccount = await api.login(`nobody-${Date.now()}`, OPERATOR.password);
   expect(wrongPassword.status()).toBe(401);
   expect(unknownAccount.status()).toBe(401);
   expect(await wrongPassword.text()).toBe(await unknownAccount.text());
@@ -39,7 +39,7 @@ test('failed logins are generic and do not reveal whether the account exists', a
 
 test('login requires the CSRF token', async () => {
   const api = await Api.anonymous();
-  const response = await api.login(OPERATOR.email, OPERATOR.password, { csrf: false });
+  const response = await api.login(OPERATOR.username, OPERATOR.password, { csrf: false });
   expect(response.status()).toBe(403);
   expect(await api.viewer()).toBeNull();
   await api.dispose();
@@ -72,7 +72,7 @@ test('login rotates the session; pre-login cookies are not authenticated', async
   const api = await Api.anonymous();
   await api.csrfToken(true);
   const before = await api.storageState();
-  const response = await api.login(OPERATOR.email, OPERATOR.password);
+  const response = await api.login(OPERATOR.username, OPERATOR.password);
   expect(response.status()).toBe(200);
   const after = await api.storageState();
 
@@ -170,7 +170,7 @@ test.describe('session cookies are Secure outside loopback HTTP', () => {
     const api = await Api.anonymous();
     const token = await api.csrfToken();
     const response = await api.ctx.post('/auth/login', {
-      data: { email: OPERATOR.email, password: OPERATOR.password },
+      data: { username: OPERATOR.username, password: OPERATOR.password },
       headers: { ...PUBLIC_HOST, 'X-CSRF-Token': token },
     });
     expect(response.status(), await response.text()).toBe(200);

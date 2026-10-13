@@ -8,7 +8,7 @@ The host needs bash, Python 3 and Podman or Docker. PHP, Rust, Composer, Node an
 
 ```sh
 scripts/acceptance/gates
-export ADMIN_EMAIL=operator@example.test
+export ADMIN_USERNAME=operator
 export ADMIN_DISPLAY_NAME='Site Operator'
 read -rs ADMIN_PASSWORD; export ADMIN_PASSWORD
 scripts/acceptance/up
@@ -51,7 +51,7 @@ scripts/php php server/console.php install
 scripts/php php server/console.php bootstrap
 ```
 
-Bootstrap refuses to create a second account. The application exposes only the operator's allowlisted profile fields, never generic user lifecycle operations or credentials. Account activation/session expiry hooks are for acceptance testing and future operator workflows.
+Bootstrap reads `ADMIN_USERNAME`, `ADMIN_DISPLAY_NAME` (the author name shown on posts) and `ADMIN_PASSWORD` (at least 12 characters), and refuses to create a second account. The account has no email; change its password from Settings in the admin. The application exposes only the operator's allowlisted profile fields, never generic user lifecycle operations or credentials. Account activation/session expiry hooks are for acceptance testing and future operator workflows.
 
 For a running acceptance stack:
 
