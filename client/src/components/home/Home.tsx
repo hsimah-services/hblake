@@ -11,7 +11,7 @@ const DESTINATIONS = [
   { slug: 'about', symbol: '01', style: 'green' },
   { slug: 'frameworks', symbol: '02', style: 'orange' },
   { slug: 'portfolio', symbol: '03', style: 'blue' },
-  { slug: 'contact', symbol: '04', style: 'red' },
+  { slug: 'contact', symbol: '04', style: 'berry' },
 ] as const;
 
 export function Home({ queryRef }: HomeProps) {
@@ -52,21 +52,22 @@ function useHome(queryRef: PreloadedQuery<HomeQuery>) {
 type HomeProps = { queryRef: PreloadedQuery<HomeQuery> };
 
 const styles = stylex.create({
-  grid: { display: 'grid', gridTemplateColumns: { default: 'repeat(4, minmax(0, 1fr))', '@media (max-width: 900px)': 'repeat(2, minmax(0, 1fr))', '@media (max-width: 480px)': '1fr' }, gap: '1rem', marginBlock: '3rem' },
-  // Hover and keyboard focus grow the tile; reduced motion keeps the change without animating it.
+  grid: { display: 'grid', gridTemplateColumns: { default: 'repeat(4, minmax(0, 1fr))', '@media (max-width: 900px)': 'repeat(2, minmax(0, 1fr))', '@media (max-width: 480px)': '1fr' }, gap: '1rem', marginBlock: { default: '3rem', '@media (max-width: 480px)': '2rem' } },
+  // Hover and keyboard focus grow the tile where there is room; reduced motion keeps the change
+  // without animating it. On phones the single column stays flat so nothing overflows.
   tile: {
-    position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'space-between', gap: '1.25rem', minHeight: '17rem', padding: '1.5rem', color: '#ffffff', textDecoration: 'none', borderRadius: 0,
+    position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'space-between', gap: '1.25rem', minHeight: { default: '17rem', '@media (max-width: 480px)': '0' }, padding: { default: '1.5rem', '@media (max-width: 480px)': '1.25rem' }, color: '#ffffff', textDecoration: 'none', borderRadius: 0,
     zIndex: { default: 0, ':hover': 1, ':focus-visible': 1 },
-    transform: { default: 'none', ':hover': 'scale(1.04)', ':focus-visible': 'scale(1.04)' },
+    transform: { default: 'none', ':hover': { default: 'scale(1.04)', '@media (max-width: 480px)': 'none' }, ':focus-visible': { default: 'scale(1.04)', '@media (max-width: 480px)': 'none' } },
     boxShadow: { default: '0 6px 16px -12px rgb(0 0 0 / 0.5)', ':hover': '0 22px 40px -18px rgb(0 0 0 / 0.65)', ':focus-visible': '0 22px 40px -18px rgb(0 0 0 / 0.65)' },
     transitionProperty: 'transform, box-shadow', transitionDuration: { default: 'var(--duration-medium-min)', '@media (prefers-reduced-motion: reduce)': '0s' }, transitionTimingFunction: 'var(--ease-standard)',
   },
-  tileContent: { display: 'flex', flexDirection: 'column', gap: '1.25rem', minHeight: '14rem' },
-  green: { backgroundColor: '#246b35' },
-  orange: { backgroundColor: '#a64218' },
-  blue: { backgroundColor: '#12677e' },
-  red: { backgroundColor: '#ad193c' },
-  number: { fontSize: '3rem', lineHeight: 1, fontWeight: 300 },
+  tileContent: { display: 'flex', flexDirection: 'column', gap: { default: '1.25rem', '@media (max-width: 480px)': '0.5rem' }, minHeight: { default: '14rem', '@media (max-width: 480px)': '0' } },
+  green: { backgroundColor: 'var(--site-tile-green)' },
+  orange: { backgroundColor: 'var(--site-tile-orange)' },
+  blue: { backgroundColor: 'var(--site-tile-blue)' },
+  berry: { backgroundColor: 'var(--site-tile-berry)' },
+  number: { fontSize: { default: '3rem', '@media (max-width: 480px)': '2rem' }, lineHeight: 1, fontWeight: 300 },
   label: { fontSize: '1.4rem', fontWeight: 700 },
   excerpt: { fontSize: '0.9rem', lineHeight: 1.6 },
   latest: { marginBlock: '3rem', paddingBlock: '2rem', borderTop: '1px solid var(--site-hairline)' },

@@ -11,7 +11,7 @@ The icons use assets from the owner’s hsimah repository, have accessible names
 and open in a new tab. Contact links point to
 GitHub and LinkedIn; no email address or contact form is published. The portfolio
 explains that customer permission is pending, without publishing customer details.
-Public typography and spacing prioritize readable content. The UI follows Tsquid’s
+Public typography and spacing prioritize readable content. The UI follows tsquid’s
 Astryx/StyleX conventions with keyboard access, visible focus and responsive layouts.
 
 Owner-approved content lives in content/pages.json and can replace existing Page,
@@ -68,12 +68,22 @@ preview must not enter shared caches or public search metadata.
 Public pages have content-specific document title, description from excerpt,
 canonical URL and social metadata updated by the client. V1 renders on the client
 with no SSR or prerender requirement. The HTML for each route carries that route's
-query response as Tsquid initial data, so the first render does not wait on a GraphQL
+query response as tsquid initial data, so the first render does not wait on a GraphQL
 round trip. Initial HTML still contains only the app shell markup; reduced
 search/link-preview metadata is accepted before the business launches, and
 initial-HTML SEO is deferred to a later rendering enhancement.
 
-Text stays legible in both light and dark system colour schemes. Every screen's
+Accessibility comes first. Text keeps WCAG AA contrast in light and dark. The site
+follows the system colour scheme until the visitor chooses one with the header toggle
+("Switch to dark/light mode"); the choice is remembered on the device and applied
+before first paint. The palette (green, orange, blue, berry) stays distinguishable
+with protanopia, deuteranopia and tritanopia, and colour never carries meaning alone:
+the current page in the navigation is also underlined and semibold, and marked with
+`aria-current`. Motion respects reduced-motion preferences.
+
+On phone-sized screens nothing scrolls sideways, the navigation collapses behind a
+Menu disclosure button (Escape, an outside tap or following a link closes it and
+returns focus), and touch targets are at least 44 by 44 pixels. Every screen's
 document title names what it shows; only a missing record is titled "Not found".
 
 V1 accepts policy-filtered paging that may produce short or empty pages and slow

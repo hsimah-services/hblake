@@ -181,6 +181,40 @@ test.describe('navigation', () => {
     await expect(page.locator('nav a[href="/products"]').first()).toBeVisible();
   });
 
+  test('the navigation marks the current page and section', async ({ page }) => {
+    await ensurePage(api, 'services', 'PUBLISHED', { title: 'Services' });
+    const post = await createPublished(api, 'Post');
+    const nav = page.getByRole('navigation', { name: 'Main navigation' });
+    const current = nav.locator('a[aria-current]');
+    for (const [path, href, value] of [
+      ['/', '/', 'page'],
+      ['/pages/services', '/pages/services', 'page'],
+      ['/posts', '/posts', 'page'],
+      [publicPath('Post', post.slug), '/posts', 'true'],
+    ] as const) {
+      await page.goto(path);
+      await expect(current, `${path}: one current link`).toHaveCount(1);
+      await expect(current, path).toHaveAttribute('href', href);
+      await expect(current, path).toHaveAttribute('aria-current', value);
+    }
+    await page.goto(`/pages/missing-${uniqueSlug()}`);
+    await expect(current, 'an unknown page matches no link').toHaveCount(0);
+  });
+
+  test('the current page is marked by more than colour', async ({ page }) => {
+    await ensurePage(api, 'services', 'PUBLISHED', { title: 'Services' });
+    await page.goto('/pages/services');
+    const current = page.getByRole('navigation', { name: 'Main navigation' }).locator('a[aria-current="page"]');
+    const other = page.getByRole('navigation', { name: 'Main navigation' }).locator('a[href="/"]');
+    const cue = (link: typeof current): Promise<{ underline: boolean; weight: number }> => link.evaluate(element => ({
+      underline: getComputedStyle(element).textDecorationLine.includes('underline'),
+      weight: Math.max(...[element, ...element.querySelectorAll('*')].map(node => Number(getComputedStyle(node).fontWeight))),
+    }));
+    expect(await cue(current)).toEqual({ underline: true, weight: expect.any(Number) });
+    expect((await cue(current)).weight).toBeGreaterThanOrEqual(600);
+    expect((await cue(other)).underline, 'other links are not underlined').toBe(false);
+  });
+
   test('every public route has a consistent header, navigation and footer', async ({ page }) => {
     const post = await createPublished(api, 'Post');
     for (const path of ['/', '/posts', '/products', publicPath('Post', post.slug), `/pages/missing-${uniqueSlug()}`]) {

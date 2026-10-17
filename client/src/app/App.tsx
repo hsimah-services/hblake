@@ -4,8 +4,7 @@ import { RouterProvider } from 'react-router/dom';
 import { RelayEnvironmentProvider } from 'react-relay';
 import { createLink } from '@tsquid/routes/Link';
 import { LinkProvider } from '@astryxdesign/core/Link';
-import { Theme } from '@astryxdesign/core/theme';
-import { neutralTheme } from '@astryxdesign/theme-neutral/built';
+import { ColorMode } from '../ColorMode';
 import { ENVIRONMENT } from '../relay/environment';
 import { LoginURI } from '../routes/__generated__/routes';
 import { ROUTES } from '../routes/routes';
@@ -14,7 +13,7 @@ const APP_LINK = createLink(Object.values(ROUTES));
 const ROUTER = createBrowserRouter(Object.entries(ROUTES).map(([name, route]) => ({ path: route.path, Component: route.Root, loader: name.startsWith('Admin') ? requireViewer : undefined })));
 
 export function App() {
-  return <RelayEnvironmentProvider environment={ENVIRONMENT}><Theme theme={neutralTheme}><LinkProvider component={APP_LINK}><Suspense fallback={<p>Loading…</p>}><RouterProvider router={ROUTER} /></Suspense></LinkProvider></Theme></RelayEnvironmentProvider>;
+  return <RelayEnvironmentProvider environment={ENVIRONMENT}><ColorMode><LinkProvider component={APP_LINK}><Suspense fallback={<p>Loading…</p>}><RouterProvider router={ROUTER} /></Suspense></LinkProvider></ColorMode></RelayEnvironmentProvider>;
 }
 
 async function requireViewer() {

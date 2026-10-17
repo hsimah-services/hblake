@@ -142,7 +142,20 @@ The browser tests find elements by accessible role and name, not by test ids:
 
 - Public pages have a `banner`, `navigation`, `main` and `contentinfo`. The content
   title is the `h1`.
-- Text meets WCAG AA contrast (4.5:1) in both light and dark system colour schemes.
+- Text meets WCAG AA contrast (4.5:1) in both light and dark system colour schemes,
+  and after the header toggle switches mode. The toggle is a `banner` button named
+  `Switch to dark mode`/`Switch to light mode`; the choice survives reloads and is
+  applied before the application scripts run.
+- The palette in `client/src/styles/global.css` (`--site-tile-*` and the
+  `light-dark()` `--site-*` tones) keeps every pair of tones at least ΔE2000 10 apart
+  under simulated protanopia, deuteranopia and tritanopia, and AA contrast as text.
+- The navigation marks the current page (`aria-current="page"`) or section
+  (`aria-current="true"` on a collection's records) by more than colour: underlined
+  and at least semibold.
+- At 360px wide nothing scrolls sideways. The `Main navigation` holds a `Menu` button
+  with `aria-expanded` and `aria-controls`; Escape closes it and focuses the button,
+  and following a link closes it. Menu, navigation, mode toggle and footer links are
+  at least 44×44px.
 - `document.title` starts with what the screen shows: the content title, the list
   name (`Posts`), `Administration`, `Sign in`, `Create Post`, `Edit <title>`. Only a
   missing record is titled "Not found".
@@ -218,7 +231,8 @@ Spec acceptance checks and where they are tested:
 | Upstream pins (upstream.md) | `static/repository.spec.ts` |
 | 10 client rendering, metadata, caching | `ui/public-site.spec.ts`, `api/auth.spec.ts`, `api/publication.spec.ts` |
 | Initial data (architecture.md) | `api/initial-data.spec.ts`, `ui/public-site.spec.ts` |
-| Colour schemes and titles (website.md) | `ui/public-site.spec.ts`, `ui/admin.spec.ts` |
+| Colour schemes and titles (website.md) | `ui/public-site.spec.ts`, `ui/admin.spec.ts`, `ui/color-mode.spec.ts`, `static/palette.spec.ts` |
+| Phone layout (website.md) | `ui/mobile.spec.ts` |
 | 11 install, backup, secrets | `ops`, `api/http.spec.ts` |
 
 Not covered, and why:

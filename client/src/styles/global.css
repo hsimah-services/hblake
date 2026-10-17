@@ -1,11 +1,20 @@
-/* Site palette: each light/dark value keeps AA contrast against --site-canvas. */
+/*
+ * Site palette, chosen for colour-blind visitors: under simulated protanopia,
+ * deuteranopia and tritanopia every pair of tones stays at least ΔE2000 12 apart.
+ * Tiles carry white text (at least 5.9:1). Each --site-* tone keeps AA contrast as
+ * text on --site-canvas and on its own 14% tint, in light and dark.
+ */
 :root {
   --site-canvas: light-dark(#f7f6fb, #14152b);
-  --site-green: light-dark(#1f6b33, #6ee49a);
-  --site-orange: light-dark(#a3400f, #ffa36b);
-  --site-blue: light-dark(#0f6680, #5cc8f0);
-  --site-red: light-dark(#ad193c, #ff7a98);
-  --site-violet: light-dark(#6b2fd1, #b89cff);
+  --site-tile-green: #007340;
+  --site-tile-orange: #a72f08;
+  --site-tile-blue: #144687;
+  --site-tile-berry: #772449;
+  --site-green: light-dark(#007340, #4ef88f);
+  --site-orange: light-dark(#a72f08, #fc6c2f);
+  --site-blue: light-dark(#144687, #6b8efd);
+  --site-berry: light-dark(#772449, #d395ac);
+  --site-ink: var(--color-text-primary);
   --site-hairline: color-mix(in srgb, var(--color-text-primary) 14%, transparent);
 }
 
@@ -14,9 +23,9 @@ body {
   color: var(--color-text-primary);
   background-color: var(--site-canvas);
   background-image:
-    radial-gradient(ellipse 60% 50% at 0% 0%, light-dark(#12677e2e, #12677e59), transparent),
-    radial-gradient(ellipse 50% 45% at 100% 10%, light-dark(#ad193c24, #ad193c4d), transparent),
-    radial-gradient(ellipse 70% 50% at 50% 100%, light-dark(#6b2fd11f, #6b2fd147), transparent);
+    radial-gradient(ellipse 60% 50% at 0% 0%, light-dark(#1446872e, #14468766), transparent),
+    radial-gradient(ellipse 50% 45% at 100% 10%, light-dark(#77244924, #77244959), transparent),
+    radial-gradient(ellipse 70% 50% at 50% 100%, light-dark(#0073401f, #00734040), transparent);
   background-attachment: fixed;
 }
 

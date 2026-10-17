@@ -1,15 +1,16 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { graphql, useFragment } from 'react-relay';
-import { Link, Button, Stack } from '@astryxdesign/core';
+import { Link, Button, IconButton, Stack } from '@astryxdesign/core';
 import * as stylex from '@stylexjs/stylex';
 import { HomeURI, PageURI, PostListURI, ProductListURI, LoginURI, AdminHomeURI } from '../../routes/__generated__/routes';
 import { SITE_NAME } from '../../SiteName';
 import { authRequest } from '../../authRequest';
+import { useColorMode } from '../../useColorMode';
 import type { LayoutFragment$key } from './__generated__/LayoutFragment.graphql';
 
-// Navigation hover colours match the home page destination tiles.
-const NAVIGATION_TONES: Readonly<Record<string, NavigationTone>> = { about: 'green', frameworks: 'orange', portfolio: 'blue', contact: 'red' };
+// Navigation hover colours match the home page tiles; other links use the neutral ink tone.
+const NAVIGATION_TONES: Readonly<Record<string, NavigationTone>> = { about: 'green', frameworks: 'orange', portfolio: 'blue', contact: 'berry' };
 
 const LAYOUT_FRAGMENT = graphql`fragment LayoutFragment on RootQuery {
   viewer { id displayName role }
@@ -21,35 +22,45 @@ const LAYOUT_FRAGMENT = graphql`fragment LayoutFragment on RootQuery {
 export function Layout({ data, row, title, admin = false, children }: LayoutProps) {
   const layout = useLayout(data, row, title, admin);
   return <Stack gap={6} align="stretch" xstyle={styles.shell}>
-    <header {...stylex.props(styles.header)}><Stack direction="horizontal" gap={4} align="center" xstyle={styles.headerRow}>
-      <Stack direction="horizontal" gap={1} align="center">
+    <header {...stylex.props(styles.header)}><div {...stylex.props(styles.headerRow)}>
+      <Stack direction="horizontal" gap={1} align="center" xstyle={styles.brand}>
         <Link href={HomeURI.getURI({})} weight="bold" color="inherit" xstyle={styles.siteName}>{SITE_NAME}</Link>
         {/* Only the signed-in operator sees the way into the admin; the server still authorizes it. */}
-        {layout.viewer && <Link href={AdminHomeURI.getURI({})} label="Admin" tooltip="Admin" color="inherit" xstyle={[styles.navigationLink, styles.violet]}>
+        {layout.viewer && <Link href={AdminHomeURI.getURI({})} label="Admin" tooltip="Admin" color="inherit" xstyle={[styles.navigationLink, styles.iconTarget, tones.ink]}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <rect x="3" y="3" width="7" height="9" rx="1" /><rect x="14" y="3" width="7" height="5" rx="1" /><rect x="14" y="12" width="7" height="9" rx="1" /><rect x="3" y="16" width="7" height="5" rx="1" />
           </svg>
         </Link>}
       </Stack>
-      <nav aria-label="Main navigation"><Stack direction="horizontal" gap={1} xstyle={styles.navigation}>
-        <Link href="/" label="Home" color="inherit" xstyle={[styles.navigationLink, styles.violet]}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9" />
+      <nav ref={layout.menu.element} aria-label="Main navigation" onKeyDown={layout.menu.keyDown} {...stylex.props(styles.navigation)}>
+        {/* Below the mobile breakpoint the links collapse behind this disclosure button. */}
+        <button ref={layout.menu.button} type="button" aria-expanded={layout.menu.open} aria-controls="site-navigation" onClick={layout.menu.toggle} {...stylex.props(styles.menuButton, tones.ink)}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
+            {layout.menu.open ? <path d="M6 6l12 12M18 6 6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
           </svg>
-        </Link>
-        {layout.navigation.map(link => <Link key={link.href} href={link.href} color="inherit" xstyle={[styles.navigationLink, styles[link.tone]]}>{link.href === PageURI.getURI({ slug: 'contact' }) ? 'Contact' : link.title}</Link>)}
-      </Stack></nav>
-      {layout.viewer && <Button label="Sign out" clickAction={layout.signOut} isDisabled={!layout.csrf} />}
-    </Stack></header>
+          Menu
+        </button>
+        <div id="site-navigation" {...stylex.props(styles.links, layout.menu.open && styles.linksOpen)}>
+          <Link href="/" label="Home" color="inherit" aria-current={layout.homeCurrent} weight={layout.homeCurrent ? 'semibold' : undefined} xstyle={[styles.navigationLink, tones.ink, layout.homeCurrent && current.ink, layout.homeCurrent && styles.current]}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...stylex.props(styles.inlineIcon)}>
+              <path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9" />
+            </svg>
+            <span aria-hidden="true" {...stylex.props(styles.mobileLabel)}>Home</span>
+          </Link>
+          {layout.navigation.map(link => <Link key={link.href} href={link.href} color="inherit" aria-current={link.current} weight={link.current ? 'semibold' : undefined} xstyle={[styles.navigationLink, tones[link.tone], link.current && current[link.tone], link.current && styles.current]}>{link.href === PageURI.getURI({ slug: 'contact' }) ? 'Contact' : link.title}</Link>)}
+        </div>
+      </nav>
+      <Stack direction="horizontal" gap={2} align="center" xstyle={styles.tools}>
+        <IconButton label={layout.colorMode.label} tooltip={layout.colorMode.label} variant="ghost" icon={layout.colorMode.dark ? <Layout_SunIcon /> : <Layout_MoonIcon />} onClick={layout.colorMode.toggle} xstyle={[styles.iconTarget, tones.ink]} />
+        {layout.viewer && <Button label="Sign out" clickAction={layout.signOut} isDisabled={!layout.csrf} />}
+      </Stack>
+    </div></header>
     <main>{layout.notice && <p role="status">{layout.notice}</p>}{layout.error && <p role="alert">{layout.error}</p>}{children}</main>
     <footer {...stylex.props(styles.footer)}>
       <p>© {new Date().getFullYear()} {SITE_NAME}</p>
       <Stack direction="horizontal" gap={4} xstyle={styles.footerLinks}>
         <Link href="https://hsimah.com" label="hsimah.com — personal blog" target="_blank" rel="noopener noreferrer" xstyle={styles.iconLink}>
-          <picture>
-            <source srcSet="/assets/hsimah-dark.svg" media="(prefers-color-scheme: dark)" />
-            <img src="/assets/hsimah-light.svg" alt="" width={28} height={28} />
-          </picture>
+          <img src={layout.colorMode.dark ? '/assets/hsimah-dark.svg' : '/assets/hsimah-light.svg'} alt="" width={28} height={28} />
         </Link>
         <Link href="https://github.com/hsimah-services" label="hsimah-services on GitHub" target="_blank" rel="noopener noreferrer" xstyle={styles.iconLink}>
           <img src="/assets/github.svg" alt="" width={28} height={28} {...stylex.props(styles.githubIcon)} />
@@ -62,18 +73,26 @@ export function Layout({ data, row, title, admin = false, children }: LayoutProp
   </Stack>;
 }
 
+function Layout_MoonIcon() {
+  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>;
+}
+
+function Layout_SunIcon() {
+  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5" /><path d="M12 1.5v2.5M12 20v2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M1.5 12H4M20 12h2.5M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8" /></svg>;
+}
+
 function useLayout(key: LayoutFragment$key, row: LayoutRow | null | undefined, title: string | undefined, admin: boolean) {
   const data = useFragment(LAYOUT_FRAGMENT, key);
   const location = useLocation(); const navigate = useNavigate();
   const [csrf, setCsrf] = useState(''); const [error, setError] = useState('');
-  const navigation: NavigationLink[] = data.navigationPages?.nodes?.filter(value => value?.status === 'PUBLISHED' && value.slug !== 'home').map(value => ({ title: value!.title, href: PageURI.getURI({ slug: value!.slug }), tone: NAVIGATION_TONES[value!.slug] ?? 'violet' })) ?? [];
+  const navigation: NavigationLink[] = data.navigationPages?.nodes?.filter(value => value?.status === 'PUBLISHED' && value.slug !== 'home').map(value => ({ title: value!.title, href: PageURI.getURI({ slug: value!.slug }), tone: NAVIGATION_TONES[value!.slug] ?? 'ink' })) ?? [];
   const order = ['about', 'frameworks', 'portfolio', 'contact'].map(slug => PageURI.getURI({ slug }));
   navigation.sort((a, b) => {
     const first = order.indexOf(a.href); const second = order.indexOf(b.href);
     return (first < 0 ? order.length : first) - (second < 0 ? order.length : second);
   });
-  if (data.navigationPosts?.nodes?.some(value => value?.status === 'PUBLISHED')) navigation.push({ title: 'Posts', href: PostListURI.getURI({}), tone: 'violet' });
-  if (data.navigationProducts?.nodes?.some(value => value?.status === 'PUBLISHED')) navigation.push({ title: 'Products', href: ProductListURI.getURI({}), tone: 'violet' });
+  if (data.navigationPosts?.nodes?.some(value => value?.status === 'PUBLISHED')) navigation.push({ title: 'Posts', href: PostListURI.getURI({}), tone: 'ink' });
+  if (data.navigationProducts?.nodes?.some(value => value?.status === 'PUBLISHED')) navigation.push({ title: 'Products', href: ProductListURI.getURI({}), tone: 'ink' });
   useEffect(() => { updateMetadata(row, title, location.pathname, admin); }, [row, title, location.pathname, admin]);
   useEffect(() => {
     if (!data.viewer) return;
@@ -82,7 +101,36 @@ function useLayout(key: LayoutFragment$key, row: LayoutRow | null | undefined, t
     return () => { active = false; };
   }, [data.viewer]);
   async function signOut() { await authRequest('logout', undefined, csrf); navigate(LoginURI.getURI({})); }
-  return { navigation, viewer: data.viewer, csrf, error, signOut, notice: (location.state as { notice?: string } | null)?.notice };
+  const marked = navigation.map(link => ({ ...link, current: currentOf(link.href, location.pathname) }));
+  const menu = useMenu(location.pathname);
+  const mode = useColorMode();
+  const colorMode = { dark: mode.dark, toggle: mode.toggle, label: mode.dark ? 'Switch to light mode' : 'Switch to dark mode' };
+  return { navigation: marked, homeCurrent: currentOf('/', location.pathname), menu, colorMode, viewer: data.viewer, csrf, error, signOut, notice: (location.state as { notice?: string } | null)?.notice };
+}
+
+// The mobile disclosure menu: Escape or a click outside closes it and returns focus to
+// its button; following a link closes it. Above the breakpoint the links always show.
+function useMenu(path: string) {
+  const [open, setOpen] = useState(false);
+  const element = useRef<HTMLElement>(null); const button = useRef<HTMLButtonElement>(null);
+  useEffect(() => { setOpen(false); }, [path]);
+  useEffect(() => {
+    if (!open) return;
+    const outside = (event: PointerEvent) => { if (!element.current?.contains(event.target as Node)) setOpen(false); };
+    document.addEventListener('pointerdown', outside);
+    return () => { document.removeEventListener('pointerdown', outside); };
+  }, [open]);
+  function keyDown(event: KeyboardEvent<HTMLElement>) {
+    if (event.key !== 'Escape' || !open) return;
+    setOpen(false); button.current?.focus();
+  }
+  return { open, element, button, keyDown, toggle: () => { setOpen(value => !value); } };
+}
+
+// The link for this URL is the current page; a collection link stays current on its records.
+function currentOf(href: string, path: string): 'page' | 'true' | undefined {
+  if (path === href) return 'page';
+  return href !== '/' && path.startsWith(`${href}/`) ? 'true' : undefined;
 }
 
 // `heading` names screens without a content row (lists, forms, admin home); a missing
@@ -105,24 +153,58 @@ function setMeta(name: string, content: string, property = false) {
   tag.content = content;
 }
 
-type NavigationTone = 'green' | 'orange' | 'blue' | 'red' | 'violet';
+type NavigationTone = 'green' | 'orange' | 'blue' | 'berry' | 'ink';
 type NavigationLink = { title: string; href: string; tone: NavigationTone };
 type LayoutRow = { readonly title?: unknown; readonly excerpt?: unknown; readonly status?: unknown };
 type LayoutProps = { data: LayoutFragment$key; row?: LayoutRow | null; title?: string; admin?: boolean; children: ReactNode };
 
 const styles = stylex.create({
-  shell: { width: '100%', maxWidth: '72rem', minHeight: '100vh', marginInline: 'auto', padding: 'var(--spacing-6)' },
+  shell: { width: '100%', maxWidth: '72rem', minHeight: '100vh', marginInline: 'auto', padding: { default: 'var(--spacing-6)', '@media (max-width: 760px)': '1rem' }, boxSizing: 'border-box' },
   // Translucent so the page shows through, blurred so the menu stays legible over content.
   header: {
-    position: 'sticky', top: 'var(--spacing-3)', zIndex: 10, paddingBlock: '0.75rem', paddingInline: '1.25rem', fontSize: '0.9rem',
+    position: 'sticky', top: 'var(--spacing-3)', zIndex: 10, paddingBlock: '0.5rem', paddingInline: { default: '1.25rem', '@media (max-width: 760px)': '0.75rem' }, fontSize: '0.9rem',
     backgroundColor: 'color-mix(in srgb, var(--site-canvas) 72%, transparent)', backdropFilter: 'blur(14px) saturate(160%)',
     border: '1px solid var(--site-hairline)', borderRadius: '1rem', boxShadow: '0 10px 30px -18px rgb(0 0 0 / 0.5)',
   },
+  headerRow: { display: 'flex', alignItems: 'center', gap: { default: '1rem', '@media (max-width: 760px)': '0.25rem' } },
+  brand: { flexShrink: 0, marginInlineEnd: 'auto' },
   siteName: { fontSize: '1.05rem', letterSpacing: '0.02em' },
-  navigationLink: {
-    display: 'inline-flex', alignItems: 'center', minHeight: '2.25rem', paddingInline: '0.75rem', borderRadius: '999px', textDecoration: 'none',
-    transitionProperty: 'color, background-color', transitionDuration: 'var(--duration-fast)', transitionTimingFunction: 'var(--ease-standard)',
+  // Takes the width the brand and tools leave, wrapping its links inside it rather than over them.
+  navigation: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', flexGrow: 1, flexShrink: 1, minWidth: 0 },
+  menuButton: {
+    display: { default: 'none', '@media (max-width: 760px)': 'inline-flex' }, alignItems: 'center', gap: '0.4rem', minHeight: '44px', paddingInline: '0.75rem',
+    font: 'inherit', fontWeight: 600, border: '1px solid var(--site-hairline)', borderRadius: '999px', cursor: 'pointer',
   },
+  links: {
+    display: { default: 'flex', '@media (max-width: 760px)': 'none' }, flexWrap: 'wrap', justifyContent: 'flex-end', alignItems: 'center', gap: '0.25rem',
+  },
+  // The open mobile menu drops below the header as a full-width panel.
+  linksOpen: {
+    display: 'flex', flexDirection: { default: 'row', '@media (max-width: 760px)': 'column' }, alignItems: { default: 'center', '@media (max-width: 760px)': 'stretch' },
+    position: { default: 'static', '@media (max-width: 760px)': 'absolute' }, insetInline: { default: 'auto', '@media (max-width: 760px)': 0 }, top: { default: 'auto', '@media (max-width: 760px)': 'calc(100% + 0.5rem)' },
+    padding: { default: 0, '@media (max-width: 760px)': '0.5rem' }, maxHeight: { default: 'none', '@media (max-width: 760px)': 'calc(100dvh - 6rem)' }, overflowY: { default: 'visible', '@media (max-width: 760px)': 'auto' },
+    backgroundColor: { default: 'transparent', '@media (max-width: 760px)': 'var(--site-canvas)' }, border: { default: 'none', '@media (max-width: 760px)': '1px solid var(--site-hairline)' }, borderRadius: '1rem',
+    boxShadow: { default: 'none', '@media (max-width: 760px)': '0 16px 40px -20px rgb(0 0 0 / 0.6)' },
+  },
+  tools: { flexShrink: 0 },
+  navigationLink: {
+    display: 'inline-flex', alignItems: 'center', minHeight: { default: '2.25rem', '@media (max-width: 760px)': '44px' }, paddingInline: '0.75rem', borderRadius: '999px', textDecoration: 'none',
+    transitionProperty: 'color, background-color', transitionDuration: { default: 'var(--duration-fast)', '@media (prefers-reduced-motion: reduce)': '0s' }, transitionTimingFunction: 'var(--ease-standard)',
+  },
+  // The icon-only Home link gets a visible label in the mobile menu, where the current-page underline needs text.
+  inlineIcon: { display: 'inline-block', verticalAlign: '-0.25em' },
+  mobileLabel: { display: { default: 'none', '@media (max-width: 760px)': 'inline' }, marginInlineStart: '0.5rem' },
+  iconTarget: { justifyContent: 'center', minWidth: '44px', minHeight: '44px', paddingInline: 0, borderRadius: '999px' },
+  // Not colour alone: the current link is also underlined (and semibold through its weight).
+  current: { textDecoration: 'underline', textDecorationThickness: '2px', textUnderlineOffset: '0.35em' },
+  footer: { marginTop: 'auto', paddingBlock: '1.5rem', borderTop: '1px solid var(--site-hairline)', fontSize: '0.85rem', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' },
+  footerLinks: { flexWrap: 'wrap' },
+  iconLink: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '44px', height: '44px' },
+  githubIcon: { backgroundColor: '#24292f', borderRadius: '50%', padding: '3px', boxSizing: 'content-box' },
+});
+
+// Hover and focus colours. Each tone keeps AA contrast on the canvas and on its own tint.
+const tones = stylex.create({
   green: {
     color: { default: 'var(--color-text-primary)', ':hover': 'var(--site-green)', ':focus-visible': 'var(--site-green)' },
     backgroundColor: { default: 'transparent', ':hover': 'color-mix(in srgb, var(--site-green) 14%, transparent)', ':focus-visible': 'color-mix(in srgb, var(--site-green) 14%, transparent)' },
@@ -135,18 +217,36 @@ const styles = stylex.create({
     color: { default: 'var(--color-text-primary)', ':hover': 'var(--site-blue)', ':focus-visible': 'var(--site-blue)' },
     backgroundColor: { default: 'transparent', ':hover': 'color-mix(in srgb, var(--site-blue) 14%, transparent)', ':focus-visible': 'color-mix(in srgb, var(--site-blue) 14%, transparent)' },
   },
-  red: {
-    color: { default: 'var(--color-text-primary)', ':hover': 'var(--site-red)', ':focus-visible': 'var(--site-red)' },
-    backgroundColor: { default: 'transparent', ':hover': 'color-mix(in srgb, var(--site-red) 14%, transparent)', ':focus-visible': 'color-mix(in srgb, var(--site-red) 14%, transparent)' },
+  berry: {
+    color: { default: 'var(--color-text-primary)', ':hover': 'var(--site-berry)', ':focus-visible': 'var(--site-berry)' },
+    backgroundColor: { default: 'transparent', ':hover': 'color-mix(in srgb, var(--site-berry) 14%, transparent)', ':focus-visible': 'color-mix(in srgb, var(--site-berry) 14%, transparent)' },
   },
-  violet: {
-    color: { default: 'var(--color-text-primary)', ':hover': 'var(--site-violet)', ':focus-visible': 'var(--site-violet)' },
-    backgroundColor: { default: 'transparent', ':hover': 'color-mix(in srgb, var(--site-violet) 14%, transparent)', ':focus-visible': 'color-mix(in srgb, var(--site-violet) 14%, transparent)' },
+  ink: {
+    color: { default: 'var(--color-text-primary)', ':hover': 'var(--site-ink)', ':focus-visible': 'var(--site-ink)' },
+    backgroundColor: { default: 'transparent', ':hover': 'color-mix(in srgb, var(--site-ink) 14%, transparent)', ':focus-visible': 'color-mix(in srgb, var(--site-ink) 14%, transparent)' },
   },
-  headerRow: { flexWrap: 'wrap', justifyContent: 'space-between' },
-  footer: { marginTop: 'auto', paddingBlock: '1.5rem', borderTop: '1px solid var(--site-hairline)', fontSize: '0.85rem', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: '1rem' },
-  footerLinks: { flexWrap: 'wrap' },
-  navigation: { flexWrap: 'wrap' },
-  iconLink: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '44px', height: '44px' },
-  githubIcon: { backgroundColor: '#24292f', borderRadius: '50%', padding: '3px', boxSizing: 'content-box' },
+});
+
+// The current link keeps a light tint of its hover colour.
+const current = stylex.create({
+  green: {
+    color: 'var(--site-green)',
+    backgroundColor: { default: 'color-mix(in srgb, var(--site-green) 9%, transparent)', ':hover': 'color-mix(in srgb, var(--site-green) 14%, transparent)', ':focus-visible': 'color-mix(in srgb, var(--site-green) 14%, transparent)' },
+  },
+  orange: {
+    color: 'var(--site-orange)',
+    backgroundColor: { default: 'color-mix(in srgb, var(--site-orange) 9%, transparent)', ':hover': 'color-mix(in srgb, var(--site-orange) 14%, transparent)', ':focus-visible': 'color-mix(in srgb, var(--site-orange) 14%, transparent)' },
+  },
+  blue: {
+    color: 'var(--site-blue)',
+    backgroundColor: { default: 'color-mix(in srgb, var(--site-blue) 9%, transparent)', ':hover': 'color-mix(in srgb, var(--site-blue) 14%, transparent)', ':focus-visible': 'color-mix(in srgb, var(--site-blue) 14%, transparent)' },
+  },
+  berry: {
+    color: 'var(--site-berry)',
+    backgroundColor: { default: 'color-mix(in srgb, var(--site-berry) 9%, transparent)', ':hover': 'color-mix(in srgb, var(--site-berry) 14%, transparent)', ':focus-visible': 'color-mix(in srgb, var(--site-berry) 14%, transparent)' },
+  },
+  ink: {
+    color: 'var(--site-ink)',
+    backgroundColor: { default: 'color-mix(in srgb, var(--site-ink) 9%, transparent)', ':hover': 'color-mix(in srgb, var(--site-ink) 14%, transparent)', ':focus-visible': 'color-mix(in srgb, var(--site-ink) 14%, transparent)' },
+  },
 });
