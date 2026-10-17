@@ -1,4 +1,4 @@
-# Proposed application UI contract. Tsquid does not currently consume this file.
+# Proposed application UI contract. tsquid does not currently consume this file.
 version: 1
 renderer: astryx
 entities:

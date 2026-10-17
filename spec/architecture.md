@@ -79,7 +79,7 @@ backup/restore procedures handle populated databases. No existing data is presen
 
 ## Frontend
 
-The frontend uses Tsquid's route catalogue, URI builders, route contexts, Relay
+The frontend uses tsquid's route catalogue, URI builders, route contexts, Relay
 entrypoints, Astryx and StyleX. The spec route catalogue becomes the client
 `routes.json` once entrypoints exist. Routes share one entrypoint per entity: public
 Post list/detail use post/Post.entrypoint.ts; each admin content entity groups
@@ -90,7 +90,7 @@ URL (`query` in routes.json): list, create and detail routes of one entity use
 separate queries, and the entrypoint preloads the query for the current route. Component directories are lowercase kebab-case and module names
 start with the directory's PascalCase entity name.
 
-Tsquid 0.3.0 generates routes, URL query-variable helpers and entrypoint parameter unions. Entrypoints use those generated helpers directly; application route adapters and duplicate query-variable functions are removed. Schema and persisted-query checks, Relay persistence, the GraphQL network transport and promise-based mutations use Tsquid utilities. Application code supplies CSRF headers and selects entity operations. Astryx links route and preload through Tsquid’s link provider. Proposed content UI generation consumes
+tsquid 0.3.0 generates routes, URL query-variable helpers and entrypoint parameter unions. Entrypoints use those generated helpers directly; application route adapters and duplicate query-variable functions are removed. Schema and persisted-query checks, Relay persistence, the GraphQL network transport and promise-based mutations use tsquid utilities. Application code supplies CSRF headers and selects entity operations. Astryx links route and preload through tsquid’s link provider. Proposed content UI generation consumes
 an explicit normalized metadata manifest plus ui/admin.yml and GraphQL schema,
 not PHP or application TypeScript. The upstream issue defines its implementation
 contract. The proposed generator will own field rendering and mechanical mutation binding.
@@ -115,6 +115,6 @@ deferred.
 1. Resolve framework compatibility and UI generation blockers; validate specs
    with installed SQLite/GraphQL builders before generating application artifacts.
 2. Wire backend, initial installer, authentication and policy/verification tests.
-3. Generate Tsquid routes and admin UI; add guarded screens and Relay operations.
+3. Generate tsquid routes and admin UI; add guarded screens and Relay operations.
 4. Add public design, safe Markdown rendering and client-updated metadata.
 5. Add owner-provided content; verify acceptance, migration and restore procedures.

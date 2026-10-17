@@ -12,10 +12,10 @@ Deployment remains a separate operator action.
 - Generated artifacts are machine-owned. Fix specifications or upstream generators
   instead of editing generated output or copying a private generator fork here.
 - Component directories use lowercase kebab-case. Group routes for one entity
-  under one entrypoint and route context, following Tsquid's architecture checker.
-- Follow Tsquid's Astryx/StyleX UI standards. Verify authorization on the server;
+  under one entrypoint and route context, following tsquid's architecture checker.
+- Follow tsquid's Astryx/StyleX UI standards. Verify authorization on the server;
   hidden fields and client route guards do not enforce permissions.
-- Raise demonstrated Elephentity/Tsquid gaps upstream with evidence, impact,
+- Raise demonstrated Elephentity/tsquid gaps upstream with evidence, impact,
   detailed solutions, compatibility implications and acceptance checks. Link
   existing reports instead of duplicating them. User decisions on scope take
   precedence over framework guidance.

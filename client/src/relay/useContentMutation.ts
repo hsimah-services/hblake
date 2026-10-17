@@ -1,6 +1,6 @@
 import type { useMutationAction } from '@tsquid/routes/mutation';
 
-// Tsquid commits handle pending promises; successful writes invalidate cached route queries.
+// tsquid commits handle pending promises; successful writes invalidate cached route queries.
 export function useContentMutation(operations: Record<string, MutationAction>) {
   return async (action: string, input: Record<string, unknown>): Promise<Record<string, unknown>> => {
     const commit = operations[action];

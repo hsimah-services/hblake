@@ -7,7 +7,7 @@ Documentation and source were inspected at these commits on 2026-10-10:
 | Component | Commit |
 | --- | --- |
 | Elephentity | `58a37e37b3fcab5338f9159c9e349703d4fc41be` |
-| Tsquid | `82c27cdc6bc23ad004519f0b65a2c99738d50113` |
+| tsquid | `82c27cdc6bc23ad004519f0b65a2c99738d50113` |
 | Standalone GraphQL builder | `cc56d57e6ea6ed8edeaf0e4cdbd01195e8857ea9` |
 | Standalone GraphQL runtime | `558719cdfe5dffa07c86e90dc53b97f9105a842c` |
 | SQLite builder | `95681fb7dbf081b39e4f75953aa47aa5ff3a541b` |
@@ -16,7 +16,7 @@ Documentation and source were inspected at these commits on 2026-10-10:
 
 | Gap | Issue | V1 decision / resolution |
 | --- | --- | --- |
-| Tsquid generates routes, not admin views/forms | [tsquid #7](https://github.com/hsimah-services/tsquid/issues/7) | Separate metadata-driven generator for explicit list/detail/create/edit allowlists, Astryx widgets, Relay bindings, validation and deterministic checks |
+| tsquid generates routes, not admin views/forms | [tsquid #7](https://github.com/hsimah-services/tsquid/issues/7) | Separate metadata-driven generator for explicit list/detail/create/edit allowlists, Astryx widgets, Relay bindings, validation and deterministic checks |
 | Gateway/storage has no expected-version mutation contract | [elephentity #100](https://github.com/hsimah-services/elephentity/issues/100) | Deferred: the single-editor v1 has no conflict detection; future support uses opaque versions and atomic conditional mutations |
 | Policy-filtered paging and counts | [elephentity #102](https://github.com/hsimah-services/elephentity/issues/102) | Accepted for the small v1 dataset; upstream keyset paging resumes after the last visible row |
 | Publication fields appear in generic client inputs | [elephentity #103](https://github.com/hsimah-services/elephentity/issues/103) | Accepted framework limitation; explicit action-aware verifiers protect v1, future write visibility removes these fields from generic inputs |
@@ -73,13 +73,13 @@ Specs are valid: 4 entities, 2 types.
 The upstream FormatChecker also passed canonical formatting. Independent JSON
 Schema and reference checks passed all 10 model YAML files, expanded patterns,
 action writes, admin field allowlists and 22 routes grouped across 10 entrypoints.
-UI descriptor checks verify internal consistency only; Tsquid cannot consume admin.yml yet.
+UI descriptor checks verify internal consistency only; tsquid cannot consume admin.yml yet.
 
 ## Remaining implementation boundaries
 
 - SSR/prerender and initial-HTML SEO are deferred beyond v1, per review. The
-  public frontend remains a client-rendered Tsquid app; route queries are hydrated
-  from inlined initial data using Tsquid 0.3.0 (including PR #8) and
+  public frontend remains a client-rendered tsquid app; route queries are hydrated
+  from inlined initial data using tsquid 0.3.0 (including PR #8) and
   elephentity/codegen-tsquid 0.1.0.
 - SQLite upgrades remain application-owned reviewed migrations; the initial
   installer is not an upgrade engine.
@@ -117,22 +117,22 @@ No version aliases, development branches or custom VCS repositories remain.
 - [PHP builder #35](https://github.com/hsimah-services/elephentity-codegen-php/issues/35)
   is fixed in 0.7.0: regenerated PHP no longer contains trailing whitespace.
 
-Generated artifacts remain machine-owned. Tsquid admin generation is still #7;
+Generated artifacts remain machine-owned. tsquid admin generation is still #7;
 the application's shared forms are handwritten and are not claimed as generated.
 The client now owns queries, components and mutations per entrypoint/entity, with
 shared navigation supplied by a Relay fragment independent of collection cursors.
 
-## Tsquid 0.3.0 migration
+## tsquid 0.3.0 migration
 
 Verified npm release tags on 2026-10-11: `@tsquid/routes` and `@tsquid/codegen`
 0.3.0, `@tsquid/eslint-plugin` 0.2.0, and `@tsquid/vite` 0.1.1.
 The published generator emits route-query variable helpers and entrypoint parameter
 unions. These replace the application's handwritten URL adapters and variable
-functions. Tsquid's `tsquid-schema` and `tsquid-relay` commands replace local
+functions. tsquid's `tsquid-schema` and `tsquid-relay` commands replace local
 schema fetch/normalization and persisted-query scripts. Runtime network and mutation
 helpers replace the local transport and callback-to-promise wrapper, with application
 CSRF headers and strict GraphQL error handling retained. A shared mutation dispatcher
-invalidates cached route queries after successful writes. Astryx links use the Tsquid preloading provider to satisfy
+invalidates cached route queries after successful writes. Astryx links use the tsquid preloading provider to satisfy
 the updated lint rules. Route queries use store-or-network so hover preloads are reused during navigation;
 write invalidation refreshes collection and navigation data on the next load.
 Successful sign-in/sign-out invalidates the root record so route queries reload for

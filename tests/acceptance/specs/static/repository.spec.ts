@@ -33,13 +33,13 @@ function appRouteCatalogues(): string[] {
 
 test('the client routes.json is the specified route catalogue', () => {
   const catalogues = appRouteCatalogues();
-  expect(catalogues, 'exactly one Tsquid routes.json outside spec/').toHaveLength(1);
+  expect(catalogues, 'exactly one tsquid routes.json outside spec/').toHaveLength(1);
   expect(readJson(catalogues[0])).toEqual(readJson(path.join(REPO_ROOT, 'spec/ui/routes.json')));
 });
 
 test('every route entrypoint exists beside the client routes.json', () => {
   const [catalogue] = appRouteCatalogues();
-  expect(catalogue, 'a Tsquid routes.json exists').toBeTruthy();
+  expect(catalogue, 'a tsquid routes.json exists').toBeTruthy();
   const missing = (readJson(catalogue).routes as { entryPoint: string }[])
     .map(route => route.entryPoint)
     .filter((entry, index, all) => all.indexOf(entry) === index)

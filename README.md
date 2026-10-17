@@ -1,6 +1,6 @@
 # Consulting website
 
-The site for hbla.ke: a standalone PHP/SQLite content backend built from the [Elephentity specifications](spec/README.md), with a React client using Tsquid routes, Relay, Astryx and StyleX. The public site uses owner-provided copy, four coloured navigation blocks and a latest-post feature. Pages, posts and products start as drafts; a single operator account manages them through `/admin`.
+The site for hbla.ke: a standalone PHP/SQLite content backend built from the [Elephentity specifications](spec/README.md), with a React client using tsquid routes, Relay, Astryx and StyleX. The public site uses owner-provided copy, four coloured navigation blocks and a latest-post feature. Pages, posts and products start as drafts; a single operator account manages them through `/admin`.
 
 ## Verify and run locally
 
@@ -28,7 +28,7 @@ tests/run.sh playwright
 tests/run.sh ops
 ```
 
-`tests/run.sh` passes. The gates validate live builder metadata, generated artifact drift and accessor conformance, PHPStan at maximum level, application unit tests, Tsquid routes, Relay artifacts, ESLint/architecture, TypeScript and the production build. `tests/` remains owner-maintained; implementation tests live in `server/tests`.
+`tests/run.sh` passes. The gates validate live builder metadata, generated artifact drift and accessor conformance, PHPStan at maximum level, application unit tests, tsquid routes, Relay artifacts, ESLint/architecture, TypeScript and the production build. `tests/` remains owner-maintained; implementation tests live in `server/tests`.
 
 GitHub Actions runs the same `tests/run.sh` on pushes and pull requests, and uploads Playwright results when a run fails.
 
@@ -36,7 +36,7 @@ GitHub Actions runs the same `tests/run.sh` on pushes and pull requests, and upl
 
 `spec/` is the model source; `eleph.json` configures the actual PHP, SQLite, GraphQL and tsquid builders. `generated/`, `client/persisted_queries.json`, `client/src/routes/__generated__/` and Relay `__generated__/` directories are machine-owned. Regenerate in dependency order: `scripts/node relay` (persisted queries), `scripts/node routes` (routes and `routes.manifest.json`), then `scripts/php vendor/bin/eleph generate` (which compiles the route manifest into `generated/tsquid/`). Never edit the generated output. `client/schema.graphql` uses server order as canonical: export it with `HSIMAH_DATABASE=:memory: scripts/php php server/console.php schema > client/schema.graphql`. `scripts/node schema` provides live introspection in sorted SDL order; checks normalize both representations. Re-export with the operator command before committing the schema. Set `GRAPHQL_SCHEMA_ENDPOINT` to introspect another development endpoint. `scripts/node schema:check` compares the exported server schema; `scripts/node relay:check` checks persisted operation IDs.
 
-Tsquid 0.3.0 generates routes, route-query variable helpers and entrypoint parameter unions. Its schema/persisted-query CLIs and network/mutation helpers replace the former local utilities. The ESLint plugin is 0.2.0; the Vite plugin remains at its latest release, 0.1.1. Astryx links use Tsquid preloading through the application link provider. Content screens remain application-owned. The application shares its form, preview and detail behavior explicitly; it does not label these screens generated. [Tsquid #7](https://github.com/hsimah-services/tsquid/issues/7) tracks the metadata-driven admin generator.
+tsquid 0.3.0 generates routes, route-query variable helpers and entrypoint parameter unions. Its schema/persisted-query CLIs and network/mutation helpers replace the former local utilities. The ESLint plugin is 0.2.0; the Vite plugin remains at its latest release, 0.1.1. Astryx links use tsquid preloading through the application link provider. Content screens remain application-owned. The application shares its form, preview and detail behavior explicitly; it does not label these screens generated. [tsquid #7](https://github.com/hsimah-services/tsquid/issues/7) tracks the metadata-driven admin generator.
 
 The toolchain uses released Elephentity runtime/CLI 0.13.1, coordinator 0.6.1, PHP builder 0.7.0, SQLite runtime 0.1.0-alpha.5, GraphQL runtime 0.2.0-alpha.1 and integration builders 0.1.0-alpha.3. Composer locks tagged releases, with no branch pins, aliases or custom repositories. These releases include the upstream enum decoder and generated PHPStan fixes, scalar query support, create defaults, final-state nullable validation and read-only action context. Publication actions now read original state directly; the former schema adapters are removed. The schema gate exports the server schema and compares normalized SDL against `client/schema.graphql` before Relay validation. See [upstream findings](spec/upstream.md) for release evidence and remaining framework gaps.
 
@@ -62,7 +62,7 @@ scripts/acceptance/restore /private/path/site-backup.sqlite
 
 Backup uses SQLite `VACUUM INTO` for a consistent snapshot. Restore validates integrity, stops the server, replaces the database and restarts before returning. Run the equivalent procedure under maintenance mode in production. Do not rerun the initial installer as an upgrade; future schema changes require a reviewed migration and a tested backup/restore.
 
-V1 is client-rendered; each route's HTML carries its query response as Tsquid initial data (`#tsquid-data`), executed as the requesting viewer. Initial-HTML SEO, concurrent edit protection, additional accounts and commerce are deferred, as recorded in the specification. The site name is hblake; launch copy and public contact links are supplied by the owner. Deployment remains a separate operator action.
+V1 is client-rendered; each route's HTML carries its query response as tsquid initial data (`#tsquid-data`), executed as the requesting viewer. Initial-HTML SEO, concurrent edit protection, additional accounts and commerce are deferred, as recorded in the specification. The site name is hblake; launch copy and public contact links are supplied by the owner. Deployment remains a separate operator action.
 
 ## Launch content
 

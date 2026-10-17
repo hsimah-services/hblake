@@ -6,7 +6,7 @@ application tests in server/tests. The original acceptance tests are unchanged.
 
 1. Eleph fmt/validate accept every entity, type and pattern with the actual SQLite
    and GraphQL integrations installed. generate --check reports no artifact drift;
-   eleph check verifies real accessors. Tsquid route and UI checks are deterministic.
+   eleph check verifies real accessors. tsquid route and UI checks are deterministic.
 2. Creating Page, Post or Product reuses shared fields and starts as draft. Runtime
    supplies UTC createdAt/updatedAt; client attempts to set managed fields fail.
 3. Publish commits status/time together; repeated publish retains first time.
@@ -44,5 +44,5 @@ application tests in server/tests. The original acceptance tests are unchanged.
 
 Live `eleph validate spec` discovers the configured builders. Canonical formatting,
 generated drift/accessor checks, maximum-level PHPStan, application unit tests,
-Tsquid routes, server/client schema agreement, Relay artifacts, lint, TypeScript,
+tsquid routes, server/client schema agreement, Relay artifacts, lint, TypeScript,
 production build and HTTP/UI/operator acceptance checks run through `tests/run.sh`.

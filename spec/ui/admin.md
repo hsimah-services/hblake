@@ -2,7 +2,7 @@
 
 Each content kind has list, read-only detail, create and edit screens, using the
 explicit fields in admin.yml. The current implementation shares handwritten
-application components while Tsquid #7 is unresolved; these are not generated screens. The single operator account has detail/edit only;
+application components while tsquid #7 is unresolved; these are not generated screens. The single operator account has detail/edit only;
 User list/create screens and role/active editing are outside v1. User screens
 are admin-only. Content screens are available to active editors/admins. Route guards improve navigation; backend
 policies enforce every read and write. IDs use GraphQL global IDs as string route
