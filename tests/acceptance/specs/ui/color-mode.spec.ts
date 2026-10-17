@@ -60,3 +60,22 @@ for (const system of ['light', 'dark'] as const) {
     });
   });
 }
+
+test.describe('display preferences', () => {
+  test('the colour mode and animation toggles form one labelled group with arrow-key focus', async ({ page }) => {
+    await page.goto('/');
+    const group = page.getByRole('banner').getByRole('group', { name: 'Display preferences' });
+    const buttons = group.getByRole('button');
+    await expect(buttons).toHaveCount(2);
+    await expect(buttons.first()).toHaveAccessibleName(/switch to (dark|light) mode/i);
+    await expect(buttons.last()).toHaveAccessibleName(/turn (on|off) animations/i);
+    await buttons.first().focus();
+    await page.keyboard.press('ArrowRight');
+    await expect(buttons.last()).toBeFocused();
+    const ring = await buttons.last().evaluate(element => {
+      const style = getComputedStyle(element);
+      return { outline: style.outlineStyle, clipped: getComputedStyle(element.parentElement!).overflow };
+    });
+    expect(ring, 'a visible focus ring the group does not clip').toEqual({ outline: expect.not.stringMatching(/^none$/), clipped: 'visible' });
+  });
+});

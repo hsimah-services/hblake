@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { graphql, useFragment } from 'react-relay';
-import { Link, Button, IconButton, Stack } from '@astryxdesign/core';
+import { Link, Button, ButtonGroup, IconButton, Stack } from '@astryxdesign/core';
 import * as stylex from '@stylexjs/stylex';
 import { HomeURI, PageURI, PostListURI, ProductListURI, LoginURI, AdminHomeURI } from '../../routes/__generated__/routes';
 import { SITE_NAME } from '../../SiteName';
 import { authRequest } from '../../authRequest';
 import { useColorMode } from '../../useColorMode';
+import { useMotion } from '../../useMotion';
 import type { LayoutFragment$key } from './__generated__/LayoutFragment.graphql';
 
 // Navigation hover colours match the home page tiles; other links use the neutral ink tone.
@@ -26,7 +27,7 @@ export function Layout({ data, row, title, admin = false, children }: LayoutProp
       <Stack direction="horizontal" gap={1} align="center" xstyle={styles.brand}>
         <Link href={HomeURI.getURI({})} weight="bold" color="inherit" xstyle={styles.siteName}>{SITE_NAME}</Link>
         {/* Only the signed-in operator sees the way into the admin; the server still authorizes it. */}
-        {layout.viewer && <Link href={AdminHomeURI.getURI({})} label="Admin" tooltip="Admin" color="inherit" xstyle={[styles.navigationLink, styles.iconTarget, tones.ink]}>
+        {layout.viewer && <Link href={AdminHomeURI.getURI({})} label="Admin" tooltip="Admin" color="inherit" xstyle={[styles.navigationLink, styles.iconTarget, tones.ink, styles.noUnderline]}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <rect x="3" y="3" width="7" height="9" rx="1" /><rect x="14" y="3" width="7" height="5" rx="1" /><rect x="14" y="12" width="7" height="9" rx="1" /><rect x="3" y="16" width="7" height="5" rx="1" />
           </svg>
@@ -41,17 +42,22 @@ export function Layout({ data, row, title, admin = false, children }: LayoutProp
           Menu
         </button>
         <div id="site-navigation" {...stylex.props(styles.links, layout.menu.open && styles.linksOpen)}>
-          <Link href="/" label="Home" color="inherit" aria-current={layout.homeCurrent} weight={layout.homeCurrent ? 'semibold' : undefined} xstyle={[styles.navigationLink, tones.ink, layout.homeCurrent && current.ink, layout.homeCurrent && styles.current]}>
+          {/* Home shows no visual current state; aria-current still tells assistive technology. */}
+          <Link href="/" label="Home" color="inherit" aria-current={layout.homeCurrent} xstyle={[styles.navigationLink, tones.ink, styles.noUnderline]}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...stylex.props(styles.inlineIcon)}>
               <path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9" />
             </svg>
             <span aria-hidden="true" {...stylex.props(styles.mobileLabel)}>Home</span>
           </Link>
-          {layout.navigation.map(link => <Link key={link.href} href={link.href} color="inherit" aria-current={link.current} weight={link.current ? 'semibold' : undefined} xstyle={[styles.navigationLink, tones[link.tone], link.current && current[link.tone], link.current && styles.current]}>{link.href === PageURI.getURI({ slug: 'contact' }) ? 'Contact' : link.title}</Link>)}
+          {layout.navigation.map(link => <Link key={link.href} href={link.href} color="inherit" aria-current={link.current} xstyle={[styles.navigationLink, tones[link.tone], link.current && current[link.tone], link.current && styles.current]}>{link.href === PageURI.getURI({ slug: 'contact' }) ? 'Contact' : link.title}</Link>)}
         </div>
       </nav>
       <Stack direction="horizontal" gap={2} align="center" xstyle={styles.tools}>
-        <IconButton label={layout.colorMode.label} tooltip={layout.colorMode.label} variant="ghost" icon={layout.colorMode.dark ? <Layout_SunIcon /> : <Layout_MoonIcon />} onClick={layout.colorMode.toggle} xstyle={[styles.iconTarget, tones.ink]} />
+        {/* One Tab stop; arrow keys move between the two toggles. */}
+        <ButtonGroup label="Display preferences" xstyle={styles.preferences}>
+          <IconButton label={layout.colorMode.label} tooltip={layout.colorMode.label} variant="ghost" icon={layout.colorMode.dark ? <Layout_SunIcon /> : <Layout_MoonIcon />} onClick={layout.colorMode.toggle} xstyle={[styles.iconTarget, styles.preference, tones.ink]} />
+          <IconButton label={layout.motion.label} tooltip={layout.motion.label} variant="ghost" icon={layout.motion.reduced ? <Layout_PlayIcon /> : <Layout_PauseIcon />} onClick={layout.motion.toggle} xstyle={[styles.iconTarget, styles.preference, tones.ink]} />
+        </ButtonGroup>
         {layout.viewer && <Button label="Sign out" clickAction={layout.signOut} isDisabled={!layout.csrf} />}
       </Stack>
     </div></header>
@@ -75,6 +81,14 @@ export function Layout({ data, row, title, admin = false, children }: LayoutProp
 
 function Layout_MoonIcon() {
   return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>;
+}
+
+function Layout_PauseIcon() {
+  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5" /><path d="M10 9v6M14 9v6" /></svg>;
+}
+
+function Layout_PlayIcon() {
+  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5" /><path d="m10 8.5 5.5 3.5-5.5 3.5z" /></svg>;
 }
 
 function Layout_SunIcon() {
@@ -105,7 +119,9 @@ function useLayout(key: LayoutFragment$key, row: LayoutRow | null | undefined, t
   const menu = useMenu(location.pathname);
   const mode = useColorMode();
   const colorMode = { dark: mode.dark, toggle: mode.toggle, label: mode.dark ? 'Switch to light mode' : 'Switch to dark mode' };
-  return { navigation: marked, homeCurrent: currentOf('/', location.pathname), menu, colorMode, viewer: data.viewer, csrf, error, signOut, notice: (location.state as { notice?: string } | null)?.notice };
+  const animation = useMotion();
+  const motion = { reduced: animation.reduced, toggle: animation.toggle, label: animation.reduced ? 'Turn on animations' : 'Turn off animations' };
+  return { navigation: marked, homeCurrent: currentOf('/', location.pathname), menu, colorMode, motion, viewer: data.viewer, csrf, error, signOut, notice: (location.state as { notice?: string } | null)?.notice };
 }
 
 // The mobile disclosure menu: Escape or a click outside closes it and returns focus to
@@ -187,16 +203,33 @@ const styles = stylex.create({
     boxShadow: { default: 'none', '@media (max-width: 760px)': '0 16px 40px -20px rgb(0 0 0 / 0.6)' },
   },
   tools: { flexShrink: 0 },
+  // One pill around both toggles, with a hairline divider between them. The buttons
+  // round their own outer corners rather than the group clipping them, so focus
+  // outlines stay visible.
+  preferences: { borderWidth: '1px', borderStyle: 'solid', borderColor: 'var(--site-hairline)', borderRadius: '999px' },
+  preference: {
+    borderColor: 'var(--site-hairline)',
+    // Of-type, because each button's tooltip renders as a sibling inside the group.
+    borderStartStartRadius: { default: 0, ':first-of-type': '999px' }, borderEndStartRadius: { default: 0, ':first-of-type': '999px' },
+    borderStartEndRadius: { default: 0, ':last-of-type': '999px' }, borderEndEndRadius: { default: 0, ':last-of-type': '999px' },
+  },
+  // The background fades in and a 2px underline grows out from the middle on hover and
+  // focus, shrinking back to the middle on leave. The underline is a centred gradient
+  // whose width animates. --site-motion is near zero when animations are off.
   navigationLink: {
     display: 'inline-flex', alignItems: 'center', minHeight: { default: '2.25rem', '@media (max-width: 760px)': '44px' }, paddingInline: '0.75rem', borderRadius: '999px', textDecoration: 'none',
-    transitionProperty: 'color, background-color', transitionDuration: { default: 'var(--duration-fast)', '@media (prefers-reduced-motion: reduce)': '0s' }, transitionTimingFunction: 'var(--ease-standard)',
+    backgroundImage: 'linear-gradient(currentColor, currentColor)', backgroundRepeat: 'no-repeat', backgroundOrigin: 'content-box', backgroundPosition: '50% calc(100% - 0.3rem)',
+    backgroundSize: { default: '0% 2px', ':hover': '100% 2px', ':focus-visible': '100% 2px' },
+    transitionProperty: 'color, background-color, background-size', transitionDuration: 'var(--site-motion)', transitionTimingFunction: 'var(--ease-standard)',
   },
   // The icon-only Home link gets a visible label in the mobile menu, where the current-page underline needs text.
   inlineIcon: { display: 'inline-block', verticalAlign: '-0.25em' },
   mobileLabel: { display: { default: 'none', '@media (max-width: 760px)': 'inline' }, marginInlineStart: '0.5rem' },
   iconTarget: { justifyContent: 'center', minWidth: '44px', minHeight: '44px', paddingInline: 0, borderRadius: '999px' },
-  // Not colour alone: the current link is also underlined (and semibold through its weight).
-  current: { textDecoration: 'underline', textDecorationThickness: '2px', textUnderlineOffset: '0.35em' },
+  // Icon links (Home, Admin) never draw the underline.
+  noUnderline: { backgroundImage: 'none' },
+  // Not colour alone: the current link keeps its underline drawn.
+  current: { backgroundSize: '100% 2px' },
   footer: { marginTop: 'auto', paddingBlock: '1.5rem', borderTop: '1px solid var(--site-hairline)', fontSize: '0.85rem', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' },
   footerLinks: { flexWrap: 'wrap' },
   iconLink: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '44px', height: '44px' },

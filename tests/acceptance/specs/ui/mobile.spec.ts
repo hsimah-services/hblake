@@ -80,13 +80,14 @@ test('the current page is marked in the open menu by more than colour', async ({
   await menuButton(page).click();
   const current = navLink(page, '/pages/services');
   await expect(current).toHaveAttribute('aria-current', 'page');
-  expect(await current.evaluate(element => getComputedStyle(element).textDecorationLine)).toContain('underline');
+  expect(await current.evaluate(element => getComputedStyle(element).backgroundSize), 'its underline is drawn').toBe('100% 2px');
 });
 
 test('menu, navigation, mode toggle and footer links are at least 44px touch targets', async ({ page }) => {
   await page.goto('/');
   await expectTouchTarget(menuButton(page), 'menu button');
   await expectTouchTarget(page.getByRole('banner').getByRole('button', { name: /switch to (dark|light) mode/i }), 'colour mode toggle');
+  await expectTouchTarget(page.getByRole('banner').getByRole('button', { name: /turn (on|off) animations/i }), 'animation toggle');
   await menuButton(page).click();
   for (const href of ['/', '/pages/services']) await expectTouchTarget(navLink(page, href), `nav link ${href}`);
   for (const link of await page.getByRole('contentinfo').getByRole('link').all()) {

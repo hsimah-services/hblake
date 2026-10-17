@@ -150,12 +150,21 @@ The browser tests find elements by accessible role and name, not by test ids:
   `light-dark()` `--site-*` tones) keeps every pair of tones at least ΔE2000 10 apart
   under simulated protanopia, deuteranopia and tritanopia, and AA contrast as text.
 - The navigation marks the current page (`aria-current="page"`) or section
-  (`aria-current="true"` on a collection's records) by more than colour: underlined
-  and at least semibold.
+  (`aria-current="true"` on a collection's records) by more than colour: its 2px
+  underline (a centred gradient `background-size` of `100% 2px`) stays drawn; other
+  links show it only on hover or focus. The Home icon link is the exception: it never
+  draws an underline or a current tint, and keeps `aria-current` for assistive
+  technology.
+- A `banner` button named `Turn off animations`/`Turn on animations` controls motion.
+  It starts from the system's reduced-motion setting, survives reloads and applies
+  before the application scripts run (`data-motion` on `<html>`). With animations off,
+  navigation transitions take under 10ms and home tiles do not grow on hover.
+- The colour mode and animation toggles share one `group` named `Display preferences`:
+  one Tab stop, arrow keys between them, and focus rings the group does not clip.
 - At 360px wide nothing scrolls sideways. The `Main navigation` holds a `Menu` button
   with `aria-expanded` and `aria-controls`; Escape closes it and focuses the button,
-  and following a link closes it. Menu, navigation, mode toggle and footer links are
-  at least 44×44px.
+  and following a link closes it. Menu, navigation, mode and animation toggles and
+  footer links are at least 44×44px.
 - `document.title` starts with what the screen shows: the content title, the list
   name (`Posts`), `Administration`, `Sign in`, `Create Post`, `Edit <title>`. Only a
   missing record is titled "Not found".
@@ -233,6 +242,7 @@ Spec acceptance checks and where they are tested:
 | Initial data (architecture.md) | `api/initial-data.spec.ts`, `ui/public-site.spec.ts` |
 | Colour schemes and titles (website.md) | `ui/public-site.spec.ts`, `ui/admin.spec.ts`, `ui/color-mode.spec.ts`, `static/palette.spec.ts` |
 | Phone layout (website.md) | `ui/mobile.spec.ts` |
+| Animations and the motion toggle (website.md) | `ui/motion.spec.ts` |
 | 11 install, backup, secrets | `ops`, `api/http.spec.ts` |
 
 Not covered, and why:

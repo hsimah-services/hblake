@@ -78,8 +78,15 @@ follows the system colour scheme until the visitor chooses one with the header t
 ("Switch to dark/light mode"); the choice is remembered on the device and applied
 before first paint. The palette (green, orange, blue, berry) stays distinguishable
 with protanopia, deuteranopia and tritanopia, and colour never carries meaning alone:
-the current page in the navigation is also underlined and semibold, and marked with
-`aria-current`. Motion respects reduced-motion preferences.
+the current page in the navigation is also underlined and marked with `aria-current`.
+The Home icon shows no visual current state or underline; it keeps `aria-current`.
+
+Navigation links fade in a tint and grow a 2px underline out from the middle on hover
+and focus, shrinking back on leave; home tiles grow slightly. A header toggle ("Turn
+off/on animations") switches all of this off for visitors who prefer less motion. It
+follows the system's reduced-motion setting until the visitor chooses, remembers the
+choice on the device and applies it before first paint. With animations off, states
+still change (the underline still appears) but nothing moves over time.
 
 On phone-sized screens nothing scrolls sideways, the navigation collapses behind a
 Menu disclosure button (Escape, an outside tap or following a link closes it and

@@ -16,6 +16,27 @@
   --site-berry: light-dark(#772449, #d395ac);
   --site-ink: var(--color-text-primary);
   --site-hairline: color-mix(in srgb, var(--color-text-primary) 14%, transparent);
+  /* Site motion. Every animation reads these, so the header's animation toggle (or the
+     system's reduced-motion setting until the visitor chooses) can switch it all off.
+     0.01ms rather than 0s keeps transitionend events firing for components that wait on them. */
+  --site-motion: var(--duration-medium-min);
+  --site-tile-grow: scale(1.04);
+}
+
+html[data-motion="reduce"] {
+  --site-motion: 0.01ms; --site-tile-grow: none;
+  --duration-fast-min: 0.01ms; --duration-fast: 0.01ms; --duration-fast-max: 0.01ms;
+  --duration-medium-min: 0.01ms; --duration-medium: 0.01ms; --duration-medium-max: 0.01ms;
+  --duration-slow-min: 0.01ms; --duration-slow: 0.01ms; --duration-slow-max: 0.01ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion="full"]) {
+    --site-motion: 0.01ms; --site-tile-grow: none;
+    --duration-fast-min: 0.01ms; --duration-fast: 0.01ms; --duration-fast-max: 0.01ms;
+    --duration-medium-min: 0.01ms; --duration-medium: 0.01ms; --duration-medium-max: 0.01ms;
+    --duration-slow-min: 0.01ms; --duration-slow: 0.01ms; --duration-slow-max: 0.01ms;
+  }
 }
 
 body {

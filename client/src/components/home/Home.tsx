@@ -53,14 +53,14 @@ type HomeProps = { queryRef: PreloadedQuery<HomeQuery> };
 
 const styles = stylex.create({
   grid: { display: 'grid', gridTemplateColumns: { default: 'repeat(4, minmax(0, 1fr))', '@media (max-width: 900px)': 'repeat(2, minmax(0, 1fr))', '@media (max-width: 480px)': '1fr' }, gap: '1rem', marginBlock: { default: '3rem', '@media (max-width: 480px)': '2rem' } },
-  // Hover and keyboard focus grow the tile where there is room; reduced motion keeps the change
-  // without animating it. On phones the single column stays flat so nothing overflows.
+  // Hover and keyboard focus grow the tile where there is room, unless animations are off
+  // (--site-tile-grow). On phones the single column stays flat so nothing overflows.
   tile: {
     position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'space-between', gap: '1.25rem', minHeight: { default: '17rem', '@media (max-width: 480px)': '0' }, padding: { default: '1.5rem', '@media (max-width: 480px)': '1.25rem' }, color: '#ffffff', textDecoration: 'none', borderRadius: 0,
     zIndex: { default: 0, ':hover': 1, ':focus-visible': 1 },
-    transform: { default: 'none', ':hover': { default: 'scale(1.04)', '@media (max-width: 480px)': 'none' }, ':focus-visible': { default: 'scale(1.04)', '@media (max-width: 480px)': 'none' } },
+    transform: { default: 'none', ':hover': { default: 'var(--site-tile-grow)', '@media (max-width: 480px)': 'none' }, ':focus-visible': { default: 'var(--site-tile-grow)', '@media (max-width: 480px)': 'none' } },
     boxShadow: { default: '0 6px 16px -12px rgb(0 0 0 / 0.5)', ':hover': '0 22px 40px -18px rgb(0 0 0 / 0.65)', ':focus-visible': '0 22px 40px -18px rgb(0 0 0 / 0.65)' },
-    transitionProperty: 'transform, box-shadow', transitionDuration: { default: 'var(--duration-medium-min)', '@media (prefers-reduced-motion: reduce)': '0s' }, transitionTimingFunction: 'var(--ease-standard)',
+    transitionProperty: 'transform, box-shadow', transitionDuration: 'var(--site-motion)', transitionTimingFunction: 'var(--ease-standard)',
   },
   tileContent: { display: 'flex', flexDirection: 'column', gap: { default: '1.25rem', '@media (max-width: 480px)': '0.5rem' }, minHeight: { default: '14rem', '@media (max-width: 480px)': '0' } },
   green: { backgroundColor: 'var(--site-tile-green)' },

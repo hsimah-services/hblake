@@ -170,6 +170,13 @@ test.describe('post list', () => {
   });
 });
 
+// The navigation underline is a centred 2px gradient whose width is the cue: drawn in
+// full under the current link and on hover or focus, zero width otherwise.
+const underline = (link: import('@playwright/test').Locator): Promise<string> => link.evaluate(element => {
+  const style = getComputedStyle(element);
+  return style.backgroundImage.includes('gradient') ? style.backgroundSize : 'none';
+});
+
 test.describe('navigation', () => {
   test('links to published pages and non-empty collections only', async ({ page }) => {
     await ensurePage(api, 'services', 'PUBLISHED', { title: 'Services' });
@@ -203,16 +210,24 @@ test.describe('navigation', () => {
 
   test('the current page is marked by more than colour', async ({ page }) => {
     await ensurePage(api, 'services', 'PUBLISHED', { title: 'Services' });
+    await ensurePage(api, 'portfolio', 'PUBLISHED', { title: 'Portfolio' });
     await page.goto('/pages/services');
     const current = page.getByRole('navigation', { name: 'Main navigation' }).locator('a[aria-current="page"]');
-    const other = page.getByRole('navigation', { name: 'Main navigation' }).locator('a[href="/"]');
-    const cue = (link: typeof current): Promise<{ underline: boolean; weight: number }> => link.evaluate(element => ({
-      underline: getComputedStyle(element).textDecorationLine.includes('underline'),
-      weight: Math.max(...[element, ...element.querySelectorAll('*')].map(node => Number(getComputedStyle(node).fontWeight))),
-    }));
-    expect(await cue(current)).toEqual({ underline: true, weight: expect.any(Number) });
-    expect((await cue(current)).weight).toBeGreaterThanOrEqual(600);
-    expect((await cue(other)).underline, 'other links are not underlined').toBe(false);
+    const other = page.getByRole('navigation', { name: 'Main navigation' }).locator('a[href="/pages/portfolio"]');
+    await page.mouse.move(0, 0);
+    expect(await underline(current), 'the current link keeps its underline drawn').toBe('100% 2px');
+    expect(await underline(other), 'other links are not underlined until hovered').toBe('0% 2px');
+  });
+
+  test('the home icon is never underlined or highlighted, even at home', async ({ page }) => {
+    await page.goto('/');
+    const home = page.getByRole('navigation', { name: 'Main navigation' }).locator('a[href="/"]');
+    await expect(home, 'assistive technology still hears the current page').toHaveAttribute('aria-current', 'page');
+    await page.mouse.move(0, 0);
+    expect(await underline(home)).toBe('none');
+    expect(await home.evaluate(element => getComputedStyle(element).backgroundColor), 'no current tint').toBe('rgba(0, 0, 0, 0)');
+    await home.hover();
+    expect(await underline(home), 'not on hover either').toBe('none');
   });
 
   test('every public route has a consistent header, navigation and footer', async ({ page }) => {
