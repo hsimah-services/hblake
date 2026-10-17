@@ -348,7 +348,7 @@ test.describe('document titles', () => {
   test('admin screens are titled for what they show, never "Not found"', async ({ page }) => {
     const row = await createOk(api, 'Post');
     const screens: [string, RegExp][] = [
-      ['/admin', /^Administration\b/],
+      ['/admin', /^Dashboard\b/],
       ['/admin/pages', /^Pages\b/],
       ['/admin/posts', /^Posts\b/],
       ['/admin/products', /^Products\b/],

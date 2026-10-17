@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   tsquid-manifest.php
- * digest: sha256:8c58d03e079202cdf4b6157ada2f78dc6a82c492e8a110020ffa23d5e1a13f12
+ * digest: sha256:c9495581f214b27231b43e079e7b21e63f8a1f63a1dccaf370ae41e757890de2
  */
 
 return new \Eleph\Tsquid\Manifest((object) ['routes' => [(object) ['fields' => (object) [], 'name' => 'Home', 'path' => '/', 'query' => (object) ['id' => '8377941fd17bab39b9523077363b7cf4', 'operation' => 'HomeQuery', 'text' => 'query HomeQuery {
@@ -335,51 +335,60 @@ fragment LayoutFragment on RootQuery {
     }
   }
 }
-', 'variables' => (object) []], 'ssr' => true], (object) ['fields' => (object) [], 'name' => 'AdminHome', 'path' => '/admin', 'query' => (object) ['id' => '58666bd5fa5dd8e215fc1e0ce80b6545', 'operation' => 'AdminQuery', 'text' => 'query AdminQuery {
-  ...LayoutFragment
+', 'variables' => (object) []], 'ssr' => true], (object) ['fields' => (object) [], 'name' => 'AdminHome', 'path' => '/admin', 'query' => (object) ['id' => '51dfec26dd48f849d5d67de85d1bfbf3', 'operation' => 'AdminQuery', 'text' => 'query AdminQuery {
+  ...AdminLayoutFragment
   viewer {
     id
   }
+  pages(first: 100) {
+    totalCount
+    nodes {
+      status
+      id
+    }
+  }
+  posts(first: 100) {
+    totalCount
+    nodes {
+      status
+      id
+    }
+  }
+  products(first: 100) {
+    totalCount
+    nodes {
+      status
+      id
+    }
+  }
 }
 
-fragment LayoutFragment on RootQuery {
+fragment AdminLayoutFragment on RootQuery {
   viewer {
     id
     displayName
-    role
   }
-  navigationPages: pages(first: 100) {
-    nodes {
-      id
-      title
-      slug
-      status
-    }
+  pageCount: pages(first: 1) {
+    totalCount
   }
-  navigationPosts: posts(first: 100) {
-    nodes {
-      status
-      id
-    }
+  postCount: posts(first: 1) {
+    totalCount
   }
-  navigationProducts: products(first: 100) {
-    nodes {
-      status
-      id
-    }
+  productCount: products(first: 1) {
+    totalCount
   }
 }
-', 'variables' => (object) []], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'AdminPageList', 'path' => '/admin/pages', 'query' => (object) ['id' => '871cc871620e805c36a8486336cd6a7d', 'operation' => 'AdminPageListQuery', 'text' => 'query AdminPageListQuery(
+', 'variables' => (object) []], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'AdminPageList', 'path' => '/admin/pages', 'query' => (object) ['id' => '12cfe7b9258ead963a590592ea023a28', 'operation' => 'AdminPageListQuery', 'text' => 'query AdminPageListQuery(
   $after: String
 ) {
-  ...LayoutFragment
+  ...AdminLayoutFragment
   pages(first: 20, after: $after) {
     nodes {
       id
       title
       slug
-      excerpt
       status
+      updatedAt
     }
     pageInfo {
       hasNextPage
@@ -388,71 +397,47 @@ fragment LayoutFragment on RootQuery {
   }
 }
 
-fragment LayoutFragment on RootQuery {
+fragment AdminLayoutFragment on RootQuery {
   viewer {
     id
     displayName
-    role
   }
-  navigationPages: pages(first: 100) {
-    nodes {
-      id
-      title
-      slug
-      status
-    }
+  pageCount: pages(first: 1) {
+    totalCount
   }
-  navigationPosts: posts(first: 100) {
-    nodes {
-      status
-      id
-    }
+  postCount: posts(first: 1) {
+    totalCount
   }
-  navigationProducts: products(first: 100) {
-    nodes {
-      status
-      id
-    }
+  productCount: products(first: 1) {
+    totalCount
   }
 }
-', 'variables' => (object) ['after' => (object) ['input' => 'after']]], 'ssr' => true], (object) ['fields' => (object) [], 'name' => 'AdminPageCreate', 'path' => '/admin/pages/new', 'query' => (object) ['id' => '39f6abee2d5dde6d19efe5ca23fc0809', 'operation' => 'AdminPageCreateQuery', 'text' => 'query AdminPageCreateQuery {
-  ...LayoutFragment
+', 'variables' => (object) ['after' => (object) ['input' => 'after']]], 'ssr' => true], (object) ['fields' => (object) [], 'name' => 'AdminPageCreate', 'path' => '/admin/pages/new', 'query' => (object) ['id' => '49a713d009cbfd87d8987bdc99e625fd', 'operation' => 'AdminPageCreateQuery', 'text' => 'query AdminPageCreateQuery {
+  ...AdminLayoutFragment
   viewer {
     id
   }
 }
 
-fragment LayoutFragment on RootQuery {
+fragment AdminLayoutFragment on RootQuery {
   viewer {
     id
     displayName
-    role
   }
-  navigationPages: pages(first: 100) {
-    nodes {
-      id
-      title
-      slug
-      status
-    }
+  pageCount: pages(first: 1) {
+    totalCount
   }
-  navigationPosts: posts(first: 100) {
-    nodes {
-      status
-      id
-    }
+  postCount: posts(first: 1) {
+    totalCount
   }
-  navigationProducts: products(first: 100) {
-    nodes {
-      status
-      id
-    }
+  productCount: products(first: 1) {
+    totalCount
   }
 }
-', 'variables' => (object) []], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminPageDetail', 'path' => '/admin/pages/:id', 'query' => (object) ['id' => '882298eb384f668b2a13eead8e835499', 'operation' => 'AdminPageQuery', 'text' => 'query AdminPageQuery(
+', 'variables' => (object) []], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminPageDetail', 'path' => '/admin/pages/:id', 'query' => (object) ['id' => '3b6475242bf5b05d8434a81e9ab1b10b', 'operation' => 'AdminPageQuery', 'text' => 'query AdminPageQuery(
   $id: ID!
 ) {
-  ...LayoutFragment
+  ...AdminLayoutFragment
   page(id: $id) {
     id
     title
@@ -466,37 +451,25 @@ fragment LayoutFragment on RootQuery {
   }
 }
 
-fragment LayoutFragment on RootQuery {
+fragment AdminLayoutFragment on RootQuery {
   viewer {
     id
     displayName
-    role
   }
-  navigationPages: pages(first: 100) {
-    nodes {
-      id
-      title
-      slug
-      status
-    }
+  pageCount: pages(first: 1) {
+    totalCount
   }
-  navigationPosts: posts(first: 100) {
-    nodes {
-      status
-      id
-    }
+  postCount: posts(first: 1) {
+    totalCount
   }
-  navigationProducts: products(first: 100) {
-    nodes {
-      status
-      id
-    }
+  productCount: products(first: 1) {
+    totalCount
   }
 }
-', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminPageEdit', 'path' => '/admin/pages/:id/edit', 'query' => (object) ['id' => '882298eb384f668b2a13eead8e835499', 'operation' => 'AdminPageQuery', 'text' => 'query AdminPageQuery(
+', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminPageEdit', 'path' => '/admin/pages/:id/edit', 'query' => (object) ['id' => '3b6475242bf5b05d8434a81e9ab1b10b', 'operation' => 'AdminPageQuery', 'text' => 'query AdminPageQuery(
   $id: ID!
 ) {
-  ...LayoutFragment
+  ...AdminLayoutFragment
   page(id: $id) {
     id
     title
@@ -510,44 +483,33 @@ fragment LayoutFragment on RootQuery {
   }
 }
 
-fragment LayoutFragment on RootQuery {
+fragment AdminLayoutFragment on RootQuery {
   viewer {
     id
     displayName
-    role
   }
-  navigationPages: pages(first: 100) {
-    nodes {
-      id
-      title
-      slug
-      status
-    }
+  pageCount: pages(first: 1) {
+    totalCount
   }
-  navigationPosts: posts(first: 100) {
-    nodes {
-      status
-      id
-    }
+  postCount: posts(first: 1) {
+    totalCount
   }
-  navigationProducts: products(first: 100) {
-    nodes {
-      status
-      id
-    }
+  productCount: products(first: 1) {
+    totalCount
   }
 }
-', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'AdminPostList', 'path' => '/admin/posts', 'query' => (object) ['id' => 'c9abcb1d83b0d5f8451d79b3d62e22c2', 'operation' => 'AdminPostListQuery', 'text' => 'query AdminPostListQuery(
+', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'AdminPostList', 'path' => '/admin/posts', 'query' => (object) ['id' => 'dff86c06acb2c466cabe1662792b5987', 'operation' => 'AdminPostListQuery', 'text' => 'query AdminPostListQuery(
   $after: String
 ) {
-  ...LayoutFragment
+  ...AdminLayoutFragment
   posts(first: 20, after: $after) {
     nodes {
       id
       title
       slug
-      excerpt
       status
+      updatedAt
+      publishedAt
     }
     pageInfo {
       hasNextPage
@@ -556,71 +518,47 @@ fragment LayoutFragment on RootQuery {
   }
 }
 
-fragment LayoutFragment on RootQuery {
+fragment AdminLayoutFragment on RootQuery {
   viewer {
     id
     displayName
-    role
   }
-  navigationPages: pages(first: 100) {
-    nodes {
-      id
-      title
-      slug
-      status
-    }
+  pageCount: pages(first: 1) {
+    totalCount
   }
-  navigationPosts: posts(first: 100) {
-    nodes {
-      status
-      id
-    }
+  postCount: posts(first: 1) {
+    totalCount
   }
-  navigationProducts: products(first: 100) {
-    nodes {
-      status
-      id
-    }
+  productCount: products(first: 1) {
+    totalCount
   }
 }
-', 'variables' => (object) ['after' => (object) ['input' => 'after']]], 'ssr' => true], (object) ['fields' => (object) [], 'name' => 'AdminPostCreate', 'path' => '/admin/posts/new', 'query' => (object) ['id' => '9311a6a8e2e12480151d0605f5a97cc1', 'operation' => 'AdminPostCreateQuery', 'text' => 'query AdminPostCreateQuery {
-  ...LayoutFragment
+', 'variables' => (object) ['after' => (object) ['input' => 'after']]], 'ssr' => true], (object) ['fields' => (object) [], 'name' => 'AdminPostCreate', 'path' => '/admin/posts/new', 'query' => (object) ['id' => '9507ce88faf42861274aff138dfb666d', 'operation' => 'AdminPostCreateQuery', 'text' => 'query AdminPostCreateQuery {
+  ...AdminLayoutFragment
   viewer {
     id
   }
 }
 
-fragment LayoutFragment on RootQuery {
+fragment AdminLayoutFragment on RootQuery {
   viewer {
     id
     displayName
-    role
   }
-  navigationPages: pages(first: 100) {
-    nodes {
-      id
-      title
-      slug
-      status
-    }
+  pageCount: pages(first: 1) {
+    totalCount
   }
-  navigationPosts: posts(first: 100) {
-    nodes {
-      status
-      id
-    }
+  postCount: posts(first: 1) {
+    totalCount
   }
-  navigationProducts: products(first: 100) {
-    nodes {
-      status
-      id
-    }
+  productCount: products(first: 1) {
+    totalCount
   }
 }
-', 'variables' => (object) []], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminPostDetail', 'path' => '/admin/posts/:id', 'query' => (object) ['id' => 'aa4ce48104c3bf6f79b656b2e7331612', 'operation' => 'AdminPostQuery', 'text' => 'query AdminPostQuery(
+', 'variables' => (object) []], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminPostDetail', 'path' => '/admin/posts/:id', 'query' => (object) ['id' => '61b146c4d4458157331be252570c9ab6', 'operation' => 'AdminPostQuery', 'text' => 'query AdminPostQuery(
   $id: ID!
 ) {
-  ...LayoutFragment
+  ...AdminLayoutFragment
   post(id: $id) {
     id
     title
@@ -634,37 +572,25 @@ fragment LayoutFragment on RootQuery {
   }
 }
 
-fragment LayoutFragment on RootQuery {
+fragment AdminLayoutFragment on RootQuery {
   viewer {
     id
     displayName
-    role
   }
-  navigationPages: pages(first: 100) {
-    nodes {
-      id
-      title
-      slug
-      status
-    }
+  pageCount: pages(first: 1) {
+    totalCount
   }
-  navigationPosts: posts(first: 100) {
-    nodes {
-      status
-      id
-    }
+  postCount: posts(first: 1) {
+    totalCount
   }
-  navigationProducts: products(first: 100) {
-    nodes {
-      status
-      id
-    }
+  productCount: products(first: 1) {
+    totalCount
   }
 }
-', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminPostEdit', 'path' => '/admin/posts/:id/edit', 'query' => (object) ['id' => 'aa4ce48104c3bf6f79b656b2e7331612', 'operation' => 'AdminPostQuery', 'text' => 'query AdminPostQuery(
+', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminPostEdit', 'path' => '/admin/posts/:id/edit', 'query' => (object) ['id' => '61b146c4d4458157331be252570c9ab6', 'operation' => 'AdminPostQuery', 'text' => 'query AdminPostQuery(
   $id: ID!
 ) {
-  ...LayoutFragment
+  ...AdminLayoutFragment
   post(id: $id) {
     id
     title
@@ -678,44 +604,32 @@ fragment LayoutFragment on RootQuery {
   }
 }
 
-fragment LayoutFragment on RootQuery {
+fragment AdminLayoutFragment on RootQuery {
   viewer {
     id
     displayName
-    role
   }
-  navigationPages: pages(first: 100) {
-    nodes {
-      id
-      title
-      slug
-      status
-    }
+  pageCount: pages(first: 1) {
+    totalCount
   }
-  navigationPosts: posts(first: 100) {
-    nodes {
-      status
-      id
-    }
+  postCount: posts(first: 1) {
+    totalCount
   }
-  navigationProducts: products(first: 100) {
-    nodes {
-      status
-      id
-    }
+  productCount: products(first: 1) {
+    totalCount
   }
 }
-', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'AdminProductList', 'path' => '/admin/products', 'query' => (object) ['id' => '2d0b3371ab170c3fe43d4f47bf581ee9', 'operation' => 'AdminProductListQuery', 'text' => 'query AdminProductListQuery(
+', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'AdminProductList', 'path' => '/admin/products', 'query' => (object) ['id' => '913a8cc640ffe8bc7bb23bab5533e0fd', 'operation' => 'AdminProductListQuery', 'text' => 'query AdminProductListQuery(
   $after: String
 ) {
-  ...LayoutFragment
+  ...AdminLayoutFragment
   products(first: 20, after: $after) {
     nodes {
       id
       title
       slug
-      excerpt
       status
+      updatedAt
     }
     pageInfo {
       hasNextPage
@@ -724,71 +638,47 @@ fragment LayoutFragment on RootQuery {
   }
 }
 
-fragment LayoutFragment on RootQuery {
+fragment AdminLayoutFragment on RootQuery {
   viewer {
     id
     displayName
-    role
   }
-  navigationPages: pages(first: 100) {
-    nodes {
-      id
-      title
-      slug
-      status
-    }
+  pageCount: pages(first: 1) {
+    totalCount
   }
-  navigationPosts: posts(first: 100) {
-    nodes {
-      status
-      id
-    }
+  postCount: posts(first: 1) {
+    totalCount
   }
-  navigationProducts: products(first: 100) {
-    nodes {
-      status
-      id
-    }
+  productCount: products(first: 1) {
+    totalCount
   }
 }
-', 'variables' => (object) ['after' => (object) ['input' => 'after']]], 'ssr' => true], (object) ['fields' => (object) [], 'name' => 'AdminProductCreate', 'path' => '/admin/products/new', 'query' => (object) ['id' => 'fae72bd615ed872e7c91a92fb7f6868f', 'operation' => 'AdminProductCreateQuery', 'text' => 'query AdminProductCreateQuery {
-  ...LayoutFragment
+', 'variables' => (object) ['after' => (object) ['input' => 'after']]], 'ssr' => true], (object) ['fields' => (object) [], 'name' => 'AdminProductCreate', 'path' => '/admin/products/new', 'query' => (object) ['id' => 'e2c07990c6624cadc34e0c9ad727587d', 'operation' => 'AdminProductCreateQuery', 'text' => 'query AdminProductCreateQuery {
+  ...AdminLayoutFragment
   viewer {
     id
   }
 }
 
-fragment LayoutFragment on RootQuery {
+fragment AdminLayoutFragment on RootQuery {
   viewer {
     id
     displayName
-    role
   }
-  navigationPages: pages(first: 100) {
-    nodes {
-      id
-      title
-      slug
-      status
-    }
+  pageCount: pages(first: 1) {
+    totalCount
   }
-  navigationPosts: posts(first: 100) {
-    nodes {
-      status
-      id
-    }
+  postCount: posts(first: 1) {
+    totalCount
   }
-  navigationProducts: products(first: 100) {
-    nodes {
-      status
-      id
-    }
+  productCount: products(first: 1) {
+    totalCount
   }
 }
-', 'variables' => (object) []], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminProductDetail', 'path' => '/admin/products/:id', 'query' => (object) ['id' => 'a45ec5d2e3149eea62f96b6f196ff091', 'operation' => 'AdminProductQuery', 'text' => 'query AdminProductQuery(
+', 'variables' => (object) []], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminProductDetail', 'path' => '/admin/products/:id', 'query' => (object) ['id' => '04edab7bcc1d60619c62ade975d9bb52', 'operation' => 'AdminProductQuery', 'text' => 'query AdminProductQuery(
   $id: ID!
 ) {
-  ...LayoutFragment
+  ...AdminLayoutFragment
   product(id: $id) {
     id
     title
@@ -803,37 +693,25 @@ fragment LayoutFragment on RootQuery {
   }
 }
 
-fragment LayoutFragment on RootQuery {
+fragment AdminLayoutFragment on RootQuery {
   viewer {
     id
     displayName
-    role
   }
-  navigationPages: pages(first: 100) {
-    nodes {
-      id
-      title
-      slug
-      status
-    }
+  pageCount: pages(first: 1) {
+    totalCount
   }
-  navigationPosts: posts(first: 100) {
-    nodes {
-      status
-      id
-    }
+  postCount: posts(first: 1) {
+    totalCount
   }
-  navigationProducts: products(first: 100) {
-    nodes {
-      status
-      id
-    }
+  productCount: products(first: 1) {
+    totalCount
   }
 }
-', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminProductEdit', 'path' => '/admin/products/:id/edit', 'query' => (object) ['id' => 'a45ec5d2e3149eea62f96b6f196ff091', 'operation' => 'AdminProductQuery', 'text' => 'query AdminProductQuery(
+', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminProductEdit', 'path' => '/admin/products/:id/edit', 'query' => (object) ['id' => '04edab7bcc1d60619c62ade975d9bb52', 'operation' => 'AdminProductQuery', 'text' => 'query AdminProductQuery(
   $id: ID!
 ) {
-  ...LayoutFragment
+  ...AdminLayoutFragment
   product(id: $id) {
     id
     title
@@ -848,37 +726,25 @@ fragment LayoutFragment on RootQuery {
   }
 }
 
-fragment LayoutFragment on RootQuery {
+fragment AdminLayoutFragment on RootQuery {
   viewer {
     id
     displayName
-    role
   }
-  navigationPages: pages(first: 100) {
-    nodes {
-      id
-      title
-      slug
-      status
-    }
+  pageCount: pages(first: 1) {
+    totalCount
   }
-  navigationPosts: posts(first: 100) {
-    nodes {
-      status
-      id
-    }
+  postCount: posts(first: 1) {
+    totalCount
   }
-  navigationProducts: products(first: 100) {
-    nodes {
-      status
-      id
-    }
+  productCount: products(first: 1) {
+    totalCount
   }
 }
-', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminUserDetail', 'path' => '/admin/users/:id', 'query' => (object) ['id' => '1422e44144ed4b9951d1a15489de37bd', 'operation' => 'AdminUserQuery', 'text' => 'query AdminUserQuery(
+', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminUserDetail', 'path' => '/admin/users/:id', 'query' => (object) ['id' => '8f4b5eccc449933db2c386792c607389', 'operation' => 'AdminUserQuery', 'text' => 'query AdminUserQuery(
   $id: ID!
 ) {
-  ...LayoutFragment
+  ...AdminLayoutFragment
   adminUser(id: $id) {
     id
     username
@@ -886,37 +752,25 @@ fragment LayoutFragment on RootQuery {
   }
 }
 
-fragment LayoutFragment on RootQuery {
+fragment AdminLayoutFragment on RootQuery {
   viewer {
     id
     displayName
-    role
   }
-  navigationPages: pages(first: 100) {
-    nodes {
-      id
-      title
-      slug
-      status
-    }
+  pageCount: pages(first: 1) {
+    totalCount
   }
-  navigationPosts: posts(first: 100) {
-    nodes {
-      status
-      id
-    }
+  postCount: posts(first: 1) {
+    totalCount
   }
-  navigationProducts: products(first: 100) {
-    nodes {
-      status
-      id
-    }
+  productCount: products(first: 1) {
+    totalCount
   }
 }
-', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminUserEdit', 'path' => '/admin/users/:id/edit', 'query' => (object) ['id' => '1422e44144ed4b9951d1a15489de37bd', 'operation' => 'AdminUserQuery', 'text' => 'query AdminUserQuery(
+', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminUserEdit', 'path' => '/admin/users/:id/edit', 'query' => (object) ['id' => '8f4b5eccc449933db2c386792c607389', 'operation' => 'AdminUserQuery', 'text' => 'query AdminUserQuery(
   $id: ID!
 ) {
-  ...LayoutFragment
+  ...AdminLayoutFragment
   adminUser(id: $id) {
     id
     username
@@ -924,31 +778,19 @@ fragment LayoutFragment on RootQuery {
   }
 }
 
-fragment LayoutFragment on RootQuery {
+fragment AdminLayoutFragment on RootQuery {
   viewer {
     id
     displayName
-    role
   }
-  navigationPages: pages(first: 100) {
-    nodes {
-      id
-      title
-      slug
-      status
-    }
+  pageCount: pages(first: 1) {
+    totalCount
   }
-  navigationPosts: posts(first: 100) {
-    nodes {
-      status
-      id
-    }
+  postCount: posts(first: 1) {
+    totalCount
   }
-  navigationProducts: products(first: 100) {
-    nodes {
-      status
-      id
-    }
+  productCount: products(first: 1) {
+    totalCount
   }
 }
 ', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true]], 'version' => 1]);

@@ -166,7 +166,7 @@ The browser tests find elements by accessible role and name, not by test ids:
   and following a link closes it. Menu, navigation, mode and animation toggles and
   footer links are at least 44×44px.
 - `document.title` starts with what the screen shows: the content title, the list
-  name (`Posts`), `Administration`, `Sign in`, `Create Post`, `Edit <title>`. Only a
+  name (`Posts`), `Dashboard`, `Sign in`, `Create Post`, `Edit <title>`. Only a
   missing record is titled "Not found".
 - Unknown or unpublished content renders a heading matching `/not found/i`.
 - The empty post and product lists say "No posts" and "No products".
@@ -199,6 +199,18 @@ The browser tests find elements by accessible role and name, not by test ids:
   `New password`, `Confirm new password` and a `Change password` button. Mismatched or
   short new passwords are refused before sending; success is announced as updated.
 - The profile form (`/admin/users/:id/edit`) has one field, `Display name`.
+- Admin screens sit in a shell with a `navigation` named `Administration` linking
+  Dashboard, Pages, Posts, Products and Settings; the current one has
+  `aria-current="page"`. On phones its links open in a drawer `dialog` from an
+  `Open navigation` button.
+- Admin lists are tables with the `spec/ui/admin.yml` list columns (Title, Slug,
+  Status, Published for posts, Updated). Under each title are links `View “<title>”`
+  and `Edit “<title>”` and a button `Delete “<title>”`, which confirms in a dialog,
+  stays on the list, announces the deletion in a `status` and focuses the heading.
+  The list links `Add new <type>`. On a 360px screen the row actions stay on screen
+  as 44px targets.
+- Timestamps in the admin read relatively in a `<time datetime>`; the absolute time is
+  the `aria-label` and appears when the element (a Tab stop) is focused or hovered.
 - Published posts show `By <display name>` on the post and in the post list.
 - A dirty form warns before in-app navigation, through `confirm()` or a dialog with a
   stay/cancel button.
@@ -243,6 +255,7 @@ Spec acceptance checks and where they are tested:
 | Colour schemes and titles (website.md) | `ui/public-site.spec.ts`, `ui/admin.spec.ts`, `ui/color-mode.spec.ts`, `static/palette.spec.ts` |
 | Phone layout (website.md) | `ui/mobile.spec.ts` |
 | Animations and the motion toggle (website.md) | `ui/motion.spec.ts` |
+| Admin shell, tables and timestamps (ui/admin.md) | `ui/admin-shell.spec.ts` |
 | 11 install, backup, secrets | `ops`, `api/http.spec.ts` |
 
 Not covered, and why:

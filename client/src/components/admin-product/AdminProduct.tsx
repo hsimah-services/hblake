@@ -1,6 +1,6 @@
 import { usePreloadedQuery, type PreloadedQuery } from 'react-relay';
 import { Heading } from '@astryxdesign/core';
-import { Layout } from '../layout/Layout';
+import { AdminLayout } from '../admin-layout/AdminLayout';
 import { ADMIN_PRODUCT_LIST_QUERY } from './AdminProductListQuery';
 import { ADMIN_PRODUCT_QUERY } from './AdminProductQuery';
 import { ADMIN_PRODUCT_CREATE_QUERY } from './AdminProductCreateQuery';
@@ -8,7 +8,7 @@ import type { AdminProductListQuery } from './__generated__/AdminProductListQuer
 import type { AdminProductQuery } from './__generated__/AdminProductQuery.graphql';
 import type { AdminProductCreateQuery } from './__generated__/AdminProductCreateQuery.graphql';
 import { useAdminProductRouteContext, RouteName, AdminProductListURI, AdminProductCreateURI, AdminProductDetailURI, AdminProductEditURI } from '../../routes/__generated__/routes';
-import { ContentList } from '../content-list/ContentList';
+import { AdminTable } from '../admin-table/AdminTable';
 import { ContentForm } from '../content-form/ContentForm';
 import { AdminDetail } from '../admin-detail/AdminDetail';
 import { AdminProductMutation } from './AdminProductMutation';
@@ -20,21 +20,23 @@ export function AdminProduct({ list, create, content }: AdminProductProps) {
 
 function AdminProduct_List({ queryRef }: { queryRef: PreloadedQuery<AdminProductListQuery> }) {
   const data = usePreloadedQuery<AdminProductListQuery>(ADMIN_PRODUCT_LIST_QUERY, queryRef);
-  return <Layout data={data} title="Products" admin>
-    <ContentList title="Products" rows={data.products?.nodes}
-      create={AdminProductCreateURI.getURI({})} detail={row => AdminProductDetailURI.getURI({ id: row.id })}
+  const mutate = AdminProductMutation();
+  return <AdminLayout data={data} section="products" title="Products">
+    <AdminTable kind="Product" plural="Products" rows={data.products?.nodes}
+      create={AdminProductCreateURI.getURI({})} detail={id => AdminProductDetailURI.getURI({ id })} edit={id => AdminProductEditURI.getURI({ id })}
+      remove={id => mutate('delete', { id })}
       next={data.products?.pageInfo.hasNextPage ? AdminProductListURI.getURI({ after: data.products.pageInfo.endCursor ?? undefined }) : undefined} />
-  </Layout>;
+  </AdminLayout>;
 }
 
 function AdminProduct_Create({ queryRef }: { queryRef: PreloadedQuery<AdminProductCreateQuery> }) {
   const data = usePreloadedQuery<AdminProductCreateQuery>(ADMIN_PRODUCT_CREATE_QUERY, queryRef);
   const mutate = AdminProductMutation();
   const save = useAdminProduct_Save(null, mutate);
-  return <Layout data={data} title="Create Product" admin>
+  return <AdminLayout data={data} section="products" title="Create Product">
     <Heading level={1}>Create Product</Heading>
     <ContentForm key="new" kind="Product" save={save} detail={id => AdminProductDetailURI.getURI({ id })} />
-  </Layout>;
+  </AdminLayout>;
 }
 
 function AdminProduct_Content({ queryRef }: { queryRef: PreloadedQuery<AdminProductQuery> }) {
@@ -42,12 +44,12 @@ function AdminProduct_Content({ queryRef }: { queryRef: PreloadedQuery<AdminProd
   const route = useAdminProductRouteContext(); const mutate = AdminProductMutation(); const row = data.product;
   const save = useAdminProduct_Save(row, mutate);
   const editing = route.currentRoute === RouteName.AdminProductEdit && row != null;
-  return <Layout data={data} row={row} title={editing ? `Edit ${row.title}` : undefined} admin>
+  return <AdminLayout data={data} section="products" row={row} title={editing ? `Edit ${row.title}` : undefined}>
     {editing ? <>
       <Heading level={1}>Edit Product</Heading>
       <ContentForm key={row.id} kind="Product" row={row} save={save} detail={id => AdminProductDetailURI.getURI({ id })} />
     </> : <AdminDetail kind="Product" row={row} edit={AdminProductEditURI.getURI({ id: row?.id ?? '' })} list={AdminProductListURI.getURI({})} mutate={mutate} />}
-  </Layout>;
+  </AdminLayout>;
 }
 
 function useAdminProduct_Save(row: { readonly id: string } | null | undefined, mutate: ReturnType<typeof AdminProductMutation>) {

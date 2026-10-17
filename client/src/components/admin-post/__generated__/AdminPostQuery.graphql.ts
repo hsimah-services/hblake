@@ -1,6 +1,6 @@
 /**
- * @generated SignedSource<<92a77eb8dd4da05996af8e140acd25e5>>
- * @relayHash aa4ce48104c3bf6f79b656b2e7331612
+ * @generated SignedSource<<a761f4a442e50f0d9c2507a3d3200f61>>
+ * @relayHash 61b146c4d4458157331be252570c9ab6
  * @lightSyntaxTransform
  */
 
@@ -8,7 +8,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-// @relayRequestID aa4ce48104c3bf6f79b656b2e7331612
+// @relayRequestID 61b146c4d4458157331be252570c9ab6
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
@@ -28,7 +28,7 @@ export type AdminPostQuery$data = {
     readonly title: string;
     readonly updatedAt: string;
   } | null | undefined;
-  readonly " $fragmentSpreads": FragmentRefs<"LayoutFragment">;
+  readonly " $fragmentSpreads": FragmentRefs<"AdminLayoutFragment">;
 };
 export type AdminPostQuery = {
   response: AdminPostQuery$data;
@@ -52,27 +52,6 @@ v1 = {
 },
 v2 = {
   "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "title",
-  "storageKey": null
-},
-v3 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "slug",
-  "storageKey": null
-},
-v4 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "status",
-  "storageKey": null
-},
-v5 = {
-  "alias": null,
   "args": [
     {
       "kind": "Variable",
@@ -86,8 +65,20 @@ v5 = {
   "plural": false,
   "selections": [
     (v1/*:: as any*/),
-    (v2/*:: as any*/),
-    (v3/*:: as any*/),
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "title",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "slug",
+      "storageKey": null
+    },
     {
       "alias": null,
       "args": null,
@@ -102,7 +93,13 @@ v5 = {
       "name": "excerpt",
       "storageKey": null
     },
-    (v4/*:: as any*/),
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "status",
+      "storageKey": null
+    },
     {
       "alias": null,
       "args": null,
@@ -127,16 +124,21 @@ v5 = {
   ],
   "storageKey": null
 },
-v6 = [
+v3 = [
   {
     "kind": "Literal",
     "name": "first",
-    "value": 100
+    "value": 1
   }
 ],
-v7 = [
-  (v4/*:: as any*/),
-  (v1/*:: as any*/)
+v4 = [
+  {
+    "alias": null,
+    "args": null,
+    "kind": "ScalarField",
+    "name": "totalCount",
+    "storageKey": null
+  }
 ];
 return {
   "fragment": {
@@ -148,9 +150,9 @@ return {
       {
         "args": null,
         "kind": "FragmentSpread",
-        "name": "LayoutFragment"
+        "name": "AdminLayoutFragment"
       },
-      (v5/*:: as any*/)
+      (v2/*:: as any*/)
     ],
     "type": "RootQuery",
     "abstractKey": null
@@ -176,99 +178,54 @@ return {
             "kind": "ScalarField",
             "name": "displayName",
             "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "role",
-            "storageKey": null
           }
         ],
         "storageKey": null
       },
       {
-        "alias": "navigationPages",
-        "args": (v6/*:: as any*/),
+        "alias": "pageCount",
+        "args": (v3/*:: as any*/),
         "concreteType": "RootQueryToPageConnection",
         "kind": "LinkedField",
         "name": "pages",
         "plural": false,
-        "selections": [
-          {
-            "alias": null,
-            "args": null,
-            "concreteType": "Page",
-            "kind": "LinkedField",
-            "name": "nodes",
-            "plural": true,
-            "selections": [
-              (v1/*:: as any*/),
-              (v2/*:: as any*/),
-              (v3/*:: as any*/),
-              (v4/*:: as any*/)
-            ],
-            "storageKey": null
-          }
-        ],
-        "storageKey": "pages(first:100)"
+        "selections": (v4/*:: as any*/),
+        "storageKey": "pages(first:1)"
       },
       {
-        "alias": "navigationPosts",
-        "args": (v6/*:: as any*/),
+        "alias": "postCount",
+        "args": (v3/*:: as any*/),
         "concreteType": "RootQueryToPostConnection",
         "kind": "LinkedField",
         "name": "posts",
         "plural": false,
-        "selections": [
-          {
-            "alias": null,
-            "args": null,
-            "concreteType": "Post",
-            "kind": "LinkedField",
-            "name": "nodes",
-            "plural": true,
-            "selections": (v7/*:: as any*/),
-            "storageKey": null
-          }
-        ],
-        "storageKey": "posts(first:100)"
+        "selections": (v4/*:: as any*/),
+        "storageKey": "posts(first:1)"
       },
       {
-        "alias": "navigationProducts",
-        "args": (v6/*:: as any*/),
+        "alias": "productCount",
+        "args": (v3/*:: as any*/),
         "concreteType": "RootQueryToProductConnection",
         "kind": "LinkedField",
         "name": "products",
         "plural": false,
-        "selections": [
-          {
-            "alias": null,
-            "args": null,
-            "concreteType": "Product",
-            "kind": "LinkedField",
-            "name": "nodes",
-            "plural": true,
-            "selections": (v7/*:: as any*/),
-            "storageKey": null
-          }
-        ],
-        "storageKey": "products(first:100)"
+        "selections": (v4/*:: as any*/),
+        "storageKey": "products(first:1)"
       },
-      (v5/*:: as any*/)
+      (v2/*:: as any*/)
     ]
   },
   "params": {
-    "cacheID": "aa4ce48104c3bf6f79b656b2e7331612",
-    "id": "aa4ce48104c3bf6f79b656b2e7331612",
+    "cacheID": "61b146c4d4458157331be252570c9ab6",
+    "id": "61b146c4d4458157331be252570c9ab6",
     "metadata": {},
     "name": "AdminPostQuery",
     "operationKind": "query",
-    "text": "query AdminPostQuery(\n  $id: ID!\n) {\n  ...LayoutFragment\n  post(id: $id) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n"
+    "text": "query AdminPostQuery(\n  $id: ID!\n) {\n  ...AdminLayoutFragment\n  post(id: $id) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  postCount: posts(first: 1) {\n    totalCount\n  }\n  productCount: products(first: 1) {\n    totalCount\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "9a4aad257e9358712b23f519584463b6";
+(node as any).hash = "d9a50c5d64906a9ff3fd8c4a7d9b7144";
 
 export default node;

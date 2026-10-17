@@ -8,8 +8,21 @@ are admin-only. Content screens are available to active editors/admins. Route gu
 policies enforce every read and write. IDs use GraphQL global IDs as string route
 input, never unchecked numeric conversion.
 
-Lists show bounded cursor pagination and useful empty/loading/error states. Detail
-screens show rendered content plus timestamps. Forms use labels, inline errors,
+The admin uses a WordPress-style shell (Astryx AppShell): a top bar with the site
+name, View site, display preferences and Sign out, and a sidebar navigation named
+"Administration" with Dashboard, Pages, Posts and Products (each with its record
+count) and Settings. The current item carries `aria-current`; on phones the sidebar
+opens from a menu button. The Dashboard shows each type's published and draft counts
+with links to manage it and add a new one.
+
+Lists are tables with the admin.yml list columns. Each title links to the record,
+and under it View, Edit and Delete stay visible (not hover-only) so they remain on
+screen on narrow devices; their accessible names include the title. Delete confirms
+in a modal alert dialog, stays on the list, announces the deletion and moves focus
+to the heading. Status shows as a text badge. Timestamps read relatively ("2 hours
+ago") in a `<time datetime>`; the absolute time is the accessible name and appears
+on hover or keyboard focus. Lists show bounded cursor pagination and useful
+empty/loading/error states. Detail screens show rendered content plus timestamps. Forms use labels, inline errors,
 a keyboard-accessible error summary and focused first invalid field. Markdown uses
 a textarea and safe preview. Enums use explicit choices; enquiryUrl and optional
 fields can be cleared. Forms distinguish omitted fields from explicit null/empty values.

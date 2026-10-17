@@ -28,7 +28,7 @@ pages through the normal runtime contracts in one transaction.
 | `/products` | Published offerings, title ascending then ID, pagination |
 | `/products/:slug` | Published offering, optional safe enquiry link, or 404 |
 | `/admin/login` | Staff login |
-| `/admin` | Links to content management and the operator's settings |
+| `/admin` | Dashboard: counts per content type, links to manage and add each, and settings |
 | `/admin/{pages,posts,products}` | Authorized generated content management views |
 | `/admin/users/:id` and `/admin/users/:id/edit` | Settings (username, display name, password change) and display-name edit |
 

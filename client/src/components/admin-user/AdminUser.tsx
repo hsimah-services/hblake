@@ -1,7 +1,7 @@
 import { useRef, useState, type FormEvent } from 'react';
 import { usePreloadedQuery, type PreloadedQuery } from 'react-relay';
 import { Button, Heading, Link, Stack, TextInput } from '@astryxdesign/core';
-import { Layout } from '../layout/Layout';
+import { AdminLayout } from '../admin-layout/AdminLayout';
 import { ADMIN_USER_QUERY } from './AdminUserQuery';
 import type { AdminUserQuery } from './__generated__/AdminUserQuery.graphql';
 import { useAdminUserRouteContext, RouteName, AdminUserDetailURI, AdminUserEditURI } from '../../routes/__generated__/routes';
@@ -13,7 +13,7 @@ const PASSWORD_FIELDS = ['currentPassword', 'newPassword', 'confirmPassword'] as
 
 export function AdminUser({ queryRef }: AdminUserProps) {
   const screen = useAdminUser(queryRef);
-  return <Layout data={screen.data} title={screen.title} admin>{screen.row ? screen.route.currentRoute === RouteName.AdminUserEdit ? <>
+  return <AdminLayout data={screen.data} section="settings" title={screen.title}>{screen.row ? screen.route.currentRoute === RouteName.AdminUserEdit ? <>
     <Heading level={1}>Edit display name</Heading><ContentForm kind="User" row={screen.row} save={screen.save} detail={id => AdminUserDetailURI.getURI({ id })} />
   </> : <Stack gap={6} align="stretch">
     <Heading level={1}>Settings</Heading>
@@ -24,7 +24,7 @@ export function AdminUser({ queryRef }: AdminUserProps) {
       <Link href={AdminUserEditURI.getURI({ id: screen.row.id })}>Edit display name</Link>
     </Stack></section>
     <AdminUser_PasswordForm />
-  </Stack> : <Heading level={1}>Not found</Heading>}</Layout>;
+  </Stack> : <Heading level={1}>Not found</Heading>}</AdminLayout>;
 }
 
 function AdminUser_PasswordForm() {

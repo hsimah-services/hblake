@@ -1,6 +1,6 @@
 /**
- * @generated SignedSource<<354e07245c1922f42eb602552de602ad>>
- * @relayHash fae72bd615ed872e7c91a92fb7f6868f
+ * @generated SignedSource<<e55ab1ac8222d48dcd02dde43d86d760>>
+ * @relayHash e2c07990c6624cadc34e0c9ad727587d
  * @lightSyntaxTransform
  */
 
@@ -8,7 +8,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-// @relayRequestID fae72bd615ed872e7c91a92fb7f6868f
+// @relayRequestID e2c07990c6624cadc34e0c9ad727587d
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
@@ -17,7 +17,7 @@ export type AdminProductCreateQuery$data = {
   readonly viewer: {
     readonly id: string | null | undefined;
   } | null | undefined;
-  readonly " $fragmentSpreads": FragmentRefs<"LayoutFragment">;
+  readonly " $fragmentSpreads": FragmentRefs<"AdminLayoutFragment">;
 };
 export type AdminProductCreateQuery = {
   response: AdminProductCreateQuery$data;
@@ -36,19 +36,17 @@ v1 = [
   {
     "kind": "Literal",
     "name": "first",
-    "value": 100
+    "value": 1
   }
 ],
-v2 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "status",
-  "storageKey": null
-},
-v3 = [
-  (v2/*:: as any*/),
-  (v0/*:: as any*/)
+v2 = [
+  {
+    "alias": null,
+    "args": null,
+    "kind": "ScalarField",
+    "name": "totalCount",
+    "storageKey": null
+  }
 ];
 return {
   "fragment": {
@@ -60,7 +58,7 @@ return {
       {
         "args": null,
         "kind": "FragmentSpread",
-        "name": "LayoutFragment"
+        "name": "AdminLayoutFragment"
       },
       {
         "alias": null,
@@ -99,110 +97,53 @@ return {
             "kind": "ScalarField",
             "name": "displayName",
             "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "role",
-            "storageKey": null
           }
         ],
         "storageKey": null
       },
       {
-        "alias": "navigationPages",
+        "alias": "pageCount",
         "args": (v1/*:: as any*/),
         "concreteType": "RootQueryToPageConnection",
         "kind": "LinkedField",
         "name": "pages",
         "plural": false,
-        "selections": [
-          {
-            "alias": null,
-            "args": null,
-            "concreteType": "Page",
-            "kind": "LinkedField",
-            "name": "nodes",
-            "plural": true,
-            "selections": [
-              (v0/*:: as any*/),
-              {
-                "alias": null,
-                "args": null,
-                "kind": "ScalarField",
-                "name": "title",
-                "storageKey": null
-              },
-              {
-                "alias": null,
-                "args": null,
-                "kind": "ScalarField",
-                "name": "slug",
-                "storageKey": null
-              },
-              (v2/*:: as any*/)
-            ],
-            "storageKey": null
-          }
-        ],
-        "storageKey": "pages(first:100)"
+        "selections": (v2/*:: as any*/),
+        "storageKey": "pages(first:1)"
       },
       {
-        "alias": "navigationPosts",
+        "alias": "postCount",
         "args": (v1/*:: as any*/),
         "concreteType": "RootQueryToPostConnection",
         "kind": "LinkedField",
         "name": "posts",
         "plural": false,
-        "selections": [
-          {
-            "alias": null,
-            "args": null,
-            "concreteType": "Post",
-            "kind": "LinkedField",
-            "name": "nodes",
-            "plural": true,
-            "selections": (v3/*:: as any*/),
-            "storageKey": null
-          }
-        ],
-        "storageKey": "posts(first:100)"
+        "selections": (v2/*:: as any*/),
+        "storageKey": "posts(first:1)"
       },
       {
-        "alias": "navigationProducts",
+        "alias": "productCount",
         "args": (v1/*:: as any*/),
         "concreteType": "RootQueryToProductConnection",
         "kind": "LinkedField",
         "name": "products",
         "plural": false,
-        "selections": [
-          {
-            "alias": null,
-            "args": null,
-            "concreteType": "Product",
-            "kind": "LinkedField",
-            "name": "nodes",
-            "plural": true,
-            "selections": (v3/*:: as any*/),
-            "storageKey": null
-          }
-        ],
-        "storageKey": "products(first:100)"
+        "selections": (v2/*:: as any*/),
+        "storageKey": "products(first:1)"
       }
     ]
   },
   "params": {
-    "cacheID": "fae72bd615ed872e7c91a92fb7f6868f",
-    "id": "fae72bd615ed872e7c91a92fb7f6868f",
+    "cacheID": "e2c07990c6624cadc34e0c9ad727587d",
+    "id": "e2c07990c6624cadc34e0c9ad727587d",
     "metadata": {},
     "name": "AdminProductCreateQuery",
     "operationKind": "query",
-    "text": "query AdminProductCreateQuery {\n  ...LayoutFragment\n  viewer {\n    id\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n"
+    "text": "query AdminProductCreateQuery {\n  ...AdminLayoutFragment\n  viewer {\n    id\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  postCount: posts(first: 1) {\n    totalCount\n  }\n  productCount: products(first: 1) {\n    totalCount\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "fd97d808cdb771713e1255fca996877d";
+(node as any).hash = "2d3ae37b23b336711d80cca9657a4778";
 
 export default node;

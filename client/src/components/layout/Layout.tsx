@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
-import { useLocation, useNavigate } from 'react-router';
+import { useLocation } from 'react-router';
 import { graphql, useFragment } from 'react-relay';
-import { Link, Button, ButtonGroup, IconButton, Stack } from '@astryxdesign/core';
+import { Link, Button, Stack } from '@astryxdesign/core';
 import * as stylex from '@stylexjs/stylex';
-import { HomeURI, PageURI, PostListURI, ProductListURI, LoginURI, AdminHomeURI } from '../../routes/__generated__/routes';
+import { HomeURI, PageURI, PostListURI, ProductListURI, AdminHomeURI } from '../../routes/__generated__/routes';
 import { SITE_NAME } from '../../SiteName';
-import { authRequest } from '../../authRequest';
 import { useColorMode } from '../../useColorMode';
-import { useMotion } from '../../useMotion';
+import { useDocumentMetadata, type useDocumentMetadataRow } from '../../useDocumentMetadata';
+import { useSignOut } from '../../useSignOut';
+import { DisplayPreferences } from '../display-preferences/DisplayPreferences';
 import type { LayoutFragment$key } from './__generated__/LayoutFragment.graphql';
 
 // Navigation hover colours match the home page tiles; other links use the neutral ink tone.
@@ -53,12 +54,8 @@ export function Layout({ data, row, title, admin = false, children }: LayoutProp
         </div>
       </nav>
       <Stack direction="horizontal" gap={2} align="center" xstyle={styles.tools}>
-        {/* One Tab stop; arrow keys move between the two toggles. */}
-        <ButtonGroup label="Display preferences" xstyle={styles.preferences}>
-          <IconButton label={layout.colorMode.label} tooltip={layout.colorMode.label} variant="ghost" icon={layout.colorMode.dark ? <Layout_SunIcon /> : <Layout_MoonIcon />} onClick={layout.colorMode.toggle} xstyle={[styles.iconTarget, styles.preference, tones.ink]} />
-          <IconButton label={layout.motion.label} tooltip={layout.motion.label} variant="ghost" icon={layout.motion.reduced ? <Layout_PlayIcon /> : <Layout_PauseIcon />} onClick={layout.motion.toggle} xstyle={[styles.iconTarget, styles.preference, tones.ink]} />
-        </ButtonGroup>
-        {layout.viewer && <Button label="Sign out" clickAction={layout.signOut} isDisabled={!layout.csrf} />}
+        <DisplayPreferences />
+        {layout.viewer && <Button label="Sign out" clickAction={layout.signOut} isDisabled={!layout.signOutReady} />}
       </Stack>
     </div></header>
     <main>{layout.notice && <p role="status">{layout.notice}</p>}{layout.error && <p role="alert">{layout.error}</p>}{children}</main>
@@ -66,7 +63,7 @@ export function Layout({ data, row, title, admin = false, children }: LayoutProp
       <p>© {new Date().getFullYear()} {SITE_NAME}</p>
       <Stack direction="horizontal" gap={4} xstyle={styles.footerLinks}>
         <Link href="https://hsimah.com" label="hsimah.com — personal blog" target="_blank" rel="noopener noreferrer" xstyle={styles.iconLink}>
-          <img src={layout.colorMode.dark ? '/assets/hsimah-dark.svg' : '/assets/hsimah-light.svg'} alt="" width={28} height={28} />
+          <img src={layout.dark ? '/assets/hsimah-dark.svg' : '/assets/hsimah-light.svg'} alt="" width={28} height={28} />
         </Link>
         <Link href="https://github.com/hsimah-services" label="hsimah-services on GitHub" target="_blank" rel="noopener noreferrer" xstyle={styles.iconLink}>
           <img src="/assets/github.svg" alt="" width={28} height={28} {...stylex.props(styles.githubIcon)} />
@@ -79,26 +76,9 @@ export function Layout({ data, row, title, admin = false, children }: LayoutProp
   </Stack>;
 }
 
-function Layout_MoonIcon() {
-  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>;
-}
-
-function Layout_PauseIcon() {
-  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5" /><path d="M10 9v6M14 9v6" /></svg>;
-}
-
-function Layout_PlayIcon() {
-  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5" /><path d="m10 8.5 5.5 3.5-5.5 3.5z" /></svg>;
-}
-
-function Layout_SunIcon() {
-  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5" /><path d="M12 1.5v2.5M12 20v2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M1.5 12H4M20 12h2.5M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8" /></svg>;
-}
-
-function useLayout(key: LayoutFragment$key, row: LayoutRow | null | undefined, title: string | undefined, admin: boolean) {
+function useLayout(key: LayoutFragment$key, row: useDocumentMetadataRow | null | undefined, title: string | undefined, admin: boolean) {
   const data = useFragment(LAYOUT_FRAGMENT, key);
-  const location = useLocation(); const navigate = useNavigate();
-  const [csrf, setCsrf] = useState(''); const [error, setError] = useState('');
+  const location = useLocation();
   const navigation: NavigationLink[] = data.navigationPages?.nodes?.filter(value => value?.status === 'PUBLISHED' && value.slug !== 'home').map(value => ({ title: value!.title, href: PageURI.getURI({ slug: value!.slug }), tone: NAVIGATION_TONES[value!.slug] ?? 'ink' })) ?? [];
   const order = ['about', 'frameworks', 'portfolio', 'contact'].map(slug => PageURI.getURI({ slug }));
   navigation.sort((a, b) => {
@@ -107,21 +87,12 @@ function useLayout(key: LayoutFragment$key, row: LayoutRow | null | undefined, t
   });
   if (data.navigationPosts?.nodes?.some(value => value?.status === 'PUBLISHED')) navigation.push({ title: 'Posts', href: PostListURI.getURI({}), tone: 'ink' });
   if (data.navigationProducts?.nodes?.some(value => value?.status === 'PUBLISHED')) navigation.push({ title: 'Products', href: ProductListURI.getURI({}), tone: 'ink' });
-  useEffect(() => { updateMetadata(row, title, location.pathname, admin); }, [row, title, location.pathname, admin]);
-  useEffect(() => {
-    if (!data.viewer) return;
-    let active = true;
-    fetch('/auth/csrf', { credentials: 'same-origin', cache: 'no-store' }).then(response => response.json()).then((value: { token: string }) => { if (active) setCsrf(value.token); }).catch(() => { if (active) setError('Could not prepare sign out. Reload and try again.'); });
-    return () => { active = false; };
-  }, [data.viewer]);
-  async function signOut() { await authRequest('logout', undefined, csrf); navigate(LoginURI.getURI({})); }
+  useDocumentMetadata(row, title, admin);
+  const session = useSignOut(data.viewer != null);
   const marked = navigation.map(link => ({ ...link, current: currentOf(link.href, location.pathname) }));
   const menu = useMenu(location.pathname);
-  const mode = useColorMode();
-  const colorMode = { dark: mode.dark, toggle: mode.toggle, label: mode.dark ? 'Switch to light mode' : 'Switch to dark mode' };
-  const animation = useMotion();
-  const motion = { reduced: animation.reduced, toggle: animation.toggle, label: animation.reduced ? 'Turn on animations' : 'Turn off animations' };
-  return { navigation: marked, homeCurrent: currentOf('/', location.pathname), menu, colorMode, motion, viewer: data.viewer, csrf, error, signOut, notice: (location.state as { notice?: string } | null)?.notice };
+  const dark = useColorMode().dark;
+  return { navigation: marked, homeCurrent: currentOf('/', location.pathname), menu, dark, viewer: data.viewer, error: session.error, signOut: session.signOut, signOutReady: session.ready, notice: (location.state as { notice?: string } | null)?.notice };
 }
 
 // The mobile disclosure menu: Escape or a click outside closes it and returns focus to
@@ -149,30 +120,9 @@ function currentOf(href: string, path: string): 'page' | 'true' | undefined {
   return href !== '/' && path.startsWith(`${href}/`) ? 'true' : undefined;
 }
 
-// `heading` names screens without a content row (lists, forms, admin home); a missing
-// row on a content route is the only "Not found".
-function updateMetadata(row: LayoutRow | null | undefined, heading: string | undefined, path: string, admin: boolean) {
-  const title = heading ?? (typeof row?.title === 'string' ? row.title : path === '/' ? SITE_NAME : 'Not found');
-  document.title = `${title} | ${SITE_NAME}`;
-  setMeta('description', typeof row?.excerpt === 'string' ? row.excerpt : '');
-  setMeta('og:title', title, true);
-  setMeta('robots', admin || row?.status === 'DRAFT' ? 'noindex, nofollow' : 'index, follow');
-  let canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
-  if (!canonical) { canonical = document.createElement('link'); canonical.rel = 'canonical'; document.head.append(canonical); }
-  canonical.href = window.location.origin + (path === PageURI.getURI({ slug: 'home' }) ? '/' : path);
-}
-
-function setMeta(name: string, content: string, property = false) {
-  const attribute = property ? 'property' : 'name';
-  let tag = document.querySelector<HTMLMetaElement>(`meta[${attribute}="${name}"]`);
-  if (!tag) { tag = document.createElement('meta'); tag.setAttribute(attribute, name); document.head.append(tag); }
-  tag.content = content;
-}
-
 type NavigationTone = 'green' | 'orange' | 'blue' | 'berry' | 'ink';
 type NavigationLink = { title: string; href: string; tone: NavigationTone };
-type LayoutRow = { readonly title?: unknown; readonly excerpt?: unknown; readonly status?: unknown };
-type LayoutProps = { data: LayoutFragment$key; row?: LayoutRow | null; title?: string; admin?: boolean; children: ReactNode };
+type LayoutProps = { data: LayoutFragment$key; row?: useDocumentMetadataRow | null; title?: string; admin?: boolean; children: ReactNode };
 
 const styles = stylex.create({
   shell: { width: '100%', maxWidth: '72rem', minHeight: '100vh', marginInline: 'auto', padding: { default: 'var(--spacing-6)', '@media (max-width: 760px)': '1rem' }, boxSizing: 'border-box' },
@@ -203,16 +153,6 @@ const styles = stylex.create({
     boxShadow: { default: 'none', '@media (max-width: 760px)': '0 16px 40px -20px rgb(0 0 0 / 0.6)' },
   },
   tools: { flexShrink: 0 },
-  // One pill around both toggles, with a hairline divider between them. The buttons
-  // round their own outer corners rather than the group clipping them, so focus
-  // outlines stay visible.
-  preferences: { borderWidth: '1px', borderStyle: 'solid', borderColor: 'var(--site-hairline)', borderRadius: '999px' },
-  preference: {
-    borderColor: 'var(--site-hairline)',
-    // Of-type, because each button's tooltip renders as a sibling inside the group.
-    borderStartStartRadius: { default: 0, ':first-of-type': '999px' }, borderEndStartRadius: { default: 0, ':first-of-type': '999px' },
-    borderStartEndRadius: { default: 0, ':last-of-type': '999px' }, borderEndEndRadius: { default: 0, ':last-of-type': '999px' },
-  },
   // The background fades in and a 2px underline grows out from the middle on hover and
   // focus, shrinking back to the middle on leave. The underline is a centred gradient
   // whose width animates. --site-motion is near zero when animations are off.
