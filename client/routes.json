@@ -92,6 +92,10 @@
         "status": {
           "kind": "string",
           "optional": true
+        },
+        "q": {
+          "kind": "string",
+          "optional": true
         }
       },
       "query": "AdminPageListQuery"
@@ -137,6 +141,10 @@
         "status": {
           "kind": "string",
           "optional": true
+        },
+        "q": {
+          "kind": "string",
+          "optional": true
         }
       },
       "query": "AdminPostListQuery"
@@ -180,6 +188,10 @@
           "optional": true
         },
         "status": {
+          "kind": "string",
+          "optional": true
+        },
+        "q": {
           "kind": "string",
           "optional": true
         }

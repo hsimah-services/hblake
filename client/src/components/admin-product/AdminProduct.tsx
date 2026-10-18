@@ -23,12 +23,14 @@ function AdminProduct_List({ queryRef }: { queryRef: PreloadedQuery<AdminProduct
   const mutate = AdminProductMutation();
   const route = useAdminProductRouteContext();
   const status = 'status' in route.input && typeof route.input.status === 'string' ? route.input.status : undefined;
+  const q = 'q' in route.input && typeof route.input.q === 'string' ? route.input.q : undefined;
   return <AdminLayout data={data} section="products" title="Products">
     <AdminTable kind="Product" plural="Products" rows={data.products?.nodes}
       create={AdminProductCreateURI.getURI({})} detail={id => AdminProductDetailURI.getURI({ id })} edit={id => AdminProductEditURI.getURI({ id })}
       remove={id => mutate('delete', { id })}
-      status={status} filtered={value => AdminProductListURI.getURI({ status: value })}
-      next={data.products?.pageInfo.hasNextPage ? AdminProductListURI.getURI({ after: data.products.pageInfo.endCursor ?? undefined, status }) : undefined} />
+      status={status} q={q} listUrl={params => AdminProductListURI.getURI(params)}
+      publish={row => mutate(row.status === 'PUBLISHED' ? 'unpublish' : 'publish', { id: row.id })}
+      next={data.products?.pageInfo.hasNextPage ? AdminProductListURI.getURI({ after: data.products.pageInfo.endCursor ?? undefined, status, q }) : undefined} />
   </AdminLayout>;
 }
 
@@ -50,7 +52,8 @@ function AdminProduct_Content({ queryRef }: { queryRef: PreloadedQuery<AdminProd
   return <AdminLayout data={data} section="products" row={row} title={editing ? `Edit ${row.title}` : undefined}>
     {editing ? <>
       <Heading level={1}>Edit product</Heading>
-      <ContentForm key={row.id} kind="Product" row={row} save={save} detail={id => AdminProductDetailURI.getURI({ id })} />
+      <ContentForm key={row.id} kind="Product" row={row} save={save} detail={id => AdminProductDetailURI.getURI({ id })}
+        publication={{ status: row.status, toggle: () => mutate(row.status === 'PUBLISHED' ? 'unpublish' : 'publish', { id: row.id }) }} />
     </> : <AdminDetail kind="Product" row={row} edit={AdminProductEditURI.getURI({ id: row?.id ?? '' })} list={AdminProductListURI.getURI({})} mutate={mutate} />}
   </AdminLayout>;
 }

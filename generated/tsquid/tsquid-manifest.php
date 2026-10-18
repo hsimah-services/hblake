@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   tsquid-manifest.php
- * digest: sha256:1a47b4efce3bd50a37b7058c8440cb8e70e942aa9ffe4d5d0ed113e8fa7bf506
+ * digest: sha256:3771f65ea231a49eaa8a7fd38099d83d2c590bd1dda34fea5ed1411a36e7d922
  */
 
 return new \Eleph\Tsquid\Manifest((object) ['routes' => [(object) ['fields' => (object) [], 'name' => 'Home', 'path' => '/', 'query' => (object) ['id' => '8377941fd17bab39b9523077363b7cf4', 'operation' => 'HomeQuery', 'text' => 'query HomeQuery {
@@ -117,7 +117,7 @@ fragment LayoutFragment on RootQuery {
     }
   }
 }
-', 'variables' => (object) ['slug' => (object) ['input' => 'slug']]], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'PostList', 'path' => '/news', 'query' => (object) ['id' => '5c0947501fc7618f64548214828e1f09', 'operation' => 'PostListQuery', 'text' => 'query PostListQuery(
+', 'variables' => (object) ['slug' => (object) ['input' => 'slug']]], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'PostList', 'path' => '/news', 'query' => (object) ['id' => 'a650fc157b0dd1ea549ff5d8546f391b', 'operation' => 'PostListQuery', 'text' => 'query PostListQuery(
   $after: String
 ) {
   ...LayoutFragment
@@ -127,7 +127,9 @@ fragment LayoutFragment on RootQuery {
       title
       slug
       excerpt
+      content
       status
+      publishedAt
       author {
         displayName
       }
@@ -166,7 +168,7 @@ fragment LayoutFragment on RootQuery {
     }
   }
 }
-', 'variables' => (object) ['after' => (object) ['input' => 'after']]], 'ssr' => true], (object) ['fields' => (object) ['slug' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'Post', 'path' => '/news/:slug', 'query' => (object) ['id' => '460afd8126de35665089ff76542d2a9e', 'operation' => 'PostQuery', 'text' => 'query PostQuery(
+', 'variables' => (object) ['after' => (object) ['input' => 'after']]], 'ssr' => true], (object) ['fields' => (object) ['slug' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'Post', 'path' => '/news/:slug', 'query' => (object) ['id' => '002c91e27921e3e48404b6295a94a4b2', 'operation' => 'PostQuery', 'text' => 'query PostQuery(
   $slug: String!
 ) {
   ...LayoutFragment
@@ -182,6 +184,14 @@ fragment LayoutFragment on RootQuery {
     updatedAt
     author {
       displayName
+    }
+  }
+  newsOrder: posts(first: 100) {
+    nodes {
+      slug
+      title
+      status
+      id
     }
   }
 }
@@ -335,7 +345,7 @@ fragment LayoutFragment on RootQuery {
     }
   }
 }
-', 'variables' => (object) []], 'ssr' => true], (object) ['fields' => (object) [], 'name' => 'AdminHome', 'path' => '/admin', 'query' => (object) ['id' => '51dfec26dd48f849d5d67de85d1bfbf3', 'operation' => 'AdminQuery', 'text' => 'query AdminQuery {
+', 'variables' => (object) []], 'ssr' => true], (object) ['fields' => (object) [], 'name' => 'AdminHome', 'path' => '/admin', 'query' => (object) ['id' => 'b70a123f9323c35adc2c338bc7bcab1b', 'operation' => 'AdminQuery', 'text' => 'query AdminQuery {
   ...AdminLayoutFragment
   viewer {
     id
@@ -343,22 +353,28 @@ fragment LayoutFragment on RootQuery {
   pages(first: 100) {
     totalCount
     nodes {
-      status
       id
+      title
+      status
+      updatedAt
     }
   }
   posts(first: 100) {
     totalCount
     nodes {
-      status
       id
+      title
+      status
+      updatedAt
     }
   }
   products(first: 100) {
     totalCount
     nodes {
-      status
       id
+      title
+      status
+      updatedAt
     }
   }
 }
@@ -378,7 +394,7 @@ fragment AdminLayoutFragment on RootQuery {
     totalCount
   }
 }
-', 'variables' => (object) []], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true], 'status' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'AdminPageList', 'path' => '/admin/pages', 'query' => (object) ['id' => '12cfe7b9258ead963a590592ea023a28', 'operation' => 'AdminPageListQuery', 'text' => 'query AdminPageListQuery(
+', 'variables' => (object) []], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true], 'q' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true], 'status' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'AdminPageList', 'path' => '/admin/pages', 'query' => (object) ['id' => '12cfe7b9258ead963a590592ea023a28', 'operation' => 'AdminPageListQuery', 'text' => 'query AdminPageListQuery(
   $after: String
 ) {
   ...AdminLayoutFragment
@@ -498,7 +514,7 @@ fragment AdminLayoutFragment on RootQuery {
     totalCount
   }
 }
-', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true], 'status' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'AdminPostList', 'path' => '/admin/news', 'query' => (object) ['id' => 'dff86c06acb2c466cabe1662792b5987', 'operation' => 'AdminPostListQuery', 'text' => 'query AdminPostListQuery(
+', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true], 'q' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true], 'status' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'AdminPostList', 'path' => '/admin/news', 'query' => (object) ['id' => 'dff86c06acb2c466cabe1662792b5987', 'operation' => 'AdminPostListQuery', 'text' => 'query AdminPostListQuery(
   $after: String
 ) {
   ...AdminLayoutFragment
@@ -619,7 +635,7 @@ fragment AdminLayoutFragment on RootQuery {
     totalCount
   }
 }
-', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true], 'status' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'AdminProductList', 'path' => '/admin/products', 'query' => (object) ['id' => '913a8cc640ffe8bc7bb23bab5533e0fd', 'operation' => 'AdminProductListQuery', 'text' => 'query AdminProductListQuery(
+', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true], 'q' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true], 'status' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'AdminProductList', 'path' => '/admin/products', 'query' => (object) ['id' => '913a8cc640ffe8bc7bb23bab5533e0fd', 'operation' => 'AdminProductListQuery', 'text' => 'query AdminProductListQuery(
   $after: String
 ) {
   ...AdminLayoutFragment

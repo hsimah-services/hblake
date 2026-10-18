@@ -1,11 +1,22 @@
 <?php
 declare(strict_types=1);
 require dirname(__DIR__,2).'/vendor/autoload.php';
-use Hsimah\{App, Auth, GraphQLEndpoint, Http, Media};
+use Hsimah\{Actor, App, Auth, GraphQLEndpoint, Http, Media, NewsFeed};
 use Eleph\Tsquid\{InitialData, Manifest};
 use GraphQL\Language\Parser;
 
 $path=parse_url(Http::server('REQUEST_URI') ?: '/',PHP_URL_PATH);
+// The News Atom feed, built from public data only.
+if ($path==='/news/feed.xml') {
+    try {
+        $host=parse_url('http://'.Http::server('HTTP_HOST'),PHP_URL_HOST);
+        $https=strtolower(Http::server('HTTPS'));
+        $scheme=($https!=='' && $https!=='off') || !in_array($host,['localhost','127.0.0.1','[::1]'],true) ? 'https' : 'http';
+        $feed=NewsFeed::render(new App(App::database(),new Actor()),$scheme.'://'.Http::server('HTTP_HOST'));
+        header('Content-Type: application/atom+xml; charset=utf-8'); header('Cache-Control: public, max-age=300'); echo $feed;
+    } catch (\Throwable $error) { error_log((string)$error); http_response_code(503); header('Content-Type: text/plain'); echo 'Feed unavailable'; }
+    return;
+}
 // Posts became News: keep old links working with a permanent redirect.
 if (preg_match('#^/(admin/)?posts(/.*)?$#D',(string)$path,$old)===1) {
     $query=parse_url(Http::server('REQUEST_URI') ?: '/',PHP_URL_QUERY);

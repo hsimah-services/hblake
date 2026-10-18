@@ -5,6 +5,8 @@ Owner-provided launch content consists of Home, About, Frameworks, Portfolio and
 Contact us. The homepage shows four large coloured links to those pages, followed
 by the latest published post ("Latest news") when one exists. News and Products may
 remain empty. Posts are presented to visitors and in the admin as News.
+News carries hbla.ke's business and technical writing; personal writing stays on
+hsimah.com, which the footer links. The two do not otherwise cross-link.
 
 The header provides understated page navigation. The footer includes copyright,
 icon links to hsimah.com, hsimah-services on GitHub and Hamish’s LinkedIn.
@@ -25,6 +27,7 @@ pages through the normal runtime contracts in one transaction.
 | `/` | Published Page with slug `home`; meaningful unavailable state if absent |
 | `/pages/:slug` | Published Page by exact slug; home redirects to `/` |
 | `/news` | Published posts as News, newest first, cursor pagination, empty state |
+| `/news/feed.xml` | Atom feed of published News, newest first |
 | `/news/:slug` | Published post or 404. Old `/posts…` and `/admin/posts…` URLs redirect (301) to `/news…` and `/admin/news…` |
 | `/products` | Published offerings, title ascending then ID, pagination |
 | `/products/:slug` | Published offering, optional safe enquiry link, or 404 |

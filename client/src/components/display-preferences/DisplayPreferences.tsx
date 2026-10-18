@@ -3,13 +3,33 @@ import * as stylex from '@stylexjs/stylex';
 import { useColorMode } from '../../useColorMode';
 import { useMotion } from '../../useMotion';
 
-/** The colour mode and animation toggles: one Tab stop, arrow keys between them, 44px targets. */
-export function DisplayPreferences() {
+/**
+ * The colour mode and animation toggles, then a link to the other side of the site (Admin
+ * from the public site, View site from the admin) and Sign out when someone is signed in:
+ * one Tab stop, arrow keys between them, 44px targets.
+ */
+export function DisplayPreferences({ destination, signOut }: DisplayPreferencesProps) {
   const preferences = useDisplayPreferences();
-  return <ButtonGroup label="Display preferences" xstyle={styles.group}>
+  return <ButtonGroup label="Display and account" xstyle={styles.group}>
     <IconButton label={preferences.colorLabel} tooltip={preferences.colorLabel} variant="ghost" icon={preferences.dark ? <DisplayPreferences_SunIcon /> : <DisplayPreferences_MoonIcon />} onClick={preferences.toggleColor} xstyle={styles.button} />
     <IconButton label={preferences.motionLabel} tooltip={preferences.motionLabel} variant="ghost" icon={preferences.reduced ? <DisplayPreferences_PlayIcon /> : <DisplayPreferences_PauseIcon />} onClick={preferences.toggleMotion} xstyle={styles.button} />
+    {destination && <IconButton href={destination.href} label={destination.label} tooltip={destination.label} variant="ghost" icon={destination.label === 'Admin' ? <DisplayPreferences_AdminIcon /> : <DisplayPreferences_SiteIcon />} xstyle={styles.button} />}
+    {signOut && <IconButton label="Sign out" tooltip="Sign out" variant="ghost" icon={<DisplayPreferences_SignOutIcon />} clickAction={signOut.action} isDisabled={!signOut.ready} xstyle={styles.button} />}
   </ButtonGroup>;
+}
+
+export type DisplayPreferencesProps = { destination?: { href: string; label: 'Admin' | 'View site' }; signOut?: { action: () => Promise<void>; ready: boolean } };
+
+function DisplayPreferences_AdminIcon() {
+  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z" /></svg>;
+}
+
+function DisplayPreferences_SiteIcon() {
+  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" /></svg>;
+}
+
+function DisplayPreferences_SignOutIcon() {
+  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l-5-5 5-5M5 12h11" /></svg>;
 }
 
 function DisplayPreferences_MoonIcon() {

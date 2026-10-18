@@ -23,6 +23,16 @@ Documentation and source were inspected at these commits on 2026-10-10:
 
 The reports include evidence, concrete solutions, acceptance checks and compatibility
 implications. Admin generation remains a blocker for claiming generated forms.
+
+**Admin revamp decision (hblake #15):** the WordPress-style admin stays hand-built for
+now rather than waiting for tsquid #7. It is the reference the generator should be able
+to reproduce, and feeds these requirements into #7: an AppShell with a content-type
+sidebar and per-type counts; list tables with the admin.yml columns, sortable headers,
+status and title filters in the URL, and per-row edit, publish/unpublish and delete with
+an accessible confirmation; a two-column edit form with a publishing side panel; a
+dashboard with per-status counts and recently edited records; relative timestamps with
+an accessible absolute time. Filtering and sorting are client-side over the loaded page
+until the list queries accept status, search and order arguments.
 Neither concurrency support nor improved paging blocks v1. Publication fields stay
 in generated inputs until #103; v1 verifiers require draft/null on create and the
 appropriate declared action for field changes. No unsupported write-visibility key

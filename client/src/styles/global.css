@@ -50,11 +50,11 @@ body {
   background-attachment: fixed;
 }
 
-/* The admin is a working tool: square it off. Every Astryx radius drops to a few pixels
-   (pills and badges included) while an admin screen is mounted. The second selector
-   reaches past the theme element, which redeclares the radii for its subtree. */
-html[data-surface="admin"],
-html[data-surface="admin"] [data-astryx-theme] {
+/* Crisp corners everywhere: every Astryx radius drops to a few pixels (pills and badges
+   included). The second selector reaches past the theme element, which redeclares the
+   radii for its subtree. */
+:root,
+[data-astryx-theme] {
   --radius-none: 0px; --radius-inner: 2px; --radius-element: 3px; --radius-container: 4px;
   --radius-page: 0px; --radius-chat: 4px; --radius-full: 3px;
 }

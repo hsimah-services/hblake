@@ -3,9 +3,10 @@ import { Button, Card, Heading, Link, Stack, Text } from '@astryxdesign/core';
 import * as stylex from '@stylexjs/stylex';
 import { AdminLayout } from '../admin-layout/AdminLayout';
 import { AdminIcon } from '../admin-icon/AdminIcon';
+import { AdminTimestamp } from '../admin-timestamp/AdminTimestamp';
 import { ADMIN_QUERY } from './AdminQuery';
 import type { AdminQuery } from './__generated__/AdminQuery.graphql';
-import { AdminPageCreateURI, AdminPageListURI, AdminPostCreateURI, AdminPostListURI, AdminProductCreateURI, AdminProductListURI, AdminUserDetailURI } from '../../routes/__generated__/routes';
+import { AdminPageCreateURI, AdminPageDetailURI, AdminPageListURI, AdminPostCreateURI, AdminPostDetailURI, AdminPostListURI, AdminProductCreateURI, AdminProductDetailURI, AdminProductListURI, AdminUserDetailURI } from '../../routes/__generated__/routes';
 
 export function Admin({ queryRef }: AdminProps) {
   const dashboard = useAdmin(queryRef);
@@ -28,6 +29,16 @@ export function Admin({ queryRef }: AdminProps) {
         </Stack>
       </Card>)}
     </div>
+    <section aria-labelledby="recent-heading">
+      <Heading level={2} id="recent-heading" xstyle={styles.recentHeading}>Recently edited</Heading>
+      {dashboard.recent.length === 0 ? <Text color="secondary">Nothing yet. Start with a new page or article.</Text>
+        : <ul {...stylex.props(styles.recent)}>{dashboard.recent.map(item => <li key={item.id} {...stylex.props(styles.recentItem)}>
+          <AdminIcon name={item.icon} />
+          <Link href={item.href} weight="semibold" color="inherit" xstyle={styles.recentLink}>{item.title}</Link>
+          <Text color="secondary" size="sm">{item.type} · {item.status === 'PUBLISHED' ? 'Published' : 'Draft'} · </Text>
+          <AdminTimestamp value={item.updatedAt} />
+        </li>)}</ul>}
+    </section>
     {dashboard.settings && <Link href={dashboard.settings} hasUnderline xstyle={styles.settings}>Settings</Link>}
   </AdminLayout>;
 }
@@ -44,7 +55,13 @@ function useAdmin(queryRef: PreloadedQuery<AdminQuery>) {
     { plural: 'News', singular: 'article', icon: 'news', tone: 'green', list: AdminPostListURI.getURI({}), publishedList: AdminPostListURI.getURI({ status: 'published' }), draftList: AdminPostListURI.getURI({ status: 'draft' }), create: AdminPostCreateURI.getURI({}), ...count(data.posts) },
     { plural: 'Products', singular: 'product', icon: 'product', tone: 'orange', list: AdminProductListURI.getURI({}), publishedList: AdminProductListURI.getURI({ status: 'published' }), draftList: AdminProductListURI.getURI({ status: 'draft' }), create: AdminProductCreateURI.getURI({}), ...count(data.products) },
   ];
-  return { data, types, settings: data.viewer?.id ? AdminUserDetailURI.getURI({ id: data.viewer.id }) : undefined };
+  // The five most recently updated records of any type.
+  const recent = [
+    ...(data.pages?.nodes ?? []).map(node => node && { ...node, type: 'Page', icon: 'page' as const, href: AdminPageDetailURI.getURI({ id: node.id }) }),
+    ...(data.posts?.nodes ?? []).map(node => node && { ...node, type: 'Article', icon: 'news' as const, href: AdminPostDetailURI.getURI({ id: node.id }) }),
+    ...(data.products?.nodes ?? []).map(node => node && { ...node, type: 'Product', icon: 'product' as const, href: AdminProductDetailURI.getURI({ id: node.id }) }),
+  ].filter(item => item != null).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)).slice(0, 5);
+  return { data, types, recent, settings: data.viewer?.id ? AdminUserDetailURI.getURI({ id: data.viewer.id }) : undefined };
 }
 
 type AdminDashboardType = {
@@ -70,5 +87,12 @@ const styles = stylex.create({
   titleLink: { textDecoration: { default: 'none', ':hover': 'underline', ':focus-visible': 'underline' }, textUnderlineOffset: '0.2em' },
   total: { fontSize: '2rem', fontWeight: 700, lineHeight: 1.1 },
   breakdown: { flexWrap: 'wrap' },
+  recentHeading: { marginTop: '0.5rem', marginBottom: '0.5rem' },
+  recent: { listStyle: 'none', margin: 0, padding: 0, borderWidth: '1px', borderStyle: 'solid', borderColor: 'var(--color-border)', borderRadius: 'var(--radius-container)' },
+  recentItem: {
+    display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.5rem', paddingBlock: '0.6rem', paddingInline: '0.75rem',
+    borderTopWidth: { default: '1px', ':first-child': 0 }, borderTopStyle: 'solid', borderTopColor: 'var(--color-border)',
+  },
+  recentLink: { textDecoration: { default: 'none', ':hover': 'underline', ':focus-visible': 'underline' }, marginInlineEnd: 'auto' },
   settings: { alignSelf: 'flex-start', minHeight: '44px', display: 'inline-flex', alignItems: 'center' },
 });

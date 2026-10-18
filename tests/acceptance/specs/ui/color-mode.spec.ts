@@ -62,9 +62,9 @@ for (const system of ['light', 'dark'] as const) {
 }
 
 test.describe('display preferences', () => {
-  test('the colour mode and animation toggles form one labelled group with arrow-key focus', async ({ page }) => {
+  test('the colour mode and animation toggles form one labelled group with arrow-key focus (plus Sign out when signed in)', async ({ page }) => {
     await page.goto('/');
-    const group = page.getByRole('banner').getByRole('group', { name: 'Display preferences' });
+    const group = page.getByRole('banner').getByRole('group', { name: 'Display and account' });
     const buttons = group.getByRole('button');
     await expect(buttons).toHaveCount(2);
     await expect(buttons.first()).toHaveAccessibleName(/switch to (dark|light) mode/i);

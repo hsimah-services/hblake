@@ -1,6 +1,6 @@
 /**
- * @generated SignedSource<<72c8fc3ca6b114ad0562c5bb320b7e1f>>
- * @relayHash 460afd8126de35665089ff76542d2a9e
+ * @generated SignedSource<<ca4e30e27e9e4af7f92c60069570441f>>
+ * @relayHash 002c91e27921e3e48404b6295a94a4b2
  * @lightSyntaxTransform
  */
 
@@ -8,7 +8,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-// @relayRequestID 460afd8126de35665089ff76542d2a9e
+// @relayRequestID 002c91e27921e3e48404b6295a94a4b2
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
@@ -17,6 +17,13 @@ export type PostQuery$variables = {
   slug: string;
 };
 export type PostQuery$data = {
+  readonly newsOrder: {
+    readonly nodes: ReadonlyArray<{
+      readonly slug: string;
+      readonly status: PublicationStatus;
+      readonly title: string;
+    } | null | undefined> | null | undefined;
+  } | null | undefined;
   readonly postBySlug: {
     readonly author: {
       readonly displayName: string;
@@ -172,7 +179,32 @@ return {
         "kind": "FragmentSpread",
         "name": "LayoutFragment"
       },
-      (v6/*:: as any*/)
+      (v6/*:: as any*/),
+      {
+        "alias": "newsOrder",
+        "args": (v7/*:: as any*/),
+        "concreteType": "RootQueryToPostConnection",
+        "kind": "LinkedField",
+        "name": "posts",
+        "plural": false,
+        "selections": [
+          {
+            "alias": null,
+            "args": null,
+            "concreteType": "Post",
+            "kind": "LinkedField",
+            "name": "nodes",
+            "plural": true,
+            "selections": [
+              (v3/*:: as any*/),
+              (v2/*:: as any*/),
+              (v4/*:: as any*/)
+            ],
+            "storageKey": null
+          }
+        ],
+        "storageKey": "posts(first:100)"
+      }
     ],
     "type": "RootQuery",
     "abstractKey": null
@@ -271,20 +303,46 @@ return {
         ],
         "storageKey": "products(first:100)"
       },
-      (v6/*:: as any*/)
+      (v6/*:: as any*/),
+      {
+        "alias": "newsOrder",
+        "args": (v7/*:: as any*/),
+        "concreteType": "RootQueryToPostConnection",
+        "kind": "LinkedField",
+        "name": "posts",
+        "plural": false,
+        "selections": [
+          {
+            "alias": null,
+            "args": null,
+            "concreteType": "Post",
+            "kind": "LinkedField",
+            "name": "nodes",
+            "plural": true,
+            "selections": [
+              (v3/*:: as any*/),
+              (v2/*:: as any*/),
+              (v4/*:: as any*/),
+              (v1/*:: as any*/)
+            ],
+            "storageKey": null
+          }
+        ],
+        "storageKey": "posts(first:100)"
+      }
     ]
   },
   "params": {
-    "cacheID": "460afd8126de35665089ff76542d2a9e",
-    "id": "460afd8126de35665089ff76542d2a9e",
+    "cacheID": "002c91e27921e3e48404b6295a94a4b2",
+    "id": "002c91e27921e3e48404b6295a94a4b2",
     "metadata": {},
     "name": "PostQuery",
     "operationKind": "query",
-    "text": "query PostQuery(\n  $slug: String!\n) {\n  ...LayoutFragment\n  postBySlug(slug: $slug) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    author {\n      displayName\n    }\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n"
+    "text": "query PostQuery(\n  $slug: String!\n) {\n  ...LayoutFragment\n  postBySlug(slug: $slug) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    author {\n      displayName\n    }\n  }\n  newsOrder: posts(first: 100) {\n    nodes {\n      slug\n      title\n      status\n      id\n    }\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "ffd1c8cfb1cad2149ee32e3351727e77";
+(node as any).hash = "152a385b8f7a08772f5fec20a4f83db7";
 
 export default node;

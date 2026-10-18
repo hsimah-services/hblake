@@ -73,9 +73,26 @@ test.describe('access', () => {
     await expect(main.locator(`a[href="/admin/users/${encodeURIComponent(viewer.id)}"], a[href="/admin/users/${viewer.id}"]`).first()).toBeVisible();
   });
 
+  test('signed in, the header groups dark mode, animations, Admin or View site, and Sign out', async ({ page }) => {
+    await signIn(page);
+    await page.goto('/');
+    const group = page.getByRole('banner').getByRole('group', { name: 'Display and account' });
+    const names = await group.locator('a, button').evaluateAll(controls => controls.map(control => control.getAttribute('aria-label') ?? control.textContent?.trim()));
+    expect(names).toEqual([expect.stringMatching(/switch to (dark|light) mode/i), expect.stringMatching(/turn (on|off) animations/i), 'Admin', 'Sign out']);
+    await group.getByRole('link', { name: 'Admin' }).click();
+    await expect(page).toHaveURL(`${BASE_URL}/admin`);
+    // The admin's group is the inverse: View site in place of Admin.
+    const adminGroup = page.getByRole('banner').getByRole('group', { name: 'Display and account' });
+    const adminNames = await adminGroup.locator('a, button').evaluateAll(controls => controls.map(control => control.getAttribute('aria-label') ?? control.textContent?.trim()));
+    expect(adminNames).toEqual([expect.stringMatching(/switch to (dark|light) mode/i), expect.stringMatching(/turn (on|off) animations/i), 'View site', 'Sign out']);
+    await adminGroup.getByRole('link', { name: 'View site' }).click();
+    await expect(page).toHaveURL(`${BASE_URL}/`);
+  });
+
   test('signing out ends the session', async ({ page }) => {
     await signIn(page);
     await page.goto('/admin');
+    await expect(page.getByRole('group', { name: 'Display and account' }).getByRole('button', { name: 'Sign out' }), 'sign out sits in the header group').toBeVisible();
     await page.getByRole('button', { name: /sign out|log out/i }).or(page.getByRole('link', { name: /sign out|log out/i })).first().click();
     await page.goto('/admin/pages');
     await expect(page).toHaveURL(`${BASE_URL}/admin/login`);

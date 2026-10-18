@@ -1,10 +1,10 @@
-import { useEffect, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { useLocation } from 'react-router';
 import { graphql, useFragment } from 'react-relay';
 import { AppShell } from '@astryxdesign/core/AppShell';
 import { SideNav, SideNavItem, SideNavSection } from '@astryxdesign/core/SideNav';
 import { TopNav } from '@astryxdesign/core/TopNav';
-import { Badge, Button, Link, Stack, Text } from '@astryxdesign/core';
+import { Badge, Link, Stack, Text } from '@astryxdesign/core';
 import * as stylex from '@stylexjs/stylex';
 import { AdminHomeURI, AdminPageListURI, AdminPostListURI, AdminProductListURI, AdminUserDetailURI, HomeURI } from '../../routes/__generated__/routes';
 import { SITE_NAME } from '../../SiteName';
@@ -26,9 +26,7 @@ export function AdminLayout({ data, section, title, row, children }: AdminLayout
   const layout = useAdminLayout(data, row, title);
   return <AppShell
     topNav={<TopNav label="Site tools" heading={<AdminLayout_Brand />} endContent={<Stack direction="horizontal" gap={2} align="center">
-      <Button href={HomeURI.getURI({})} label="View site" variant="ghost" icon={<AdminIcon name="external" />} xstyle={styles.viewSite} />
-      <DisplayPreferences />
-      {layout.viewer && <Button label="Sign out" icon={<AdminIcon name="signOut" />} clickAction={layout.signOut} isDisabled={!layout.signOutReady} />}
+      <DisplayPreferences destination={{ href: HomeURI.getURI({}), label: 'View site' }} signOut={layout.viewer ? { action: layout.signOut, ready: layout.signOutReady } : undefined} />
     </Stack>} />}
     sideNav={<SideNav aria-label="Administration">
       <SideNavSection title="Manage" isHeaderHidden>
@@ -63,11 +61,6 @@ function useAdminLayout(key: AdminLayoutFragment$key, row: useDocumentMetadataRo
   const location = useLocation();
   useDocumentMetadata(row, title, true);
   const session = useSignOut(data.viewer != null);
-  // global.css squares off every radius on the admin surface, dialogs and drawers included.
-  useEffect(() => {
-    document.documentElement.dataset.surface = 'admin';
-    return () => { delete document.documentElement.dataset.surface; };
-  }, []);
   const sections = [
     { section: 'pages', label: 'Pages', href: AdminPageListURI.getURI({}), count: data.pageCount?.totalCount ?? 0, icon: 'page' },
     { section: 'posts', label: 'News', href: AdminPostListURI.getURI({}), count: data.postCount?.totalCount ?? 0, icon: 'news' },
@@ -80,5 +73,4 @@ type AdminLayoutProps = { data: AdminLayoutFragment$key; section: AdminLayoutSec
 
 const styles = stylex.create({
   content: { width: '100%', maxWidth: '72rem', marginInline: 'auto', padding: { default: 'var(--spacing-6)', '@media (max-width: 760px)': '1rem' }, boxSizing: 'border-box' },
-  viewSite: { display: { default: 'inline-flex', '@media (max-width: 480px)': 'none' }, alignItems: 'center', minHeight: '44px', paddingInline: '0.5rem' },
 });

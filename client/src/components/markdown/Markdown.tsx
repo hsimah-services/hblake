@@ -35,6 +35,6 @@ function Markdown_Paragraph({ children }: { children?: React.ReactNode }) {
 const styles = stylex.create({
   heading: { marginTop: '1.5rem', marginBottom: '0.75rem' },
   image: { verticalAlign: 'middle', marginInlineEnd: '0.75rem', objectFit: 'contain' },
-  media: { display: 'block', maxWidth: '100%', height: 'auto', marginBlock: '1.5rem', borderRadius: '0.5rem' },
+  media: { display: 'block', maxWidth: '100%', height: 'auto', marginBlock: '1.5rem', borderRadius: 'var(--radius-element)' },
   paragraph: { marginBlock: '1rem', lineHeight: 1.8 },
 });

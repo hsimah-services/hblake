@@ -173,3 +173,55 @@ test('the dashboard draft count opens the list filtered to drafts', async ({ pag
   await page.getByRole('main').getByRole('link', { name: /^show all news$/i }).click();
   await expect(page).toHaveURL(`${BASE_URL}${adminPath('Post')}`);
 });
+
+test('the edit screen publishes from its side panel, only once changes are saved', async ({ page }) => {
+  const row = await createOk(api, 'Page', { title: `Panel ${RUN_ID}` });
+  await page.goto(`${adminPath('Page')}/${encodeURIComponent(row.id)}/edit`);
+  const panel = page.getByRole('complementary', { name: 'Publishing' });
+  await expect(panel.getByText('Status: Draft')).toBeVisible();
+  await page.getByLabel('Title').fill(`${row.title} changed`);
+  await expect(panel.getByRole('button', { name: 'Publish' }), 'unsaved changes must be saved first').toBeDisabled();
+  await page.getByLabel('Title').fill(row.title);
+  await panel.getByRole('button', { name: 'Publish' }).click();
+  await expect(panel.getByText('Status: Published')).toBeVisible();
+  await expect(panel.getByRole('button', { name: 'Unpublish' })).toBeEnabled();
+  await expect.poll(async () => (await byId(api, 'Page', row.id))?.status).toBe('PUBLISHED');
+});
+
+test('rows publish and unpublish from their actions cell', async ({ page }) => {
+  const row = await createOk(api, 'Product', { title: `Row publish ${RUN_ID}` });
+  const record = await openListAt(page, 'Product', row.title);
+  await record.getByRole('button', { name: `Publish “${row.title}”` }).click();
+  await expect(record.getByRole('button', { name: `Unpublish “${row.title}”` })).toBeVisible();
+  await expect(record.getByText(/^Published$/)).toBeVisible();
+  await expect(page.getByRole('status').filter({ hasText: /published/i })).toBeVisible();
+  await expect.poll(async () => (await byId(api, 'Product', row.id))?.status).toBe('PUBLISHED');
+});
+
+test('status links and title search narrow the list through the URL', async ({ page }) => {
+  await page.goto(`${adminPath('Page')}?status=draft`);
+  const filters = page.getByRole('navigation', { name: 'Filter by status' });
+  await expect(filters.getByRole('link', { name: 'Drafts' })).toHaveAttribute('aria-current', 'page');
+  await expect(filters.getByRole('link', { name: 'All' })).not.toHaveAttribute('aria-current', 'page');
+  await filters.getByRole('link', { name: 'All' }).click();
+  await expect(page).toHaveURL(`${BASE_URL}${adminPath('Page')}`);
+
+  const first = await createOk(api, 'Page', { title: `Findable ${RUN_ID}` });
+  await page.goto(adminPath('Page'));
+  await page.getByRole('search').getByLabel('Search titles').fill(`findable ${RUN_ID}`);
+  await page.getByRole('search').getByRole('button', { name: 'Search' }).click();
+  await expect(page).toHaveURL(new RegExp(`\\?q=`));
+  await expect(page.getByRole('main').getByText(/matching/i)).toBeVisible();
+  const titles = await page.getByRole('main').getByRole('row').locator('td:first-child a').allTextContents();
+  expect(titles.every(title => title.toLowerCase().includes(`findable ${RUN_ID}`.toLowerCase())), titles.join(', ')).toBe(true);
+  expect(first.title).toContain('Findable');
+});
+
+test('the dashboard lists recently edited records, newest first', async ({ page }) => {
+  const row = await createOk(api, 'Page', { title: `Recent ${RUN_ID}` });
+  await page.goto('/admin');
+  const recent = page.getByRole('region', { name: 'Recently edited' });
+  await expect(recent.getByRole('listitem').first()).toContainText(row.title);
+  await recent.getByRole('link', { name: row.title }).click();
+  await expect(page).toHaveURL(`${BASE_URL}${adminPath('Page')}/${encodeURIComponent(row.id)}`);
+});

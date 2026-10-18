@@ -1,5 +1,7 @@
 import { expect, request, test } from '@playwright/test';
 
+import { Api } from '../../lib/api.ts';
+import { createOk, createPublished, uniqueSlug } from '../../lib/content.ts';
 import { BASE_URL } from '../../lib/env.ts';
 
 // Secrets, the database, source and backups are unreachable over HTTP (acceptance 11).
@@ -79,4 +81,25 @@ test('old /posts addresses redirect permanently to /news', async () => {
     expect(response.headers()['location'], from).toBe(to);
   }
   await api.dispose();
+});
+
+test('the News Atom feed lists published articles only, safely escaped', async () => {
+  const operator = await Api.operator();
+  const published = await createPublished(operator, 'Post', { title: `Feed & <friends> ${uniqueSlug()}` });
+  const draft = await createOk(operator, 'Post', { title: `Feed draft ${uniqueSlug()}` });
+  await operator.dispose();
+  const api = await request.newContext({ baseURL: BASE_URL });
+  const response = await api.get('/news/feed.xml');
+  expect(response.status()).toBe(200);
+  expect(response.headers()['content-type']).toMatch(/^application\/atom\+xml/);
+  const body = await response.text();
+  expect(body).toContain('<feed xmlns="http://www.w3.org/2005/Atom">');
+  expect(body).toContain(published.title.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;'));
+  expect(body).toContain(`/news/${published.slug}`);
+  expect(body).not.toContain(draft.title);
+  await api.dispose();
+  // The site advertises it from every page.
+  const page = await request.newContext({ baseURL: BASE_URL });
+  expect(await (await page.get('/')).text()).toContain('type="application/atom+xml"');
+  await page.dispose();
 });

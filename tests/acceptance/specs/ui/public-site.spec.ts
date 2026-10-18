@@ -144,6 +144,26 @@ test.describe('products', () => {
   });
 });
 
+test.describe('news details', () => {
+  test('articles show their date and reading time, and link to newer and older news', async ({ page }) => {
+    const older = await createPublished(api, 'Post', { title: `Older story ${RUN_ID}`, content: `${'word '.repeat(450)}end.` });
+    const newer = await createPublished(api, 'Post', { title: `Newer story ${RUN_ID}` });
+    await page.goto(publicPath('Post', older.slug));
+    const byline = page.getByRole('main').getByText(/^By .* min read$/);
+    await expect(byline).toContainText('2 min read');
+    await expect(byline.locator('time')).toHaveAttribute('datetime', older.publishedAt!);
+    const more = page.getByRole('navigation', { name: 'More news' });
+    await expect(more.getByRole('link', { name: newer.title })).toHaveAttribute('href', publicPath('Post', newer.slug));
+    await page.goto(publicPath('Post', newer.slug));
+    await expect(page.getByRole('navigation', { name: 'More news' }).getByRole('link', { name: older.title })).toBeVisible();
+
+    await page.goto('/news');
+    const item = page.getByRole('main').locator('article', { has: page.getByRole('link', { name: newer.title }) });
+    await expect(item.locator('time')).toHaveAttribute('datetime', newer.publishedAt!);
+    await expect(item).toContainText(/\d+ min read/);
+  });
+});
+
 test.describe('post list', () => {
   test('lists published posts newest first and links to them', async ({ page }) => {
     const draft = await createOk(api, 'Post', { title: `Listed draft ${RUN_ID}` });

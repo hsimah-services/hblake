@@ -167,7 +167,9 @@ The browser tests find elements by accessible role and name, not by test ids:
   It starts from the system's reduced-motion setting, survives reloads and applies
   before the application scripts run (`data-motion` on `<html>`). With animations off,
   navigation transitions take under 10ms and home tiles do not grow on hover.
-- The colour mode and animation toggles share one `group` named `Display preferences`:
+- The colour mode and animation toggles, then a link to the other side (`Admin` on the
+  public site when signed in, `View site` in the admin) and `Sign out` when signed in,
+  share one `group` named `Display and account`:
   one Tab stop, arrow keys between them, and focus rings the group does not clip.
 - At 360px wide nothing scrolls sideways. The `Main navigation` holds a `Menu` button
   with `aria-expanded` and `aria-controls`; Escape closes it and focuses the button,
@@ -221,6 +223,15 @@ The browser tests find elements by accessible role and name, not by test ids:
   `New password`, `Confirm new password` and a `Change password` button. Mismatched or
   short new passwords are refused before sending; success is announced as updated.
 - The profile form (`/admin/users/:id/edit`) has one field, `Display name`.
+- Edit screens put Title, Slug, Content and the preview first, then a `complementary`
+  region named `Publishing` with `Status: Draft|Published`, a Publish/Unpublish button
+  (disabled while there are unsaved changes), Excerpt, Enquiry URL for products and
+  Save. The Dashboard has a `region` named `Recently edited` listing the newest
+  updated records first, each linking to it.
+- News articles show `By <name> · <date> · N min read` (the date in a `<time>`) and a
+  `navigation` named `More news` linking the newer and older published articles; the
+  News list shows each date and reading time. `GET /news/feed.xml` is an Atom feed of
+  published articles only (`application/atom+xml`), advertised by every page.
 - Admin screens sit in a shell with a `navigation` named `Administration` linking
   Dashboard, Pages, News, Products and Settings; the current one has
   `aria-current="page"`. On phones its links open in a drawer `dialog` from an
@@ -228,9 +239,12 @@ The browser tests find elements by accessible role and name, not by test ids:
 - Admin lists are tables with the `spec/ui/admin.yml` list columns (Title, then an
   Actions column, Slug, Status, Published for posts, Updated). Titles link to the
   record. Sortable column headers carry `aria-sort`. `?status=draft|published` in the
-  list URL filters the listed page (the dashboard's published and draft counts link
-  there, and `Show all <type>` clears it). Each row's Actions cell has a link
-  `Edit “<title>”` and a button `Delete “<title>”`, which confirms in a dialog,
+  list URL filters the listed page, as does `?q=` (a `search` form, `Search titles`);
+  a `navigation` named `Filter by status` links All, Published and Drafts with
+  `aria-current` on the active one (the dashboard's published and draft counts link
+  there too, and `Show all <type>` clears both). Each row's Actions cell has a link
+  `Edit “<title>”`, a button `Publish “<title>”`/`Unpublish “<title>”`, and a
+  button `Delete “<title>”`, which confirms in a dialog,
   stays on the list, announces the deletion in a `status` and focuses the heading.
   The list links `New <type>` (`New page`, `New article`, `New product`). On a 360px screen the row actions stay on screen
   as 44px targets.

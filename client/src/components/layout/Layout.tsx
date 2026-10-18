@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { useLocation } from 'react-router';
 import { graphql, useFragment } from 'react-relay';
-import { Link, Button, Stack } from '@astryxdesign/core';
+import { Link, Stack } from '@astryxdesign/core';
 import * as stylex from '@stylexjs/stylex';
 import { HomeURI, PageURI, PostListURI, ProductListURI, AdminHomeURI } from '../../routes/__generated__/routes';
 import { SITE_NAME } from '../../SiteName';
@@ -27,12 +27,6 @@ export function Layout({ data, row, title, admin = false, children }: LayoutProp
     <header {...stylex.props(styles.header)}><div {...stylex.props(styles.headerRow)}>
       <Stack direction="horizontal" gap={1} align="center" xstyle={styles.brand}>
         <Link href={HomeURI.getURI({})} weight="bold" color="inherit" xstyle={styles.siteName}>{SITE_NAME}</Link>
-        {/* Only the signed-in operator sees the way into the admin; the server still authorizes it. */}
-        {layout.viewer && <Link href={AdminHomeURI.getURI({})} label="Admin" tooltip="Admin" color="inherit" xstyle={[styles.navigationLink, styles.iconTarget, tones.ink, styles.noUnderline]}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <rect x="3" y="3" width="7" height="9" rx="1" /><rect x="14" y="3" width="7" height="5" rx="1" /><rect x="14" y="12" width="7" height="9" rx="1" /><rect x="3" y="16" width="7" height="5" rx="1" />
-          </svg>
-        </Link>}
       </Stack>
       <nav ref={layout.menu.element} aria-label="Main navigation" onKeyDown={layout.menu.keyDown} {...stylex.props(styles.navigation)}>
         {/* Below the mobile breakpoint the links collapse behind this disclosure button. */}
@@ -54,8 +48,8 @@ export function Layout({ data, row, title, admin = false, children }: LayoutProp
         </div>
       </nav>
       <Stack direction="horizontal" gap={2} align="center" xstyle={styles.tools}>
-        <DisplayPreferences />
-        {layout.viewer && <Button label="Sign out" clickAction={layout.signOut} isDisabled={!layout.signOutReady} />}
+        {/* Admin shows only to the signed-in operator; the server still authorizes the admin. */}
+        <DisplayPreferences destination={layout.viewer ? { href: AdminHomeURI.getURI({}), label: 'Admin' } : undefined} signOut={layout.viewer ? { action: layout.signOut, ready: layout.signOutReady } : undefined} />
       </Stack>
     </div></header>
     <main>{layout.notice && <p role="status">{layout.notice}</p>}{layout.error && <p role="alert">{layout.error}</p>}{children}</main>
@@ -130,7 +124,7 @@ const styles = stylex.create({
   header: {
     position: 'sticky', top: 'var(--spacing-3)', zIndex: 10, paddingBlock: '0.5rem', paddingInline: { default: '1.25rem', '@media (max-width: 760px)': '0.75rem' }, fontSize: '0.9rem',
     backgroundColor: 'color-mix(in srgb, var(--site-canvas) 72%, transparent)', backdropFilter: 'blur(14px) saturate(160%)',
-    border: '1px solid var(--site-hairline)', borderRadius: '1rem', boxShadow: '0 10px 30px -18px rgb(0 0 0 / 0.5)',
+    border: '1px solid var(--site-hairline)', borderRadius: 'var(--radius-container)', boxShadow: '0 10px 30px -18px rgb(0 0 0 / 0.5)',
   },
   headerRow: { display: 'flex', alignItems: 'center', gap: { default: '1rem', '@media (max-width: 760px)': '0.25rem' } },
   brand: { flexShrink: 0, marginInlineEnd: 'auto' },
@@ -139,7 +133,7 @@ const styles = stylex.create({
   navigation: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', flexGrow: 1, flexShrink: 1, minWidth: 0 },
   menuButton: {
     display: { default: 'none', '@media (max-width: 760px)': 'inline-flex' }, alignItems: 'center', gap: '0.4rem', minHeight: '44px', paddingInline: '0.75rem',
-    font: 'inherit', fontWeight: 600, border: '1px solid var(--site-hairline)', borderRadius: '999px', cursor: 'pointer',
+    font: 'inherit', fontWeight: 600, border: '1px solid var(--site-hairline)', borderRadius: 'var(--radius-full)', cursor: 'pointer',
   },
   links: {
     display: { default: 'flex', '@media (max-width: 760px)': 'none' }, flexWrap: 'wrap', justifyContent: 'flex-end', alignItems: 'center', gap: '0.25rem',
@@ -149,7 +143,7 @@ const styles = stylex.create({
     display: 'flex', flexDirection: { default: 'row', '@media (max-width: 760px)': 'column' }, alignItems: { default: 'center', '@media (max-width: 760px)': 'stretch' },
     position: { default: 'static', '@media (max-width: 760px)': 'absolute' }, insetInline: { default: 'auto', '@media (max-width: 760px)': 0 }, top: { default: 'auto', '@media (max-width: 760px)': 'calc(100% + 0.5rem)' },
     padding: { default: 0, '@media (max-width: 760px)': '0.5rem' }, maxHeight: { default: 'none', '@media (max-width: 760px)': 'calc(100dvh - 6rem)' }, overflowY: { default: 'visible', '@media (max-width: 760px)': 'auto' },
-    backgroundColor: { default: 'transparent', '@media (max-width: 760px)': 'var(--site-canvas)' }, border: { default: 'none', '@media (max-width: 760px)': '1px solid var(--site-hairline)' }, borderRadius: '1rem',
+    backgroundColor: { default: 'transparent', '@media (max-width: 760px)': 'var(--site-canvas)' }, border: { default: 'none', '@media (max-width: 760px)': '1px solid var(--site-hairline)' }, borderRadius: 'var(--radius-container)',
     boxShadow: { default: 'none', '@media (max-width: 760px)': '0 16px 40px -20px rgb(0 0 0 / 0.6)' },
   },
   tools: { flexShrink: 0 },
@@ -157,7 +151,7 @@ const styles = stylex.create({
   // focus, shrinking back to the middle on leave. The underline is a centred gradient
   // whose width animates. --site-motion is near zero when animations are off.
   navigationLink: {
-    display: 'inline-flex', alignItems: 'center', minHeight: { default: '2.25rem', '@media (max-width: 760px)': '44px' }, paddingInline: '0.75rem', borderRadius: '999px', textDecoration: 'none',
+    display: 'inline-flex', alignItems: 'center', minHeight: { default: '2.25rem', '@media (max-width: 760px)': '44px' }, paddingInline: '0.75rem', borderRadius: 'var(--radius-full)', textDecoration: 'none',
     backgroundImage: 'linear-gradient(currentColor, currentColor)', backgroundRepeat: 'no-repeat', backgroundOrigin: 'content-box', backgroundPosition: '50% calc(100% - 0.3rem)',
     backgroundSize: { default: '0% 2px', ':hover': '100% 2px', ':focus-visible': '100% 2px' },
     transitionProperty: 'color, background-color, background-size', transitionDuration: 'var(--site-motion)', transitionTimingFunction: 'var(--ease-standard)',
@@ -165,8 +159,7 @@ const styles = stylex.create({
   // The icon-only Home link gets a visible label in the mobile menu, where the current-page underline needs text.
   inlineIcon: { display: 'inline-block', verticalAlign: '-0.25em' },
   mobileLabel: { display: { default: 'none', '@media (max-width: 760px)': 'inline' }, marginInlineStart: '0.5rem' },
-  iconTarget: { justifyContent: 'center', minWidth: '44px', minHeight: '44px', paddingInline: 0, borderRadius: '999px' },
-  // Icon links (Home, Admin) never draw the underline.
+  // The Home icon link never draws the underline.
   noUnderline: { backgroundImage: 'none' },
   // Not colour alone: the current link keeps its underline drawn.
   current: { backgroundSize: '100% 2px' },

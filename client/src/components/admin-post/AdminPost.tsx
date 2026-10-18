@@ -23,12 +23,14 @@ function AdminPost_List({ queryRef }: { queryRef: PreloadedQuery<AdminPostListQu
   const mutate = AdminPostMutation();
   const route = useAdminPostRouteContext();
   const status = 'status' in route.input && typeof route.input.status === 'string' ? route.input.status : undefined;
+  const q = 'q' in route.input && typeof route.input.q === 'string' ? route.input.q : undefined;
   return <AdminLayout data={data} section="posts" title="News">
     <AdminTable kind="Article" plural="News" rows={data.posts?.nodes} published
       create={AdminPostCreateURI.getURI({})} detail={id => AdminPostDetailURI.getURI({ id })} edit={id => AdminPostEditURI.getURI({ id })}
       remove={id => mutate('delete', { id })}
-      status={status} filtered={value => AdminPostListURI.getURI({ status: value })}
-      next={data.posts?.pageInfo.hasNextPage ? AdminPostListURI.getURI({ after: data.posts.pageInfo.endCursor ?? undefined, status }) : undefined} />
+      status={status} q={q} listUrl={params => AdminPostListURI.getURI(params)}
+      publish={row => mutate(row.status === 'PUBLISHED' ? 'unpublish' : 'publish', { id: row.id })}
+      next={data.posts?.pageInfo.hasNextPage ? AdminPostListURI.getURI({ after: data.posts.pageInfo.endCursor ?? undefined, status, q }) : undefined} />
   </AdminLayout>;
 }
 
@@ -50,7 +52,8 @@ function AdminPost_Content({ queryRef }: { queryRef: PreloadedQuery<AdminPostQue
   return <AdminLayout data={data} section="posts" row={row} title={editing ? `Edit ${row.title}` : undefined}>
     {editing ? <>
       <Heading level={1}>Edit article</Heading>
-      <ContentForm key={row.id} kind="Post" row={row} save={save} detail={id => AdminPostDetailURI.getURI({ id })} />
+      <ContentForm key={row.id} kind="Post" row={row} save={save} detail={id => AdminPostDetailURI.getURI({ id })}
+        publication={{ status: row.status, toggle: () => mutate(row.status === 'PUBLISHED' ? 'unpublish' : 'publish', { id: row.id }) }} />
     </> : <AdminDetail kind="Article" row={row} edit={AdminPostEditURI.getURI({ id: row?.id ?? '' })} list={AdminPostListURI.getURI({})} mutate={mutate} />}
   </AdminLayout>;
 }

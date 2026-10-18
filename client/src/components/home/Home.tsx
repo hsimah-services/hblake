@@ -56,7 +56,7 @@ const styles = stylex.create({
   // Hover and keyboard focus grow the tile where there is room, unless animations are off
   // (--site-tile-grow). On phones the single column stays flat so nothing overflows.
   tile: {
-    position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'space-between', gap: '1.25rem', minHeight: { default: '17rem', '@media (max-width: 480px)': '0' }, padding: { default: '1.5rem', '@media (max-width: 480px)': '1.25rem' }, color: '#ffffff', textDecoration: 'none', borderRadius: 0,
+    position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'space-between', gap: '1.25rem', minHeight: { default: '17rem', '@media (max-width: 480px)': '0' }, padding: { default: '1.5rem', '@media (max-width: 480px)': '1.25rem' }, color: '#ffffff', textDecoration: 'none', borderRadius: 'var(--radius-container)',
     zIndex: { default: 0, ':hover': 1, ':focus-visible': 1 },
     transform: { default: 'none', ':hover': { default: 'var(--site-tile-grow)', '@media (max-width: 480px)': 'none' }, ':focus-visible': { default: 'var(--site-tile-grow)', '@media (max-width: 480px)': 'none' } },
     boxShadow: { default: '0 6px 16px -12px rgb(0 0 0 / 0.5)', ':hover': '0 22px 40px -18px rgb(0 0 0 / 0.65)', ':focus-visible': '0 22px 40px -18px rgb(0 0 0 / 0.65)' },

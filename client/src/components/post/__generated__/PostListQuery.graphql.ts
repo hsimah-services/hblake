@@ -1,6 +1,6 @@
 /**
- * @generated SignedSource<<8beb4f9cbf0e0ef6f5f0fb9d08c4c620>>
- * @relayHash 5c0947501fc7618f64548214828e1f09
+ * @generated SignedSource<<356be9a60ac89a99599702cb5ce5dc04>>
+ * @relayHash a650fc157b0dd1ea549ff5d8546f391b
  * @lightSyntaxTransform
  */
 
@@ -8,7 +8,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-// @relayRequestID 5c0947501fc7618f64548214828e1f09
+// @relayRequestID a650fc157b0dd1ea549ff5d8546f391b
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
@@ -22,8 +22,10 @@ export type PostListQuery$data = {
       readonly author: {
         readonly displayName: string;
       } | null | undefined;
+      readonly content: string;
       readonly excerpt: string;
       readonly id: string;
+      readonly publishedAt: string | null | undefined;
       readonly slug: string;
       readonly status: PublicationStatus;
       readonly title: string;
@@ -120,7 +122,21 @@ v6 = {
           "name": "excerpt",
           "storageKey": null
         },
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "content",
+          "storageKey": null
+        },
         (v4/*:: as any*/),
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "publishedAt",
+          "storageKey": null
+        },
         {
           "alias": null,
           "args": null,
@@ -290,16 +306,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "5c0947501fc7618f64548214828e1f09",
-    "id": "5c0947501fc7618f64548214828e1f09",
+    "cacheID": "a650fc157b0dd1ea549ff5d8546f391b",
+    "id": "a650fc157b0dd1ea549ff5d8546f391b",
     "metadata": {},
     "name": "PostListQuery",
     "operationKind": "query",
-    "text": "query PostListQuery(\n  $after: String\n) {\n  ...LayoutFragment\n  posts(first: 20, after: $after) {\n    nodes {\n      id\n      title\n      slug\n      excerpt\n      status\n      author {\n        displayName\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n"
+    "text": "query PostListQuery(\n  $after: String\n) {\n  ...LayoutFragment\n  posts(first: 20, after: $after) {\n    nodes {\n      id\n      title\n      slug\n      excerpt\n      content\n      status\n      publishedAt\n      author {\n        displayName\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "ba9320f785d331675f5839308f1039a4";
+(node as any).hash = "0bbca0d9b7873d78cb49661ebe477114";
 
 export default node;
