@@ -3,7 +3,8 @@
 The hblake site introduces Hamish Blake and the open frameworks behind his work.
 Owner-provided launch content consists of Home, About, Frameworks, Portfolio and
 Contact us. The homepage shows four large coloured links to those pages, followed
-by the latest published post when one exists. Posts and Products may remain empty.
+by the latest published post ("Latest news") when one exists. News and Products may
+remain empty. Posts are presented to visitors and in the admin as News.
 
 The header provides understated page navigation. The footer includes copyright,
 icon links to hsimah.com, hsimah-services on GitHub and Hamish’s LinkedIn.
@@ -23,16 +24,16 @@ pages through the normal runtime contracts in one transaction.
 | --- | --- |
 | `/` | Published Page with slug `home`; meaningful unavailable state if absent |
 | `/pages/:slug` | Published Page by exact slug; home redirects to `/` |
-| `/posts` | Published posts, newest first, cursor pagination, empty state |
-| `/posts/:slug` | Published post or 404 |
+| `/news` | Published posts as News, newest first, cursor pagination, empty state |
+| `/news/:slug` | Published post or 404. Old `/posts…` and `/admin/posts…` URLs redirect (301) to `/news…` and `/admin/news…` |
 | `/products` | Published offerings, title ascending then ID, pagination |
 | `/products/:slug` | Published offering, optional safe enquiry link, or 404 |
 | `/admin/login` | Staff login |
 | `/admin` | Dashboard: counts per content type, links to manage and add each, and settings |
-| `/admin/{pages,posts,products}` | Authorized generated content management views |
+| `/admin/{pages,news,products}` | Authorized content management views (News manages posts) |
 | `/admin/users/:id` and `/admin/users/:id/edit` | Settings (username, display name, password change) and display-name edit |
 
-Navigation omits a link whose backing page is missing or draft. Show Posts and
+Navigation omits a link whose backing page is missing or draft. Show News and
 Products navigation when published records exist. No arbitrary user-defined route
 catch-all; Page URLs are namespaced to avoid collisions with admin and collections.
 

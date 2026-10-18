@@ -65,3 +65,18 @@ test('GraphQL introspection and queries are served on /graphql over POST', async
   expect(await response.json()).toMatchObject({ data: { __typename: expect.any(String) } });
   await ctx.dispose();
 });
+
+test('old /posts addresses redirect permanently to /news', async () => {
+  const api = await request.newContext({ baseURL: BASE_URL });
+  for (const [from, to] of [
+    ['/posts', '/news'],
+    ['/posts/some-story', '/news/some-story'],
+    ['/admin/posts?after=abc', '/admin/news?after=abc'],
+    ['/admin/posts/xyz/edit', '/admin/news/xyz/edit'],
+  ]) {
+    const response = await api.get(from, { maxRedirects: 0 });
+    expect(response.status(), from).toBe(301);
+    expect(response.headers()['location'], from).toBe(to);
+  }
+  await api.dispose();
+});

@@ -53,7 +53,7 @@ function useConfirmDelete(isOpen: boolean, onCancel: () => void) {
 
 const styles = stylex.create({
   dialog: {
-    width: 'min(28rem, calc(100vw - 2rem))', boxSizing: 'border-box', padding: '1.25rem', borderRadius: '1rem',
+    width: 'min(28rem, calc(100vw - 2rem))', boxSizing: 'border-box', padding: '1.25rem', borderRadius: 'var(--radius-container)',
     borderWidth: '1px', borderStyle: 'solid', borderColor: 'var(--site-hairline)',
     backgroundColor: 'var(--color-background-surface)', color: 'var(--color-text-primary)',
     boxShadow: '0 24px 60px -24px rgb(0 0 0 / 0.6)',

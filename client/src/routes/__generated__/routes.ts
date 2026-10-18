@@ -53,7 +53,7 @@ export const PageRouteQuery = {
 export type PostListInputType = {
   after?: string;
 };
-export const PostListURI = createURI<PostListInputType>("/posts", {"after":{"kind":"string","optional":true}});
+export const PostListURI = createURI<PostListInputType>("/news", {"after":{"kind":"string","optional":true}});
 
 export const PostListRouteQuery = {
   operation: "PostListQuery",
@@ -67,7 +67,7 @@ export const PostListRouteQuery = {
 export type PostInputType = {
   slug: string;
 };
-export const PostURI = createURI<PostInputType>("/posts/:slug", {"slug":{"kind":"string","optional":false}});
+export const PostURI = createURI<PostInputType>("/news/:slug", {"slug":{"kind":"string","optional":false}});
 
 export const PostRouteQuery = {
   operation: "PostQuery",
@@ -126,8 +126,9 @@ export const AdminHomeRouteQuery = {
 
 export type AdminPageListInputType = {
   after?: string;
+  status?: string;
 };
-export const AdminPageListURI = createURI<AdminPageListInputType>("/admin/pages", {"after":{"kind":"string","optional":true}});
+export const AdminPageListURI = createURI<AdminPageListInputType>("/admin/pages", {"after":{"kind":"string","optional":true},"status":{"kind":"string","optional":true}});
 
 export const AdminPageListRouteQuery = {
   operation: "AdminPageListQuery",
@@ -177,8 +178,9 @@ export const AdminPageEditRouteQuery = {
 
 export type AdminPostListInputType = {
   after?: string;
+  status?: string;
 };
-export const AdminPostListURI = createURI<AdminPostListInputType>("/admin/posts", {"after":{"kind":"string","optional":true}});
+export const AdminPostListURI = createURI<AdminPostListInputType>("/admin/news", {"after":{"kind":"string","optional":true},"status":{"kind":"string","optional":true}});
 
 export const AdminPostListRouteQuery = {
   operation: "AdminPostListQuery",
@@ -191,7 +193,7 @@ export const AdminPostListRouteQuery = {
 
 export type AdminPostCreateInputType = {
 };
-export const AdminPostCreateURI = createURI<AdminPostCreateInputType>("/admin/posts/new", {});
+export const AdminPostCreateURI = createURI<AdminPostCreateInputType>("/admin/news/new", {});
 
 export const AdminPostCreateRouteQuery = {
   operation: "AdminPostCreateQuery",
@@ -201,7 +203,7 @@ export const AdminPostCreateRouteQuery = {
 export type AdminPostDetailInputType = {
   id: string;
 };
-export const AdminPostDetailURI = createURI<AdminPostDetailInputType>("/admin/posts/:id", {"id":{"kind":"string","optional":false}});
+export const AdminPostDetailURI = createURI<AdminPostDetailInputType>("/admin/news/:id", {"id":{"kind":"string","optional":false}});
 
 export const AdminPostDetailRouteQuery = {
   operation: "AdminPostQuery",
@@ -215,7 +217,7 @@ export const AdminPostDetailRouteQuery = {
 export type AdminPostEditInputType = {
   id: string;
 };
-export const AdminPostEditURI = createURI<AdminPostEditInputType>("/admin/posts/:id/edit", {"id":{"kind":"string","optional":false}});
+export const AdminPostEditURI = createURI<AdminPostEditInputType>("/admin/news/:id/edit", {"id":{"kind":"string","optional":false}});
 
 export const AdminPostEditRouteQuery = {
   operation: "AdminPostQuery",
@@ -228,8 +230,9 @@ export const AdminPostEditRouteQuery = {
 
 export type AdminProductListInputType = {
   after?: string;
+  status?: string;
 };
-export const AdminProductListURI = createURI<AdminProductListInputType>("/admin/products", {"after":{"kind":"string","optional":true}});
+export const AdminProductListURI = createURI<AdminProductListInputType>("/admin/products", {"after":{"kind":"string","optional":true},"status":{"kind":"string","optional":true}});
 
 export const AdminProductListRouteQuery = {
   operation: "AdminProductListQuery",

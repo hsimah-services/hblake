@@ -33,7 +33,7 @@ export function Home({ queryRef }: HomeProps) {
         })}
       </section>
       {latest && <section {...stylex.props(styles.latest)}>
-        <Heading level={2}>Latest from the blog</Heading>
+        <Heading level={2}>Latest news</Heading>
         <Heading level={3}><Link href={PostURI.getURI({ slug: latest.slug })}>{latest.title}</Link></Heading>
         {latest.publishedAt && <time dateTime={latest.publishedAt}>{new Date(latest.publishedAt).toLocaleDateString('en', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })}</time>}
         <p>{latest.excerpt}</p>

@@ -36,13 +36,13 @@ async function expectTouchTarget(target: Locator, label: string): Promise<void> 
 
 test('public and admin screens fit the width without sideways scrolling', async ({ page }) => {
   const post = await createPublished(api, 'Post', { content: `A ${'long '.repeat(60)}body with an unbroken ${'x'.repeat(40)} word.` });
-  for (const path of ['/', '/posts', '/products', publicPath('Post', post.slug), `/pages/missing-${uniqueSlug()}`, '/admin/login']) {
+  for (const path of ['/', '/news', '/products', publicPath('Post', post.slug), `/pages/missing-${uniqueSlug()}`, '/admin/login']) {
     await page.goto(path);
     await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
     expect(await overflow(page), `${path} overflows`).toBeLessThanOrEqual(0);
   }
   await signIn(page);
-  for (const path of ['/admin', '/admin/posts', '/admin/posts/new']) {
+  for (const path of ['/admin', '/admin/news', '/admin/news/new']) {
     await page.goto(path);
     await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
     expect(await overflow(page), `${path} overflows`).toBeLessThanOrEqual(0);

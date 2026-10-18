@@ -39,14 +39,14 @@ test('home shows a meaningful unavailable state when no home page is published',
 test('navigation omits links to missing pages and empty collections', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('main')).toBeVisible();
-  for (const href of ['/pages/services', '/pages/about', '/pages/contact', '/posts', '/products']) {
+  for (const href of ['/pages/services', '/pages/about', '/pages/contact', '/news', '/products']) {
     await expect(page.locator(`nav a[href="${href}"]`), `no navigation link to ${href}`).toHaveCount(0);
   }
 });
 
 test('empty post and product lists render an empty state', async ({ page }) => {
-  await page.goto('/posts');
-  await expect(page.getByRole('main').getByText(/no posts/i)).toBeVisible();
+  await page.goto('/news');
+  await expect(page.getByRole('main').getByText(/no news/i)).toBeVisible();
   await page.goto('/products');
   await expect(page.getByRole('main').getByText(/no products/i)).toBeVisible();
 });

@@ -16,7 +16,7 @@ export function ContentForm({ kind, row, save, detail }: ContentFormProps) {
         <TextInput label="Display name" htmlName="displayName" description="Shown as the author of posts." value={form.values.displayName} onChange={value => form.change('displayName', value)} status={form.invalid.displayName ? { type: 'error' } : undefined} />
       </> : <>
         <TextInput label="Title" htmlName="title" value={form.values.title} onChange={value => form.change('title', value)} status={form.invalid.title ? { type: 'error' } : undefined} />
-        <TextInput label="Slug" htmlName="slug" value={form.values.slug} onChange={value => form.change('slug', value)} status={form.invalid.slug ? { type: 'error' } : undefined} description={row ? 'Changing the slug changes the public URL.' : 'Lowercase letters and numbers separated by hyphens.'} />
+        <TextInput label="Slug" htmlName="slug" value={form.values.slug} onChange={value => form.change('slug', value)} status={form.invalid.slug ? { type: 'error' } : undefined} description={row ? 'Changing the slug changes the public URL.' : 'Filled in from the title until you edit it. Lowercase letters and numbers separated by hyphens.'} />
         {/* Posts are written as rich text; pages and products keep the Markdown textarea. */}
         {kind === 'Post'
           ? <RichTextEditor label="Content" name="content" value={form.values.content} onChange={value => form.change('content', value)} invalid={form.invalid.content} />
@@ -52,7 +52,14 @@ function useContentForm(kind: string, row: ContentFormRow | null | undefined, sa
     window.addEventListener('beforeunload', before);
     return () => { window.removeEventListener('beforeunload', before); };
   }, [dirty]);
-  function change(field: string, value: string) { setValues(previous => ({ ...previous, [field]: value })); }
+  // On a new record the slug follows the title until it is edited; clearing it resumes
+  // following. Existing records never change their slug (it is the public URL).
+  const slugEdited = useRef(false);
+  function change(field: string, value: string) {
+    if (field === 'slug') slugEdited.current = value !== '';
+    const follow = field === 'title' && !row && !slugEdited.current;
+    setValues(previous => ({ ...previous, [field]: value, ...(follow ? { slug: slugFrom(value) } : {}) }));
+  }
   async function submit(event: FormEvent) {
     event.preventDefault(); if (pending) return;
     const errors = validateValues(kind, values);
@@ -71,6 +78,15 @@ function useContentForm(kind: string, row: ContentFormRow | null | undefined, sa
     finally { setPending(false); }
   }
   return { values, invalid, error, pending, element, change, submit };
+}
+
+/** A title as a slug: lowercase ASCII words joined by single hyphens, at most 160 characters. */
+function slugFrom(title: string): string {
+  const words = title.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+    .replace(/['’]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  if (words.length <= 160) return words;
+  const cut = words.slice(0, 161);
+  return cut.slice(0, cut.lastIndexOf('-') > 0 ? cut.lastIndexOf('-') : 160).replace(/-+$/, '');
 }
 
 function initialValues(row: ContentFormRow | null | undefined): Record<string, string> {

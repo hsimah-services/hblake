@@ -37,7 +37,7 @@
     },
     {
       "name": "PostList",
-      "path": "/posts",
+      "path": "/news",
       "ssr": true,
       "fields": {
         "after": {
@@ -59,7 +59,7 @@
     },
     {
       "name": "Post",
-      "path": "/posts/:slug",
+      "path": "/news/:slug",
       "ssr": true,
       "fields": {
         "slug": {
@@ -156,6 +156,11 @@
           "kind": "string",
           "optional": true,
           "in": "query"
+        },
+        "status": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
         }
       },
       "query": {
@@ -227,10 +232,15 @@
     },
     {
       "name": "AdminPostList",
-      "path": "/admin/posts",
+      "path": "/admin/news",
       "ssr": true,
       "fields": {
         "after": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        },
+        "status": {
           "kind": "string",
           "optional": true,
           "in": "query"
@@ -249,7 +259,7 @@
     },
     {
       "name": "AdminPostCreate",
-      "path": "/admin/posts/new",
+      "path": "/admin/news/new",
       "ssr": true,
       "fields": {},
       "query": {
@@ -261,7 +271,7 @@
     },
     {
       "name": "AdminPostDetail",
-      "path": "/admin/posts/:id",
+      "path": "/admin/news/:id",
       "ssr": true,
       "fields": {
         "id": {
@@ -283,7 +293,7 @@
     },
     {
       "name": "AdminPostEdit",
-      "path": "/admin/posts/:id/edit",
+      "path": "/admin/news/:id/edit",
       "ssr": true,
       "fields": {
         "id": {
@@ -309,6 +319,11 @@
       "ssr": true,
       "fields": {
         "after": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        },
+        "status": {
           "kind": "string",
           "optional": true,
           "in": "query"

@@ -28,8 +28,9 @@ export type ContentInput = Partial<Omit<Content, 'id'>> & Record<string, unknown
 export const field = (kind: Kind): string => kind.charAt(0).toLowerCase() + kind.slice(1);
 export const collection = (kind: Kind): string => `${field(kind)}s`;
 export const publicPath = (kind: Kind, slug: string): string =>
-  ({ Page: `/pages/${slug}`, Post: `/posts/${slug}`, Product: `/products/${slug}` })[kind];
-export const adminPath = (kind: Kind): string => `/admin/${collection(kind)}`;
+  ({ Page: `/pages/${slug}`, Post: `/news/${slug}`, Product: `/products/${slug}` })[kind];
+// Posts are presented as News, at /news and /admin/news.
+export const adminPath = (kind: Kind): string => (kind === 'Post' ? '/admin/news' : `/admin/${collection(kind)}`);
 
 export function selection(kind: Kind): string {
   return `id title slug content excerpt status publishedAt createdAt updatedAt${kind === 'Product' ? ' enquiryUrl' : ''}`;

@@ -130,7 +130,7 @@ test.describe('sessions are created only when needed', () => {
     const query = await api.ctx.post('/graphql', { data: { query: '{ posts(first: 1) { totalCount } }' } });
     expect(query.status()).toBe(200);
     expect(setCookies(query).map(cookie => cookie.name), 'Set-Cookie on an anonymous GraphQL query').toEqual([]);
-    for (const path of ['/', '/posts', '/admin/login']) {
+    for (const path of ['/', '/news', '/admin/login']) {
       const response = await api.ctx.get(path);
       expect(setCookies(response).map(cookie => cookie.name), `Set-Cookie on GET ${path}`).toEqual([]);
     }

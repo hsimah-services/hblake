@@ -15,8 +15,8 @@ export function Post({ list, content }: PostProps) {
 
 function Post_List({ queryRef }: { queryRef: PreloadedQuery<PostListQuery> }) {
   const data = usePreloadedQuery<PostListQuery>(POST_LIST_QUERY, queryRef);
-  return <Layout data={data} title="Posts">
-    <ContentList title="Posts" rows={data.posts?.nodes}
+  return <Layout data={data} title="News">
+    <ContentList title="News" rows={data.posts?.nodes}
       next={data.posts?.pageInfo.hasNextPage ? PostListURI.getURI({ after: data.posts.pageInfo.endCursor ?? undefined }) : undefined}
       detail={row => PostURI.getURI({ slug: row.slug })} />
   </Layout>;

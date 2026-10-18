@@ -223,14 +223,14 @@ type ToolState = { bold: boolean; italic: boolean; strike: boolean; code: boolea
 
 const styles = stylex.create({
   header: { justifyContent: 'space-between', flexWrap: 'wrap' },
-  frame: { borderWidth: '1px', borderStyle: 'solid', borderColor: 'var(--color-border-emphasized)', borderRadius: '0.75rem', overflow: 'hidden' },
+  frame: { borderWidth: '1px', borderStyle: 'solid', borderColor: 'var(--color-border-emphasized)', borderRadius: 'var(--radius-container)', overflow: 'hidden' },
   invalid: { borderColor: 'var(--color-error)' },
   tools: { flexWrap: 'wrap' },
   editable: {
     minHeight: '16rem', padding: '0.75rem 1rem', lineHeight: 1.7, outline: { default: 'none', ':focus-visible': '2px solid var(--color-text-primary)' }, outlineOffset: '-2px',
   },
   dialog: {
-    width: 'min(30rem, calc(100vw - 2rem))', boxSizing: 'border-box', padding: '1.25rem', borderRadius: '1rem',
+    width: 'min(30rem, calc(100vw - 2rem))', boxSizing: 'border-box', padding: '1.25rem', borderRadius: 'var(--radius-container)',
     borderWidth: '1px', borderStyle: 'solid', borderColor: 'var(--site-hairline)',
     backgroundColor: 'var(--color-background-surface)', color: 'var(--color-text-primary)',
     '::backdrop': { backgroundColor: 'rgb(0 0 0 / 0.45)' },

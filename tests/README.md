@@ -174,10 +174,13 @@ The browser tests find elements by accessible role and name, not by test ids:
   and following a link closes it. Menu, navigation, mode and animation toggles and
   footer links are at least 44×44px.
 - `document.title` starts with what the screen shows: the content title, the list
-  name (`Posts`), `Dashboard`, `Sign in`, `Create Post`, `Edit <title>`. Only a
+  name (`News`), `Dashboard`, `Sign in`, `New article`, `Edit <title>`. Only a
   missing record is titled "Not found".
 - Unknown or unpublished content renders a heading matching `/not found/i`.
-- The empty post and product lists say "No posts" and "No products".
+- The empty news and product lists say "No news" and "No products". Posts are presented
+  as News at `/news`, `/news/:slug` and `/admin/news…`; old `/posts…` and
+  `/admin/posts…` addresses redirect there with `301`, keeping the rest of the path
+  and the query.
 - A product's enquiry link is named `/enquir/i`.
 - List pagination is a link or button named `/next|older|more/i` that puts `?after=`
   in the URL. Paging one list never changes the site navigation.
@@ -191,7 +194,10 @@ The browser tests find elements by accessible role and name, not by test ids:
   link named `/sign out|log out/i`.
 - Content forms have fields labelled `Title`, `Slug`, `Content` (a textarea), `Excerpt`
   and, for products, `Enquiry URL`, with a `Save`/`Create` button. They have no
-  inputs for id, status, publication time or timestamps. Posts edit `Content` as rich
+  inputs for id, status, publication time or timestamps. On a new record `Slug` follows
+  `Title` (lowercase, accents folded, apostrophes dropped, other punctuation and spaces
+  as single hyphens, at most 160 characters) until it is edited; clearing it resumes.
+  Edit forms never change an existing slug. Posts edit `Content` as rich
   text: a `textbox` named `Content` (multiline, contenteditable) under a `toolbar` named
   `Formatting` (Bold, Italic, Strikethrough, Inline code, Heading 2, Heading 3,
   Bulleted list, Numbered list, Quote, Code block, Link, Image, Undo, Redo; toggles
@@ -216,14 +222,17 @@ The browser tests find elements by accessible role and name, not by test ids:
   short new passwords are refused before sending; success is announced as updated.
 - The profile form (`/admin/users/:id/edit`) has one field, `Display name`.
 - Admin screens sit in a shell with a `navigation` named `Administration` linking
-  Dashboard, Pages, Posts, Products and Settings; the current one has
+  Dashboard, Pages, News, Products and Settings; the current one has
   `aria-current="page"`. On phones its links open in a drawer `dialog` from an
   `Open navigation` button.
-- Admin lists are tables with the `spec/ui/admin.yml` list columns (Title, Slug,
-  Status, Published for posts, Updated). Under each title are links `View “<title>”`
-  and `Edit “<title>”` and a button `Delete “<title>”`, which confirms in a dialog,
+- Admin lists are tables with the `spec/ui/admin.yml` list columns (Title, then an
+  Actions column, Slug, Status, Published for posts, Updated). Titles link to the
+  record. Sortable column headers carry `aria-sort`. `?status=draft|published` in the
+  list URL filters the listed page (the dashboard's published and draft counts link
+  there, and `Show all <type>` clears it). Each row's Actions cell has a link
+  `Edit “<title>”` and a button `Delete “<title>”`, which confirms in a dialog,
   stays on the list, announces the deletion in a `status` and focuses the heading.
-  The list links `Add new <type>`. On a 360px screen the row actions stay on screen
+  The list links `New <type>` (`New page`, `New article`, `New product`). On a 360px screen the row actions stay on screen
   as 44px targets.
 - Timestamps in the admin read relatively in a `<time datetime>`; the absolute time is
   the `aria-label` and appears when the element (a Tab stop) is focused or hovered.
@@ -239,7 +248,7 @@ The browser tests find elements by accessible role and name, not by test ids:
   directory and named after its module (`PostQuery`, `AdminPostQuery`, …); no two
   entrypoints share a query;
 - `client/src` builds route paths with the generated URI builders: no string or
-  template literal starting with `/admin`, `/pages`, `/posts` or `/products`;
+  template literal starting with `/admin`, `/pages`, `/posts`, `/news` or `/products`;
 - every `__generated__/*.graphql.ts` belongs to an operation or fragment defined in
   the directory above it;
 - the client contains no business description the owner has not supplied (the word

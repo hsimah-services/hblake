@@ -85,7 +85,7 @@ function useLayout(key: LayoutFragment$key, row: useDocumentMetadataRow | null |
     const first = order.indexOf(a.href); const second = order.indexOf(b.href);
     return (first < 0 ? order.length : first) - (second < 0 ? order.length : second);
   });
-  if (data.navigationPosts?.nodes?.some(value => value?.status === 'PUBLISHED')) navigation.push({ title: 'Posts', href: PostListURI.getURI({}), tone: 'ink' });
+  if (data.navigationPosts?.nodes?.some(value => value?.status === 'PUBLISHED')) navigation.push({ title: 'News', href: PostListURI.getURI({}), tone: 'ink' });
   if (data.navigationProducts?.nodes?.some(value => value?.status === 'PUBLISHED')) navigation.push({ title: 'Products', href: ProductListURI.getURI({}), tone: 'ink' });
   useDocumentMetadata(row, title, admin);
   const session = useSignOut(data.viewer != null);

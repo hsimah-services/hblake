@@ -40,14 +40,14 @@ const styles = stylex.create({
   // One pill around both toggles, with a hairline divider between them. The buttons
   // round their own outer corners rather than the group clipping them, so focus
   // outlines stay visible.
-  group: { flexShrink: 0, borderWidth: '1px', borderStyle: 'solid', borderColor: 'var(--site-hairline)', borderRadius: '999px' },
+  group: { flexShrink: 0, borderWidth: '1px', borderStyle: 'solid', borderColor: 'var(--site-hairline)', borderRadius: 'var(--radius-full)' },
   button: {
     justifyContent: 'center', minWidth: '44px', minHeight: '44px', paddingInline: 0, borderColor: 'var(--site-hairline)',
     color: 'var(--color-text-primary)',
     backgroundColor: { default: 'transparent', ':hover': 'color-mix(in srgb, var(--site-ink) 14%, transparent)', ':focus-visible': 'color-mix(in srgb, var(--site-ink) 14%, transparent)' },
     transitionProperty: 'background-color', transitionDuration: 'var(--site-motion)',
     // Of-type, because each button's tooltip renders as a sibling inside the group.
-    borderStartStartRadius: { default: 0, ':first-of-type': '999px' }, borderEndStartRadius: { default: 0, ':first-of-type': '999px' },
-    borderStartEndRadius: { default: 0, ':last-of-type': '999px' }, borderEndEndRadius: { default: 0, ':last-of-type': '999px' },
+    borderStartStartRadius: { default: 0, ':first-of-type': 'var(--radius-full)' }, borderEndStartRadius: { default: 0, ':first-of-type': 'var(--radius-full)' },
+    borderStartEndRadius: { default: 0, ':last-of-type': 'var(--radius-full)' }, borderEndEndRadius: { default: 0, ':last-of-type': 'var(--radius-full)' },
   },
 });

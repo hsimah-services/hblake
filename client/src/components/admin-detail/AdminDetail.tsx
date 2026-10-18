@@ -4,6 +4,7 @@ import { Badge, Button, Heading, Stack, Text } from '@astryxdesign/core';
 import * as stylex from '@stylexjs/stylex';
 import { Markdown } from '../markdown/Markdown';
 import { ConfirmDelete } from '../confirm-delete/ConfirmDelete';
+import { AdminIcon } from '../admin-icon/AdminIcon';
 import { AdminTimestamp } from '../admin-timestamp/AdminTimestamp';
 
 export function AdminDetail({ kind, row, edit, list, mutate }: AdminDetailProps) {
@@ -20,9 +21,9 @@ export function AdminDetail({ kind, row, edit, list, mutate }: AdminDetailProps)
       <AdminDetail_Fact label="Published" value={row.publishedAt} />
     </dl>
     <Stack direction="horizontal" gap={2} align="center" xstyle={styles.actions}>
-      <Button href={edit} label="Edit" variant="primary" />
-      <Button label={row.status === 'PUBLISHED' ? 'Unpublish' : 'Publish'} clickAction={detail.publish} isLoading={detail.pending} />
-      <Button label="Delete" variant="destructive" onClick={detail.ask} />
+      <Button href={edit} label="Edit" variant="primary" icon={<AdminIcon name="edit" />} />
+      <Button label={row.status === 'PUBLISHED' ? 'Unpublish' : 'Publish'} icon={<AdminIcon name={row.status === 'PUBLISHED' ? 'unpublish' : 'publish'} />} clickAction={detail.publish} isLoading={detail.pending} />
+      <Button label="Delete" variant="destructive" icon={<AdminIcon name="delete" />} onClick={detail.ask} />
     </Stack>
     <section aria-label={`${kind} content`} {...stylex.props(styles.content)}><Markdown content={row.content ?? ''} />{row.enquiryUrl && <a href={row.enquiryUrl}>Enquire</a>}</section>
     <ConfirmDelete isOpen={detail.asking} onCancel={detail.cancel} onConfirm={detail.confirmDelete} isPending={detail.pending}

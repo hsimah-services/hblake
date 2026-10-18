@@ -55,7 +55,7 @@ test('a public route inlines its query response and is not shared-cacheable', as
 });
 
 test('list routes bind their URL cursor', async () => {
-  for (const path of ['/posts', '/products']) {
+  for (const path of ['/news', '/products']) {
     const { payload } = await html(visitor, path);
     expect(payload?.responses, `${path} inlines its list query`).toHaveLength(1);
     expect(payload!.responses[0].variables.after ?? null).toBeNull();
@@ -91,7 +91,7 @@ test('inlined content cannot break out of its script element', async () => {
 });
 
 test('URLs that match no route get the plain shell', async () => {
-  for (const path of [`/nothing-${uniqueSlug()}`, '/posts/a/b/c', '/posts/%E0%A4%A']) {
+  for (const path of [`/nothing-${uniqueSlug()}`, '/news/a/b/c', '/news/%E0%A4%A']) {
     const { payload } = await html(visitor, path);
     expect(payload, path).toBeNull();
   }

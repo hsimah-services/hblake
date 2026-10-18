@@ -31,7 +31,7 @@ const styles = stylex.create({
   wrap: { position: 'relative', display: 'inline-block' },
   card: {
     position: 'absolute', top: 'calc(100% + 0.35rem)', insetInlineStart: 0, zIndex: 5, whiteSpace: 'nowrap',
-    paddingBlock: '0.35rem', paddingInline: '0.6rem', borderRadius: '0.5rem', fontSize: '0.85rem',
+    paddingBlock: '0.35rem', paddingInline: '0.6rem', borderRadius: 'var(--radius-inner)', fontSize: '0.85rem',
     backgroundColor: 'var(--color-background-popover)', color: 'var(--color-text-primary)',
     borderWidth: '1px', borderStyle: 'solid', borderColor: 'var(--site-hairline)', boxShadow: '0 8px 24px -12px rgb(0 0 0 / 0.5)',
   },

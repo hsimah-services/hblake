@@ -21,11 +21,14 @@ export function AdminPost({ list, create, content }: AdminPostProps) {
 function AdminPost_List({ queryRef }: { queryRef: PreloadedQuery<AdminPostListQuery> }) {
   const data = usePreloadedQuery<AdminPostListQuery>(ADMIN_POST_LIST_QUERY, queryRef);
   const mutate = AdminPostMutation();
-  return <AdminLayout data={data} section="posts" title="Posts">
-    <AdminTable kind="Post" plural="Posts" rows={data.posts?.nodes} published
+  const route = useAdminPostRouteContext();
+  const status = 'status' in route.input && typeof route.input.status === 'string' ? route.input.status : undefined;
+  return <AdminLayout data={data} section="posts" title="News">
+    <AdminTable kind="Article" plural="News" rows={data.posts?.nodes} published
       create={AdminPostCreateURI.getURI({})} detail={id => AdminPostDetailURI.getURI({ id })} edit={id => AdminPostEditURI.getURI({ id })}
       remove={id => mutate('delete', { id })}
-      next={data.posts?.pageInfo.hasNextPage ? AdminPostListURI.getURI({ after: data.posts.pageInfo.endCursor ?? undefined }) : undefined} />
+      status={status} filtered={value => AdminPostListURI.getURI({ status: value })}
+      next={data.posts?.pageInfo.hasNextPage ? AdminPostListURI.getURI({ after: data.posts.pageInfo.endCursor ?? undefined, status }) : undefined} />
   </AdminLayout>;
 }
 
@@ -33,8 +36,8 @@ function AdminPost_Create({ queryRef }: { queryRef: PreloadedQuery<AdminPostCrea
   const data = usePreloadedQuery<AdminPostCreateQuery>(ADMIN_POST_CREATE_QUERY, queryRef);
   const mutate = AdminPostMutation();
   const save = useAdminPost_Save(null, mutate);
-  return <AdminLayout data={data} section="posts" title="Create Post">
-    <Heading level={1}>Create Post</Heading>
+  return <AdminLayout data={data} section="posts" title="New article">
+    <Heading level={1}>New article</Heading>
     <ContentForm key="new" kind="Post" save={save} detail={id => AdminPostDetailURI.getURI({ id })} />
   </AdminLayout>;
 }
@@ -46,9 +49,9 @@ function AdminPost_Content({ queryRef }: { queryRef: PreloadedQuery<AdminPostQue
   const editing = route.currentRoute === RouteName.AdminPostEdit && row != null;
   return <AdminLayout data={data} section="posts" row={row} title={editing ? `Edit ${row.title}` : undefined}>
     {editing ? <>
-      <Heading level={1}>Edit Post</Heading>
+      <Heading level={1}>Edit article</Heading>
       <ContentForm key={row.id} kind="Post" row={row} save={save} detail={id => AdminPostDetailURI.getURI({ id })} />
-    </> : <AdminDetail kind="Post" row={row} edit={AdminPostEditURI.getURI({ id: row?.id ?? '' })} list={AdminPostListURI.getURI({})} mutate={mutate} />}
+    </> : <AdminDetail kind="Article" row={row} edit={AdminPostEditURI.getURI({ id: row?.id ?? '' })} list={AdminPostListURI.getURI({})} mutate={mutate} />}
   </AdminLayout>;
 }
 

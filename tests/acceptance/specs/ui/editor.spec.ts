@@ -35,7 +35,7 @@ const markdown = async (page: Page): Promise<string> => {
 };
 
 test('post content is a labelled rich-text editor with a named formatting toolbar', async ({ page }) => {
-  await page.goto('/admin/posts/new');
+  await page.goto('/admin/news/new');
   await expect(editor(page)).toHaveAttribute('contenteditable', 'true');
   await expect(editor(page)).toHaveAttribute('aria-multiline', 'true');
   for (const name of ['Bold', 'Italic', 'Strikethrough', 'Inline code', 'Heading 2', 'Heading 3', 'Bulleted list', 'Numbered list', 'Quote', 'Code block', 'Link', 'Image', 'Undo', 'Redo']) {
@@ -49,7 +49,7 @@ test('post content is a labelled rich-text editor with a named formatting toolba
 });
 
 test('formatting shows its pressed state and is saved as Markdown', async ({ page }) => {
-  await page.goto('/admin/posts/new');
+  await page.goto('/admin/news/new');
   await editor(page).click();
   await page.keyboard.type('Plain then strong');
   await page.keyboard.press('Shift+Home');
@@ -61,7 +61,7 @@ test('formatting shows its pressed state and is saved as Markdown', async ({ pag
 });
 
 test('Markdown source and rich text round-trip', async ({ page }) => {
-  await page.goto('/admin/posts/new');
+  await page.goto('/admin/news/new');
   await mode(page, 'Markdown').click();
   await page.getByLabel('Content').fill('## Section title\n\n- first\n- second\n\n> quoted');
   await mode(page, 'Rich text').click();
@@ -71,7 +71,7 @@ test('Markdown source and rich text round-trip', async ({ page }) => {
 });
 
 test('links must be web, email or site addresses', async ({ page }) => {
-  await page.goto('/admin/posts/new');
+  await page.goto('/admin/news/new');
   await editor(page).click();
   await toolbar(page).getByRole('button', { name: 'Link', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: 'Link' });
@@ -87,7 +87,7 @@ test('links must be web, email or site addresses', async ({ page }) => {
 
 test('an image needs alt text, uploads from the editor and appears on the published post', async ({ page }) => {
   const slug = uniqueSlug('picture');
-  await page.goto('/admin/posts/new');
+  await page.goto('/admin/news/new');
   await page.getByLabel('Title').fill(`Picture ${slug}`);
   await page.getByLabel('Slug').fill(slug);
   await editor(page).click();
@@ -105,10 +105,12 @@ test('an image needs alt text, uploads from the editor and appears on the publis
   expect(await markdown(page)).toMatch(/!\[A tiny black square\]\(\/media\/[a-f0-9]{32}\.png\)/);
 
   await page.getByRole('button', { name: /^(create|save)/i }).click();
-  await expect(page).toHaveURL(new RegExp(`^${BASE_URL}/admin/posts/[^/]+$`));
+  // Wait for the save itself: /admin/news/new would also match a bare id pattern.
+  await expect(page.getByRole('status').filter({ hasText: /created/i })).toBeVisible();
+  await expect(page).toHaveURL(new RegExp(`^${BASE_URL}/admin/news/(?!new$)[^/]+$`));
   const post = await bySlug(api, 'Post', slug);
   await action(api, 'Post', 'publish', post!.id);
-  await page.goto(`/posts/${slug}`);
+  await page.goto(`/news/${slug}`);
   const image = page.getByRole('main').getByRole('img', { name: 'A tiny black square' });
   await expect(image).toBeVisible();
   await expect.poll(() => image.evaluate(element => (element as HTMLImageElement).naturalWidth), 'the image loads').toBeGreaterThan(0);

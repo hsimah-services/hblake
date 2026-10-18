@@ -1,7 +1,7 @@
 # Post
 
-A consulting article or business update, addressed at `/posts/:slug` and listed
-at `/posts`. Uses Content, Publishable and Timestamps. The list sorts by
+A consulting article or business update, presented as News: addressed at
+`/news/:slug` and listed at `/news`. Uses Content, Publishable and Timestamps. The list sorts by
 `publishedAt` descending, then ID descending, and supports bounded pagination.
 
 No posts are invented to fill the site. No comments, categories, tags or public

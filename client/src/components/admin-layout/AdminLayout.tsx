@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { useLocation } from 'react-router';
 import { graphql, useFragment } from 'react-relay';
 import { AppShell } from '@astryxdesign/core/AppShell';
@@ -11,6 +11,7 @@ import { SITE_NAME } from '../../SiteName';
 import { useDocumentMetadata, type useDocumentMetadataRow } from '../../useDocumentMetadata';
 import { useSignOut } from '../../useSignOut';
 import { DisplayPreferences } from '../display-preferences/DisplayPreferences';
+import { AdminIcon } from '../admin-icon/AdminIcon';
 import type { AdminLayoutFragment$key } from './__generated__/AdminLayoutFragment.graphql';
 
 const ADMIN_LAYOUT_FRAGMENT = graphql`fragment AdminLayoutFragment on RootQuery {
@@ -25,18 +26,18 @@ export function AdminLayout({ data, section, title, row, children }: AdminLayout
   const layout = useAdminLayout(data, row, title);
   return <AppShell
     topNav={<TopNav label="Site tools" heading={<AdminLayout_Brand />} endContent={<Stack direction="horizontal" gap={2} align="center">
-      <Link href={HomeURI.getURI({})} xstyle={styles.viewSite}>View site</Link>
+      <Button href={HomeURI.getURI({})} label="View site" variant="ghost" icon={<AdminIcon name="external" />} xstyle={styles.viewSite} />
       <DisplayPreferences />
-      {layout.viewer && <Button label="Sign out" clickAction={layout.signOut} isDisabled={!layout.signOutReady} />}
+      {layout.viewer && <Button label="Sign out" icon={<AdminIcon name="signOut" />} clickAction={layout.signOut} isDisabled={!layout.signOutReady} />}
     </Stack>} />}
     sideNav={<SideNav aria-label="Administration">
       <SideNavSection title="Manage" isHeaderHidden>
-        <SideNavItem label="Dashboard" href={AdminHomeURI.getURI({})} isSelected={section === 'dashboard'} icon={<AdminLayout_Icon path="M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z" />} />
-        {layout.sections.map(item => <SideNavItem key={item.href} label={item.label} href={item.href} isSelected={section === item.section} icon={<AdminLayout_Icon path={item.icon} />}
+        <SideNavItem label="Dashboard" href={AdminHomeURI.getURI({})} isSelected={section === 'dashboard'} icon={<AdminIcon name="dashboard" />} />
+        {layout.sections.map(item => <SideNavItem key={item.href} label={item.label} href={item.href} isSelected={section === item.section} icon={<AdminIcon name={item.icon} />}
           endContent={<Badge label={item.count} aria-label={`${item.count} ${item.label.toLowerCase()}`} />} />)}
       </SideNavSection>
       {layout.viewer && <SideNavSection title="Account" isHeaderHidden>
-        <SideNavItem label="Settings" href={AdminUserDetailURI.getURI({ id: layout.viewer.id ?? '' })} isSelected={section === 'settings'} icon={<AdminLayout_Icon path="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" />} />
+        <SideNavItem label="Settings" href={AdminUserDetailURI.getURI({ id: layout.viewer.id ?? '' })} isSelected={section === 'settings'} icon={<AdminIcon name="settings" />} />
       </SideNavSection>}
     </SideNav>}
   >
@@ -57,19 +58,20 @@ function AdminLayout_Brand() {
   </Stack>;
 }
 
-function AdminLayout_Icon({ path }: { path: string }) {
-  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={path} /></svg>;
-}
-
 function useAdminLayout(key: AdminLayoutFragment$key, row: useDocumentMetadataRow | null | undefined, title: string | undefined) {
   const data = useFragment(ADMIN_LAYOUT_FRAGMENT, key);
   const location = useLocation();
   useDocumentMetadata(row, title, true);
   const session = useSignOut(data.viewer != null);
+  // global.css squares off every radius on the admin surface, dialogs and drawers included.
+  useEffect(() => {
+    document.documentElement.dataset.surface = 'admin';
+    return () => { delete document.documentElement.dataset.surface; };
+  }, []);
   const sections = [
-    { section: 'pages', label: 'Pages', href: AdminPageListURI.getURI({}), count: data.pageCount?.totalCount ?? 0, icon: 'M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M8 13h8M8 17h5' },
-    { section: 'posts', label: 'Posts', href: AdminPostListURI.getURI({}), count: data.postCount?.totalCount ?? 0, icon: 'M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z' },
-    { section: 'products', label: 'Products', href: AdminProductListURI.getURI({}), count: data.productCount?.totalCount ?? 0, icon: 'M21 8 12 3 3 8v8l9 5 9-5zM3 8l9 5 9-5M12 13v8' },
+    { section: 'pages', label: 'Pages', href: AdminPageListURI.getURI({}), count: data.pageCount?.totalCount ?? 0, icon: 'page' },
+    { section: 'posts', label: 'News', href: AdminPostListURI.getURI({}), count: data.postCount?.totalCount ?? 0, icon: 'news' },
+    { section: 'products', label: 'Products', href: AdminProductListURI.getURI({}), count: data.productCount?.totalCount ?? 0, icon: 'product' },
   ] as const;
   return { viewer: data.viewer, sections, error: session.error, signOut: session.signOut, signOutReady: session.ready, notice: (location.state as { notice?: string } | null)?.notice };
 }

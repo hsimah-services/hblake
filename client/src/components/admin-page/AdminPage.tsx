@@ -21,11 +21,14 @@ export function AdminPage({ list, create, content }: AdminPageProps) {
 function AdminPage_List({ queryRef }: { queryRef: PreloadedQuery<AdminPageListQuery> }) {
   const data = usePreloadedQuery<AdminPageListQuery>(ADMIN_PAGE_LIST_QUERY, queryRef);
   const mutate = AdminPageMutation();
+  const route = useAdminPageRouteContext();
+  const status = 'status' in route.input && typeof route.input.status === 'string' ? route.input.status : undefined;
   return <AdminLayout data={data} section="pages" title="Pages">
     <AdminTable kind="Page" plural="Pages" rows={data.pages?.nodes}
       create={AdminPageCreateURI.getURI({})} detail={id => AdminPageDetailURI.getURI({ id })} edit={id => AdminPageEditURI.getURI({ id })}
       remove={id => mutate('delete', { id })}
-      next={data.pages?.pageInfo.hasNextPage ? AdminPageListURI.getURI({ after: data.pages.pageInfo.endCursor ?? undefined }) : undefined} />
+      status={status} filtered={value => AdminPageListURI.getURI({ status: value })}
+      next={data.pages?.pageInfo.hasNextPage ? AdminPageListURI.getURI({ after: data.pages.pageInfo.endCursor ?? undefined, status }) : undefined} />
   </AdminLayout>;
 }
 
@@ -33,8 +36,8 @@ function AdminPage_Create({ queryRef }: { queryRef: PreloadedQuery<AdminPageCrea
   const data = usePreloadedQuery<AdminPageCreateQuery>(ADMIN_PAGE_CREATE_QUERY, queryRef);
   const mutate = AdminPageMutation();
   const save = useAdminPage_Save(null, mutate);
-  return <AdminLayout data={data} section="pages" title="Create Page">
-    <Heading level={1}>Create Page</Heading>
+  return <AdminLayout data={data} section="pages" title="New page">
+    <Heading level={1}>New page</Heading>
     <ContentForm key="new" kind="Page" save={save} detail={id => AdminPageDetailURI.getURI({ id })} />
   </AdminLayout>;
 }
@@ -46,7 +49,7 @@ function AdminPage_Content({ queryRef }: { queryRef: PreloadedQuery<AdminPageQue
   const editing = route.currentRoute === RouteName.AdminPageEdit && row != null;
   return <AdminLayout data={data} section="pages" row={row} title={editing ? `Edit ${row.title}` : undefined}>
     {editing ? <>
-      <Heading level={1}>Edit Page</Heading>
+      <Heading level={1}>Edit page</Heading>
       <ContentForm key={row.id} kind="Page" row={row} save={save} detail={id => AdminPageDetailURI.getURI({ id })} />
     </> : <AdminDetail kind="Page" row={row} edit={AdminPageEditURI.getURI({ id: row?.id ?? '' })} list={AdminPageListURI.getURI({})} mutate={mutate} />}
   </AdminLayout>;

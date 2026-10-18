@@ -21,11 +21,14 @@ export function AdminProduct({ list, create, content }: AdminProductProps) {
 function AdminProduct_List({ queryRef }: { queryRef: PreloadedQuery<AdminProductListQuery> }) {
   const data = usePreloadedQuery<AdminProductListQuery>(ADMIN_PRODUCT_LIST_QUERY, queryRef);
   const mutate = AdminProductMutation();
+  const route = useAdminProductRouteContext();
+  const status = 'status' in route.input && typeof route.input.status === 'string' ? route.input.status : undefined;
   return <AdminLayout data={data} section="products" title="Products">
     <AdminTable kind="Product" plural="Products" rows={data.products?.nodes}
       create={AdminProductCreateURI.getURI({})} detail={id => AdminProductDetailURI.getURI({ id })} edit={id => AdminProductEditURI.getURI({ id })}
       remove={id => mutate('delete', { id })}
-      next={data.products?.pageInfo.hasNextPage ? AdminProductListURI.getURI({ after: data.products.pageInfo.endCursor ?? undefined }) : undefined} />
+      status={status} filtered={value => AdminProductListURI.getURI({ status: value })}
+      next={data.products?.pageInfo.hasNextPage ? AdminProductListURI.getURI({ after: data.products.pageInfo.endCursor ?? undefined, status }) : undefined} />
   </AdminLayout>;
 }
 
@@ -33,8 +36,8 @@ function AdminProduct_Create({ queryRef }: { queryRef: PreloadedQuery<AdminProdu
   const data = usePreloadedQuery<AdminProductCreateQuery>(ADMIN_PRODUCT_CREATE_QUERY, queryRef);
   const mutate = AdminProductMutation();
   const save = useAdminProduct_Save(null, mutate);
-  return <AdminLayout data={data} section="products" title="Create Product">
-    <Heading level={1}>Create Product</Heading>
+  return <AdminLayout data={data} section="products" title="New product">
+    <Heading level={1}>New product</Heading>
     <ContentForm key="new" kind="Product" save={save} detail={id => AdminProductDetailURI.getURI({ id })} />
   </AdminLayout>;
 }
@@ -46,7 +49,7 @@ function AdminProduct_Content({ queryRef }: { queryRef: PreloadedQuery<AdminProd
   const editing = route.currentRoute === RouteName.AdminProductEdit && row != null;
   return <AdminLayout data={data} section="products" row={row} title={editing ? `Edit ${row.title}` : undefined}>
     {editing ? <>
-      <Heading level={1}>Edit Product</Heading>
+      <Heading level={1}>Edit product</Heading>
       <ContentForm key={row.id} kind="Product" row={row} save={save} detail={id => AdminProductDetailURI.getURI({ id })} />
     </> : <AdminDetail kind="Product" row={row} edit={AdminProductEditURI.getURI({ id: row?.id ?? '' })} list={AdminProductListURI.getURI({})} mutate={mutate} />}
   </AdminLayout>;

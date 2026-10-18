@@ -41,7 +41,7 @@ const idFromUrl = (page: Page, kind: Kind): string => {
 
 test.describe('access', () => {
   test('signed-out visitors are sent to the login page', async ({ page }) => {
-    for (const path of ['/admin', '/admin/pages', '/admin/posts/new', '/admin/products']) {
+    for (const path of ['/admin', '/admin/pages', '/admin/news/new', '/admin/products']) {
       await page.goto(path);
       await expect(page, path).toHaveURL(`${BASE_URL}/admin/login`);
     }
@@ -66,7 +66,7 @@ test.describe('access', () => {
     await page.keyboard.press('Enter');
     await expect(page).toHaveURL(`${BASE_URL}/admin`);
     const main = page.getByRole('main');
-    for (const href of ['/admin/pages', '/admin/posts', '/admin/products']) {
+    for (const href of ['/admin/pages', '/admin/news', '/admin/products']) {
       await expect(main.locator(`a[href="${href}"]`).first()).toBeVisible();
     }
     const viewer = (await api.viewer())!;
@@ -211,6 +211,30 @@ test.describe('forms in detail', () => {
     await signIn(page);
   });
 
+  test("a new record's slug follows its title until the slug is edited", async ({ page }) => {
+    await page.goto('/admin/pages/new');
+    const title = page.getByLabel('Title'); const slug = page.getByLabel('Slug');
+    await title.fill("Hello, World! It's 2026 — Café & Co.");
+    await expect(slug, 'kebab case, accents folded, punctuation dropped').toHaveValue('hello-world-its-2026-cafe-co');
+    await title.fill(`${'Long words '.repeat(30)}end`);
+    await expect(slug).toHaveValue(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
+    expect((await slug.inputValue()).length, 'within the slug limit').toBeLessThanOrEqual(160);
+
+    await slug.fill('chosen-slug');
+    await title.fill('A different title');
+    await expect(slug, 'an edited slug stays').toHaveValue('chosen-slug');
+    await slug.fill('');
+    await title.fill('Back to automatic');
+    await expect(slug, 'clearing it resumes following').toHaveValue('back-to-automatic');
+  });
+
+  test('editing a title never changes an existing slug', async ({ page }) => {
+    const row = await createOk(api, 'Page');
+    await page.goto(`/admin/pages/${encodeURIComponent(row.id)}/edit`);
+    await page.getByLabel('Title').fill('Renamed without moving');
+    await expect(page.getByLabel('Slug')).toHaveValue(row.slug);
+  });
+
   test('an enquiry URL can be cleared', async ({ page }) => {
     const row = await createOk(api, 'Product', { enquiryUrl: 'https://example.com/clear-me' });
     await page.goto(`/admin/products/${encodeURIComponent(row.id)}/edit`);
@@ -223,7 +247,7 @@ test.describe('forms in detail', () => {
 
   test('an excerpt can be cleared without touching other fields', async ({ page }) => {
     const row = await createOk(api, 'Post', { excerpt: 'Remove me.' });
-    await page.goto(`/admin/posts/${encodeURIComponent(row.id)}/edit`);
+    await page.goto(`/admin/news/${encodeURIComponent(row.id)}/edit`);
     await page.getByLabel('Excerpt').fill('');
     await page.getByRole('button', { name: /^save/i }).click();
     await expect(confirmation(page)).toBeVisible();
@@ -272,8 +296,8 @@ test.describe('forms in detail', () => {
   test('admin lists page in bounded steps with the cursor in the URL', async ({ page }) => {
     const { totalCount } = await pageOf(api, 'Post');
     for (let i = totalCount; i < 21; i += 1) await createOk(api, 'Post');
-    await page.goto('/admin/posts');
-    const records = page.getByRole('main').locator('a[href^="/admin/posts/"]');
+    await page.goto('/admin/news');
+    const records = page.getByRole('main').locator('a[href^="/admin/news/"]');
     await expect(records.first()).toBeVisible();
     const ids = await records.evaluateAll(links =>
       [...new Set(links.map(link => link.getAttribute('href')!.split('/')[3]).filter(id => id && id !== 'new'))],
@@ -281,12 +305,12 @@ test.describe('forms in detail', () => {
     expect(ids.length, 'at most 20 records per page').toBeLessThanOrEqual(20);
     expect(ids.length).toBeGreaterThan(0);
     await page.getByRole('link', { name: /next|older|more/i }).or(page.getByRole('button', { name: /next|older|more/i })).first().click();
-    await expect(page).toHaveURL(/\/admin\/posts\?(.*&)?after=/);
+    await expect(page).toHaveURL(/\/admin\/news\?(.*&)?after=/);
   });
 
   test('records created in the admin are not public until published', async ({ page }) => {
     const slug = uniqueSlug('ui-private');
-    await page.goto('/admin/posts/new');
+    await page.goto('/admin/news/new');
     await page.getByLabel('Title').fill(`Private ${slug}`);
     await page.getByLabel('Slug').fill(slug);
     await markdownSource(page, 'Post');
@@ -338,7 +362,7 @@ test.describe('dialogs and routing', () => {
     const sameDocument = (): Promise<boolean> =>
       page.evaluate(() => (window as unknown as { __document?: string }).__document === 'first-load');
 
-    await page.getByRole('main').getByRole('link', { name: /^posts$/i }).click();
+    await page.getByRole('main').getByRole('link', { name: /^news$/i }).click();
     await expect(page).toHaveURL(`${BASE_URL}${adminPath('Post')}`);
     expect(await sameDocument(), 'section link handled by the router').toBe(true);
 
@@ -361,11 +385,11 @@ test.describe('document titles', () => {
     const screens: [string, RegExp][] = [
       ['/admin', /^Dashboard\b/],
       ['/admin/pages', /^Pages\b/],
-      ['/admin/posts', /^Posts\b/],
+      ['/admin/news', /^News\b/],
       ['/admin/products', /^Products\b/],
-      ['/admin/posts/new', /^Create Post\b/],
-      [`/admin/posts/${encodeURIComponent(row.id)}`, new RegExp(`^${row.title}\\b`)],
-      [`/admin/posts/${encodeURIComponent(row.id)}/edit`, new RegExp(`^Edit ${row.title}\\b`)],
+      ['/admin/news/new', /^New article\b/],
+      [`/admin/news/${encodeURIComponent(row.id)}`, new RegExp(`^${row.title}\\b`)],
+      [`/admin/news/${encodeURIComponent(row.id)}/edit`, new RegExp(`^Edit ${row.title}\\b`)],
     ];
     for (const [path, title] of screens) {
       await page.goto(path);

@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   tsquid-manifest.php
- * digest: sha256:c9495581f214b27231b43e079e7b21e63f8a1f63a1dccaf370ae41e757890de2
+ * digest: sha256:1a47b4efce3bd50a37b7058c8440cb8e70e942aa9ffe4d5d0ed113e8fa7bf506
  */
 
 return new \Eleph\Tsquid\Manifest((object) ['routes' => [(object) ['fields' => (object) [], 'name' => 'Home', 'path' => '/', 'query' => (object) ['id' => '8377941fd17bab39b9523077363b7cf4', 'operation' => 'HomeQuery', 'text' => 'query HomeQuery {
@@ -117,7 +117,7 @@ fragment LayoutFragment on RootQuery {
     }
   }
 }
-', 'variables' => (object) ['slug' => (object) ['input' => 'slug']]], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'PostList', 'path' => '/posts', 'query' => (object) ['id' => '5c0947501fc7618f64548214828e1f09', 'operation' => 'PostListQuery', 'text' => 'query PostListQuery(
+', 'variables' => (object) ['slug' => (object) ['input' => 'slug']]], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'PostList', 'path' => '/news', 'query' => (object) ['id' => '5c0947501fc7618f64548214828e1f09', 'operation' => 'PostListQuery', 'text' => 'query PostListQuery(
   $after: String
 ) {
   ...LayoutFragment
@@ -166,7 +166,7 @@ fragment LayoutFragment on RootQuery {
     }
   }
 }
-', 'variables' => (object) ['after' => (object) ['input' => 'after']]], 'ssr' => true], (object) ['fields' => (object) ['slug' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'Post', 'path' => '/posts/:slug', 'query' => (object) ['id' => '460afd8126de35665089ff76542d2a9e', 'operation' => 'PostQuery', 'text' => 'query PostQuery(
+', 'variables' => (object) ['after' => (object) ['input' => 'after']]], 'ssr' => true], (object) ['fields' => (object) ['slug' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'Post', 'path' => '/news/:slug', 'query' => (object) ['id' => '460afd8126de35665089ff76542d2a9e', 'operation' => 'PostQuery', 'text' => 'query PostQuery(
   $slug: String!
 ) {
   ...LayoutFragment
@@ -378,7 +378,7 @@ fragment AdminLayoutFragment on RootQuery {
     totalCount
   }
 }
-', 'variables' => (object) []], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'AdminPageList', 'path' => '/admin/pages', 'query' => (object) ['id' => '12cfe7b9258ead963a590592ea023a28', 'operation' => 'AdminPageListQuery', 'text' => 'query AdminPageListQuery(
+', 'variables' => (object) []], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true], 'status' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'AdminPageList', 'path' => '/admin/pages', 'query' => (object) ['id' => '12cfe7b9258ead963a590592ea023a28', 'operation' => 'AdminPageListQuery', 'text' => 'query AdminPageListQuery(
   $after: String
 ) {
   ...AdminLayoutFragment
@@ -498,7 +498,7 @@ fragment AdminLayoutFragment on RootQuery {
     totalCount
   }
 }
-', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'AdminPostList', 'path' => '/admin/posts', 'query' => (object) ['id' => 'dff86c06acb2c466cabe1662792b5987', 'operation' => 'AdminPostListQuery', 'text' => 'query AdminPostListQuery(
+', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true], 'status' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'AdminPostList', 'path' => '/admin/news', 'query' => (object) ['id' => 'dff86c06acb2c466cabe1662792b5987', 'operation' => 'AdminPostListQuery', 'text' => 'query AdminPostListQuery(
   $after: String
 ) {
   ...AdminLayoutFragment
@@ -533,7 +533,7 @@ fragment AdminLayoutFragment on RootQuery {
     totalCount
   }
 }
-', 'variables' => (object) ['after' => (object) ['input' => 'after']]], 'ssr' => true], (object) ['fields' => (object) [], 'name' => 'AdminPostCreate', 'path' => '/admin/posts/new', 'query' => (object) ['id' => '9507ce88faf42861274aff138dfb666d', 'operation' => 'AdminPostCreateQuery', 'text' => 'query AdminPostCreateQuery {
+', 'variables' => (object) ['after' => (object) ['input' => 'after']]], 'ssr' => true], (object) ['fields' => (object) [], 'name' => 'AdminPostCreate', 'path' => '/admin/news/new', 'query' => (object) ['id' => '9507ce88faf42861274aff138dfb666d', 'operation' => 'AdminPostCreateQuery', 'text' => 'query AdminPostCreateQuery {
   ...AdminLayoutFragment
   viewer {
     id
@@ -555,7 +555,7 @@ fragment AdminLayoutFragment on RootQuery {
     totalCount
   }
 }
-', 'variables' => (object) []], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminPostDetail', 'path' => '/admin/posts/:id', 'query' => (object) ['id' => '61b146c4d4458157331be252570c9ab6', 'operation' => 'AdminPostQuery', 'text' => 'query AdminPostQuery(
+', 'variables' => (object) []], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminPostDetail', 'path' => '/admin/news/:id', 'query' => (object) ['id' => '61b146c4d4458157331be252570c9ab6', 'operation' => 'AdminPostQuery', 'text' => 'query AdminPostQuery(
   $id: ID!
 ) {
   ...AdminLayoutFragment
@@ -587,7 +587,7 @@ fragment AdminLayoutFragment on RootQuery {
     totalCount
   }
 }
-', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminPostEdit', 'path' => '/admin/posts/:id/edit', 'query' => (object) ['id' => '61b146c4d4458157331be252570c9ab6', 'operation' => 'AdminPostQuery', 'text' => 'query AdminPostQuery(
+', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminPostEdit', 'path' => '/admin/news/:id/edit', 'query' => (object) ['id' => '61b146c4d4458157331be252570c9ab6', 'operation' => 'AdminPostQuery', 'text' => 'query AdminPostQuery(
   $id: ID!
 ) {
   ...AdminLayoutFragment
@@ -619,7 +619,7 @@ fragment AdminLayoutFragment on RootQuery {
     totalCount
   }
 }
-', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'AdminProductList', 'path' => '/admin/products', 'query' => (object) ['id' => '913a8cc640ffe8bc7bb23bab5533e0fd', 'operation' => 'AdminProductListQuery', 'text' => 'query AdminProductListQuery(
+', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true], 'status' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'AdminProductList', 'path' => '/admin/products', 'query' => (object) ['id' => '913a8cc640ffe8bc7bb23bab5533e0fd', 'operation' => 'AdminProductListQuery', 'text' => 'query AdminProductListQuery(
   $after: String
 ) {
   ...AdminLayoutFragment

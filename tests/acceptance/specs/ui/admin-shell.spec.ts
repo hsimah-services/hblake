@@ -34,7 +34,7 @@ async function openListAt(page: Page, kind: Kind, title: string): Promise<Locato
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     const row = rowOf(page, title);
     if (await row.count()) return row;
-    const next = page.getByRole('main').getByRole('link', { name: /^next page$/i });
+    const next = page.getByRole('main').getByRole('link', { name: /^next$/i });
     if (!(await next.count())) break;
     // Load the next page directly, so each check sees a fully rendered list rather than
     // the previous page while a client-side transition is still loading.
@@ -45,10 +45,10 @@ async function openListAt(page: Page, kind: Kind, title: string): Promise<Locato
 
 test('the sidebar lists the content types and marks the current one', async ({ page }) => {
   await page.goto(adminPath('Post'));
-  for (const name of ['Dashboard', 'Pages', 'Posts', 'Products', 'Settings']) {
+  for (const name of ['Dashboard', 'Pages', 'News', 'Products', 'Settings']) {
     await expect(sidebar(page).getByRole('link', { name: new RegExp(`^${name}\\b`) }), name).toBeVisible();
   }
-  await expect(sidebar(page).getByRole('link', { name: /^Posts\b/ })).toHaveAttribute('aria-current', 'page');
+  await expect(sidebar(page).getByRole('link', { name: /^News\b/ })).toHaveAttribute('aria-current', 'page');
   await expect(sidebar(page).locator('a[aria-current="page"]')).toHaveCount(1);
   await sidebar(page).getByRole('link', { name: /^Pages\b/ }).click();
   await expect(page).toHaveURL(`${BASE_URL}${adminPath('Page')}`);
@@ -56,9 +56,9 @@ test('the sidebar lists the content types and marks the current one', async ({ p
 });
 
 for (const [kind, columns] of [
-  ['Page', ['Title', 'Slug', 'Status', 'Updated']],
-  ['Post', ['Title', 'Slug', 'Status', 'Published', 'Updated']],
-  ['Product', ['Title', 'Slug', 'Status', 'Updated']],
+  ['Page', ['Title', 'Actions', 'Slug', 'Status', 'Updated']],
+  ['Post', ['Title', 'Actions', 'Slug', 'Status', 'Published', 'Updated']],
+  ['Product', ['Title', 'Actions', 'Slug', 'Status', 'Updated']],
 ] as [Kind, string[]][]) {
   test(`${kind.toLowerCase()} records are listed in a table with the specified columns`, async ({ page }) => {
     const row = await createOk(api, kind, { title: `Tabled ${kind} ${RUN_ID}` });
@@ -85,13 +85,14 @@ test('timestamps read relatively, with the absolute time on focus and for screen
   await page.keyboard.press('Tab');
   await expect(time, 'keyboard users can reach it').toBeFocused();
   await expect(record.getByText(new RegExp(year)), 'focus shows the absolute time').toBeVisible();
-  await page.keyboard.press('Tab');
-  await expect(record.getByText(new RegExp(year)), 'and hides it when focus moves on').toBeHidden();
+  // Move focus out of the timestamp (Tab may land on the copy button inside its card).
+  await record.getByRole('link', { name: row.title, exact: true }).focus();
+  await expect(record.getByText(new RegExp(year)), 'and hides it when focus moves away').toBeHidden();
 });
 
-test('each row can be viewed, edited and deleted from the table', async ({ page }) => {
+test('each row opens from its title and is edited or deleted from its own actions cell', async ({ page }) => {
   const row = await createOk(api, 'Post', { title: `Row actions ${RUN_ID}` });
-  await (await openListAt(page, 'Post', row.title)).getByRole('link', { name: `View “${row.title}”` }).click();
+  await (await openListAt(page, 'Post', row.title)).getByRole('link', { name: row.title, exact: true }).click();
   await expect(page).toHaveURL(`${BASE_URL}${adminPath('Post')}/${encodeURIComponent(row.id)}`);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(row.title);
 
@@ -116,9 +117,9 @@ test('each row can be viewed, edited and deleted from the table', async ({ page 
   await expect(page.getByRole('heading', { level: 1 }), 'focus does not fall to the page').toBeFocused();
 });
 
-test('"Add new" opens an empty form for the type', async ({ page }) => {
+test('"New <type>" opens an empty form for the type', async ({ page }) => {
   await page.goto(adminPath('Product'));
-  await page.getByRole('main').getByRole('link', { name: /^add new product$/i }).click();
+  await page.getByRole('main').getByRole('link', { name: /^new product$/i }).click();
   await expect(page).toHaveURL(`${BASE_URL}${adminPath('Product')}/new`);
   await expect(page.getByLabel('Title')).toHaveValue('');
   await expect(page.getByLabel('Enquiry URL')).toBeVisible();
@@ -130,7 +131,7 @@ test.describe('on a phone', () => {
   test('row actions stay in view and the sidebar opens from a menu button', async ({ page }) => {
     const row = await createOk(api, 'Post', { title: `Phone ${RUN_ID}` });
     await openListAt(page, 'Post', row.title);
-    for (const name of [`View “${row.title}”`, `Edit “${row.title}”`, `Delete “${row.title}”`]) {
+    for (const name of [`Edit “${row.title}”`, `Delete “${row.title}”`]) {
       const action = rowOf(page, row.title).getByRole(name.startsWith('Delete') ? 'button' : 'link', { name });
       const box = await action.boundingBox();
       expect(box, name).not.toBeNull();
@@ -141,4 +142,34 @@ test.describe('on a phone', () => {
     await page.getByRole('button', { name: /open navigation/i }).click();
     await expect(page.getByRole('dialog').getByRole('link', { name: /^Products\b/ })).toBeVisible();
   });
+});
+
+test('columns sort the listed records and say how they are sorted', async ({ page }) => {
+  await createOk(api, 'Page', { title: `Sortable A ${RUN_ID}` });
+  await createOk(api, 'Page', { title: `Sortable B ${RUN_ID}` });
+  await page.goto(adminPath('Page'));
+  const header = page.getByRole('main').getByRole('columnheader', { name: 'Sort by Title' });
+  const titles = (): Promise<string[]> => page.getByRole('main').getByRole('row').locator('td:first-child a').allTextContents();
+  const collate = (values: string[]): string[] => [...values].sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+  await header.getByRole('button', { name: 'Sort by Title' }).click();
+  await expect(header).toHaveAttribute('aria-sort', 'ascending');
+  expect(await titles()).toEqual(collate(await titles()));
+  await header.getByRole('button', { name: 'Sort by Title' }).click();
+  await expect(header).toHaveAttribute('aria-sort', 'descending');
+  expect(await titles()).toEqual(collate(await titles()).reverse());
+});
+
+test('the dashboard draft count opens the list filtered to drafts', async ({ page }) => {
+  await createOk(api, 'Post', { title: `Filter draft ${RUN_ID}` });
+  await page.goto('/admin');
+  const drafts = page.getByRole('main').locator(`a[href="${adminPath('Post')}?status=draft"]`);
+  await expect(drafts).toHaveText(/^\d+ drafts?$/);
+  await drafts.click();
+  await expect(page).toHaveURL(`${BASE_URL}${adminPath('Post')}?status=draft`);
+  await expect(page.getByRole('main').getByText(/showing drafts only/i)).toBeVisible();
+  const statuses = await page.getByRole('main').getByRole('row').locator('td').filter({ hasText: /^(Draft|Published)$/ }).allTextContents();
+  expect(statuses.length).toBeGreaterThan(0);
+  expect(new Set(statuses)).toEqual(new Set(['Draft']));
+  await page.getByRole('main').getByRole('link', { name: /^show all news$/i }).click();
+  await expect(page).toHaveURL(`${BASE_URL}${adminPath('Post')}`);
 });

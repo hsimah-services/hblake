@@ -10,7 +10,7 @@ input, never unchecked numeric conversion.
 
 The admin uses a WordPress-style shell (Astryx AppShell): a top bar with the site
 name, View site, display preferences and Sign out, and a sidebar navigation named
-"Administration" with Dashboard, Pages, Posts and Products (each with its record
+"Administration" with Dashboard, Pages, News (posts) and Products (each with its record
 count) and Settings. The current item carries `aria-current`; on phones the sidebar
 opens from a menu button. The Dashboard shows each type's published and draft counts
 with links to manage it and add a new one.
@@ -21,9 +21,12 @@ sanitizer apply. Links accept only https/http, mailto or site paths. Images are 
 from the editor with required alt text and upload to the media endpoint. Pages and
 products keep the Markdown textarea.
 
-Lists are tables with the admin.yml list columns. Each title links to the record,
-and under it View, Edit and Delete stay visible (not hover-only) so they remain on
-screen on narrow devices; their accessible names include the title. Delete confirms
+Lists are tables with the admin.yml list columns. Each title links to the record; an
+Actions cell right after it holds Edit and Delete (always visible, accessible names
+include the title), so they stay on screen on phones. Columns sort, and
+`?status=draft|published` filters the listed page in the browser for now; server-side
+filtering and sorting come later. The Dashboard's published and draft counts link to
+those filtered lists. Delete confirms
 in a modal alert dialog, stays on the list, announces the deletion and moves focus
 to the heading. Status shows as a text badge. Timestamps read relatively ("2 hours
 ago") in a `<time datetime>`; the absolute time is the accessible name and appears

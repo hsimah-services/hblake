@@ -6,6 +6,11 @@ use Eleph\Tsquid\{InitialData, Manifest};
 use GraphQL\Language\Parser;
 
 $path=parse_url(Http::server('REQUEST_URI') ?: '/',PHP_URL_PATH);
+// Posts became News: keep old links working with a permanent redirect.
+if (preg_match('#^/(admin/)?posts(/.*)?$#D',(string)$path,$old)===1) {
+    $query=parse_url(Http::server('REQUEST_URI') ?: '/',PHP_URL_QUERY);
+    header('Location: /'.($old[1] ?? '').'news'.($old[2] ?? '').(is_string($query) && $query!=='' ? '?'.$query : ''),true,301); return;
+}
 // Post images: staff upload them (multipart, CSRF) and anyone may fetch them by name.
 if ($path==='/media' && Http::server('REQUEST_METHOD')==='POST') {
     header('Cache-Control: no-store');

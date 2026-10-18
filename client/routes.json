@@ -23,7 +23,7 @@
     {
       "name": "PostList",
       "entryPoint": "src/components/post/Post.entrypoint.ts",
-      "path": "/posts",
+      "path": "/news",
       "fields": {
         "after": {
           "kind": "string",
@@ -35,7 +35,7 @@
     {
       "name": "Post",
       "entryPoint": "src/components/post/Post.entrypoint.ts",
-      "path": "/posts/:slug",
+      "path": "/news/:slug",
       "fields": {
         "slug": {
           "kind": "string"
@@ -88,6 +88,10 @@
         "after": {
           "kind": "string",
           "optional": true
+        },
+        "status": {
+          "kind": "string",
+          "optional": true
         }
       },
       "query": "AdminPageListQuery"
@@ -124,9 +128,13 @@
     {
       "name": "AdminPostList",
       "entryPoint": "src/components/admin-post/AdminPost.entrypoint.ts",
-      "path": "/admin/posts",
+      "path": "/admin/news",
       "fields": {
         "after": {
+          "kind": "string",
+          "optional": true
+        },
+        "status": {
           "kind": "string",
           "optional": true
         }
@@ -136,14 +144,14 @@
     {
       "name": "AdminPostCreate",
       "entryPoint": "src/components/admin-post/AdminPost.entrypoint.ts",
-      "path": "/admin/posts/new",
+      "path": "/admin/news/new",
       "fields": {},
       "query": "AdminPostCreateQuery"
     },
     {
       "name": "AdminPostDetail",
       "entryPoint": "src/components/admin-post/AdminPost.entrypoint.ts",
-      "path": "/admin/posts/:id",
+      "path": "/admin/news/:id",
       "fields": {
         "id": {
           "kind": "string"
@@ -154,7 +162,7 @@
     {
       "name": "AdminPostEdit",
       "entryPoint": "src/components/admin-post/AdminPost.entrypoint.ts",
-      "path": "/admin/posts/:id/edit",
+      "path": "/admin/news/:id/edit",
       "fields": {
         "id": {
           "kind": "string"
@@ -168,6 +176,10 @@
       "path": "/admin/products",
       "fields": {
         "after": {
+          "kind": "string",
+          "optional": true
+        },
+        "status": {
           "kind": "string",
           "optional": true
         }
