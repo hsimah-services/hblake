@@ -2,7 +2,7 @@
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/../.."
 ENGINE=$(command -v podman || command -v docker)
-IMAGE=${HSIMAH_PHP_IMAGE:-localhost/hsimah-php:1}
+IMAGE=${HSIMAH_PHP_IMAGE:-localhost/hsimah-php:2}
 STACK=hsimah-acceptance
 export BASE_URL=${BASE_URL:-http://localhost:8080}
 # The acceptance stack owns a separate database, so up/down never touch the local

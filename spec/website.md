@@ -43,7 +43,10 @@ titles change. A deliberate slug change changes the URL; redirects/history are
 outside this version and the edit screen must make the consequence clear.
 
 Markdown bodies store source text. Render with raw HTML disabled and sanitize
-output and URLs. Draft content may be blank. Published content requires a nonblank
+output and URLs. Posts may contain images uploaded by staff: PNG, JPEG or WebP up to
+5 MB, checked by content, re-encoded so no camera or location metadata survives,
+stored under random names in a private media directory beside the database and
+served from `/media/<name>`. Every image has alt text. Backups include the images. Draft content may be blank. Published content requires a nonblank
 title and body. Limit request/body size to 1 MiB and enforce it on the server.
 Titles are nonblank after trimming; excerpts are plain text for cards and metadata,
 limited to 300 characters in the shared schema and form.

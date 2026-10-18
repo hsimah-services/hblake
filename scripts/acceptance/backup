@@ -2,7 +2,7 @@
 source "$(dirname "$0")/common"
 : "${1:?Backup path required}"
 if [[ -e "$1" ]]; then echo 'Backup path already exists.' >&2; exit 1; fi
-backup_file="$DATA/backup-$(date +%s%N).sqlite"
+backup_file="$DATA/backup-$(date +%s%N).tar"
 scripts/php php server/console.php backup "/app/$backup_file"
 cp -- "$backup_file" "$1"
 chmod 600 "$1"

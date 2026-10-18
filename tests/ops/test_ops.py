@@ -9,6 +9,7 @@ Standard library only:  python3 -I tests/ops/test_ops.py
 
 from __future__ import annotations
 
+import base64
 import http.cookiejar
 import json
 import os
@@ -26,6 +27,8 @@ BASE_URL = os.environ.get("BASE_URL", "http://localhost:8080").rstrip("/")
 USERNAME = os.environ.get("ADMIN_USERNAME", "")
 PASSWORD = os.environ.get("ADMIN_PASSWORD", "")
 RUN = uuid.uuid4().hex[:8]
+# A 4×4 PNG for POST /media.
+PNG = base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAADElEQVQImWNgIB0AAAA0AAEjQ4N1AAAAAElFTkSuQmCC")
 
 
 def harness(name: str, *args: str, env: dict[str, str] | None = None) -> subprocess.CompletedProcess[str]:
@@ -94,6 +97,25 @@ class Client:
             {"input": {"title": title, "slug": slug, "content": f"Body of {title}."}},
         )
 
+    def upload(self, image: bytes = PNG) -> str:
+        """POST /media as multipart field `image`; returns the stored URL."""
+        boundary = uuid.uuid4().hex
+        body = (f"--{boundary}\r\nContent-Disposition: form-data; name=\"image\"; filename=\"square.png\"\r\n"
+                f"Content-Type: image/png\r\n\r\n").encode() + image + f"\r\n--{boundary}--\r\n".encode()
+        req = urllib.request.Request(BASE_URL + "/media", data=body, method="POST")
+        req.add_header("content-type", f"multipart/form-data; boundary={boundary}")
+        req.add_header("X-CSRF-Token", self.csrf())
+        with self.opener.open(req, timeout=30) as response:
+            assert response.status == 201, response.status
+            return json.loads(response.read().decode())["url"]
+
+    def fetch(self, path: str) -> int:
+        try:
+            with self.opener.open(BASE_URL + path, timeout=30) as response:
+                return response.status
+        except urllib.error.HTTPError as error:
+            return error.code
+
     def page(self, slug: str) -> dict | None:
         result = self.graphql("query($slug: String!) { pageBySlug(slug: $slug) { id slug title status } }", {"slug": slug})
         return (result.get("data") or {}).get("pageBySlug")
@@ -137,6 +159,7 @@ class OperatorProcedures(unittest.TestCase):
         created = client.create_page(slug, "Backed up")
         self.assertFalse(rejected(created), created)
         page_id = created["data"]["createPage"]["page"]["id"]
+        kept = client.upload()
 
         with tempfile.TemporaryDirectory() as directory:
             backup = os.path.join(directory, "backup")
@@ -147,6 +170,7 @@ class OperatorProcedures(unittest.TestCase):
             deleted = client.graphql("mutation($input: DeletePageInput!) { deletePage(input: $input) { deletedId } }", {"input": {"id": page_id}})
             self.assertFalse(rejected(deleted), deleted)
             self.assertIsNone(client.page(slug))
+            later = client.upload()
 
             result = harness("restore", backup)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
@@ -154,6 +178,8 @@ class OperatorProcedures(unittest.TestCase):
         restored = operator().page(slug)
         self.assertIsNotNone(restored, "restore brings back content deleted after the backup")
         self.assertEqual(restored["title"], "Backed up")
+        self.assertEqual(Client().fetch(kept), 200, "images uploaded before the backup are restored")
+        self.assertEqual(Client().fetch(later), 404, "the restore replaces images with the backup's")
 
     def test_40_expired_sessions_cannot_use_the_api(self) -> None:
         client = operator()

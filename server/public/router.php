@@ -1,11 +1,18 @@
 <?php
 declare(strict_types=1);
 require dirname(__DIR__,2).'/vendor/autoload.php';
-use Hsimah\{App, Auth, GraphQLEndpoint, Http};
+use Hsimah\{App, Auth, GraphQLEndpoint, Http, Media};
 use Eleph\Tsquid\{InitialData, Manifest};
 use GraphQL\Language\Parser;
 
 $path=parse_url(Http::server('REQUEST_URI') ?: '/',PHP_URL_PATH);
+// Post images: staff upload them (multipart, CSRF) and anyone may fetch them by name.
+if ($path==='/media' && Http::server('REQUEST_METHOD')==='POST') {
+    header('Cache-Control: no-store');
+    try { Media::upload(new Auth(App::database())); }
+    catch (\Throwable $error) { error_log((string)$error); Auth::respond(400,['error'=>'The image could not be processed.']); }
+}
+if (str_starts_with((string)$path,'/media/')) { Media::serve((string)$path); return; }
 if ($path==='/graphql' || str_starts_with((string)$path,'/auth/')) {
     header('Cache-Control: no-store');
     try {

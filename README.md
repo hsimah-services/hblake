@@ -42,7 +42,7 @@ The toolchain uses released Elephentity runtime/CLI 0.13.1, coordinator 0.6.1, P
 
 ## Operator data procedures
 
-SQLite, credentials, sessions and dependency caches live outside `server/public` and the built static client. A deployment must serve only those public roots, route `/graphql`, `/auth/*` and every HTML (non-asset) request to PHP so route data can be inlined, use HTTPS, and give the private data directory mode 0700. Backups include credential hashes and sessions; protect them as private data. Session cookies use Secure for HTTPS and all public hosts; plain HTTP loopback requests are the only exception. Login throttling uses REMOTE_ADDR: configure trusted-proxy address handling before deploying behind a reverse proxy so clients do not share one failure bucket. No production deployment is configured here.
+SQLite, credentials, sessions and dependency caches live outside `server/public` and the built static client. A deployment must serve only those public roots, route `/graphql`, `/auth/*` and every HTML (non-asset) request to PHP so route data can be inlined, use HTTPS, and give the private data directory mode 0700. Post images live in `media/` beside the database (override with `HSIMAH_MEDIA`) and are served by PHP from `/media/`, so route `/media/*` to PHP too. PHP needs the GD extension with JPEG and WebP support, `upload_max_filesize` of at least 6M and `post_max_size` of at least 8M; `.docker/php.Dockerfile` (image `localhost/hsimah-php:2`) sets these up. Backups include credential hashes and sessions; protect them as private data. Session cookies use Secure for HTTPS and all public hosts; plain HTTP loopback requests are the only exception. Login throttling uses REMOTE_ADDR: configure trusted-proxy address handling before deploying behind a reverse proxy so clients do not share one failure bucket. No production deployment is configured here.
 
 Initial installation is explicit and refuses existing tables:
 
@@ -56,11 +56,11 @@ Bootstrap reads `ADMIN_USERNAME`, `ADMIN_DISPLAY_NAME` (the author name shown on
 For a running acceptance stack:
 
 ```sh
-scripts/acceptance/backup /private/path/site-backup.sqlite
-scripts/acceptance/restore /private/path/site-backup.sqlite
+scripts/acceptance/backup /private/path/site-backup.tar
+scripts/acceptance/restore /private/path/site-backup.tar
 ```
 
-Backup uses SQLite `VACUUM INTO` for a consistent snapshot. Restore validates integrity, stops the server, replaces the database and restarts before returning. Run the equivalent procedure under maintenance mode in production. Do not rerun the initial installer as an upgrade; future schema changes require a reviewed migration and a tested backup/restore.
+A backup is a tar of a `VACUUM INTO` database snapshot (`site.sqlite`) and the post images (`media/`). Restore validates the archive and the database's integrity before stopping the server, then replaces the database and images and restarts before returning. Run the equivalent procedure under maintenance mode in production. Do not rerun the initial installer as an upgrade; future schema changes require a reviewed migration and a tested backup/restore.
 
 V1 is client-rendered; each route's HTML carries its query response as tsquid initial data (`#tsquid-data`), executed as the requesting viewer. Initial-HTML SEO, concurrent edit protection, additional accounts and commerce are deferred, as recorded in the specification. The site name is hblake; launch copy and public contact links are supplied by the owner. Deployment remains a separate operator action.
 

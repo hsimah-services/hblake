@@ -15,6 +15,12 @@ count) and Settings. The current item carries `aria-current`; on phones the side
 opens from a menu button. The Dashboard shows each type's published and draft counts
 with links to manage it and add a new one.
 
+Post content is edited as rich text (Tiptap, MIT) with a formatting toolbar and a
+Markdown source mode; Markdown remains the stored format, so the existing renderer and
+sanitizer apply. Links accept only https/http, mailto or site paths. Images are added
+from the editor with required alt text and upload to the media endpoint. Pages and
+products keep the Markdown textarea.
+
 Lists are tables with the admin.yml list columns. Each title links to the record,
 and under it View, Edit and Delete stay visible (not hover-only) so they remain on
 screen on narrow devices; their accessible names include the title. Delete confirms

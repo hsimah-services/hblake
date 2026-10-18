@@ -20,9 +20,12 @@ function Markdown_Link({ href, children }: { href?: string; children?: React.Rea
   return <Link href={href} hasUnderline>{children}</Link>;
 }
 
-// Images in Markdown are small inline marks, such as a logo beside a heading.
+// Uploaded post images (/media/…) fill the column and load lazily; other images, such as
+// a logo beside a heading, stay small inline marks.
 function Markdown_Image({ src, alt }: { src?: string; alt?: string }) {
-  return <img src={src} alt={alt ?? ''} width={56} height={56} {...stylex.props(styles.image)} />;
+  return src?.startsWith('/media/')
+    ? <img src={src} alt={alt ?? ''} loading="lazy" decoding="async" {...stylex.props(styles.media)} />
+    : <img src={src} alt={alt ?? ''} width={56} height={56} {...stylex.props(styles.image)} />;
 }
 
 function Markdown_Paragraph({ children }: { children?: React.ReactNode }) {
@@ -32,5 +35,6 @@ function Markdown_Paragraph({ children }: { children?: React.ReactNode }) {
 const styles = stylex.create({
   heading: { marginTop: '1.5rem', marginBottom: '0.75rem' },
   image: { verticalAlign: 'middle', marginInlineEnd: '0.75rem', objectFit: 'contain' },
+  media: { display: 'block', maxWidth: '100%', height: 'auto', marginBlock: '1.5rem', borderRadius: '0.5rem' },
   paragraph: { marginBlock: '1rem', lineHeight: 1.8 },
 });

@@ -27,6 +27,12 @@ test.afterAll(async () => {
   await api.dispose();
 });
 
+// Posts are written as rich text (ui/editor.spec.ts); their Markdown mode is the plain
+// Content textarea these tests type raw Markdown into.
+const markdownSource = async (page: Page, kind: Kind): Promise<void> => {
+  if (kind === 'Post') await page.getByRole('radio', { name: 'Markdown' }).click();
+};
+
 const idFromUrl = (page: Page, kind: Kind): string => {
   const match = new URL(page.url()).pathname.match(new RegExp(`^${adminPath(kind)}/([^/]+)$`));
   expect(match, `on a ${kind} detail URL, got ${page.url()}`).toBeTruthy();
@@ -110,6 +116,7 @@ for (const kind of KINDS) {
       for (const path of [`${adminPath(kind)}/new`, `${adminPath(kind)}/${encodeURIComponent(row.id)}/edit`]) {
         await page.goto(path);
         for (const label of expected) await expect(page.getByLabel(label).first(), `${path} ${label}`).toBeVisible();
+        await markdownSource(page, kind);
         await expect(page.getByLabel('Content').first()).toHaveJSProperty('tagName', 'TEXTAREA');
         await expect(forbiddenControls(page), `${path} has no status, timestamp or id inputs`).toHaveCount(0);
       }
@@ -120,6 +127,7 @@ for (const kind of KINDS) {
       const title = `Invalid ${RUN_ID}`;
       await page.getByLabel('Title').fill(title);
       await page.getByLabel('Slug').fill('Not A Valid Slug');
+      await markdownSource(page, kind);
       await page.getByLabel('Content').fill('Some body text.');
       await page.getByRole('button', { name: /^(save|create)/i }).click();
 
@@ -137,6 +145,7 @@ for (const kind of KINDS) {
       await page.goto(`${adminPath(kind)}/new`);
       await page.getByLabel('Title').fill(`Duplicate ${RUN_ID}`);
       await page.getByLabel('Slug').fill(taken.slug);
+      await markdownSource(page, kind);
       await page.getByLabel('Content').fill('Duplicate slug body.');
       await page.getByRole('button', { name: /^(save|create)/i }).click();
       await expect(announcedError(page).first()).toBeVisible();
@@ -146,6 +155,7 @@ for (const kind of KINDS) {
 
     test('the Markdown preview renders safely', async ({ page }) => {
       await page.goto(`${adminPath(kind)}/new`);
+      await markdownSource(page, kind);
       await page.getByLabel('Content').fill(`## Preview ${RUN_ID}\n\n<img src=x onerror="window.__xss=1"><script>window.__xss=2</script>`);
       const toggle = page.getByRole('tab', { name: /preview/i }).or(page.getByRole('button', { name: /preview/i }));
       if (await toggle.count()) await toggle.first().click();
@@ -279,6 +289,7 @@ test.describe('forms in detail', () => {
     await page.goto('/admin/posts/new');
     await page.getByLabel('Title').fill(`Private ${slug}`);
     await page.getByLabel('Slug').fill(slug);
+    await markdownSource(page, 'Post');
     await page.getByLabel('Content').fill('Not yet.');
     await page.getByRole('button', { name: /^(save|create)/i }).click();
     await expect(confirmation(page)).toBeVisible();

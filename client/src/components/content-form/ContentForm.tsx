@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useNavigate, useBlocker } from 'react-router';
 import { Button, Heading, Stack, TextInput, TextArea } from '@astryxdesign/core';
 import { Markdown } from '../markdown/Markdown';
+import { RichTextEditor } from '../rich-text/RichTextEditor';
 
 const CONTENT_FIELDS = ['title', 'slug', 'content', 'excerpt', 'enquiryUrl'];
 const PROFILE_FIELDS = ['displayName'];
@@ -16,7 +17,10 @@ export function ContentForm({ kind, row, save, detail }: ContentFormProps) {
       </> : <>
         <TextInput label="Title" htmlName="title" value={form.values.title} onChange={value => form.change('title', value)} status={form.invalid.title ? { type: 'error' } : undefined} />
         <TextInput label="Slug" htmlName="slug" value={form.values.slug} onChange={value => form.change('slug', value)} status={form.invalid.slug ? { type: 'error' } : undefined} description={row ? 'Changing the slug changes the public URL.' : 'Lowercase letters and numbers separated by hyphens.'} />
-        <TextArea label="Content" htmlName="content" value={form.values.content} onChange={value => form.change('content', value)} status={form.invalid.content ? { type: 'error' } : undefined} />
+        {/* Posts are written as rich text; pages and products keep the Markdown textarea. */}
+        {kind === 'Post'
+          ? <RichTextEditor label="Content" name="content" value={form.values.content} onChange={value => form.change('content', value)} invalid={form.invalid.content} />
+          : <TextArea label="Content" htmlName="content" value={form.values.content} onChange={value => form.change('content', value)} status={form.invalid.content ? { type: 'error' } : undefined} />}
         <TextInput label="Excerpt" htmlName="excerpt" value={form.values.excerpt} onChange={value => form.change('excerpt', value)} status={form.invalid.excerpt ? { type: 'error' } : undefined} />
         {kind === 'Product' && <TextInput label="Enquiry URL" htmlName="enquiryUrl" value={form.values.enquiryUrl} onChange={value => form.change('enquiryUrl', value)} status={form.invalid.enquiryUrl ? { type: 'error' } : undefined} />}
       </>}

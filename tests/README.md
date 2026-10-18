@@ -38,8 +38,8 @@ success.
 | `down` | Stop the stack and discard its database. |
 | `bootstrap` | Run the operator bootstrap command against the running stack's database, using `ADMIN_*`. Must exit non-zero when an account already exists. |
 | `install` | Run the initial schema installer against the running stack's database. Must exit non-zero on a populated database. |
-| `backup <path>` | Write a backup of the running stack's data to `<path>` on the host, using the documented operator procedure. |
-| `restore <path>` | Restore that backup into the running stack, which must serve the restored data when the script exits. |
+| `backup <path>` | Write a backup of the running stack's data, including uploaded images, to `<path>` on the host, using the documented operator procedure. |
+| `restore <path>` | Restore that backup into the running stack, which must serve the restored data and images (and none uploaded since) when the script exits. |
 | `expire-sessions` | Expire every session as though its lifetime had passed. Test hook. |
 | `set-active <true\|false>` | Set the operator account's `active` flag. Test hook standing in for future lifecycle screens. |
 
@@ -83,6 +83,14 @@ endpoints. The tests fix them as follows:
     PHP or stack details (`SQLSTATE`, constraint text, table names, file paths,
     date-parser output). Unexpected exceptions get a generic message.
   - Introspection stays enabled; `pnpm schema` needs it too.
+- `POST /media` (multipart field `image`, `X-CSRF-Token`) stores a post image for a
+  signed-in staff session → `201 {"url": "/media/<32 hex>.<png|jpg|webp>"}`. The type
+  comes from the content (PNG, JPEG or WebP), never the name; anything else → `415`.
+  Over 5 MB → `413`. Missing token or no staff session → `403`. Stored images carry no
+  EXIF or other camera/location metadata.
+- `GET /media/<name>` serves only stored names, with the image's `Content-Type`,
+  `X-Content-Type-Options: nosniff` and a long `Cache-Control` max-age; any other path
+  under `/media/` → `404`.
 
 ## HTML contract
 
@@ -183,7 +191,15 @@ The browser tests find elements by accessible role and name, not by test ids:
   link named `/sign out|log out/i`.
 - Content forms have fields labelled `Title`, `Slug`, `Content` (a textarea), `Excerpt`
   and, for products, `Enquiry URL`, with a `Save`/`Create` button. They have no
-  inputs for id, status, publication time or timestamps.
+  inputs for id, status, publication time or timestamps. Posts edit `Content` as rich
+  text: a `textbox` named `Content` (multiline, contenteditable) under a `toolbar` named
+  `Formatting` (Bold, Italic, Strikethrough, Inline code, Heading 2, Heading 3,
+  Bulleted list, Numbered list, Quote, Code block, Link, Image, Undo, Redo; toggles
+  report `aria-pressed`; one Tab stop with arrow keys). An `Editing mode` radio group
+  switches to `Markdown`, where `Content` is the textarea; Markdown is what is saved.
+  The `Link` dialog accepts only https/http, mailto or site paths. The `Insert image`
+  dialog requires `Alt text`, uploads through `POST /media` and inserts
+  `![alt](/media/…)`, which the published post shows as an image with that alt text.
 - Detail views have `Publish`/`Unpublish` and `Delete` buttons. Delete opens a
   `dialog`/`alertdialog` with a cancel button and a confirm button. It is modal:
   focus moves into it, Tab and Shift+Tab stay inside it, Escape closes it without
@@ -255,6 +271,7 @@ Spec acceptance checks and where they are tested:
 | Colour schemes and titles (website.md) | `ui/public-site.spec.ts`, `ui/admin.spec.ts`, `ui/color-mode.spec.ts`, `static/palette.spec.ts` |
 | Phone layout (website.md) | `ui/mobile.spec.ts` |
 | Animations and the motion toggle (website.md) | `ui/motion.spec.ts` |
+| Rich-text posts and images (website.md, ui/admin.md) | `ui/editor.spec.ts`, `api/media.spec.ts`, `ops` (backup) |
 | Admin shell, tables and timestamps (ui/admin.md) | `ui/admin-shell.spec.ts` |
 | 11 install, backup, secrets | `ops`, `api/http.spec.ts` |
 

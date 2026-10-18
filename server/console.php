@@ -23,8 +23,18 @@ try {
             \Hsimah\SiteContent::replace(new App($db,new Actor(bootstrap:true)));
             echo "Site content replaced.\n"; break;
         case 'backup':
+            // A tar of a consistent database snapshot (site.sqlite) and the post images (media/).
             $path=$argv[2] ?? ''; if ($path==='' || file_exists($path)) throw new RuntimeException('Choose a new backup path.');
-            $db->pdo->exec('VACUUM INTO '.$db->pdo->quote($path)); chmod($path,0600); break;
+            $work=sys_get_temp_dir().'/hsimah-backup-'.bin2hex(random_bytes(8));
+            mkdir($work,0700); $snapshot=$work.'/site.sqlite';
+            $db->pdo->exec('VACUUM INTO '.$db->pdo->quote($snapshot));
+            $archive=new PharData($work.'/backup.tar');
+            $archive->addFile($snapshot,'site.sqlite');
+            $media=\Hsimah\Media::directory();
+            foreach (is_dir($media) ? (glob($media.'/*') ?: []) : [] as $file) if (is_file($file)) $archive->addFile($file,'media/'.basename($file));
+            unset($archive);
+            rename($work.'/backup.tar',$path); chmod($path,0600);
+            unlink($snapshot); rmdir($work); break;
         case 'expire-sessions': $db->execute('UPDATE auth_session SET expires_at=0'); break;
         case 'set-active':
             if (!in_array($argv[2] ?? '',['true','false'],true)) throw new RuntimeException('Expected true or false.');
