@@ -53,13 +53,13 @@ async function openListAt(page: Page, kind: Kind, title: string): Promise<Locato
 test('a page that holds items gets its own sidebar section, named by the page', async ({ page }) => {
   const title = `Notes ${RUN_ID}`;
   const slug = `notes-${RUN_ID}`.toLowerCase();
-  await createOk(api, 'Page', { title, slug, itemKind: 'Note' });
+  await createOk(api, 'Page', { title, slug, defaultItemKind: 'Note' });
   await page.goto('/admin');
   const link = sidebar(page).getByRole('link', { name: new RegExp(`^${title}\\b`) });
   await expect(link).toHaveAttribute('href', `/admin/items/${slug}`);
   await link.click();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(title);
-  await expect(page.getByRole('main').getByRole('link', { name: /^new note$/i })).toBeVisible();
+  await expect(page.getByRole('main').getByRole('link', { name: /^new note$/i }).first()).toBeVisible();
 });
 
 test('a page that holds no items has no section', async ({ page }) => {

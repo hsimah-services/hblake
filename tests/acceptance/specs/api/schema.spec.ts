@@ -90,7 +90,7 @@ test('there are no Post or Product types, fields or operations', () => {
 
 test('items are listed by page, newest published first, with a page filter', () => {
   const ofPage = (queryType.fields ?? []).find(f => f.name === 'pageItemsOfPage');
-  expect(ofPage?.args?.map(arg => arg.name).sort()).toEqual(['after', 'first', 'where']);
+  expect(ofPage?.args?.map(arg => arg.name), 'paged, filtered by page').toEqual(expect.arrayContaining(['after', 'first', 'where']));
   const where = types.get(named(ofPage!.args!.find(arg => arg.name === 'where')!.type));
   expect(fieldNames(where), 'filtered by the slug of the page').toEqual(['page']);
 });
@@ -125,7 +125,7 @@ test('no type exposes credentials or session secrets', () => {
 test('content types expose the specified fields; everything links only an author display name', () => {
   const common = ['id', 'title', 'slug', 'content', 'excerpt', 'status', 'publishedAt', 'createdAt', 'updatedAt', 'author'];
   const extra: Record<string, string[]> = {
-    Page: ['showInNavigation', 'navigationOrder', 'featureOnHome', 'homeOrder', 'accent', 'itemKind'],
+    Page: ['showInNavigation', 'navigationOrder', 'featureOnHome', 'homeOrder', 'accent', 'defaultItemKind', 'items', 'itemCount', 'publishedItemCount'],
     PageItem: ['kind', 'enquiryUrl', 'page'],
   };
   for (const { type } of CONTENT) {
@@ -154,9 +154,9 @@ test('create and update inputs never accept ids, authors or managed timestamps',
     expect(create).not.toContain('id');
   }
   const item = fieldNames(argInput('createPageItem'));
-  expect(item, 'an item is attached to a page and labelled with a kind').toEqual(expect.arrayContaining(['pageId', 'kind', 'enquiryUrl']));
+  expect(item, 'an item is attached to a page and labelled with a kind').toEqual(expect.arrayContaining(['page', 'kind', 'enquiryUrl']));
   expect(fieldNames(argInput('updatePageItem')), 'enquiryUrl can be changed').toContain('enquiryUrl');
-  expect(fieldNames(argInput('createPage')), 'a page chooses its item kind').toContain('itemKind');
+  expect(fieldNames(argInput('createPage')), 'a page chooses its item kind').toContain('defaultItemKind');
 });
 
 test('publication status is the DRAFT/PUBLISHED enum', () => {

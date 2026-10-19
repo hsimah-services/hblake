@@ -15,6 +15,7 @@ import {
   unpublishOk,
   update,
   updateOk,
+  typeName,
 } from '../../lib/content.ts';
 
 // Publishable: website.md "publish sets status and first publishedAt together…" and
@@ -50,7 +51,7 @@ for (const kind of KINDS) {
       await sleep(1_100);
       const again = await action(operator, kind, 'publish', first.id);
       // Either outcome is acceptable for a repeat publish; the timestamp must not move.
-      if (again.errors.length === 0) expect(again.data[`publish${kind}`]).toBeTruthy();
+      if (again.errors.length === 0) expect(again.data[`publish${typeName(kind)}`]).toBeTruthy();
       const after = await byId(operator, kind, first.id);
       expect(after).toMatchObject({ status: 'PUBLISHED', publishedAt: first.publishedAt });
     });

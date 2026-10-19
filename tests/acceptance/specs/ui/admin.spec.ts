@@ -377,8 +377,8 @@ test.describe('items in the admin', () => {
     await page.getByLabel('Item kind').fill('Framework');
     await page.getByRole('button', { name: /^save/i }).click();
     await expect(confirmation(page)).toBeVisible();
-    const saved = await api.ok('query($id: ID!) { page(id: $id) { itemKind } }', { id: row.id });
-    expect(saved.page.itemKind).toBe('Framework');
+    const saved = await api.ok('query($id: ID!) { page(id: $id) { defaultItemKind } }', { id: row.id });
+    expect(saved.page.defaultItemKind).toBe('Framework');
     await page.goto('/admin');
     await expect(page.getByRole('navigation', { name: 'Administration' }).getByRole('link', { name: new RegExp(`^${row.title}`) })).toBeVisible();
   });

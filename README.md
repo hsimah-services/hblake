@@ -1,6 +1,6 @@
 # Consulting website
 
-The site for hbla.ke: a standalone PHP/SQLite content backend built from the [Elephentity specifications](spec/README.md), with a React client using tsquid routes, Relay, Astryx and StyleX. The public site uses owner-provided copy, four coloured navigation blocks and a latest-post feature. Pages, posts and products start as drafts; a single operator account manages them through `/admin`.
+The site for hbla.ke: a standalone PHP/SQLite content backend built from the [Elephentity specifications](spec/README.md), with a React client using tsquid routes, Relay, Astryx and StyleX. The public site uses owner-provided copy, four coloured navigation blocks and a latest-news feature. Pages and the items they hold (articles, products, framework entries) start as drafts; a single operator account manages them through `/admin`.
 
 ## Verify and run locally
 
@@ -42,7 +42,7 @@ The toolchain uses released Elephentity runtime/CLI 0.13.1, coordinator 0.6.1, P
 
 ## Operator data procedures
 
-SQLite, credentials, sessions and dependency caches live outside `server/public` and the built static client. A deployment must serve only those public roots, route `/graphql`, `/auth/*` and every HTML (non-asset) request to PHP so route data can be inlined, use HTTPS, and give the private data directory mode 0700. Post images live in `media/` beside the database (override with `HSIMAH_MEDIA`) and are served by PHP from `/media/`, so route `/media/*` to PHP too. PHP needs the GD extension with JPEG and WebP support, `upload_max_filesize` of at least 6M and `post_max_size` of at least 8M; `.docker/php.Dockerfile` (image `localhost/hsimah-php:2`) sets these up. Backups include credential hashes and sessions; protect them as private data. Session cookies use Secure for HTTPS and all public hosts; plain HTTP loopback requests are the only exception. Login throttling uses REMOTE_ADDR: configure trusted-proxy address handling before deploying behind a reverse proxy so clients do not share one failure bucket. No production deployment is configured here.
+SQLite, credentials, sessions and dependency caches live outside `server/public` and the built static client. A deployment must serve only those public roots, route `/graphql`, `/auth/*` and every HTML (non-asset) request to PHP so route data can be inlined, use HTTPS, and give the private data directory mode 0700. Item images live in `media/` beside the database (override with `HSIMAH_MEDIA`) and are served by PHP from `/media/`, so route `/media/*` to PHP too. PHP needs the GD extension with JPEG and WebP support, `upload_max_filesize` of at least 6M and `post_max_size` of at least 8M; `.docker/php.Dockerfile` (image `localhost/hsimah-php:2`) sets these up. Backups include credential hashes and sessions; protect them as private data. Session cookies use Secure for HTTPS and all public hosts; plain HTTP loopback requests are the only exception. Login throttling uses REMOTE_ADDR: configure trusted-proxy address handling before deploying behind a reverse proxy so clients do not share one failure bucket. No production deployment is configured here.
 
 Initial installation is explicit and refuses existing tables:
 
@@ -51,7 +51,7 @@ scripts/php php server/console.php install
 scripts/php php server/console.php bootstrap
 ```
 
-Bootstrap reads `ADMIN_USERNAME`, `ADMIN_DISPLAY_NAME` (the author name shown on posts) and `ADMIN_PASSWORD` (at least 12 characters), and refuses to create a second account. The account has no email; change its password from Settings in the admin. The application exposes only the operator's allowlisted profile fields, never generic user lifecycle operations or credentials. Account activation/session expiry hooks are for acceptance testing and future operator workflows.
+Bootstrap reads `ADMIN_USERNAME`, `ADMIN_DISPLAY_NAME` (the author name shown on pages and items) and `ADMIN_PASSWORD` (at least 12 characters), and refuses to create a second account. The account has no email; change its password from Settings in the admin. The application exposes only the operator's allowlisted profile fields, never generic user lifecycle operations or credentials. Account activation/session expiry hooks are for acceptance testing and future operator workflows.
 
 For a running acceptance stack:
 
@@ -60,7 +60,7 @@ scripts/acceptance/backup /private/path/site-backup.tar
 scripts/acceptance/restore /private/path/site-backup.tar
 ```
 
-A backup is a tar of a `VACUUM INTO` database snapshot (`site.sqlite`) and the post images (`media/`). Restore validates the archive and the database's integrity before stopping the server, then replaces the database and images and restarts before returning. Run the equivalent procedure under maintenance mode in production. Do not rerun the initial installer as an upgrade. Schema changes ship as reviewed migrations in `server/src/Migrations.php` (tested in `server/tests/MigrationsTest.php`); after deploying a release, take a backup and then apply them:
+A backup is a tar of a `VACUUM INTO` database snapshot (`site.sqlite`) and the item images (`media/`). Restore validates the archive and the database's integrity before stopping the server, then replaces the database and images and restarts before returning. Run the equivalent procedure under maintenance mode in production. Do not rerun the initial installer as an upgrade. Schema changes ship as reviewed migrations in `server/src/Migrations.php` (tested in `server/tests/MigrationsTest.php`); after deploying a release, take a backup and then apply them:
 
 ```sh
 scripts/php php server/console.php upgrade
@@ -73,8 +73,8 @@ V1 is client-rendered; each route's HTML carries its query response as tsquid in
 ## Launch content
 
 `content/pages.json` contains the owner-approved Home, About, Frameworks, Portfolio
-and Contact us copy. After installation, replace all Page, Post and Product content
-with these five published pages:
+and Contact us copy. After installation, replace all Page and PageItem content
+with these seven published pages (the five launch pages plus the empty News and Products pages, which hold items):
 
 ```sh
 scripts/php php server/console.php replace-content
@@ -84,4 +84,5 @@ This command is destructive to existing content and runs atomically. Accounts,
 credentials and sessions are preserved. It is explicit and never runs during
 acceptance startup, which requires an empty content database. Subsequent edits can
 be made through the admin screens. The homepage displays the latest published
-post when available and omits the blog section while no posts exist.
+News item when available and omits that section while there is none. The News and Products
+pages carry placeholder copy of two words each; replace it with the owner's wording.

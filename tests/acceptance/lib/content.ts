@@ -17,9 +17,9 @@ export const KINDS: readonly Kind[] = ['Page', 'Article', 'Product'];
 export type ItemKind = Exclude<Kind, 'Page'>;
 
 /** The seeded page each item kind lives on, and the label its items are given. */
-export const HOSTS: Record<ItemKind, { slug: string; title: string; itemKind: ItemKind }> = {
-  Article: { slug: 'news', title: 'News', itemKind: 'Article' },
-  Product: { slug: 'products', title: 'Products', itemKind: 'Product' },
+export const HOSTS: Record<ItemKind, { slug: string; title: string; defaultItemKind: ItemKind }> = {
+  Article: { slug: 'news', title: 'News', defaultItemKind: 'Article' },
+  Product: { slug: 'products', title: 'Products', defaultItemKind: 'Product' },
 };
 
 /** Page slugs that would shadow a fixed route (tests/README.md, "Reserved slugs"). */
@@ -71,8 +71,8 @@ export function hostPage(kind: ItemKind): Promise<Content> {
   let host = hosts.get(kind);
   if (!host) {
     hostSession ??= Api.operator();
-    const { slug, title, itemKind } = HOSTS[kind];
-    host = hostSession.then(api => ensurePage(api, slug, 'PUBLISHED', { title, itemKind }));
+    const { slug, title, defaultItemKind } = HOSTS[kind];
+    host = hostSession.then(api => ensurePage(api, slug, 'PUBLISHED', { title, defaultItemKind }));
     hosts.set(kind, host);
   }
   return host;
@@ -100,7 +100,7 @@ export function defaults(kind: Kind, overrides: ContentInput = {}): ContentInput
 /** An item's input: attached to the kind's page and labelled with the kind, unless given. */
 async function withHost(kind: Kind, input: ContentInput): Promise<ContentInput> {
   if (!isItem(kind)) return input;
-  return { pageId: (await hostPage(kind)).id, kind, ...input };
+  return { page: (await hostPage(kind)).id, kind, ...input } as unknown as ContentInput;
 }
 
 export async function create(api: Api, kind: Kind, input: ContentInput): Promise<GraphQLResult> {

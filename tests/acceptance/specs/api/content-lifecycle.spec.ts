@@ -136,12 +136,12 @@ test.describe('items belong to a page', () => {
 
   test('a page chooses the kind of item it holds, and new items default to it', async () => {
     const host = await hostPage('Article');
-    const page = (await api.ok('query($id: ID!) { page(id: $id) { itemKind } }', { id: host.id })).page;
-    expect(page.itemKind).toBe('Article');
+    const page = (await api.ok('query($id: ID!) { page(id: $id) { defaultItemKind } }', { id: host.id })).page;
+    expect(page.defaultItemKind).toBe('Article');
     const slug = uniqueSlug('default-kind');
     const result = await api.graphql(
       'mutation($input: CreatePageItemInput!) { createPageItem(input: $input) { pageItem { kind } } }',
-      { input: { pageId: host.id, title: `Default kind ${slug}`, slug } },
+      { input: { page: host.id, title: `Default kind ${slug}`, slug } },
     );
     expect(result.errors).toEqual([]);
     expect(result.data.createPageItem.pageItem.kind).toBe('Article');
@@ -157,9 +157,9 @@ test.describe('items belong to a page', () => {
   test('an item needs an existing page that holds items', async () => {
     const plain = await createOk(api, 'Page');
     const attempts: [string, Record<string, unknown>][] = [
-      ['a page that holds no items', { pageId: plain.id }],
-      ['a missing page id', { pageId: 'no-such-page' }],
-      ['an item id as the page', { pageId: (await createOk(api, 'Product')).id }],
+      ['a page that holds no items', { page: plain.id }],
+      ['a missing page id', { page: 'no-such-page' }],
+      ['an item id as the page', { page: (await createOk(api, 'Product')).id }],
       ['a blank kind', { kind: '  ' }],
       ['a kind over 80 characters', { kind: 'k'.repeat(81) }],
     ];
@@ -182,10 +182,10 @@ test.describe('items belong to a page', () => {
 
   test('deleting a page deletes its items', async () => {
     const slug = uniqueSlug('doomed');
-    const page = await createOk(api, 'Page', { slug, itemKind: 'Note' });
+    const page = await createOk(api, 'Page', { slug, defaultItemKind: 'Note' });
     const result = await api.graphql(
       'mutation($input: CreatePageItemInput!) { createPageItem(input: $input) { pageItem { id } } }',
-      { input: { pageId: page.id, title: 'Goes with its page', slug: uniqueSlug('goes') } },
+      { input: { page: page.id, title: 'Goes with its page', slug: uniqueSlug('goes') } },
     );
     expect(result.errors).toEqual([]);
     const itemId = result.data.createPageItem.pageItem.id as string;
@@ -195,10 +195,10 @@ test.describe('items belong to a page', () => {
 
   test('a published item is visible only while its page is published', async () => {
     const slug = uniqueSlug('draft-host');
-    const page = await createOk(api, 'Page', { slug, itemKind: 'Note' });
+    const page = await createOk(api, 'Page', { slug, defaultItemKind: 'Note' });
     const created = await api.graphql(
       'mutation($input: CreatePageItemInput!) { createPageItem(input: $input) { pageItem { id slug } } }',
-      { input: { pageId: page.id, title: 'On a draft page', slug: uniqueSlug('on-draft') } },
+      { input: { page: page.id, title: 'On a draft page', slug: uniqueSlug('on-draft'), content: 'Body.' } },
     );
     const item = created.data.createPageItem.pageItem as { id: string; slug: string };
     const anonymous = await Api.anonymous();
@@ -206,6 +206,25 @@ test.describe('items belong to a page', () => {
     expect(await bySlug(anonymous, 'Article', item.slug), 'invisible while its page is a draft').toBeNull();
     await publishOk(api, 'Page', page.id);
     expect((await bySlug(anonymous, 'Article', item.slug))?.id).toBe(item.id);
+    await anonymous.dispose();
+  });
+
+  test('a page counts its items: all of them for staff, only published ones for visitors', async () => {
+    const page = await createOk(api, 'Page', { slug: uniqueSlug('counted'), defaultItemKind: 'Note' });
+    await publishOk(api, 'Page', page.id);
+    const ids: string[] = [];
+    for (const label of ['one', 'two']) {
+      const created = await api.graphql(
+        'mutation($input: CreatePageItemInput!) { createPageItem(input: $input) { pageItem { id } } }',
+        { input: { page: page.id, title: `Counted ${label}`, slug: uniqueSlug(label), content: 'Body.' } },
+      );
+      ids.push(created.data.createPageItem.pageItem.id as string);
+    }
+    await publishOk(api, 'Article', ids[0]);
+    const counts = 'query($id: ID!) { page(id: $id) { itemCount publishedItemCount } }';
+    expect((await api.ok(counts, { id: page.id })).page).toEqual({ itemCount: 2, publishedItemCount: 1 });
+    const anonymous = await Api.anonymous();
+    expect((await anonymous.ok(counts, { id: page.id })).page, 'drafts are not counted for visitors').toEqual({ itemCount: 1, publishedItemCount: 1 });
     await anonymous.dispose();
   });
 });

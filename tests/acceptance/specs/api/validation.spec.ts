@@ -90,11 +90,11 @@ test.describe('slugs', () => {
     });
   }
 
-  test('the same slug may be used by different content kinds', async () => {
+  test('a page and an item may share a slug; items of any page may not', async () => {
     const slug = uniqueSlug('shared');
-    for (const kind of KINDS) {
-      expect((await createOk(api, kind, { slug })).slug).toBe(slug);
-    }
+    expect((await createOk(api, 'Page', { slug })).slug).toBe(slug);
+    expect((await createOk(api, 'Article', { slug })).slug).toBe(slug);
+    expectRejected(await create(api, 'Product', defaults('Product', { slug })), 'the slug of an item of another page');
   });
 
   test('a slug may be changed deliberately', async () => {
