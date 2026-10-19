@@ -6,8 +6,10 @@ use Eleph\GraphQL\SchemaBuilder;
 use Eleph\GraphQL\Registration\{TypeRegistrar, MutationRegistrar};
 use Eleph\GraphQL\Relay\GlobalId;
 use Eleph\GraphQL\Resolver\Connections;
-use Eleph\Runtime\Storage\{Criteria, Order};
+use Eleph\Runtime\Storage\{Criteria, EdgeFilter, Filter, Order};
 use Eleph\Runtime\Identity\EntityId;
+use Hsimah\Entity\Page\Page;
+use Hsimah\Entity\PageItem\PageItem;
 use Hsimah\Entity\User\User;
 use GraphQL\Type\Schema as GraphQLSchema;
 
@@ -22,11 +24,15 @@ final class Schema {
             'startCursor'=>['type'=>'String'], 'endCursor'=>['type'=>'String']]]);
         foreach($r->enumConfigs() as $name=>$config) $b->enum($name,$config);
         $b->enum('UserRole',['values'=>['EDITOR'=>['value'=>'editor'],'ADMIN'=>['value'=>'admin']]]);
-        // Posts have one author, the site's account. Only its display name is public.
+        // Pages and items have one author. Only the display name is public.
         $b->object('Author',['fields'=>['displayName'=>['type'=>['non_null'=>'String']]]]);
         foreach($r->objectConfigs() as $name=>$config) {
             assert(is_array($config['fields'])); unset($config['fields']['databaseId']);
-            if ($name==='Post') $config['fields']['author']=['type'=>'Author','resolve'=>static fn(): ?array => self::author($app)];
+            if ($name==='Page') {
+                $config['fields']['itemCount']=['type'=>['non_null'=>'Int'],'resolve'=>static fn(Page $page): int => self::items($app,$page,false)];
+                $config['fields']['publishedItemCount']=['type'=>['non_null'=>'Int'],'resolve'=>static fn(Page $page): int => self::items($app,$page,true)];
+            }
+            if ($name==='Page' || $name==='PageItem') $config['fields']['author']=['type'=>'Author','resolve'=>static fn(object $row): ?array => self::author($app,$row)];
             $b->object($name,$config);
         }
         foreach($r->rootFieldConfigs() as $field) {
@@ -49,26 +55,37 @@ final class Schema {
                         $enum='Hsimah\\Entity\\Enum\\'.(is_string($type) ? $type : '');
                         if (is_string($value) && is_subclass_of($enum,\BackedEnum::class)) $where[$name]=$enum::from($value);
                     }
-                    return $resolve($source,[...$where,...$args]);
+                    return $resolve($source,['first'=>20,...$where,...$args]);
                 };
                 $b->connection($config);
                 continue;
             }
             $config['resolve']=static function($source,array $args) use($app,$entity): array {
                 $criteria=Criteria::for($entity);
-                $criteria=$entity === 'Product'
-                    ? $criteria->orderBy(Order::ascending('title'))->orderBy(Order::ascending('id'))
-                    : ($entity === 'Post' ? $criteria->orderBy(Order::descending('publishedAt'))->orderBy(Order::descending('id')) : $criteria->orderBy(Order::ascending('id')));
+                $criteria=$entity === 'PageItem'
+                    ? $criteria->orderBy(Order::descending('publishedAt'))->orderBy(Order::descending('id'))
+                    : $criteria->orderBy(Order::ascending('id'));
                 return (new Connections())->resolve($app->runtime->queries()->of($app->catalogue->hydrator($entity),$criteria),['first'=>20,...$args]);
             };
             $b->connection($config);
         }
         foreach((new MutationRegistrar($manifest,$app->runtime))->configs() as $name=>$config) {
+            // Content records who wrote it, and an item needs a page that holds items.
+            $prepare=match($name) {
+                'createPage' => static fn(array $input): array => PageItems::authored($app,$input),
+                'createPageItem' => static fn(array $input): array => PageItems::authored($app,PageItems::create($app,$input)),
+                'updatePageItem' => static fn(array $input): array => PageItems::update($app,$input),
+                default => null,
+            };
+            if ($prepare!==null) {
+                $mutate=$config['mutateAndGetPayload']; assert(is_callable($mutate));
+                $config['mutateAndGetPayload']=static fn(array $input): mixed => $mutate($prepare($input));
+            }
             $b->mutation($name,$config);
         }
         $b->field('RootQuery','node',['type'=>'Node','args'=>['id'=>['type'=>['non_null'=>'ID']]],'resolve'=>static function($source,array $args) use($app): ?object {
             assert(is_string($args['id'])); $global=GlobalId::decode($args['id']);
-            if ($global===null || !in_array($global->type,['Page','Post','Product'],true)) return null;
+            if ($global===null || !in_array($global->type,['Page','PageItem'],true)) return null;
             return $app->runtime->find($global->type,EntityId::of($global->id));
         }]);
         $b->object('Viewer',['fields'=>['id'=>['type'=>'ID'],'displayName'=>['type'=>'String'],'role'=>['type'=>'UserRole']]]);
@@ -103,12 +120,20 @@ final class Schema {
     private static function profile(User $user): array {
         return ['id'=>GlobalId::encode('User',(string)$user->getId()),'username'=>$user->getUsername(),'displayName'=>$user->getDisplayName()];
     }
+    /** The items of a page the viewer can read, optionally only the published ones. */
+    private static function items(App $app, Page $page, bool $published): int {
+        $criteria=Criteria::for('PageItem')->linkedTo(EdgeFilter::back('PageItem','page',$page->getId()));
+        if ($published) $criteria=$criteria->where(Filter::equals('status','published'));
+        return $app->runtime->queries()->of($app->catalogue->hydrator('PageItem'),$criteria)->count();
+    }
     /**
      * Read from trusted storage: visitors cannot read User, and the projection is the display name only.
      * @return array{displayName:string}|null
      */
-    private static function author(App $app): ?array {
-        $name=$app->db->scalar('SELECT display_name FROM hsimah_user WHERE active=1 ORDER BY id LIMIT 1');
+    private static function author(App $app, object $row): ?array {
+        $table=match(true) { $row instanceof Page => 'hsimah_page', $row instanceof PageItem => 'hsimah_page_item', default => null };
+        if ($table===null) return null;
+        $name=$app->db->scalar('SELECT u.display_name FROM '.$table.' c JOIN hsimah_user u ON u.id=c.author_id WHERE c.id=?',[$row->getId()->raw()]);
         return is_string($name) ? ['displayName'=>$name] : null;
     }
 }

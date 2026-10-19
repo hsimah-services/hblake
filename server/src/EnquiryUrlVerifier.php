@@ -4,7 +4,7 @@ namespace Hsimah;
 
 use Eleph\Runtime\Mutation\MutationContext;
 use Eleph\Runtime\Verification\Verification;
-use Hsimah\Entity\Product\Contract\ProductEnquiryUrlVerifier;
-final class EnquiryUrlVerifier implements ProductEnquiryUrlVerifier {
+use Hsimah\Entity\PageItem\Contract\PageItemEnquiryUrlVerifier;
+final class EnquiryUrlVerifier implements PageItemEnquiryUrlVerifier {
     public function verify(?string $value, MutationContext $context): Verification { return $value === null ? Verification::ok() : Rules::enquiry($value); }
 }

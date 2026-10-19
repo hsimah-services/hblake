@@ -10,8 +10,10 @@ final class SiteContent {
         /** @var list<array<string,mixed>> $pages Content fields plus page placement (#13). */
         $pages=json_decode($source,true,512,JSON_THROW_ON_ERROR);
         $app->db->transaction(function() use($app,$pages): void {
-            foreach (['hsimah_post','hsimah_product','hsimah_page'] as $table) $app->db->execute('DELETE FROM '.$table);
+            foreach (['hsimah_page_item','hsimah_page'] as $table) $app->db->execute('DELETE FROM '.$table);
+            $author=$app->db->scalar('SELECT id FROM hsimah_user WHERE active=1 ORDER BY id LIMIT 1');
             foreach ($pages as $page) {
+                if ($author!==null) $page['author']=(string)$author;
                 $created=$app->runtime->create('Page',$page);
                 $app->runtime->runAction('Page','publish',$created->id,[]);
             }

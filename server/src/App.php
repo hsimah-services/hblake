@@ -27,21 +27,26 @@ final readonly class App {
         $columns=$manifest->columns;
         $storage = new SQLiteAdaptor($db, $manifest->tables, new FieldMap($columns), $manifest->placements, new QueryCompiler(placements: $manifest->placements));
         $runtime = new Runtime($storage, $catalogue, new UnitOfWorkFactory($storage, $catalogue, new NullProcessorRegistry()), new ReadGate($catalogue, $actor), new WriteGate($catalogue, $actor));
-        $publish = new Publish();
-        foreach (['Page','Post','Product'] as $entity) {
-            foreach (['Title','Slug','Content','Status','PublishedAt'] as $field) {
+        $publish = new Publish(); $unpublish = new Unpublish();
+        foreach (['Page','PageItem'] as $entity) {
+            foreach (['Title','Content','Status','PublishedAt'] as $field) {
                 $interface = "Hsimah\\Entity\\$entity\\Contract\\$entity{$field}Verifier";
                 $class = __NAMESPACE__."\\{$field}Verifier";
                 $c->set($interface, new $class());
             }
+            $c->set("Hsimah\\Entity\\$entity\\Contract\\{$entity}SlugVerifier", new SlugVerifier($entity === 'Page'));
             $c->set("Hsimah\\Entity\\$entity\\Contract\\{$entity}PublishAction", $publish);
-            $c->set("Hsimah\\Entity\\$entity\\Contract\\{$entity}UnpublishAction", new Unpublish());
+            $c->set("Hsimah\\Entity\\$entity\\Contract\\{$entity}UnpublishAction", $unpublish);
             $class = __NAMESPACE__."\\{$entity}BySlug";
             $c->set("Hsimah\\Entity\\$entity\\Contract\\{$entity}BySlugQuery", new $class($runtime));
             $class = __NAMESPACE__."\\{$entity}Recent";
             $c->set("Hsimah\\Entity\\$entity\\Contract\\{$entity}RecentQuery", new $class($runtime));
         }
-        $c->set(\Hsimah\Entity\Product\Contract\ProductEnquiryUrlVerifier::class, new EnquiryUrlVerifier());
+        $kind = new KindVerifier();
+        $c->set(\Hsimah\Entity\Page\Contract\PageDefaultItemKindVerifier::class, $kind);
+        $c->set(\Hsimah\Entity\PageItem\Contract\PageItemKindVerifier::class, $kind);
+        $c->set(\Hsimah\Entity\PageItem\Contract\PageItemEnquiryUrlVerifier::class, new EnquiryUrlVerifier());
+        $c->set(\Hsimah\Entity\PageItem\Contract\PageItemOfPageQuery::class, new PageItemOfPage($runtime));
         $placement = new PagePlacement();
         $c->set(\Hsimah\Entity\Page\Contract\PageAccentVerifier::class, $placement);
         $c->set(\Hsimah\Entity\Page\Contract\PageHomeOrderVerifier::class, $placement);

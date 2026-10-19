@@ -24,7 +24,8 @@
     "navigationOrder": 2,
     "featureOnHome": true,
     "homeOrder": 2,
-    "accent": "orange"
+    "accent": "orange",
+    "defaultItemKind": "Framework"
   },
   {
     "title": "Portfolio",
@@ -45,5 +46,21 @@
     "featureOnHome": true,
     "homeOrder": 4,
     "accent": "berry"
+  },
+  {
+    "title": "News",
+    "slug": "news",
+    "excerpt": "Articles and updates.",
+    "content": "Articles and updates.",
+    "navigationOrder": 5,
+    "defaultItemKind": "Article"
+  },
+  {
+    "title": "Products",
+    "slug": "products",
+    "excerpt": "Products and offerings.",
+    "content": "Products and offerings.",
+    "navigationOrder": 6,
+    "defaultItemKind": "Product"
   }
 ]

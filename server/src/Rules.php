@@ -16,6 +16,14 @@ final class Rules {
     public static function slug(string $value): Verification {
         return self::check(strlen($value) <= 160 && preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/D', $value) === 1, 'Use a lowercase slug with single hyphens, up to 160 characters.');
     }
+    /** Fixed routes that a page slug would shadow in /<page-slug>/<item-slug>. */
+    public const RESERVED_SLUGS = ['admin','assets','auth','graphql','media','pages'];
+    public static function pageSlug(string $value): Verification {
+        return self::check(!in_array($value, self::RESERVED_SLUGS, true), 'This slug is reserved for the site; choose another.');
+    }
+    public static function kind(string $value): Verification {
+        return self::check(trim($value) !== '' && mb_strlen($value) <= 80, 'Use a nonblank kind of at most 80 characters.');
+    }
     public static function content(string $value, MutationContext $context): Verification {
         return self::check($context->pending('status') !== PublicationStatus::Published || trim($value) !== '', 'Published content cannot be blank.');
     }

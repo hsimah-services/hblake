@@ -17,12 +17,7 @@ if ($path==='/news/feed.xml') {
     } catch (\Throwable $error) { error_log((string)$error); http_response_code(503); header('Content-Type: text/plain'); echo 'Feed unavailable'; }
     return;
 }
-// Posts became News: keep old links working with a permanent redirect.
-if (preg_match('#^/(admin/)?posts(/.*)?$#D',(string)$path,$old)===1) {
-    $query=parse_url(Http::server('REQUEST_URI') ?: '/',PHP_URL_QUERY);
-    header('Location: /'.($old[1] ?? '').'news'.($old[2] ?? '').(is_string($query) && $query!=='' ? '?'.$query : ''),true,301); return;
-}
-// Post images: staff upload them (multipart, CSRF) and anyone may fetch them by name.
+// Item images: staff upload them (multipart, CSRF) and anyone may fetch them by name.
 if ($path==='/media' && Http::server('REQUEST_METHOD')==='POST') {
     header('Cache-Control: no-store');
     try { Media::upload(new Auth(App::database())); }

@@ -12,7 +12,7 @@ use Eleph\SQLite\Database;
 final class Migrations {
     /** @return array<string, callable(Database): void> */
     private static function all(): array {
-        return ['0001-page-placement' => self::pagePlacement(...)];
+        return ['0001-page-placement' => self::pagePlacement(...), '0002-page-items' => self::pageItems(...)];
     }
 
     public static function markAllApplied(Database $db): void {
@@ -51,7 +51,31 @@ final class Migrations {
             'feature_on_home'=>"CASE WHEN slug IN ('about','frameworks','portfolio','contact') THEN 1 ELSE 0 END",
             'home_order'=>"CASE slug WHEN 'about' THEN 1 WHEN 'frameworks' THEN 2 WHEN 'portfolio' THEN 3 WHEN 'contact' THEN 4 ELSE 100 END",
             'accent'=>"CASE slug WHEN 'about' THEN 'green' WHEN 'frameworks' THEN 'orange' WHEN 'portfolio' THEN 'blue' WHEN 'contact' THEN 'berry' ELSE 'ink' END",
+            'default_item_kind'=>'NULL',
+            'author_id'=>'NULL',
         ]);
+    }
+
+    /**
+     * Page items: Posts and Products become PageItems attached to a Page. Pages gain the kind
+     * of item they hold and an author; the old tables are dropped, discarding their rows.
+     */
+    private static function pageItems(Database $db): void {
+        if (!in_array('default_item_kind',self::columns($db->pdo,'hsimah_page'),true)) self::rebuild($db,'hsimah_page',['default_item_kind'=>'NULL','author_id'=>'NULL']);
+        if (self::columns($db->pdo,'hsimah_page_item')===[]) foreach (self::generatedDefinition('hsimah_page_item') as $sql) $db->pdo->exec($sql);
+        foreach (['hsimah_post','hsimah_product'] as $table) $db->pdo->exec('DROP TABLE IF EXISTS '.$table);
+    }
+
+    /** @return list<string> the generated table statement, then its indexes */
+    private static function generatedDefinition(string $table): array {
+        $fresh=new \PDO('sqlite::memory:');
+        $install=require dirname(__DIR__,2).'/generated/sqlite/install.php';
+        assert(is_callable($install)); $install($fresh);
+        $ddl=$fresh->query("SELECT sql FROM sqlite_master WHERE tbl_name=".$fresh->quote($table)." AND sql IS NOT NULL ORDER BY type DESC");
+        /** @var list<string> $statements */
+        $statements=$ddl===false ? [] : $ddl->fetchAll(\PDO::FETCH_COLUMN);
+        if ($statements===[]) throw new \RuntimeException('No generated definition for '.$table.'.');
+        return $statements;
     }
 
     /** @return list<string> */

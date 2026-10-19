@@ -32,7 +32,7 @@ final class MigrationsTest extends TestCase {
             $db->execute("INSERT INTO hsimah_page (title, slug, content, excerpt, status, published_at, created_at, updated_at) VALUES (?, ?, 'Body', '', 'published', '2026-10-01 00:00:00', '2026-10-01 00:00:00', '2026-10-01 00:00:00')", [ucfirst($slug), $slug]);
         }
 
-        self::assertSame(['0001-page-placement'], Migrations::upgrade($db));
+        self::assertSame(['0001-page-placement','0002-page-items'], Migrations::upgrade($db));
         self::assertSame($expected, self::shape($db), 'the upgraded table matches a fresh install');
         $rows=$db->select('SELECT slug, title, show_in_navigation, navigation_order, feature_on_home, home_order, accent FROM hsimah_page ORDER BY id');
         self::assertSame(['slug'=>'home','title'=>'Home','show_in_navigation'=>0,'navigation_order'=>100,'feature_on_home'=>0,'home_order'=>100,'accent'=>'ink'], $rows[0]);
@@ -40,6 +40,20 @@ final class MigrationsTest extends TestCase {
         self::assertSame('berry', $rows[4]['accent']);
         self::assertSame(['slug'=>'extra','title'=>'Extra','show_in_navigation'=>1,'navigation_order'=>100,'feature_on_home'=>0,'home_order'=>100,'accent'=>'ink'], $rows[5]);
         self::assertSame([], Migrations::upgrade($db), 'a second run changes nothing');
+    }
+
+    public function testPageItemsReplaceThePostAndProductTables(): void {
+        $db=new Database(':memory:');
+        $install=require dirname(__DIR__,2).'/generated/sqlite/install.php'; $install($db->pdo);
+        Migrations::markAllApplied($db);
+        $db->pdo->exec('DROP TABLE hsimah_page_item');
+        foreach (['hsimah_post','hsimah_product'] as $table) $db->pdo->exec('CREATE TABLE '.$table.' (id INTEGER PRIMARY KEY, title TEXT)');
+        $db->execute("DELETE FROM schema_migration WHERE id='0002-page-items'");
+
+        self::assertSame(['0002-page-items'], Migrations::upgrade($db));
+        self::assertSame(0,(int)$db->scalar('SELECT COUNT(*) FROM hsimah_page_item'), 'the items table exists and is empty');
+        self::assertSame(0,(int)$db->scalar("SELECT COUNT(*) FROM sqlite_master WHERE name IN ('hsimah_post','hsimah_product')"), 'the old tables are gone');
+        self::assertSame([], Migrations::upgrade($db));
     }
 
     public function testAFreshInstallNeedsNoUpgrade(): void {

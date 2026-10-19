@@ -4,11 +4,9 @@ namespace Hsimah;
 
 use Hsimah\Entity\Enum\PublicationStatus;
 use Hsimah\Entity\Page\PageUnpublishContext;
-use Hsimah\Entity\Post\PostUnpublishContext;
-use Hsimah\Entity\Product\ProductUnpublishContext;
+use Hsimah\Entity\PageItem\PageItemUnpublishContext;
 use Hsimah\Entity\Page\Contract\PageUnpublishAction;
-use Hsimah\Entity\Post\Contract\PostUnpublishAction;
-use Hsimah\Entity\Product\Contract\ProductUnpublishAction;
-final class Unpublish implements PageUnpublishAction, PostUnpublishAction, ProductUnpublishAction {
-    public function handle(PageUnpublishContext|PostUnpublishContext|ProductUnpublishContext $context): void { $context->setStatus(PublicationStatus::Draft); }
+use Hsimah\Entity\PageItem\Contract\PageItemUnpublishAction;
+final class Unpublish implements PageUnpublishAction, PageItemUnpublishAction {
+    public function handle(PageUnpublishContext|PageItemUnpublishContext $context): void { $context->setStatus(PublicationStatus::Draft); }
 }
