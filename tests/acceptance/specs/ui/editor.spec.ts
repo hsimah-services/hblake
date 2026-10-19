@@ -116,10 +116,18 @@ test('an image needs alt text, uploads from the editor and appears on the publis
   await expect.poll(() => image.evaluate(element => (element as HTMLImageElement).naturalWidth), 'the image loads').toBeGreaterThan(0);
 });
 
-test('pages and products keep the Markdown textarea', async ({ page }) => {
-  for (const path of ['/admin/pages/new', '/admin/products/new']) {
-    await page.goto(path);
-    await expect(page.getByLabel('Content'), path).toHaveJSProperty('tagName', 'TEXTAREA');
-    await expect(toolbar(page), path).toHaveCount(0);
+test('pages and products are written as rich text too, saved as Markdown', async ({ page }) => {
+  for (const kind of ['Page', 'Product'] as const) {
+    const slug = uniqueSlug(`rich-${kind.toLowerCase()}`);
+    await page.goto(kind === 'Page' ? '/admin/pages/new' : '/admin/products/new');
+    await expect(toolbar(page), kind).toBeVisible();
+    await page.getByLabel('Title').fill(`Rich ${slug}`);
+    await page.getByLabel('Slug').fill(slug);
+    await editor(page).click();
+    await toolbar(page).getByRole('button', { name: 'Bold' }).click();
+    await page.keyboard.type('Strong words');
+    await page.getByRole('button', { name: 'Create' }).click();
+    await expect(page.getByRole('status').filter({ hasText: /created/i })).toBeVisible();
+    await expect.poll(async () => (await bySlug(api, kind, slug))?.content, kind).toBe('**Strong words**');
   }
 });

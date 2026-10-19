@@ -1,6 +1,6 @@
 /**
- * @generated SignedSource<<0da43724592979aca8d4ed350880972d>>
- * @relayHash ff0ea7e03054c8055d11e27878bb8e72
+ * @generated SignedSource<<939aed78a540201fbbd8779600fe61fd>>
+ * @relayHash d37a9715d22dcc403e32982ee359e205
  * @lightSyntaxTransform
  */
 
@@ -8,7 +8,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-// @relayRequestID ff0ea7e03054c8055d11e27878bb8e72
+// @relayRequestID d37a9715d22dcc403e32982ee359e205
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
@@ -29,22 +29,22 @@ var v0 = {
   "name": "id",
   "storageKey": null
 },
-v1 = [
-  {
-    "kind": "Literal",
-    "name": "first",
-    "value": 100
-  }
-],
-v2 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "status",
-  "storageKey": null
+v1 = {
+  "kind": "Literal",
+  "name": "first",
+  "value": 100
 },
+v2 = [
+  (v1/*:: as any*/)
+],
 v3 = [
-  (v2/*:: as any*/),
+  {
+    "alias": null,
+    "args": null,
+    "kind": "ScalarField",
+    "name": "status",
+    "storageKey": null
+  },
   (v0/*:: as any*/)
 ];
 return {
@@ -97,10 +97,19 @@ return {
       },
       {
         "alias": "navigationPages",
-        "args": (v1/*:: as any*/),
-        "concreteType": "RootQueryToPageConnection",
+        "args": [
+          (v1/*:: as any*/),
+          {
+            "kind": "Literal",
+            "name": "where",
+            "value": {
+              "home": false
+            }
+          }
+        ],
+        "concreteType": "RootQueryToPlacedPagesConnection",
         "kind": "LinkedField",
-        "name": "pages",
+        "name": "placedPages",
         "plural": false,
         "selections": [
           {
@@ -126,16 +135,22 @@ return {
                 "name": "slug",
                 "storageKey": null
               },
-              (v2/*:: as any*/)
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "accent",
+                "storageKey": null
+              }
             ],
             "storageKey": null
           }
         ],
-        "storageKey": "pages(first:100)"
+        "storageKey": "placedPages(first:100,where:{\"home\":false})"
       },
       {
         "alias": "navigationPosts",
-        "args": (v1/*:: as any*/),
+        "args": (v2/*:: as any*/),
         "concreteType": "RootQueryToPostConnection",
         "kind": "LinkedField",
         "name": "posts",
@@ -156,7 +171,7 @@ return {
       },
       {
         "alias": "navigationProducts",
-        "args": (v1/*:: as any*/),
+        "args": (v2/*:: as any*/),
         "concreteType": "RootQueryToProductConnection",
         "kind": "LinkedField",
         "name": "products",
@@ -178,12 +193,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "ff0ea7e03054c8055d11e27878bb8e72",
-    "id": "ff0ea7e03054c8055d11e27878bb8e72",
+    "cacheID": "d37a9715d22dcc403e32982ee359e205",
+    "id": "d37a9715d22dcc403e32982ee359e205",
     "metadata": {},
     "name": "LoginQuery",
     "operationKind": "query",
-    "text": "query LoginQuery {\n  ...LayoutFragment\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n"
+    "text": "query LoginQuery {\n  ...LayoutFragment\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: placedPages(where: {home: false}, first: 100) {\n    nodes {\n      id\n      title\n      slug\n      accent\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n"
   }
 };
 })();

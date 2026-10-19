@@ -1,6 +1,6 @@
 /**
- * @generated SignedSource<<356be9a60ac89a99599702cb5ce5dc04>>
- * @relayHash a650fc157b0dd1ea549ff5d8546f391b
+ * @generated SignedSource<<dfecbf7b5454252ff686f7e76d84768c>>
+ * @relayHash 1ac8036107bedef4da37b33e69a53cd0
  * @lightSyntaxTransform
  */
 
@@ -8,7 +8,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-// @relayRequestID a650fc157b0dd1ea549ff5d8546f391b
+// @relayRequestID 1ac8036107bedef4da37b33e69a53cd0
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
@@ -180,14 +180,15 @@ v6 = {
   ],
   "storageKey": null
 },
-v7 = [
-  {
-    "kind": "Literal",
-    "name": "first",
-    "value": 100
-  }
-],
+v7 = {
+  "kind": "Literal",
+  "name": "first",
+  "value": 100
+},
 v8 = [
+  (v7/*:: as any*/)
+],
+v9 = [
   (v4/*:: as any*/),
   (v1/*:: as any*/)
 ];
@@ -236,10 +237,19 @@ return {
       },
       {
         "alias": "navigationPages",
-        "args": (v7/*:: as any*/),
-        "concreteType": "RootQueryToPageConnection",
+        "args": [
+          (v7/*:: as any*/),
+          {
+            "kind": "Literal",
+            "name": "where",
+            "value": {
+              "home": false
+            }
+          }
+        ],
+        "concreteType": "RootQueryToPlacedPagesConnection",
         "kind": "LinkedField",
-        "name": "pages",
+        "name": "placedPages",
         "plural": false,
         "selections": [
           {
@@ -253,16 +263,22 @@ return {
               (v1/*:: as any*/),
               (v2/*:: as any*/),
               (v3/*:: as any*/),
-              (v4/*:: as any*/)
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "accent",
+                "storageKey": null
+              }
             ],
             "storageKey": null
           }
         ],
-        "storageKey": "pages(first:100)"
+        "storageKey": "placedPages(first:100,where:{\"home\":false})"
       },
       {
         "alias": "navigationPosts",
-        "args": (v7/*:: as any*/),
+        "args": (v8/*:: as any*/),
         "concreteType": "RootQueryToPostConnection",
         "kind": "LinkedField",
         "name": "posts",
@@ -275,7 +291,7 @@ return {
             "kind": "LinkedField",
             "name": "nodes",
             "plural": true,
-            "selections": (v8/*:: as any*/),
+            "selections": (v9/*:: as any*/),
             "storageKey": null
           }
         ],
@@ -283,7 +299,7 @@ return {
       },
       {
         "alias": "navigationProducts",
-        "args": (v7/*:: as any*/),
+        "args": (v8/*:: as any*/),
         "concreteType": "RootQueryToProductConnection",
         "kind": "LinkedField",
         "name": "products",
@@ -296,7 +312,7 @@ return {
             "kind": "LinkedField",
             "name": "nodes",
             "plural": true,
-            "selections": (v8/*:: as any*/),
+            "selections": (v9/*:: as any*/),
             "storageKey": null
           }
         ],
@@ -306,12 +322,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "a650fc157b0dd1ea549ff5d8546f391b",
-    "id": "a650fc157b0dd1ea549ff5d8546f391b",
+    "cacheID": "1ac8036107bedef4da37b33e69a53cd0",
+    "id": "1ac8036107bedef4da37b33e69a53cd0",
     "metadata": {},
     "name": "PostListQuery",
     "operationKind": "query",
-    "text": "query PostListQuery(\n  $after: String\n) {\n  ...LayoutFragment\n  posts(first: 20, after: $after) {\n    nodes {\n      id\n      title\n      slug\n      excerpt\n      content\n      status\n      publishedAt\n      author {\n        displayName\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n"
+    "text": "query PostListQuery(\n  $after: String\n) {\n  ...LayoutFragment\n  posts(first: 20, after: $after) {\n    nodes {\n      id\n      title\n      slug\n      excerpt\n      content\n      status\n      publishedAt\n      author {\n        displayName\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: placedPages(where: {home: false}, first: 100) {\n    nodes {\n      id\n      title\n      slug\n      accent\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n"
   }
 };
 })();

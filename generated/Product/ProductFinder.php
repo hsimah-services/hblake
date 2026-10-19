@@ -9,12 +9,15 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Product/ProductFinder.php
- * digest: sha256:a57e88f669ad5be149fb5d90d0725dab2da6188e76f6aaba3a4900a1f6a3d558
+ * digest: sha256:6541ad8ac592cb43f2bb1a39abce8f75f4baacaf50bbae3a2e5d27fa3540cec1
  */
 
 namespace Hsimah\Entity\Product;
 
+use Eleph\Runtime\Query\EntityQuery;
+use Hsimah\Entity\Enum\PublicationStatus;
 use Hsimah\Entity\Product\Contract\ProductBySlugQuery;
+use Hsimah\Entity\Product\Contract\ProductRecentQuery;
 
 /**
  * Collection-level queries over Product.
@@ -23,6 +26,7 @@ final class ProductFinder
 {
     public function __construct(
         private readonly ProductBySlugQuery $bySlugQuery,
+        private readonly ProductRecentQuery $recentQuery,
     ) {
 
     }
@@ -31,5 +35,14 @@ final class ProductFinder
         string $slug,
     ): ?Product {
         return $this->bySlugQuery->find($slug);
+    }
+
+    /**
+     * @return EntityQuery<Product>
+     */
+    public function recent(
+        ?PublicationStatus $status = null,
+    ): EntityQuery {
+        return $this->recentQuery->find($status);
     }
 }

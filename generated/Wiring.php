@@ -9,16 +9,21 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Wiring.php
- * digest: sha256:2e51f32f9de40cd443a12eb97853f5192bbfa4393cb5b626a827e5613b4a284f
+ * digest: sha256:b677a6d18c64eb6518540be3c18d5328f5ef81a04d4af96a4cda49932b9e21c1
  */
 
 namespace Hsimah\Entity;
 
 use Closure;
 use Eleph\Runtime\Query\ValueDecoder;
+use Hsimah\Entity\Page\Contract\PageAccentVerifier;
 use Hsimah\Entity\Page\Contract\PageBySlugQuery;
 use Hsimah\Entity\Page\Contract\PageContentVerifier;
+use Hsimah\Entity\Page\Contract\PageHomeOrderVerifier;
+use Hsimah\Entity\Page\Contract\PageNavigationOrderVerifier;
+use Hsimah\Entity\Page\Contract\PagePlacedQuery;
 use Hsimah\Entity\Page\Contract\PagePublishedAtVerifier;
+use Hsimah\Entity\Page\Contract\PageRecentQuery;
 use Hsimah\Entity\Page\Contract\PageSlugVerifier;
 use Hsimah\Entity\Page\Contract\PageStatusVerifier;
 use Hsimah\Entity\Page\Contract\PageTitleVerifier;
@@ -34,6 +39,7 @@ use Hsimah\Entity\Pattern\Publishable\Contract\PublishableContentVisibilityReadP
 use Hsimah\Entity\Post\Contract\PostBySlugQuery;
 use Hsimah\Entity\Post\Contract\PostContentVerifier;
 use Hsimah\Entity\Post\Contract\PostPublishedAtVerifier;
+use Hsimah\Entity\Post\Contract\PostRecentQuery;
 use Hsimah\Entity\Post\Contract\PostSlugVerifier;
 use Hsimah\Entity\Post\Contract\PostStatusVerifier;
 use Hsimah\Entity\Post\Contract\PostTitleVerifier;
@@ -48,6 +54,7 @@ use Hsimah\Entity\Product\Contract\ProductBySlugQuery;
 use Hsimah\Entity\Product\Contract\ProductContentVerifier;
 use Hsimah\Entity\Product\Contract\ProductEnquiryUrlVerifier;
 use Hsimah\Entity\Product\Contract\ProductPublishedAtVerifier;
+use Hsimah\Entity\Product\Contract\ProductRecentQuery;
 use Hsimah\Entity\Product\Contract\ProductSlugVerifier;
 use Hsimah\Entity\Product\Contract\ProductStatusVerifier;
 use Hsimah\Entity\Product\Contract\ProductTitleVerifier;
@@ -86,24 +93,24 @@ final class Wiring
             PageHydrator::class => static fn (ContainerInterface $c): object => new PageHydrator(self::resolve($c, ValueDecoder::class)),
             PageInput::class => static fn (ContainerInterface $c): object => new PageInput(self::resolve($c, ValueDecoder::class)),
             PageSideEffects::class => static fn (ContainerInterface $c): object => new PageSideEffects(),
-            PageVerifiers::class => static fn (ContainerInterface $c): object => new PageVerifiers(self::resolve($c, PageTitleVerifier::class), self::resolve($c, PageSlugVerifier::class), self::resolve($c, PageContentVerifier::class), self::resolve($c, PageStatusVerifier::class), self::resolve($c, PagePublishedAtVerifier::class)),
+            PageVerifiers::class => static fn (ContainerInterface $c): object => new PageVerifiers(self::resolve($c, PageTitleVerifier::class), self::resolve($c, PageSlugVerifier::class), self::resolve($c, PageContentVerifier::class), self::resolve($c, PageStatusVerifier::class), self::resolve($c, PagePublishedAtVerifier::class), self::resolve($c, PageNavigationOrderVerifier::class), self::resolve($c, PageHomeOrderVerifier::class), self::resolve($c, PageAccentVerifier::class)),
             PageReadPolicies::class => static fn (ContainerInterface $c): object => new PageReadPolicies(self::resolve($c, PublishableContentVisibilityReadPolicy::class)),
             PageWritePolicies::class => static fn (ContainerInterface $c): object => new PageWritePolicies(self::resolve($c, PublishableContentStaffWritePolicy::class)),
-            PageFinder::class => static fn (ContainerInterface $c): object => new PageFinder(self::resolve($c, PageBySlugQuery::class)),
+            PageFinder::class => static fn (ContainerInterface $c): object => new PageFinder(self::resolve($c, PageBySlugQuery::class), self::resolve($c, PagePlacedQuery::class), self::resolve($c, PageRecentQuery::class)),
             PostHydrator::class => static fn (ContainerInterface $c): object => new PostHydrator(self::resolve($c, ValueDecoder::class)),
             PostInput::class => static fn (ContainerInterface $c): object => new PostInput(self::resolve($c, ValueDecoder::class)),
             PostSideEffects::class => static fn (ContainerInterface $c): object => new PostSideEffects(),
             PostVerifiers::class => static fn (ContainerInterface $c): object => new PostVerifiers(self::resolve($c, PostTitleVerifier::class), self::resolve($c, PostSlugVerifier::class), self::resolve($c, PostContentVerifier::class), self::resolve($c, PostStatusVerifier::class), self::resolve($c, PostPublishedAtVerifier::class)),
             PostReadPolicies::class => static fn (ContainerInterface $c): object => new PostReadPolicies(self::resolve($c, PublishableContentVisibilityReadPolicy::class)),
             PostWritePolicies::class => static fn (ContainerInterface $c): object => new PostWritePolicies(self::resolve($c, PublishableContentStaffWritePolicy::class)),
-            PostFinder::class => static fn (ContainerInterface $c): object => new PostFinder(self::resolve($c, PostBySlugQuery::class)),
+            PostFinder::class => static fn (ContainerInterface $c): object => new PostFinder(self::resolve($c, PostBySlugQuery::class), self::resolve($c, PostRecentQuery::class)),
             ProductHydrator::class => static fn (ContainerInterface $c): object => new ProductHydrator(self::resolve($c, ValueDecoder::class)),
             ProductInput::class => static fn (ContainerInterface $c): object => new ProductInput(self::resolve($c, ValueDecoder::class)),
             ProductSideEffects::class => static fn (ContainerInterface $c): object => new ProductSideEffects(),
             ProductVerifiers::class => static fn (ContainerInterface $c): object => new ProductVerifiers(self::resolve($c, ProductTitleVerifier::class), self::resolve($c, ProductSlugVerifier::class), self::resolve($c, ProductContentVerifier::class), self::resolve($c, ProductStatusVerifier::class), self::resolve($c, ProductPublishedAtVerifier::class), self::resolve($c, ProductEnquiryUrlVerifier::class)),
             ProductReadPolicies::class => static fn (ContainerInterface $c): object => new ProductReadPolicies(self::resolve($c, PublishableContentVisibilityReadPolicy::class)),
             ProductWritePolicies::class => static fn (ContainerInterface $c): object => new ProductWritePolicies(self::resolve($c, PublishableContentStaffWritePolicy::class)),
-            ProductFinder::class => static fn (ContainerInterface $c): object => new ProductFinder(self::resolve($c, ProductBySlugQuery::class)),
+            ProductFinder::class => static fn (ContainerInterface $c): object => new ProductFinder(self::resolve($c, ProductBySlugQuery::class), self::resolve($c, ProductRecentQuery::class)),
             UserHydrator::class => static fn (ContainerInterface $c): object => new UserHydrator(self::resolve($c, ValueDecoder::class)),
             UserInput::class => static fn (ContainerInterface $c): object => new UserInput(self::resolve($c, ValueDecoder::class)),
             UserSideEffects::class => static fn (ContainerInterface $c): object => new UserSideEffects(),

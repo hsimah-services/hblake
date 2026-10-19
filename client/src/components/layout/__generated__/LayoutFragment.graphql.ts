@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<a977edfeb9577605b4a33fe7a2cae736>>
+ * @generated SignedSource<<c8910b81a1f1a7eff22698145b465dc2>>
  * @lightSyntaxTransform
  */
 
@@ -8,15 +8,16 @@
 // @ts-nocheck
 
 import { ReaderFragment } from 'relay-runtime';
+export type PageAccent = "BERRY" | "BLUE" | "GREEN" | "INK" | "ORANGE" | "%future added value";
 export type PublicationStatus = "DRAFT" | "PUBLISHED" | "%future added value";
 export type UserRole = "ADMIN" | "EDITOR" | "%future added value";
 import { FragmentRefs } from "relay-runtime";
 export type LayoutFragment$data = {
   readonly navigationPages: {
     readonly nodes: ReadonlyArray<{
+      readonly accent: PageAccent;
       readonly id: string;
       readonly slug: string;
-      readonly status: PublicationStatus;
       readonly title: string;
     } | null | undefined> | null | undefined;
   } | null | undefined;
@@ -50,22 +51,22 @@ var v0 = {
   "name": "id",
   "storageKey": null
 },
-v1 = [
-  {
-    "kind": "Literal",
-    "name": "first",
-    "value": 100
-  }
-],
-v2 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "status",
-  "storageKey": null
+v1 = {
+  "kind": "Literal",
+  "name": "first",
+  "value": 100
 },
+v2 = [
+  (v1/*:: as any*/)
+],
 v3 = [
-  (v2/*:: as any*/)
+  {
+    "alias": null,
+    "args": null,
+    "kind": "ScalarField",
+    "name": "status",
+    "storageKey": null
+  }
 ];
 return {
   "argumentDefinitions": [],
@@ -101,10 +102,19 @@ return {
     },
     {
       "alias": "navigationPages",
-      "args": (v1/*:: as any*/),
-      "concreteType": "RootQueryToPageConnection",
+      "args": [
+        (v1/*:: as any*/),
+        {
+          "kind": "Literal",
+          "name": "where",
+          "value": {
+            "home": false
+          }
+        }
+      ],
+      "concreteType": "RootQueryToPlacedPagesConnection",
       "kind": "LinkedField",
-      "name": "pages",
+      "name": "placedPages",
       "plural": false,
       "selections": [
         {
@@ -130,16 +140,22 @@ return {
               "name": "slug",
               "storageKey": null
             },
-            (v2/*:: as any*/)
+            {
+              "alias": null,
+              "args": null,
+              "kind": "ScalarField",
+              "name": "accent",
+              "storageKey": null
+            }
           ],
           "storageKey": null
         }
       ],
-      "storageKey": "pages(first:100)"
+      "storageKey": "placedPages(first:100,where:{\"home\":false})"
     },
     {
       "alias": "navigationPosts",
-      "args": (v1/*:: as any*/),
+      "args": (v2/*:: as any*/),
       "concreteType": "RootQueryToPostConnection",
       "kind": "LinkedField",
       "name": "posts",
@@ -160,7 +176,7 @@ return {
     },
     {
       "alias": "navigationProducts",
-      "args": (v1/*:: as any*/),
+      "args": (v2/*:: as any*/),
       "concreteType": "RootQueryToProductConnection",
       "kind": "LinkedField",
       "name": "products",
@@ -185,6 +201,6 @@ return {
 };
 })();
 
-(node as any).hash = "579dd8cb84c7a72e9d1346a5528b8994";
+(node as any).hash = "c8347900960f641a8904c20a3a96ccc6";
 
 export default node;

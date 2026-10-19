@@ -60,7 +60,13 @@ scripts/acceptance/backup /private/path/site-backup.tar
 scripts/acceptance/restore /private/path/site-backup.tar
 ```
 
-A backup is a tar of a `VACUUM INTO` database snapshot (`site.sqlite`) and the post images (`media/`). Restore validates the archive and the database's integrity before stopping the server, then replaces the database and images and restarts before returning. Run the equivalent procedure under maintenance mode in production. Do not rerun the initial installer as an upgrade; future schema changes require a reviewed migration and a tested backup/restore.
+A backup is a tar of a `VACUUM INTO` database snapshot (`site.sqlite`) and the post images (`media/`). Restore validates the archive and the database's integrity before stopping the server, then replaces the database and images and restarts before returning. Run the equivalent procedure under maintenance mode in production. Do not rerun the initial installer as an upgrade. Schema changes ship as reviewed migrations in `server/src/Migrations.php` (tested in `server/tests/MigrationsTest.php`); after deploying a release, take a backup and then apply them:
+
+```sh
+scripts/php php server/console.php upgrade
+```
+
+Each migration runs once in a transaction and is recorded in `schema_migration`; a fresh install records them all as applied. If an upgrade misbehaves, restore the backup taken before it.
 
 V1 is client-rendered; each route's HTML carries its query response as tsquid initial data (`#tsquid-data`), executed as the requesting viewer. Initial-HTML SEO, concurrent edit protection, additional accounts and commerce are deferred, as recorded in the specification. The site name is hblake; launch copy and public contact links are supplied by the owner. Deployment remains a separate operator action.
 

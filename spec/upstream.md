@@ -127,6 +127,17 @@ No version aliases, development branches or custom VCS repositories remain.
 - [PHP builder #35](https://github.com/hsimah-services/elephentity-codegen-php/issues/35)
   is fixed in 0.7.0: regenerated PHP no longer contains trailing whitespace.
 
+- [Standalone GraphQL #9](https://github.com/hsimah-services/elephentity-graphql-php/issues/9):
+  a published collection query with no arguments emits an empty `WhereArgs` input and
+  an invalid schema. Page `placed` takes a meaningful `home` argument and `recent`
+  a nullable `status`, so neither needs an argument-free query.
+- [Standalone GraphQL #10](https://github.com/hsimah-services/elephentity-graphql-php/issues/10):
+  published collection queries read their arguments beside the paging ones while the
+  schema nests them under `where`, and enum arguments reach handlers undecoded.
+  `server/src/Schema.php` unwraps `where` and decodes enum arguments for spec queries,
+  and leaves the root `pages`/`posts`/`products` ordering override to plain lists.
+  Remove the workaround once #10 ships.
+
 Generated artifacts remain machine-owned. tsquid admin generation is still #7;
 the application's shared forms are handwritten and are not claimed as generated.
 The client now owns queries, components and mutations per entrypoint/entity, with

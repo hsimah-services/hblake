@@ -1,6 +1,6 @@
 /**
- * @generated SignedSource<<4a2d20f69ddddb038b75d89aebcadb66>>
- * @relayHash 8377941fd17bab39b9523077363b7cf4
+ * @generated SignedSource<<64ee1c4ccc5c18bff6655df2e373941e>>
+ * @relayHash 4e52b7a904a0b69cc1b4088cbe5434f5
  * @lightSyntaxTransform
  */
 
@@ -8,19 +8,20 @@
 /* eslint-disable */
 // @ts-nocheck
 
-// @relayRequestID 8377941fd17bab39b9523077363b7cf4
+// @relayRequestID 4e52b7a904a0b69cc1b4088cbe5434f5
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
+export type PageAccent = "BERRY" | "BLUE" | "GREEN" | "INK" | "ORANGE" | "%future added value";
 export type PublicationStatus = "DRAFT" | "PUBLISHED" | "%future added value";
 export type HomeQuery$variables = Record<PropertyKey, never>;
 export type HomeQuery$data = {
   readonly homePages: {
     readonly nodes: ReadonlyArray<{
+      readonly accent: PageAccent;
       readonly excerpt: string;
       readonly id: string;
       readonly slug: string;
-      readonly status: PublicationStatus;
       readonly title: string;
     } | null | undefined> | null | undefined;
   } | null | undefined;
@@ -53,54 +54,60 @@ export type HomeQuery = {
 };
 
 const node: ConcreteRequest = (function(){
-var v0 = [
-  {
-    "kind": "Literal",
-    "name": "first",
-    "value": 100
-  }
-],
-v1 = {
+var v0 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "id",
   "storageKey": null
 },
-v2 = {
+v1 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "title",
   "storageKey": null
 },
-v3 = {
+v2 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "slug",
   "storageKey": null
 },
-v4 = {
+v3 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "excerpt",
   "storageKey": null
 },
-v5 = {
+v4 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "status",
+  "name": "accent",
   "storageKey": null
 },
-v6 = {
+v5 = {
   "alias": "homePages",
-  "args": (v0/*:: as any*/),
-  "concreteType": "RootQueryToPageConnection",
+  "args": [
+    {
+      "kind": "Literal",
+      "name": "first",
+      "value": 4
+    },
+    {
+      "kind": "Literal",
+      "name": "where",
+      "value": {
+        "home": true
+      }
+    }
+  ],
+  "concreteType": "RootQueryToPlacedPagesConnection",
   "kind": "LinkedField",
-  "name": "pages",
+  "name": "placedPages",
   "plural": false,
   "selections": [
     {
@@ -111,27 +118,42 @@ v6 = {
       "name": "nodes",
       "plural": true,
       "selections": [
+        (v0/*:: as any*/),
         (v1/*:: as any*/),
         (v2/*:: as any*/),
         (v3/*:: as any*/),
-        (v4/*:: as any*/),
-        (v5/*:: as any*/)
+        (v4/*:: as any*/)
       ],
       "storageKey": null
     }
   ],
-  "storageKey": "pages(first:100)"
+  "storageKey": "placedPages(first:4,where:{\"home\":true})"
 },
-v7 = {
+v6 = {
+  "kind": "Literal",
+  "name": "first",
+  "value": 100
+},
+v7 = [
+  (v6/*:: as any*/)
+],
+v8 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "status",
+  "storageKey": null
+},
+v9 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "publishedAt",
   "storageKey": null
 },
-v8 = {
+v10 = {
   "alias": "latestPosts",
-  "args": (v0/*:: as any*/),
+  "args": (v7/*:: as any*/),
   "concreteType": "RootQueryToPostConnection",
   "kind": "LinkedField",
   "name": "posts",
@@ -145,19 +167,19 @@ v8 = {
       "name": "nodes",
       "plural": true,
       "selections": [
+        (v0/*:: as any*/),
         (v1/*:: as any*/),
         (v2/*:: as any*/),
         (v3/*:: as any*/),
-        (v4/*:: as any*/),
-        (v5/*:: as any*/),
-        (v7/*:: as any*/)
+        (v8/*:: as any*/),
+        (v9/*:: as any*/)
       ],
       "storageKey": null
     }
   ],
   "storageKey": "posts(first:100)"
 },
-v9 = {
+v11 = {
   "alias": null,
   "args": [
     {
@@ -171,9 +193,9 @@ v9 = {
   "name": "pageBySlug",
   "plural": false,
   "selections": [
+    (v0/*:: as any*/),
     (v1/*:: as any*/),
     (v2/*:: as any*/),
-    (v3/*:: as any*/),
     {
       "alias": null,
       "args": null,
@@ -181,9 +203,9 @@ v9 = {
       "name": "content",
       "storageKey": null
     },
-    (v4/*:: as any*/),
-    (v5/*:: as any*/),
-    (v7/*:: as any*/),
+    (v3/*:: as any*/),
+    (v8/*:: as any*/),
+    (v9/*:: as any*/),
     {
       "alias": null,
       "args": null,
@@ -201,9 +223,9 @@ v9 = {
   ],
   "storageKey": "pageBySlug(slug:\"home\")"
 },
-v10 = [
-  (v5/*:: as any*/),
-  (v1/*:: as any*/)
+v12 = [
+  (v8/*:: as any*/),
+  (v0/*:: as any*/)
 ];
 return {
   "fragment": {
@@ -217,9 +239,9 @@ return {
         "kind": "FragmentSpread",
         "name": "LayoutFragment"
       },
-      (v6/*:: as any*/),
-      (v8/*:: as any*/),
-      (v9/*:: as any*/)
+      (v5/*:: as any*/),
+      (v10/*:: as any*/),
+      (v11/*:: as any*/)
     ],
     "type": "RootQuery",
     "abstractKey": null
@@ -238,7 +260,7 @@ return {
         "name": "viewer",
         "plural": false,
         "selections": [
-          (v1/*:: as any*/),
+          (v0/*:: as any*/),
           {
             "alias": null,
             "args": null,
@@ -258,10 +280,19 @@ return {
       },
       {
         "alias": "navigationPages",
-        "args": (v0/*:: as any*/),
-        "concreteType": "RootQueryToPageConnection",
+        "args": [
+          (v6/*:: as any*/),
+          {
+            "kind": "Literal",
+            "name": "where",
+            "value": {
+              "home": false
+            }
+          }
+        ],
+        "concreteType": "RootQueryToPlacedPagesConnection",
         "kind": "LinkedField",
-        "name": "pages",
+        "name": "placedPages",
         "plural": false,
         "selections": [
           {
@@ -272,19 +303,19 @@ return {
             "name": "nodes",
             "plural": true,
             "selections": [
+              (v0/*:: as any*/),
               (v1/*:: as any*/),
               (v2/*:: as any*/),
-              (v3/*:: as any*/),
-              (v5/*:: as any*/)
+              (v4/*:: as any*/)
             ],
             "storageKey": null
           }
         ],
-        "storageKey": "pages(first:100)"
+        "storageKey": "placedPages(first:100,where:{\"home\":false})"
       },
       {
         "alias": "navigationPosts",
-        "args": (v0/*:: as any*/),
+        "args": (v7/*:: as any*/),
         "concreteType": "RootQueryToPostConnection",
         "kind": "LinkedField",
         "name": "posts",
@@ -297,7 +328,7 @@ return {
             "kind": "LinkedField",
             "name": "nodes",
             "plural": true,
-            "selections": (v10/*:: as any*/),
+            "selections": (v12/*:: as any*/),
             "storageKey": null
           }
         ],
@@ -305,7 +336,7 @@ return {
       },
       {
         "alias": "navigationProducts",
-        "args": (v0/*:: as any*/),
+        "args": (v7/*:: as any*/),
         "concreteType": "RootQueryToProductConnection",
         "kind": "LinkedField",
         "name": "products",
@@ -318,28 +349,28 @@ return {
             "kind": "LinkedField",
             "name": "nodes",
             "plural": true,
-            "selections": (v10/*:: as any*/),
+            "selections": (v12/*:: as any*/),
             "storageKey": null
           }
         ],
         "storageKey": "products(first:100)"
       },
-      (v6/*:: as any*/),
-      (v8/*:: as any*/),
-      (v9/*:: as any*/)
+      (v5/*:: as any*/),
+      (v10/*:: as any*/),
+      (v11/*:: as any*/)
     ]
   },
   "params": {
-    "cacheID": "8377941fd17bab39b9523077363b7cf4",
-    "id": "8377941fd17bab39b9523077363b7cf4",
+    "cacheID": "4e52b7a904a0b69cc1b4088cbe5434f5",
+    "id": "4e52b7a904a0b69cc1b4088cbe5434f5",
     "metadata": {},
     "name": "HomeQuery",
     "operationKind": "query",
-    "text": "query HomeQuery {\n  ...LayoutFragment\n  homePages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      excerpt\n      status\n    }\n  }\n  latestPosts: posts(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      excerpt\n      status\n      publishedAt\n    }\n  }\n  pageBySlug(slug: \"home\") {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n"
+    "text": "query HomeQuery {\n  ...LayoutFragment\n  homePages: placedPages(where: {home: true}, first: 4) {\n    nodes {\n      id\n      title\n      slug\n      excerpt\n      accent\n    }\n  }\n  latestPosts: posts(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      excerpt\n      status\n      publishedAt\n    }\n  }\n  pageBySlug(slug: \"home\") {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: placedPages(where: {home: false}, first: 100) {\n    nodes {\n      id\n      title\n      slug\n      accent\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "88ccf1037b74922f8bf3da68643e8a8d";
+(node as any).hash = "ffe769d0473e91ab3e8201a674304367";
 
 export default node;

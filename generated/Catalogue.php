@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Catalogue.php
- * digest: sha256:0800833a6d7542d06a6041f9c1ab79a185912db8dc78e01bdeab4d677d8d7572
+ * digest: sha256:466fc62a7d10d6002ffeda13d86b4af527afb1fc8441f1bed8d2114e8820a836
  */
 
 namespace Hsimah\Entity;
@@ -246,7 +246,7 @@ final readonly class Catalogue implements EntityCatalogue
         string $entity,
     ): array {
         return match ($entity) {
-            'Page' => ['title', 'slug', 'content', 'excerpt', 'status', 'publishedAt', 'createdAt', 'updatedAt'],
+            'Page' => ['title', 'slug', 'content', 'excerpt', 'status', 'publishedAt', 'createdAt', 'updatedAt', 'showInNavigation', 'navigationOrder', 'featureOnHome', 'homeOrder', 'accent'],
             'Post' => ['title', 'slug', 'content', 'excerpt', 'status', 'publishedAt', 'createdAt', 'updatedAt'],
             'Product' => ['title', 'slug', 'content', 'excerpt', 'status', 'publishedAt', 'createdAt', 'updatedAt', 'enquiryUrl'],
             'User' => ['createdAt', 'updatedAt', 'username', 'displayName', 'role', 'active'],
@@ -276,7 +276,7 @@ final readonly class Catalogue implements EntityCatalogue
         string $entity,
     ): array {
         return match ($entity) {
-            'Page' => ['title', 'slug', 'content', 'excerpt', 'status', 'createdAt', 'updatedAt'],
+            'Page' => ['title', 'slug', 'content', 'excerpt', 'status', 'createdAt', 'updatedAt', 'showInNavigation', 'navigationOrder', 'featureOnHome', 'homeOrder', 'accent'],
             'Post' => ['title', 'slug', 'content', 'excerpt', 'status', 'createdAt', 'updatedAt'],
             'Product' => ['title', 'slug', 'content', 'excerpt', 'status', 'createdAt', 'updatedAt'],
             'User' => ['createdAt', 'updatedAt', 'username', 'displayName', 'role', 'active'],
@@ -382,8 +382,12 @@ final readonly class Catalogue implements EntityCatalogue
     ): array {
         return match ($entity . '.' . $query) {
             'Page.bySlug' => ['slug'],
+            'Page.placed' => ['home'],
+            'Page.recent' => ['status'],
             'Post.bySlug' => ['slug'],
+            'Post.recent' => ['status'],
             'Product.bySlug' => ['slug'],
+            'Product.recent' => ['status'],
             default => [],
         };
     }
@@ -511,7 +515,7 @@ final readonly class Catalogue implements EntityCatalogue
      * @return list<string>
      */
     public function contracts(): array {
-        return ['Hsimah\\Entity\\Page\\Contract\\PageBySlugQuery', 'Hsimah\\Entity\\Page\\Contract\\PageContentVerifier', 'Hsimah\\Entity\\Page\\Contract\\PagePublishAction', 'Hsimah\\Entity\\Page\\Contract\\PagePublishedAtVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageSlugVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageStatusVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageTitleVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageUnpublishAction', 'Hsimah\\Entity\\Pattern\\Publishable\\Contract\\PublishableContentStaffWritePolicy', 'Hsimah\\Entity\\Pattern\\Publishable\\Contract\\PublishableContentVisibilityReadPolicy', 'Hsimah\\Entity\\Post\\Contract\\PostBySlugQuery', 'Hsimah\\Entity\\Post\\Contract\\PostContentVerifier', 'Hsimah\\Entity\\Post\\Contract\\PostPublishAction', 'Hsimah\\Entity\\Post\\Contract\\PostPublishedAtVerifier', 'Hsimah\\Entity\\Post\\Contract\\PostSlugVerifier', 'Hsimah\\Entity\\Post\\Contract\\PostStatusVerifier', 'Hsimah\\Entity\\Post\\Contract\\PostTitleVerifier', 'Hsimah\\Entity\\Post\\Contract\\PostUnpublishAction', 'Hsimah\\Entity\\Product\\Contract\\ProductBySlugQuery', 'Hsimah\\Entity\\Product\\Contract\\ProductContentVerifier', 'Hsimah\\Entity\\Product\\Contract\\ProductEnquiryUrlVerifier', 'Hsimah\\Entity\\Product\\Contract\\ProductPublishAction', 'Hsimah\\Entity\\Product\\Contract\\ProductPublishedAtVerifier', 'Hsimah\\Entity\\Product\\Contract\\ProductSlugVerifier', 'Hsimah\\Entity\\Product\\Contract\\ProductStatusVerifier', 'Hsimah\\Entity\\Product\\Contract\\ProductTitleVerifier', 'Hsimah\\Entity\\Product\\Contract\\ProductUnpublishAction', 'Hsimah\\Entity\\User\\Contract\\UserAdminAccountsWritePolicy', 'Hsimah\\Entity\\User\\Contract\\UserDisplayNameVerifier', 'Hsimah\\Entity\\User\\Contract\\UserStaffProfileReadPolicy', 'Hsimah\\Entity\\User\\Contract\\UserUsernameVerifier'];
+        return ['Hsimah\\Entity\\Page\\Contract\\PageAccentVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageBySlugQuery', 'Hsimah\\Entity\\Page\\Contract\\PageContentVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageHomeOrderVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageNavigationOrderVerifier', 'Hsimah\\Entity\\Page\\Contract\\PagePlacedQuery', 'Hsimah\\Entity\\Page\\Contract\\PagePublishAction', 'Hsimah\\Entity\\Page\\Contract\\PagePublishedAtVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageRecentQuery', 'Hsimah\\Entity\\Page\\Contract\\PageSlugVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageStatusVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageTitleVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageUnpublishAction', 'Hsimah\\Entity\\Pattern\\Publishable\\Contract\\PublishableContentStaffWritePolicy', 'Hsimah\\Entity\\Pattern\\Publishable\\Contract\\PublishableContentVisibilityReadPolicy', 'Hsimah\\Entity\\Post\\Contract\\PostBySlugQuery', 'Hsimah\\Entity\\Post\\Contract\\PostContentVerifier', 'Hsimah\\Entity\\Post\\Contract\\PostPublishAction', 'Hsimah\\Entity\\Post\\Contract\\PostPublishedAtVerifier', 'Hsimah\\Entity\\Post\\Contract\\PostRecentQuery', 'Hsimah\\Entity\\Post\\Contract\\PostSlugVerifier', 'Hsimah\\Entity\\Post\\Contract\\PostStatusVerifier', 'Hsimah\\Entity\\Post\\Contract\\PostTitleVerifier', 'Hsimah\\Entity\\Post\\Contract\\PostUnpublishAction', 'Hsimah\\Entity\\Product\\Contract\\ProductBySlugQuery', 'Hsimah\\Entity\\Product\\Contract\\ProductContentVerifier', 'Hsimah\\Entity\\Product\\Contract\\ProductEnquiryUrlVerifier', 'Hsimah\\Entity\\Product\\Contract\\ProductPublishAction', 'Hsimah\\Entity\\Product\\Contract\\ProductPublishedAtVerifier', 'Hsimah\\Entity\\Product\\Contract\\ProductRecentQuery', 'Hsimah\\Entity\\Product\\Contract\\ProductSlugVerifier', 'Hsimah\\Entity\\Product\\Contract\\ProductStatusVerifier', 'Hsimah\\Entity\\Product\\Contract\\ProductTitleVerifier', 'Hsimah\\Entity\\Product\\Contract\\ProductUnpublishAction', 'Hsimah\\Entity\\User\\Contract\\UserAdminAccountsWritePolicy', 'Hsimah\\Entity\\User\\Contract\\UserDisplayNameVerifier', 'Hsimah\\Entity\\User\\Contract\\UserStaffProfileReadPolicy', 'Hsimah\\Entity\\User\\Contract\\UserUsernameVerifier'];
     }
 
     /**

@@ -9,13 +9,14 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Page/Page.php
- * digest: sha256:ef0173b2575d456f130a3d9ad36882d7d8e242d820d570f5e3504d135e2cf695
+ * digest: sha256:fd7515f1ed55f7197098ba4c2c59cd4b08ca117ee39dc5cadcf77d8e0628bad6
  */
 
 namespace Hsimah\Entity\Page;
 
 use DateTimeImmutable;
 use Eleph\Runtime\Identity\EntityId;
+use Hsimah\Entity\Enum\PageAccent;
 use Hsimah\Entity\Enum\PublicationStatus;
 use Hsimah\Entity\Pattern\Publishable\Publishable;
 
@@ -34,6 +35,11 @@ final class Page implements Publishable
         private readonly ?DateTimeImmutable $publishedAt,
         private readonly DateTimeImmutable $createdAt,
         private readonly DateTimeImmutable $updatedAt,
+        private readonly bool $showInNavigation,
+        private readonly int $navigationOrder,
+        private readonly bool $featureOnHome,
+        private readonly int $homeOrder,
+        private readonly PageAccent $accent,
     ) {
 
     }
@@ -74,6 +80,26 @@ final class Page implements Publishable
         return $this->updatedAt;
     }
 
+    public function getShowInNavigation(): bool {
+        return $this->showInNavigation;
+    }
+
+    public function getNavigationOrder(): int {
+        return $this->navigationOrder;
+    }
+
+    public function getFeatureOnHome(): bool {
+        return $this->featureOnHome;
+    }
+
+    public function getHomeOrder(): int {
+        return $this->homeOrder;
+    }
+
+    public function getAccent(): PageAccent {
+        return $this->accent;
+    }
+
     public static function of(
         EntityId $id,
         string $title,
@@ -84,7 +110,12 @@ final class Page implements Publishable
         ?DateTimeImmutable $publishedAt,
         DateTimeImmutable $createdAt,
         DateTimeImmutable $updatedAt,
+        bool $showInNavigation,
+        int $navigationOrder,
+        bool $featureOnHome,
+        int $homeOrder,
+        PageAccent $accent,
     ): self {
-        return new self($id, $title, $slug, $content, $excerpt, $status, $publishedAt, $createdAt, $updatedAt);
+        return new self($id, $title, $slug, $content, $excerpt, $status, $publishedAt, $createdAt, $updatedAt, $showInNavigation, $navigationOrder, $featureOnHome, $homeOrder, $accent);
     }
 }

@@ -1,6 +1,6 @@
 /**
- * @generated SignedSource<<bf553d1a82d0aa523af3b8eb31808e8a>>
- * @relayHash b70a123f9323c35adc2c338bc7bcab1b
+ * @generated SignedSource<<32f2bc21f04d568c809d7e05fd726651>>
+ * @relayHash df6da31fccdfbbb4d2e17d9a9535a8fe
  * @lightSyntaxTransform
  */
 
@@ -8,7 +8,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-// @relayRequestID b70a123f9323c35adc2c338bc7bcab1b
+// @relayRequestID df6da31fccdfbbb4d2e17d9a9535a8fe
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
@@ -42,6 +42,15 @@ export type AdminQuery$data = {
     } | null | undefined> | null | undefined;
     readonly totalCount: number | null | undefined;
   } | null | undefined;
+  readonly publishedPages: {
+    readonly totalCount: number | null | undefined;
+  } | null | undefined;
+  readonly publishedPosts: {
+    readonly totalCount: number | null | undefined;
+  } | null | undefined;
+  readonly publishedProducts: {
+    readonly totalCount: number | null | undefined;
+  } | null | undefined;
   readonly viewer: {
     readonly id: string | null | undefined;
   } | null | undefined;
@@ -64,7 +73,7 @@ v1 = [
   {
     "kind": "Literal",
     "name": "first",
-    "value": 100
+    "value": 5
   }
 ],
 v2 = {
@@ -99,11 +108,11 @@ v3 = [
   }
 ],
 v4 = {
-  "alias": null,
+  "alias": "pages",
   "args": (v1/*:: as any*/),
-  "concreteType": "RootQueryToPageConnection",
+  "concreteType": "RootQueryToRecentPagesConnection",
   "kind": "LinkedField",
-  "name": "pages",
+  "name": "recentPages",
   "plural": false,
   "selections": [
     (v2/*:: as any*/),
@@ -118,14 +127,41 @@ v4 = {
       "storageKey": null
     }
   ],
-  "storageKey": "pages(first:100)"
+  "storageKey": "recentPages(first:5)"
 },
-v5 = {
-  "alias": null,
-  "args": (v1/*:: as any*/),
-  "concreteType": "RootQueryToPostConnection",
+v5 = [
+  {
+    "kind": "Literal",
+    "name": "first",
+    "value": 0
+  },
+  {
+    "kind": "Literal",
+    "name": "where",
+    "value": {
+      "status": "PUBLISHED"
+    }
+  }
+],
+v6 = [
+  (v2/*:: as any*/)
+],
+v7 = {
+  "alias": "publishedPages",
+  "args": (v5/*:: as any*/),
+  "concreteType": "RootQueryToRecentPagesConnection",
   "kind": "LinkedField",
-  "name": "posts",
+  "name": "recentPages",
+  "plural": false,
+  "selections": (v6/*:: as any*/),
+  "storageKey": "recentPages(first:0,where:{\"status\":\"PUBLISHED\"})"
+},
+v8 = {
+  "alias": "posts",
+  "args": (v1/*:: as any*/),
+  "concreteType": "RootQueryToRecentPostsConnection",
+  "kind": "LinkedField",
+  "name": "recentPosts",
   "plural": false,
   "selections": [
     (v2/*:: as any*/),
@@ -140,14 +176,24 @@ v5 = {
       "storageKey": null
     }
   ],
-  "storageKey": "posts(first:100)"
+  "storageKey": "recentPosts(first:5)"
 },
-v6 = {
-  "alias": null,
-  "args": (v1/*:: as any*/),
-  "concreteType": "RootQueryToProductConnection",
+v9 = {
+  "alias": "publishedPosts",
+  "args": (v5/*:: as any*/),
+  "concreteType": "RootQueryToRecentPostsConnection",
   "kind": "LinkedField",
-  "name": "products",
+  "name": "recentPosts",
+  "plural": false,
+  "selections": (v6/*:: as any*/),
+  "storageKey": "recentPosts(first:0,where:{\"status\":\"PUBLISHED\"})"
+},
+v10 = {
+  "alias": "products",
+  "args": (v1/*:: as any*/),
+  "concreteType": "RootQueryToRecentProductsConnection",
+  "kind": "LinkedField",
+  "name": "recentProducts",
   "plural": false,
   "selections": [
     (v2/*:: as any*/),
@@ -162,17 +208,24 @@ v6 = {
       "storageKey": null
     }
   ],
-  "storageKey": "products(first:100)"
+  "storageKey": "recentProducts(first:5)"
 },
-v7 = [
+v11 = {
+  "alias": "publishedProducts",
+  "args": (v5/*:: as any*/),
+  "concreteType": "RootQueryToRecentProductsConnection",
+  "kind": "LinkedField",
+  "name": "recentProducts",
+  "plural": false,
+  "selections": (v6/*:: as any*/),
+  "storageKey": "recentProducts(first:0,where:{\"status\":\"PUBLISHED\"})"
+},
+v12 = [
   {
     "kind": "Literal",
     "name": "first",
     "value": 1
   }
-],
-v8 = [
-  (v2/*:: as any*/)
 ];
 return {
   "fragment": {
@@ -199,8 +252,11 @@ return {
         "storageKey": null
       },
       (v4/*:: as any*/),
-      (v5/*:: as any*/),
-      (v6/*:: as any*/)
+      (v7/*:: as any*/),
+      (v8/*:: as any*/),
+      (v9/*:: as any*/),
+      (v10/*:: as any*/),
+      (v11/*:: as any*/)
     ],
     "type": "RootQuery",
     "abstractKey": null
@@ -232,50 +288,53 @@ return {
       },
       {
         "alias": "pageCount",
-        "args": (v7/*:: as any*/),
+        "args": (v12/*:: as any*/),
         "concreteType": "RootQueryToPageConnection",
         "kind": "LinkedField",
         "name": "pages",
         "plural": false,
-        "selections": (v8/*:: as any*/),
+        "selections": (v6/*:: as any*/),
         "storageKey": "pages(first:1)"
       },
       {
         "alias": "postCount",
-        "args": (v7/*:: as any*/),
+        "args": (v12/*:: as any*/),
         "concreteType": "RootQueryToPostConnection",
         "kind": "LinkedField",
         "name": "posts",
         "plural": false,
-        "selections": (v8/*:: as any*/),
+        "selections": (v6/*:: as any*/),
         "storageKey": "posts(first:1)"
       },
       {
         "alias": "productCount",
-        "args": (v7/*:: as any*/),
+        "args": (v12/*:: as any*/),
         "concreteType": "RootQueryToProductConnection",
         "kind": "LinkedField",
         "name": "products",
         "plural": false,
-        "selections": (v8/*:: as any*/),
+        "selections": (v6/*:: as any*/),
         "storageKey": "products(first:1)"
       },
       (v4/*:: as any*/),
-      (v5/*:: as any*/),
-      (v6/*:: as any*/)
+      (v7/*:: as any*/),
+      (v8/*:: as any*/),
+      (v9/*:: as any*/),
+      (v10/*:: as any*/),
+      (v11/*:: as any*/)
     ]
   },
   "params": {
-    "cacheID": "b70a123f9323c35adc2c338bc7bcab1b",
-    "id": "b70a123f9323c35adc2c338bc7bcab1b",
+    "cacheID": "df6da31fccdfbbb4d2e17d9a9535a8fe",
+    "id": "df6da31fccdfbbb4d2e17d9a9535a8fe",
     "metadata": {},
     "name": "AdminQuery",
     "operationKind": "query",
-    "text": "query AdminQuery {\n  ...AdminLayoutFragment\n  viewer {\n    id\n  }\n  pages(first: 100) {\n    totalCount\n    nodes {\n      id\n      title\n      status\n      updatedAt\n    }\n  }\n  posts(first: 100) {\n    totalCount\n    nodes {\n      id\n      title\n      status\n      updatedAt\n    }\n  }\n  products(first: 100) {\n    totalCount\n    nodes {\n      id\n      title\n      status\n      updatedAt\n    }\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  postCount: posts(first: 1) {\n    totalCount\n  }\n  productCount: products(first: 1) {\n    totalCount\n  }\n}\n"
+    "text": "query AdminQuery {\n  ...AdminLayoutFragment\n  viewer {\n    id\n  }\n  pages: recentPages(first: 5) {\n    totalCount\n    nodes {\n      id\n      title\n      status\n      updatedAt\n    }\n  }\n  publishedPages: recentPages(where: {status: PUBLISHED}, first: 0) {\n    totalCount\n  }\n  posts: recentPosts(first: 5) {\n    totalCount\n    nodes {\n      id\n      title\n      status\n      updatedAt\n    }\n  }\n  publishedPosts: recentPosts(where: {status: PUBLISHED}, first: 0) {\n    totalCount\n  }\n  products: recentProducts(first: 5) {\n    totalCount\n    nodes {\n      id\n      title\n      status\n      updatedAt\n    }\n  }\n  publishedProducts: recentProducts(where: {status: PUBLISHED}, first: 0) {\n    totalCount\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  postCount: posts(first: 1) {\n    totalCount\n  }\n  productCount: products(first: 1) {\n    totalCount\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "25e28d46f03d81c682527026089742f3";
+(node as any).hash = "fe451ddd39e2d8ddec5b40a7b5a8745f";
 
 export default node;

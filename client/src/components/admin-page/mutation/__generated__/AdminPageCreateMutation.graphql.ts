@@ -1,6 +1,6 @@
 /**
- * @generated SignedSource<<0c39a3a597a83a861def9eda58c34eb4>>
- * @relayHash 07e9ef4efac3c77c9cdb598b7573f940
+ * @generated SignedSource<<fceed807354808d6814003b297eb49b4>>
+ * @relayHash 8497761f27c0e3a4ed9ca0a52d09ce69
  * @lightSyntaxTransform
  */
 
@@ -8,15 +8,21 @@
 /* eslint-disable */
 // @ts-nocheck
 
-// @relayRequestID 07e9ef4efac3c77c9cdb598b7573f940
+// @relayRequestID 8497761f27c0e3a4ed9ca0a52d09ce69
 
 import { ConcreteRequest } from 'relay-runtime';
+export type PageAccent = "BERRY" | "BLUE" | "GREEN" | "INK" | "ORANGE" | "%future added value";
 export type PublicationStatus = "DRAFT" | "PUBLISHED" | "%future added value";
 export type CreatePageInput = {
+  accent?: PageAccent | null | undefined;
   clientMutationId?: string | null | undefined;
   content?: string | null | undefined;
   excerpt?: string | null | undefined;
+  featureOnHome?: boolean | null | undefined;
+  homeOrder?: number | null | undefined;
+  navigationOrder?: number | null | undefined;
   publishedAt?: string | null | undefined;
+  showInNavigation?: boolean | null | undefined;
   slug: string;
   status?: PublicationStatus | null | undefined;
   title: string;
@@ -27,11 +33,16 @@ export type AdminPageCreateMutation$variables = {
 export type AdminPageCreateMutation$data = {
   readonly createPage: {
     readonly page: {
+      readonly accent: PageAccent;
       readonly content: string;
       readonly createdAt: string;
       readonly excerpt: string;
+      readonly featureOnHome: boolean;
+      readonly homeOrder: number;
       readonly id: string;
+      readonly navigationOrder: number;
       readonly publishedAt: string | null | undefined;
+      readonly showInNavigation: boolean;
       readonly slug: string;
       readonly status: PublicationStatus;
       readonly title: string;
@@ -137,6 +148,41 @@ v1 = [
             "kind": "ScalarField",
             "name": "updatedAt",
             "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "showInNavigation",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "navigationOrder",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "featureOnHome",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "homeOrder",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "accent",
+            "storageKey": null
           }
         ],
         "storageKey": null
@@ -163,16 +209,16 @@ return {
     "selections": (v1/*:: as any*/)
   },
   "params": {
-    "cacheID": "07e9ef4efac3c77c9cdb598b7573f940",
-    "id": "07e9ef4efac3c77c9cdb598b7573f940",
+    "cacheID": "8497761f27c0e3a4ed9ca0a52d09ce69",
+    "id": "8497761f27c0e3a4ed9ca0a52d09ce69",
     "metadata": {},
     "name": "AdminPageCreateMutation",
     "operationKind": "mutation",
-    "text": "mutation AdminPageCreateMutation(\n  $input: CreatePageInput!\n) {\n  createPage(input: $input) {\n    page {\n      id\n      title\n      slug\n      content\n      excerpt\n      status\n      publishedAt\n      createdAt\n      updatedAt\n    }\n  }\n}\n"
+    "text": "mutation AdminPageCreateMutation(\n  $input: CreatePageInput!\n) {\n  createPage(input: $input) {\n    page {\n      id\n      title\n      slug\n      content\n      excerpt\n      status\n      publishedAt\n      createdAt\n      updatedAt\n      showInNavigation\n      navigationOrder\n      featureOnHome\n      homeOrder\n      accent\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "6fd2a25351224f33c924af269754fc62";
+(node as any).hash = "7344721e263b1a786a63f5afd7f74f1f";
 
 export default node;

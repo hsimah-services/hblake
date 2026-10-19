@@ -1,4 +1,4 @@
-import { expect, test, type Request } from '@playwright/test';
+import { expect, test, type Page, type Request } from '@playwright/test';
 
 import { Api } from '../../lib/api.ts';
 import {
@@ -195,6 +195,36 @@ test.describe('post list', () => {
 const underline = (link: import('@playwright/test').Locator): Promise<string> => link.evaluate(element => {
   const style = getComputedStyle(element);
   return style.backgroundImage.includes('gradient') ? style.backgroundSize : 'none';
+});
+
+test.describe('page placement', () => {
+  const tiles = (page: Page) => page.getByRole('region', { name: 'Explore the site' }).getByRole('link');
+  const navLink = (page: Page, slug: string) => page.getByRole('navigation', { name: 'Main navigation' }).locator(`a[href="/pages/${slug}"]`);
+
+  test('pages appear in the navigation and as home tiles only as placed, and drafts never do', async ({ page }) => {
+    await ensurePage(api, 'home', 'PUBLISHED', { title: 'Welcome', content: '# Welcome\n\nHome page body.' });
+    const navOnly = await createPublished(api, 'Page', { title: `Nav only ${RUN_ID}` });
+    const tile = await createPublished(api, 'Page', { title: `Tiled ${RUN_ID}`, featureOnHome: true, homeOrder: 0, accent: 'ORANGE', showInNavigation: false });
+    const draft = await createOk(api, 'Page', { title: `Placed draft ${RUN_ID}`, featureOnHome: true, homeOrder: 0, accent: 'BLUE' });
+    await page.goto('/');
+    await expect(navLink(page, navOnly.slug), 'shown in the navigation').toBeVisible();
+    await expect(tiles(page).filter({ hasText: navOnly.title }), 'not a tile').toHaveCount(0);
+    await expect(tiles(page).filter({ hasText: tile.title }), 'featured as a tile').toHaveCount(1);
+    await expect(navLink(page, tile.slug), 'hidden from the navigation').toHaveCount(0);
+    await expect(navLink(page, draft.slug)).toHaveCount(0);
+    await expect(tiles(page).filter({ hasText: draft.title }), 'drafts are never tiles').toHaveCount(0);
+  });
+
+  test('at most four tiles show, by home order then title', async ({ page }) => {
+    await ensurePage(api, 'home', 'PUBLISHED', { title: 'Welcome', content: '# Welcome\n\nHome page body.' });
+    // "A0 …" sorts before other tests' tiles at home order 0 (such as About).
+    const titles = ['A', 'B', 'C', 'D', 'E'].map(letter => `A0 Cap ${letter} ${RUN_ID}`);
+    for (const title of titles.reverse()) await createPublished(api, 'Page', { title, featureOnHome: true, homeOrder: 0, accent: 'GREEN' });
+    await page.goto('/');
+    await expect(tiles(page)).toHaveCount(4);
+    const shown = await tiles(page).allTextContents();
+    expect(shown.map(text => text.match(/Cap [A-E]/)?.[0])).toEqual(['Cap A', 'Cap B', 'Cap C', 'Cap D']);
+  });
 });
 
 test.describe('navigation', () => {

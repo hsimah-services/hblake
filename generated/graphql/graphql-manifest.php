@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   graphql-manifest.php
- * digest: sha256:dd223f670c2022b3683ef76203811ae5ce869f4175fb553b1a9ab3743694b429
+ * digest: sha256:9456c32dd445112dd9deeabaaccce33611d9ce8c203b511b7992b1210b03d1f8
  */
 
 namespace Eleph\GraphQL\Manifest;
@@ -36,6 +36,11 @@ return new Manifest(
                 'publishedAt' => new FieldEntry('publishedAt', new GraphQLType('String', false, false), 'getPublishedAt', null, FieldEncoding::Datetime, null),
                 'createdAt' => new FieldEntry('createdAt', new GraphQLType('String', true, false), 'getCreatedAt', null, FieldEncoding::Datetime, null),
                 'updatedAt' => new FieldEntry('updatedAt', new GraphQLType('String', true, false), 'getUpdatedAt', null, FieldEncoding::Datetime, null),
+                'showInNavigation' => new FieldEntry('showInNavigation', new GraphQLType('Boolean', true, false), 'getShowInNavigation', null, FieldEncoding::Value, null),
+                'navigationOrder' => new FieldEntry('navigationOrder', new GraphQLType('Int', true, false), 'getNavigationOrder', null, FieldEncoding::Value, null),
+                'featureOnHome' => new FieldEntry('featureOnHome', new GraphQLType('Boolean', true, false), 'getFeatureOnHome', null, FieldEncoding::Value, null),
+                'homeOrder' => new FieldEntry('homeOrder', new GraphQLType('Int', true, false), 'getHomeOrder', null, FieldEncoding::Value, null),
+                'accent' => new FieldEntry('accent', new GraphQLType('PageAccent', true, false), 'getAccent', null, FieldEncoding::BackedEnum, null),
             ],
             [],
             'Durable consulting page.',
@@ -82,6 +87,7 @@ return new Manifest(
         ),
     ],
     enums: [
+        'PageAccent' => new EnumTypeEntry('PageAccent', ['INK' => 'ink', 'GREEN' => 'green', 'ORANGE' => 'orange', 'BLUE' => 'blue', 'BERRY' => 'berry']),
         'PublicationStatus' => new EnumTypeEntry('PublicationStatus', ['DRAFT' => 'draft', 'PUBLISHED' => 'published']),
         'UserRole' => new EnumTypeEntry('UserRole', ['EDITOR' => 'editor', 'ADMIN' => 'admin']),
     ],
@@ -97,6 +103,11 @@ return new Manifest(
                 'excerpt' => new GraphQLType('String', false, false),
                 'status' => new GraphQLType('PublicationStatus', false, false),
                 'publishedAt' => new GraphQLType('String', false, false),
+                'showInNavigation' => new GraphQLType('Boolean', false, false),
+                'navigationOrder' => new GraphQLType('Int', false, false),
+                'featureOnHome' => new GraphQLType('Boolean', false, false),
+                'homeOrder' => new GraphQLType('Int', false, false),
+                'accent' => new GraphQLType('PageAccent', false, false),
             ],
             null,
             'Create a Page.',
@@ -204,6 +215,11 @@ return new Manifest(
                 'excerpt' => new GraphQLType('String', false, false),
                 'status' => new GraphQLType('PublicationStatus', false, false),
                 'publishedAt' => new GraphQLType('String', false, false),
+                'showInNavigation' => new GraphQLType('Boolean', false, false),
+                'navigationOrder' => new GraphQLType('Int', false, false),
+                'featureOnHome' => new GraphQLType('Boolean', false, false),
+                'homeOrder' => new GraphQLType('Int', false, false),
+                'accent' => new GraphQLType('PageAccent', false, false),
             ],
             null,
             'Update a Page.',
@@ -257,6 +273,15 @@ return new Manifest(
             ['slug' => new GraphQLType('String', true, false)],
             'Look up one content record by exact canonical slug under read policies.',
         ),
+        'placedPages' => new QueryFieldEntry(
+            'placedPages',
+            'Page',
+            true,
+            'Page',
+            'placed',
+            ['home' => new GraphQLType('Boolean', true, false)],
+            'Published pages placed on the home page (home true, by home order) or in the navigation (home false, by navigation order), then by title.',
+        ),
         'postBySlug' => new QueryFieldEntry(
             'postBySlug',
             'Post',
@@ -274,6 +299,33 @@ return new Manifest(
             'bySlug',
             ['slug' => new GraphQLType('String', true, false)],
             'Look up one content record by exact canonical slug under read policies.',
+        ),
+        'recentPages' => new QueryFieldEntry(
+            'recentPages',
+            'Page',
+            true,
+            'Page',
+            'recent',
+            ['status' => new GraphQLType('PublicationStatus', false, false)],
+            'Records newest-edited first, optionally of one publication status, under read policies.',
+        ),
+        'recentPosts' => new QueryFieldEntry(
+            'recentPosts',
+            'Post',
+            true,
+            'Post',
+            'recent',
+            ['status' => new GraphQLType('PublicationStatus', false, false)],
+            'Records newest-edited first, optionally of one publication status, under read policies.',
+        ),
+        'recentProducts' => new QueryFieldEntry(
+            'recentProducts',
+            'Product',
+            true,
+            'Product',
+            'recent',
+            ['status' => new GraphQLType('PublicationStatus', false, false)],
+            'Records newest-edited first, optionally of one publication status, under read policies.',
         ),
     ],
 );

@@ -9,12 +9,16 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Page/PageFinder.php
- * digest: sha256:d45a09a8c60b53889c9e920a648c4f78384c5e887681cb4b6b408febababcae6
+ * digest: sha256:32c4064684af3ec481499a1fa98746374e4dcafa87a675cf7cd2f5d378a110fa
  */
 
 namespace Hsimah\Entity\Page;
 
+use Eleph\Runtime\Query\EntityQuery;
+use Hsimah\Entity\Enum\PublicationStatus;
 use Hsimah\Entity\Page\Contract\PageBySlugQuery;
+use Hsimah\Entity\Page\Contract\PagePlacedQuery;
+use Hsimah\Entity\Page\Contract\PageRecentQuery;
 
 /**
  * Collection-level queries over Page.
@@ -23,6 +27,8 @@ final class PageFinder
 {
     public function __construct(
         private readonly PageBySlugQuery $bySlugQuery,
+        private readonly PagePlacedQuery $placedQuery,
+        private readonly PageRecentQuery $recentQuery,
     ) {
 
     }
@@ -31,5 +37,23 @@ final class PageFinder
         string $slug,
     ): ?Page {
         return $this->bySlugQuery->find($slug);
+    }
+
+    /**
+     * @return EntityQuery<Page>
+     */
+    public function placed(
+        bool $home,
+    ): EntityQuery {
+        return $this->placedQuery->find($home);
+    }
+
+    /**
+     * @return EntityQuery<Page>
+     */
+    public function recent(
+        ?PublicationStatus $status = null,
+    ): EntityQuery {
+        return $this->recentQuery->find($status);
     }
 }

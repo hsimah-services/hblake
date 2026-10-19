@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Page/PageInput.php
- * digest: sha256:ed3ebb6d0ce60a330d5c5f3c93615bc5ad2565a54d398c16b812b20d4a827a89
+ * digest: sha256:2a59b197ab2a714c5b9229c5b69cc57534c451d1d0bfbaf4210e1034b0257fc3
  */
 
 namespace Hsimah\Entity\Page;
@@ -17,6 +17,7 @@ namespace Hsimah\Entity\Page;
 use DateTimeImmutable;
 use Eleph\Runtime\Mutation\MutationBuffer;
 use Eleph\Runtime\Query\ValueDecoder;
+use Hsimah\Entity\Enum\PageAccent;
 use Hsimah\Entity\Enum\PublicationStatus;
 use InvalidArgumentException;
 
@@ -91,6 +92,56 @@ final readonly class PageInput
         return $this->decode->datetime($value, 'Page.publishedAt');
     }
 
+    private function showInNavigation(
+        mixed $value,
+    ): ?bool {
+        if (null === $value) {
+            return null;
+        }
+
+        return $this->decode->bool($value, 'Page.showInNavigation');
+    }
+
+    private function navigationOrder(
+        mixed $value,
+    ): ?int {
+        if (null === $value) {
+            return null;
+        }
+
+        return $this->decode->int($value, 'Page.navigationOrder');
+    }
+
+    private function featureOnHome(
+        mixed $value,
+    ): ?bool {
+        if (null === $value) {
+            return null;
+        }
+
+        return $this->decode->bool($value, 'Page.featureOnHome');
+    }
+
+    private function homeOrder(
+        mixed $value,
+    ): ?int {
+        if (null === $value) {
+            return null;
+        }
+
+        return $this->decode->int($value, 'Page.homeOrder');
+    }
+
+    private function accent(
+        mixed $value,
+    ): ?PageAccent {
+        if (null === $value) {
+            return null;
+        }
+
+        return $this->decode->enum(PageAccent::class, $value, 'Page.accent');
+    }
+
     /**
      * Seeds declared defaults on create and applies explicit input.
      * Absent update keys and existing pending values are not reset by defaults.
@@ -135,6 +186,46 @@ final readonly class PageInput
 
         if (array_key_exists('publishedAt', $input)) {
             $buffer->set('publishedAt', $this->publishedAt($input['publishedAt']));
+        }
+
+        if (!$buffer->target()->isPersisted() && !$buffer->isChanged('showInNavigation') && !array_key_exists('showInNavigation', $input)) {
+            $buffer->set('showInNavigation', $this->showInNavigation(true));
+        }
+
+        if (array_key_exists('showInNavigation', $input)) {
+            $buffer->set('showInNavigation', $this->showInNavigation($input['showInNavigation']));
+        }
+
+        if (!$buffer->target()->isPersisted() && !$buffer->isChanged('navigationOrder') && !array_key_exists('navigationOrder', $input)) {
+            $buffer->set('navigationOrder', $this->navigationOrder(100));
+        }
+
+        if (array_key_exists('navigationOrder', $input)) {
+            $buffer->set('navigationOrder', $this->navigationOrder($input['navigationOrder']));
+        }
+
+        if (!$buffer->target()->isPersisted() && !$buffer->isChanged('featureOnHome') && !array_key_exists('featureOnHome', $input)) {
+            $buffer->set('featureOnHome', $this->featureOnHome(false));
+        }
+
+        if (array_key_exists('featureOnHome', $input)) {
+            $buffer->set('featureOnHome', $this->featureOnHome($input['featureOnHome']));
+        }
+
+        if (!$buffer->target()->isPersisted() && !$buffer->isChanged('homeOrder') && !array_key_exists('homeOrder', $input)) {
+            $buffer->set('homeOrder', $this->homeOrder(100));
+        }
+
+        if (array_key_exists('homeOrder', $input)) {
+            $buffer->set('homeOrder', $this->homeOrder($input['homeOrder']));
+        }
+
+        if (!$buffer->target()->isPersisted() && !$buffer->isChanged('accent') && !array_key_exists('accent', $input)) {
+            $buffer->set('accent', $this->accent(PageAccent::Ink));
+        }
+
+        if (array_key_exists('accent', $input)) {
+            $buffer->set('accent', $this->accent($input['accent']));
         }
     }
 

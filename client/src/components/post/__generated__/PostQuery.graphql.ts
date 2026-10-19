@@ -1,6 +1,6 @@
 /**
- * @generated SignedSource<<ca4e30e27e9e4af7f92c60069570441f>>
- * @relayHash 002c91e27921e3e48404b6295a94a4b2
+ * @generated SignedSource<<074af9124635f682d340bed5be92c613>>
+ * @relayHash 888ac00703d0936daac4e6818de432d9
  * @lightSyntaxTransform
  */
 
@@ -8,7 +8,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-// @relayRequestID 002c91e27921e3e48404b6295a94a4b2
+// @relayRequestID 888ac00703d0936daac4e6818de432d9
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
@@ -156,14 +156,15 @@ v6 = {
   ],
   "storageKey": null
 },
-v7 = [
-  {
-    "kind": "Literal",
-    "name": "first",
-    "value": 100
-  }
-],
+v7 = {
+  "kind": "Literal",
+  "name": "first",
+  "value": 100
+},
 v8 = [
+  (v7/*:: as any*/)
+],
+v9 = [
   (v4/*:: as any*/),
   (v1/*:: as any*/)
 ];
@@ -182,7 +183,7 @@ return {
       (v6/*:: as any*/),
       {
         "alias": "newsOrder",
-        "args": (v7/*:: as any*/),
+        "args": (v8/*:: as any*/),
         "concreteType": "RootQueryToPostConnection",
         "kind": "LinkedField",
         "name": "posts",
@@ -237,10 +238,19 @@ return {
       },
       {
         "alias": "navigationPages",
-        "args": (v7/*:: as any*/),
-        "concreteType": "RootQueryToPageConnection",
+        "args": [
+          (v7/*:: as any*/),
+          {
+            "kind": "Literal",
+            "name": "where",
+            "value": {
+              "home": false
+            }
+          }
+        ],
+        "concreteType": "RootQueryToPlacedPagesConnection",
         "kind": "LinkedField",
-        "name": "pages",
+        "name": "placedPages",
         "plural": false,
         "selections": [
           {
@@ -254,16 +264,22 @@ return {
               (v1/*:: as any*/),
               (v2/*:: as any*/),
               (v3/*:: as any*/),
-              (v4/*:: as any*/)
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "accent",
+                "storageKey": null
+              }
             ],
             "storageKey": null
           }
         ],
-        "storageKey": "pages(first:100)"
+        "storageKey": "placedPages(first:100,where:{\"home\":false})"
       },
       {
         "alias": "navigationPosts",
-        "args": (v7/*:: as any*/),
+        "args": (v8/*:: as any*/),
         "concreteType": "RootQueryToPostConnection",
         "kind": "LinkedField",
         "name": "posts",
@@ -276,7 +292,7 @@ return {
             "kind": "LinkedField",
             "name": "nodes",
             "plural": true,
-            "selections": (v8/*:: as any*/),
+            "selections": (v9/*:: as any*/),
             "storageKey": null
           }
         ],
@@ -284,7 +300,7 @@ return {
       },
       {
         "alias": "navigationProducts",
-        "args": (v7/*:: as any*/),
+        "args": (v8/*:: as any*/),
         "concreteType": "RootQueryToProductConnection",
         "kind": "LinkedField",
         "name": "products",
@@ -297,7 +313,7 @@ return {
             "kind": "LinkedField",
             "name": "nodes",
             "plural": true,
-            "selections": (v8/*:: as any*/),
+            "selections": (v9/*:: as any*/),
             "storageKey": null
           }
         ],
@@ -306,7 +322,7 @@ return {
       (v6/*:: as any*/),
       {
         "alias": "newsOrder",
-        "args": (v7/*:: as any*/),
+        "args": (v8/*:: as any*/),
         "concreteType": "RootQueryToPostConnection",
         "kind": "LinkedField",
         "name": "posts",
@@ -333,12 +349,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "002c91e27921e3e48404b6295a94a4b2",
-    "id": "002c91e27921e3e48404b6295a94a4b2",
+    "cacheID": "888ac00703d0936daac4e6818de432d9",
+    "id": "888ac00703d0936daac4e6818de432d9",
     "metadata": {},
     "name": "PostQuery",
     "operationKind": "query",
-    "text": "query PostQuery(\n  $slug: String!\n) {\n  ...LayoutFragment\n  postBySlug(slug: $slug) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    author {\n      displayName\n    }\n  }\n  newsOrder: posts(first: 100) {\n    nodes {\n      slug\n      title\n      status\n      id\n    }\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n"
+    "text": "query PostQuery(\n  $slug: String!\n) {\n  ...LayoutFragment\n  postBySlug(slug: $slug) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    author {\n      displayName\n    }\n  }\n  newsOrder: posts(first: 100) {\n    nodes {\n      slug\n      title\n      status\n      id\n    }\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: placedPages(where: {home: false}, first: 100) {\n    nodes {\n      id\n      title\n      slug\n      accent\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n"
   }
 };
 })();

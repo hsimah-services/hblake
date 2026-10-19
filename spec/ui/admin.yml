@@ -6,8 +6,8 @@ entities:
     source: graphql
     list: [title, slug, status, updatedAt]
     detail: [title, slug, content, excerpt, status, publishedAt, createdAt, updatedAt]
-    create: [title, slug, content, excerpt]
-    edit: [title, slug, content, excerpt]
+    create: [title, slug, content, excerpt, showInNavigation, navigationOrder, featureOnHome, homeOrder, accent]
+    edit: [title, slug, content, excerpt, showInNavigation, navigationOrder, featureOnHome, homeOrder, accent]
     actions: [publish, unpublish, delete]
   Post:
     source: graphql

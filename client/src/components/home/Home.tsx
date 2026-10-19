@@ -7,31 +7,23 @@ import { HOME_QUERY } from './HomeQuery';
 import type { HomeQuery } from './__generated__/HomeQuery.graphql';
 import { PublicContent } from '../public-content/PublicContent';
 
-const DESTINATIONS = [
-  { slug: 'about', symbol: '01', style: 'green' },
-  { slug: 'frameworks', symbol: '02', style: 'orange' },
-  { slug: 'portfolio', symbol: '03', style: 'blue' },
-  { slug: 'contact', symbol: '04', style: 'berry' },
-] as const;
+const TILE_TONES: Readonly<Record<string, 'green' | 'orange' | 'blue' | 'berry'>> = { GREEN: 'green', ORANGE: 'orange', BLUE: 'blue', BERRY: 'berry' };
 
 export function Home({ queryRef }: HomeProps) {
-  const { data, pages, latest } = useHome(queryRef);
+  const { data, tiles, latest } = useHome(queryRef);
 
   return <Layout data={data} row={data.pageBySlug}>
     <PublicContent row={data.pageBySlug} home />
     {data.pageBySlug && <>
-      <section aria-label="Explore the site" {...stylex.props(styles.grid)}>
-        {DESTINATIONS.map(destination => {
-          const page = pages.find(page => page?.slug === destination.slug);
-          return page && <Link key={page.id} href={PageURI.getURI({ slug: page.slug })} color="inherit" xstyle={[styles.tile, styles[destination.style]]}>
-            <span {...stylex.props(styles.tileContent)}>
-            <span aria-hidden="true" {...stylex.props(styles.number)}>{destination.symbol}</span>
-            <span {...stylex.props(styles.label)}>{page.title} <span aria-hidden="true">↗</span></span>
-            <span {...stylex.props(styles.excerpt)}>{page.excerpt}</span>
-            </span>
-          </Link>;
-        })}
-      </section>
+      {tiles.length > 0 && <section aria-label="Explore the site" {...stylex.props(styles.grid)}>
+        {tiles.map((page, index) => <Link key={page.id} href={PageURI.getURI({ slug: page.slug })} color="inherit" xstyle={[styles.tile, styles[page.tone]]}>
+          <span {...stylex.props(styles.tileContent)}>
+          <span aria-hidden="true" {...stylex.props(styles.number)}>{String(index + 1).padStart(2, '0')}</span>
+          <span {...stylex.props(styles.label)}>{page.title} <span aria-hidden="true">↗</span></span>
+          <span {...stylex.props(styles.excerpt)}>{page.excerpt}</span>
+          </span>
+        </Link>)}
+      </section>}
       {latest && <section {...stylex.props(styles.latest)}>
         <Heading level={2}>Latest news</Heading>
         <Heading level={3}><Link href={PostURI.getURI({ slug: latest.slug })}>{latest.title}</Link></Heading>
@@ -44,9 +36,13 @@ export function Home({ queryRef }: HomeProps) {
 
 function useHome(queryRef: PreloadedQuery<HomeQuery>) {
   const data = usePreloadedQuery<HomeQuery>(HOME_QUERY, queryRef);
-  const pages = data.homePages?.nodes?.filter(page => page?.status === 'PUBLISHED') ?? [];
+  // The server returns published pages featured on the home page, in order; the first four
+  // with a colour become tiles.
+  const tiles = (data.homePages?.nodes ?? [])
+    .flatMap(page => page && TILE_TONES[page.accent] ? [{ ...page, tone: TILE_TONES[page.accent] }] : [])
+    .slice(0, 4);
   const latest = data.latestPosts?.nodes?.find(post => post?.status === 'PUBLISHED');
-  return { data, pages, latest };
+  return { data, tiles, latest };
 }
 
 type HomeProps = { queryRef: PreloadedQuery<HomeQuery> };

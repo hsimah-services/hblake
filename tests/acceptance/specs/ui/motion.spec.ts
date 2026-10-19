@@ -1,7 +1,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
 import { Api } from '../../lib/api.ts';
-import { ensurePage } from '../../lib/content.ts';
+import { ensurePage, update } from '../../lib/content.ts';
 
 // Animations (website.md): hover animations follow the system's reduced-motion setting
 // until the visitor turns them on or off with the header toggle. The choice is
@@ -13,7 +13,9 @@ let api: Api;
 test.beforeAll(async () => {
   api = await Api.operator();
   await ensurePage(api, 'home', 'PUBLISHED', { title: 'Welcome', content: '# Welcome\n\nHome page body.' });
-  await ensurePage(api, 'about', 'PUBLISHED', { title: 'About' });
+  const about = await ensurePage(api, 'about', 'PUBLISHED', { title: 'About' });
+  // A home tile needs the page featured with a colour (page placement).
+  await update(api, 'Page', about.id, { featureOnHome: true, homeOrder: 0, accent: 'GREEN' });
 });
 
 test.afterAll(async () => {

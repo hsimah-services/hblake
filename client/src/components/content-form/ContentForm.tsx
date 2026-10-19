@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useNavigate, useBlocker } from 'react-router';
-import { Button, Heading, Stack, Text, TextInput, TextArea } from '@astryxdesign/core';
+import { Button, CheckboxInput, Heading, NumberInput, RadioList, RadioListItem, Stack, Text, TextInput } from '@astryxdesign/core';
 import * as stylex from '@stylexjs/stylex';
 import { Markdown } from '../markdown/Markdown';
 import { RichTextEditor } from '../rich-text/RichTextEditor';
 
 const CONTENT_FIELDS = ['title', 'slug', 'content', 'excerpt', 'enquiryUrl'];
 const PROFILE_FIELDS = ['displayName'];
+// Page placement (#13), kept as strings in the form and converted on save.
+const PLACEMENT_DEFAULTS: Readonly<Record<string, string>> = { showInNavigation: 'true', navigationOrder: '100', featureOnHome: 'false', homeOrder: '100', accent: 'INK' };
+const ACCENTS = [['INK', 'None (no home tile)'], ['GREEN', 'Green'], ['ORANGE', 'Orange'], ['BLUE', 'Blue'], ['BERRY', 'Berry']] as const;
 
 export function ContentForm({ kind, row, save, detail, publication }: ContentFormProps) {
   const form = useContentForm(kind, row, save, detail);
@@ -26,10 +29,8 @@ export function ContentForm({ kind, row, save, detail, publication }: ContentFor
       <Stack gap={4} align="stretch" xstyle={styles.main}>
         <TextInput label="Title" htmlName="title" value={form.values.title} onChange={value => form.change('title', value)} status={form.invalid.title ? { type: 'error' } : undefined} />
         <TextInput label="Slug" htmlName="slug" value={form.values.slug} onChange={value => form.change('slug', value)} status={form.invalid.slug ? { type: 'error' } : undefined} description={row ? 'Changing the slug changes the public URL.' : 'Filled in from the title until you edit it. Lowercase letters and numbers separated by hyphens.'} />
-        {/* Posts are written as rich text; pages and products keep the Markdown textarea. */}
-        {kind === 'Post'
-          ? <RichTextEditor label="Content" name="content" value={form.values.content} onChange={value => form.change('content', value)} invalid={form.invalid.content} />
-          : <TextArea label="Content" htmlName="content" value={form.values.content} onChange={value => form.change('content', value)} status={form.invalid.content ? { type: 'error' } : undefined} />}
+        {/* Pages, posts and products are written as rich text, stored as Markdown. */}
+        <RichTextEditor label="Content" name="content" value={form.values.content} onChange={value => form.change('content', value)} invalid={form.invalid.content} />
         <section aria-label="Markdown preview"><Heading level={2}>Preview</Heading><Markdown content={form.values.content} /></section>
       </Stack>
       <aside aria-label="Publishing" {...stylex.props(styles.panel)}><Stack gap={4} align="stretch">
@@ -41,6 +42,17 @@ export function ContentForm({ kind, row, save, detail, publication }: ContentFor
         </Stack>}
         <TextInput label="Excerpt" htmlName="excerpt" value={form.values.excerpt} onChange={value => form.change('excerpt', value)} status={form.invalid.excerpt ? { type: 'error' } : undefined} description="Shown in lists and search results." />
         {kind === 'Product' && <TextInput label="Enquiry URL" htmlName="enquiryUrl" value={form.values.enquiryUrl} onChange={value => form.change('enquiryUrl', value)} status={form.invalid.enquiryUrl ? { type: 'error' } : undefined} />}
+        {kind === 'Page' && <fieldset {...stylex.props(styles.placement)}>
+          <legend {...stylex.props(styles.legend)}>Placement</legend>
+          <Stack gap={3} align="stretch">
+          <CheckboxInput label="Show in navigation" value={form.values.showInNavigation === 'true'} onChange={checked => form.change('showInNavigation', String(checked))} />
+          <NumberInput label="Navigation order" htmlName="navigationOrder" value={Number(form.values.navigationOrder)} onChange={value => form.change('navigationOrder', String(value))} min={0} max={999} step={1} status={form.invalid.navigationOrder ? { type: 'error' } : undefined} description="Lower numbers come first." />
+          <CheckboxInput label="Feature on home page" value={form.values.featureOnHome === 'true'} onChange={checked => form.change('featureOnHome', String(checked))} description="As a coloured tile. At most four show, by home order." />
+          <NumberInput label="Home order" htmlName="homeOrder" value={Number(form.values.homeOrder)} onChange={value => form.change('homeOrder', String(value))} min={0} max={999} step={1} status={form.invalid.homeOrder ? { type: 'error' } : undefined} />
+          <RadioList label="Colour" htmlName="accent" value={form.values.accent} onChange={value => form.change('accent', value)} status={form.invalid.accent ? { type: 'error' } : undefined} description="The tile colour and the navigation hover colour. Featured pages need one.">
+            {ACCENTS.map(([value, label]) => <RadioListItem key={value} value={value} label={label} />)}
+          </RadioList>
+        </Stack></fieldset>}
         <Button type="submit" label={row ? 'Save' : 'Create'} variant="primary" isLoading={form.pending} />
       </Stack></aside>
     </div>
@@ -87,6 +99,7 @@ function useContentForm(kind: string, row: ContentFormRow | null | undefined, sa
     try {
       const fields = kind === 'User' ? PROFILE_FIELDS : kind === 'Product' ? CONTENT_FIELDS : CONTENT_FIELDS.slice(0, 4);
       const input: Record<string, unknown> = Object.fromEntries(fields.map(field => [field, field === 'enquiryUrl' ? values[field] || null : values[field]]));
+      if (kind === 'Page') Object.assign(input, placementInput(values));
       if (row) input.id = row.id;
       const id = await save(input);
       clean.current = JSON.stringify(values);
@@ -120,7 +133,20 @@ function usePublication(publication: ContentFormProps['publication'], dirty: boo
 }
 
 function initialValues(row: ContentFormRow | null | undefined): Record<string, string> {
-  return Object.fromEntries([...CONTENT_FIELDS, ...PROFILE_FIELDS].map(field => [field, typeof row?.[field] === 'string' ? row[field] : '']));
+  return {
+    ...Object.fromEntries([...CONTENT_FIELDS, ...PROFILE_FIELDS].map(field => [field, typeof row?.[field] === 'string' ? row[field] : ''])),
+    ...Object.fromEntries(Object.entries(PLACEMENT_DEFAULTS).map(([field, fallback]) => {
+      const value = row?.[field];
+      return [field, typeof value === 'boolean' || typeof value === 'number' || typeof value === 'string' ? String(value) : fallback];
+    })),
+  };
+}
+
+function placementInput(values: Record<string, string>) {
+  return {
+    showInNavigation: values.showInNavigation === 'true', navigationOrder: Number(values.navigationOrder),
+    featureOnHome: values.featureOnHome === 'true', homeOrder: Number(values.homeOrder), accent: values.accent,
+  };
 }
 
 function validateValues(kind: string, values: Record<string, string>): Record<string, boolean> {
@@ -132,6 +158,10 @@ function validateValues(kind: string, values: Record<string, string>): Record<st
     if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(values.slug) || values.slug.length > 160) errors.slug = true;
     if (values.excerpt.length > 300) errors.excerpt = true;
     if (kind === 'Product' && values.enquiryUrl && !isSafeEnquiry(values.enquiryUrl)) errors.enquiryUrl = true;
+    if (kind === 'Page') {
+      for (const field of ['navigationOrder', 'homeOrder']) if (!/^\d{1,3}$/.test(values[field])) errors[field] = true;
+      if (values.featureOnHome === 'true' && values.accent === 'INK') errors.accent = true;
+    }
   }
   return errors;
 }
@@ -154,6 +184,8 @@ const styles = stylex.create({
     gridTemplateColumns: { default: 'minmax(0, 1fr) 18rem', '@media (max-width: 960px)': 'minmax(0, 1fr)' },
   },
   main: { minWidth: 0 },
+  placement: { margin: 0, padding: 0, border: 'none', minWidth: 0 },
+  legend: { fontWeight: 600, marginBottom: '0.5rem', padding: 0 },
   panel: {
     position: { default: 'sticky', '@media (max-width: 960px)': 'static' }, top: '1rem', padding: '1rem',
     borderWidth: '1px', borderStyle: 'solid', borderColor: 'var(--color-border)', borderRadius: 'var(--radius-container)',

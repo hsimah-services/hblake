@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   install.php
- * digest: sha256:0bbdb8be6cfee9609ec50c2ceb94fa8268e06cd3547578aebe48e5a49268bbe8
+ * digest: sha256:1df90bcfc91583a33b3ee1525fb32e34176689c750f75eaba7375e3a848ef4e9
  */
 
 /**
@@ -39,7 +39,12 @@ return static function (\PDO $database, string $prefix = ''): void {
     ' . '"status" TEXT NOT NULL CHECK ("status" IN (\'draft\', \'published\'))' . ',
     ' . '"published_at" TEXT' . ',
     ' . '"created_at" TEXT NOT NULL' . ',
-    ' . '"updated_at" TEXT NOT NULL' . '
+    ' . '"updated_at" TEXT NOT NULL' . ',
+    ' . '"show_in_navigation" INTEGER NOT NULL CHECK ("show_in_navigation" IN (0, 1))' . ',
+    ' . '"navigation_order" INTEGER NOT NULL' . ',
+    ' . '"feature_on_home" INTEGER NOT NULL CHECK ("feature_on_home" IN (0, 1))' . ',
+    ' . '"home_order" INTEGER NOT NULL' . ',
+    ' . '"accent" TEXT NOT NULL CHECK ("accent" IN (\'ink\', \'green\', \'orange\', \'blue\', \'berry\'))' . '
 )',
         'CREATE UNIQUE INDEX ' . $table('hsimah_page_slug_uniq') . ' ON ' . $table('hsimah_page') . ' ("slug")',
         'CREATE INDEX ' . $table('hsimah_page_status_idx') . ' ON ' . $table('hsimah_page') . ' ("status")',

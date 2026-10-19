@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   storage-manifest.php
- * digest: sha256:1c9f04e1713be8e4fc2f3439300346892a2751857c364147f68bcaf5289d05b0
+ * digest: sha256:35257a52a97556cbcc2d83305c10797e903dc1207964e1d42fbb64122594a8cc
  */
 
 namespace Eleph\SQLite\Manifest;
@@ -31,6 +31,11 @@ return new StorageManifest(
                 'published_at' => new Column('published_at', 'TEXT', true, false, null),
                 'created_at' => new Column('created_at', 'TEXT', false, false, null),
                 'updated_at' => new Column('updated_at', 'TEXT', false, false, null),
+                'show_in_navigation' => new Column('show_in_navigation', 'INTEGER', false, false, null),
+                'navigation_order' => new Column('navigation_order', 'INTEGER', false, false, null),
+                'feature_on_home' => new Column('feature_on_home', 'INTEGER', false, false, null),
+                'home_order' => new Column('home_order', 'INTEGER', false, false, null),
+                'accent' => new Column('accent', 'TEXT', false, false, null),
             ],
             [
                 'hsimah_page_slug_uniq' => new Index('hsimah_page_slug_uniq', ['slug'], true),
@@ -98,7 +103,7 @@ return new StorageManifest(
 
     ],
     columns: [
-        'Page' => ['title' => 'title', 'slug' => 'slug', 'content' => 'content', 'excerpt' => 'excerpt', 'status' => 'status', 'publishedAt' => 'published_at', 'createdAt' => 'created_at', 'updatedAt' => 'updated_at'],
+        'Page' => ['title' => 'title', 'slug' => 'slug', 'content' => 'content', 'excerpt' => 'excerpt', 'status' => 'status', 'publishedAt' => 'published_at', 'createdAt' => 'created_at', 'updatedAt' => 'updated_at', 'showInNavigation' => 'show_in_navigation', 'navigationOrder' => 'navigation_order', 'featureOnHome' => 'feature_on_home', 'homeOrder' => 'home_order', 'accent' => 'accent'],
         'Post' => ['title' => 'title', 'slug' => 'slug', 'content' => 'content', 'excerpt' => 'excerpt', 'status' => 'status', 'publishedAt' => 'published_at', 'createdAt' => 'created_at', 'updatedAt' => 'updated_at'],
         'Product' => ['title' => 'title', 'slug' => 'slug', 'content' => 'content', 'excerpt' => 'excerpt', 'status' => 'status', 'publishedAt' => 'published_at', 'createdAt' => 'created_at', 'updatedAt' => 'updated_at', 'enquiryUrl' => 'enquiry_url'],
         'User' => ['createdAt' => 'created_at', 'updatedAt' => 'updated_at', 'username' => 'username', 'displayName' => 'display_name', 'role' => 'role', 'active' => 'active'],

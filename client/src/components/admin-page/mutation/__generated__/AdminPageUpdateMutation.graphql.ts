@@ -1,6 +1,6 @@
 /**
- * @generated SignedSource<<0a5ac846da8198423e8e78316d3386b4>>
- * @relayHash e7299c8676201ae54a2422d2c12e24dd
+ * @generated SignedSource<<a0d6095e18c805bd3be2881f06480a38>>
+ * @relayHash 972f1089f664c07710fdb663c199b59f
  * @lightSyntaxTransform
  */
 
@@ -8,16 +8,22 @@
 /* eslint-disable */
 // @ts-nocheck
 
-// @relayRequestID e7299c8676201ae54a2422d2c12e24dd
+// @relayRequestID 972f1089f664c07710fdb663c199b59f
 
 import { ConcreteRequest } from 'relay-runtime';
+export type PageAccent = "BERRY" | "BLUE" | "GREEN" | "INK" | "ORANGE" | "%future added value";
 export type PublicationStatus = "DRAFT" | "PUBLISHED" | "%future added value";
 export type UpdatePageInput = {
+  accent?: PageAccent | null | undefined;
   clientMutationId?: string | null | undefined;
   content?: string | null | undefined;
   excerpt?: string | null | undefined;
+  featureOnHome?: boolean | null | undefined;
+  homeOrder?: number | null | undefined;
   id: string;
+  navigationOrder?: number | null | undefined;
   publishedAt?: string | null | undefined;
+  showInNavigation?: boolean | null | undefined;
   slug?: string | null | undefined;
   status?: PublicationStatus | null | undefined;
   title?: string | null | undefined;
@@ -28,11 +34,16 @@ export type AdminPageUpdateMutation$variables = {
 export type AdminPageUpdateMutation$data = {
   readonly updatePage: {
     readonly page: {
+      readonly accent: PageAccent;
       readonly content: string;
       readonly createdAt: string;
       readonly excerpt: string;
+      readonly featureOnHome: boolean;
+      readonly homeOrder: number;
       readonly id: string;
+      readonly navigationOrder: number;
       readonly publishedAt: string | null | undefined;
+      readonly showInNavigation: boolean;
       readonly slug: string;
       readonly status: PublicationStatus;
       readonly title: string;
@@ -138,6 +149,41 @@ v1 = [
             "kind": "ScalarField",
             "name": "updatedAt",
             "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "showInNavigation",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "navigationOrder",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "featureOnHome",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "homeOrder",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "accent",
+            "storageKey": null
           }
         ],
         "storageKey": null
@@ -164,16 +210,16 @@ return {
     "selections": (v1/*:: as any*/)
   },
   "params": {
-    "cacheID": "e7299c8676201ae54a2422d2c12e24dd",
-    "id": "e7299c8676201ae54a2422d2c12e24dd",
+    "cacheID": "972f1089f664c07710fdb663c199b59f",
+    "id": "972f1089f664c07710fdb663c199b59f",
     "metadata": {},
     "name": "AdminPageUpdateMutation",
     "operationKind": "mutation",
-    "text": "mutation AdminPageUpdateMutation(\n  $input: UpdatePageInput!\n) {\n  updatePage(input: $input) {\n    page {\n      id\n      title\n      slug\n      content\n      excerpt\n      status\n      publishedAt\n      createdAt\n      updatedAt\n    }\n  }\n}\n"
+    "text": "mutation AdminPageUpdateMutation(\n  $input: UpdatePageInput!\n) {\n  updatePage(input: $input) {\n    page {\n      id\n      title\n      slug\n      content\n      excerpt\n      status\n      publishedAt\n      createdAt\n      updatedAt\n      showInNavigation\n      navigationOrder\n      featureOnHome\n      homeOrder\n      accent\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "72c32907fa80caa0ea13c0fcd2298dde";
+(node as any).hash = "053192c7b06cd9db8d32cd3fc226d872";
 
 export default node;

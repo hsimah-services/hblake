@@ -2,8 +2,9 @@
 
 The hblake site introduces Hamish Blake and the open frameworks behind his work.
 Owner-provided launch content consists of Home, About, Frameworks, Portfolio and
-Contact us. The homepage shows four large coloured links to those pages, followed
-by the latest published post ("Latest news") when one exists. News and Products may
+Contact us. The homepage shows up to four large coloured links to pages featured on
+it (page placement, see Page.md; the launch content features About, Frameworks,
+Portfolio and Contact us), followed by the latest published post ("Latest news") when one exists. News and Products may
 remain empty. Posts are presented to visitors and in the admin as News.
 News carries hbla.ke's business and technical writing; personal writing stays on
 hsimah.com, which the footer links. The two do not otherwise cross-link.

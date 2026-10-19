@@ -1,6 +1,6 @@
 /**
- * @generated SignedSource<<e3e178614e4d02c105df76eee1ff9390>>
- * @relayHash 28dadc4c2d14dfd811b4d065d121b2f2
+ * @generated SignedSource<<a122da48182ab5d4d9f445847fd26923>>
+ * @relayHash fe08f28a953ca5fd3e6b5df722114859
  * @lightSyntaxTransform
  */
 
@@ -8,7 +8,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-// @relayRequestID 28dadc4c2d14dfd811b4d065d121b2f2
+// @relayRequestID fe08f28a953ca5fd3e6b5df722114859
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
@@ -135,14 +135,15 @@ v5 = {
   ],
   "storageKey": null
 },
-v6 = [
-  {
-    "kind": "Literal",
-    "name": "first",
-    "value": 100
-  }
-],
+v6 = {
+  "kind": "Literal",
+  "name": "first",
+  "value": 100
+},
 v7 = [
+  (v6/*:: as any*/)
+],
+v8 = [
   (v4/*:: as any*/),
   (v1/*:: as any*/)
 ];
@@ -197,10 +198,19 @@ return {
       },
       {
         "alias": "navigationPages",
-        "args": (v6/*:: as any*/),
-        "concreteType": "RootQueryToPageConnection",
+        "args": [
+          (v6/*:: as any*/),
+          {
+            "kind": "Literal",
+            "name": "where",
+            "value": {
+              "home": false
+            }
+          }
+        ],
+        "concreteType": "RootQueryToPlacedPagesConnection",
         "kind": "LinkedField",
-        "name": "pages",
+        "name": "placedPages",
         "plural": false,
         "selections": [
           {
@@ -214,16 +224,22 @@ return {
               (v1/*:: as any*/),
               (v2/*:: as any*/),
               (v3/*:: as any*/),
-              (v4/*:: as any*/)
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "accent",
+                "storageKey": null
+              }
             ],
             "storageKey": null
           }
         ],
-        "storageKey": "pages(first:100)"
+        "storageKey": "placedPages(first:100,where:{\"home\":false})"
       },
       {
         "alias": "navigationPosts",
-        "args": (v6/*:: as any*/),
+        "args": (v7/*:: as any*/),
         "concreteType": "RootQueryToPostConnection",
         "kind": "LinkedField",
         "name": "posts",
@@ -236,7 +252,7 @@ return {
             "kind": "LinkedField",
             "name": "nodes",
             "plural": true,
-            "selections": (v7/*:: as any*/),
+            "selections": (v8/*:: as any*/),
             "storageKey": null
           }
         ],
@@ -244,7 +260,7 @@ return {
       },
       {
         "alias": "navigationProducts",
-        "args": (v6/*:: as any*/),
+        "args": (v7/*:: as any*/),
         "concreteType": "RootQueryToProductConnection",
         "kind": "LinkedField",
         "name": "products",
@@ -257,7 +273,7 @@ return {
             "kind": "LinkedField",
             "name": "nodes",
             "plural": true,
-            "selections": (v7/*:: as any*/),
+            "selections": (v8/*:: as any*/),
             "storageKey": null
           }
         ],
@@ -267,12 +283,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "28dadc4c2d14dfd811b4d065d121b2f2",
-    "id": "28dadc4c2d14dfd811b4d065d121b2f2",
+    "cacheID": "fe08f28a953ca5fd3e6b5df722114859",
+    "id": "fe08f28a953ca5fd3e6b5df722114859",
     "metadata": {},
     "name": "ProductQuery",
     "operationKind": "query",
-    "text": "query ProductQuery(\n  $slug: String!\n) {\n  ...LayoutFragment\n  productBySlug(slug: $slug) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    enquiryUrl\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      status\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n"
+    "text": "query ProductQuery(\n  $slug: String!\n) {\n  ...LayoutFragment\n  productBySlug(slug: $slug) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    enquiryUrl\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: placedPages(where: {home: false}, first: 100) {\n    nodes {\n      id\n      title\n      slug\n      accent\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n"
   }
 };
 })();

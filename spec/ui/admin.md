@@ -15,11 +15,10 @@ count) and Settings. The current item carries `aria-current`; on phones the side
 opens from a menu button. The Dashboard shows each type's published and draft counts
 with links to manage it and add a new one.
 
-Post content is edited as rich text (Tiptap, MIT) with a formatting toolbar and a
+Page, post and product content is edited as rich text (Tiptap, MIT) with a formatting toolbar and a
 Markdown source mode; Markdown remains the stored format, so the existing renderer and
 sanitizer apply. Links accept only https/http, mailto or site paths. Images are added
-from the editor with required alt text and upload to the media endpoint. Pages and
-products keep the Markdown textarea.
+from the editor with required alt text and upload to the media endpoint.
 
 Lists are tables with the admin.yml list columns. Each title links to the record; an
 Actions cell right after it holds Edit and Delete (always visible, accessible names
@@ -32,8 +31,8 @@ to the heading. Status shows as a text badge. Timestamps read relatively ("2 hou
 ago") in a `<time datetime>`; the absolute time is the accessible name and appears
 on hover or keyboard focus. Lists show bounded cursor pagination and useful
 empty/loading/error states. Detail screens show rendered content plus timestamps. Forms use labels, inline errors,
-a keyboard-accessible error summary and focused first invalid field. Markdown uses
-a textarea and safe preview. Enums use explicit choices; enquiryUrl and optional
+a keyboard-accessible error summary and focused first invalid field. Content uses
+the rich-text editor (with a Markdown source mode) and a safe preview. Enums use explicit choices; enquiryUrl and optional
 fields can be cleared. Forms distinguish omitted fields from explicit null/empty values.
 
 New content starts as draft. Save and publish are separate operations. Publish and

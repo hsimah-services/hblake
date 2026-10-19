@@ -9,13 +9,14 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Page/PageMutator.php
- * digest: sha256:d5b4ee1033fae041d5ee7df196ee5f2f06f5b0b0b17233b3caed3e93bdd42442
+ * digest: sha256:5d28e73fec7cea6e5a20eb5e56ff4e13ae67b55014ddcfb24d2bee0d04167893
  */
 
 namespace Hsimah\Entity\Page;
 
 use DateTimeImmutable;
 use Eleph\Runtime\Mutation\MutationBuffer;
+use Hsimah\Entity\Enum\PageAccent;
 use Hsimah\Entity\Enum\PublicationStatus;
 use Hsimah\Entity\Page\Contract\PagePublishAction;
 use Hsimah\Entity\Page\Contract\PageUnpublishAction;
@@ -80,6 +81,46 @@ final class PageMutator
         ?DateTimeImmutable $publishedAt,
     ): self {
         $this->buffer->set('publishedAt', $publishedAt);
+
+        return $this;
+    }
+
+    public function setShowInNavigation(
+        bool $showInNavigation,
+    ): self {
+        $this->buffer->set('showInNavigation', $showInNavigation);
+
+        return $this;
+    }
+
+    public function setNavigationOrder(
+        int $navigationOrder,
+    ): self {
+        $this->buffer->set('navigationOrder', $navigationOrder);
+
+        return $this;
+    }
+
+    public function setFeatureOnHome(
+        bool $featureOnHome,
+    ): self {
+        $this->buffer->set('featureOnHome', $featureOnHome);
+
+        return $this;
+    }
+
+    public function setHomeOrder(
+        int $homeOrder,
+    ): self {
+        $this->buffer->set('homeOrder', $homeOrder);
+
+        return $this;
+    }
+
+    public function setAccent(
+        PageAccent $accent,
+    ): self {
+        $this->buffer->set('accent', $accent);
 
         return $this;
     }

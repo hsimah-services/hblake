@@ -225,3 +225,23 @@ test('the dashboard lists recently edited records, newest first', async ({ page 
   await recent.getByRole('link', { name: row.title }).click();
   await expect(page).toHaveURL(`${BASE_URL}${adminPath('Page')}/${encodeURIComponent(row.id)}`);
 });
+
+test('the page form places a page in the navigation and on the home page', async ({ page }) => {
+  const row = await createOk(api, 'Page', { title: `Placed ${RUN_ID}` });
+  await page.goto(`${adminPath('Page')}/${encodeURIComponent(row.id)}/edit`);
+  const placement = page.getByRole('group', { name: 'Placement' });
+  await expect(placement.getByRole('checkbox', { name: 'Show in navigation' })).toBeChecked();
+  await expect(placement.getByRole('checkbox', { name: 'Feature on home page' })).not.toBeChecked();
+  await placement.getByRole('checkbox', { name: 'Show in navigation' }).uncheck();
+  await placement.getByRole('checkbox', { name: 'Feature on home page' }).check();
+  await page.getByRole('button', { name: 'Save' }).click();
+  await expect(page.getByRole('alert').filter({ hasText: 'correct the highlighted fields' }), 'a featured page needs a colour').toBeVisible();
+  await expect(placement.getByRole('radiogroup', { name: 'Colour' }).getByRole('radio', { name: /^None/ })).toBeFocused();
+  await placement.getByRole('radio', { name: 'Orange' }).check();
+  await placement.getByRole('spinbutton', { name: 'Home order' }).fill('7');
+  await placement.getByRole('spinbutton', { name: 'Home order' }).press('Tab');
+  await page.getByRole('button', { name: 'Save' }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'Saved successfully.' })).toBeVisible();
+  const saved = await api.ok('query($id: ID!) { page(id: $id) { showInNavigation featureOnHome homeOrder accent } }', { id: row.id });
+  expect(saved.page).toEqual({ showInNavigation: false, featureOnHome: true, homeOrder: 7, accent: 'ORANGE' });
+});

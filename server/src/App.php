@@ -38,8 +38,15 @@ final readonly class App {
             $c->set("Hsimah\\Entity\\$entity\\Contract\\{$entity}UnpublishAction", new Unpublish());
             $class = __NAMESPACE__."\\{$entity}BySlug";
             $c->set("Hsimah\\Entity\\$entity\\Contract\\{$entity}BySlugQuery", new $class($runtime));
+            $class = __NAMESPACE__."\\{$entity}Recent";
+            $c->set("Hsimah\\Entity\\$entity\\Contract\\{$entity}RecentQuery", new $class($runtime));
         }
         $c->set(\Hsimah\Entity\Product\Contract\ProductEnquiryUrlVerifier::class, new EnquiryUrlVerifier());
+        $placement = new PagePlacement();
+        $c->set(\Hsimah\Entity\Page\Contract\PageAccentVerifier::class, $placement);
+        $c->set(\Hsimah\Entity\Page\Contract\PageHomeOrderVerifier::class, $placement);
+        $c->set(\Hsimah\Entity\Page\Contract\PageNavigationOrderVerifier::class, $placement);
+        $c->set(\Hsimah\Entity\Page\Contract\PagePlacedQuery::class, new PagePlaced($runtime));
         $c->set(\Hsimah\Entity\User\Contract\UserStaffProfileReadPolicy::class, new StaffProfile());
         $c->set(\Hsimah\Entity\User\Contract\UserAdminAccountsWritePolicy::class, new AdminAccounts());
         $c->set(\Hsimah\Entity\User\Contract\UserUsernameVerifier::class, new UsernameVerifier());

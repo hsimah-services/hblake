@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Page/PageWriteContext.php
- * digest: sha256:ba1a6b76869eb462a9e5a3fde78538b629b726a661174056ac2bdf6839296e11
+ * digest: sha256:c52db38cd3d209fe6f2f03740ac58704c2341ab1bb7ec59e08f69cbf57de0302
  */
 
 namespace Hsimah\Entity\Page;
@@ -19,6 +19,7 @@ use Eleph\Runtime\Mutation\ActionCall;
 use Eleph\Runtime\Mutation\MutationContext;
 use Eleph\Runtime\Policy\WriteContext;
 use Eleph\Runtime\Policy\WriteOperation;
+use Hsimah\Entity\Enum\PageAccent;
 use Hsimah\Entity\Enum\PublicationStatus;
 
 final readonly class PageWriteContext implements WriteContext
@@ -170,6 +171,76 @@ final readonly class PageWriteContext implements WriteContext
     public function pendingUpdatedAt(): ?DateTimeImmutable {
         $value = $this->context->mutation()?->pending('updatedAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
+
+        return $value;
+    }
+
+    public function originalShowInNavigation(): ?bool {
+        $value = $this->context->mutation()?->original('showInNavigation');
+        assert(null === $value || is_bool($value));
+
+        return $value;
+    }
+
+    public function pendingShowInNavigation(): ?bool {
+        $value = $this->context->mutation()?->pending('showInNavigation');
+        assert(null === $value || is_bool($value));
+
+        return $value;
+    }
+
+    public function originalNavigationOrder(): ?int {
+        $value = $this->context->mutation()?->original('navigationOrder');
+        assert(null === $value || is_int($value));
+
+        return $value;
+    }
+
+    public function pendingNavigationOrder(): ?int {
+        $value = $this->context->mutation()?->pending('navigationOrder');
+        assert(null === $value || is_int($value));
+
+        return $value;
+    }
+
+    public function originalFeatureOnHome(): ?bool {
+        $value = $this->context->mutation()?->original('featureOnHome');
+        assert(null === $value || is_bool($value));
+
+        return $value;
+    }
+
+    public function pendingFeatureOnHome(): ?bool {
+        $value = $this->context->mutation()?->pending('featureOnHome');
+        assert(null === $value || is_bool($value));
+
+        return $value;
+    }
+
+    public function originalHomeOrder(): ?int {
+        $value = $this->context->mutation()?->original('homeOrder');
+        assert(null === $value || is_int($value));
+
+        return $value;
+    }
+
+    public function pendingHomeOrder(): ?int {
+        $value = $this->context->mutation()?->pending('homeOrder');
+        assert(null === $value || is_int($value));
+
+        return $value;
+    }
+
+    public function originalAccent(): ?PageAccent {
+        $value = $this->context->mutation()?->original('accent');
+        assert(null === $value || $value instanceof PageAccent);
+
+        return $value;
+    }
+
+    public function pendingAccent(): ?PageAccent {
+        $value = $this->context->mutation()?->pending('accent');
+        assert(null === $value || $value instanceof PageAccent);
 
         return $value;
     }

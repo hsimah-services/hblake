@@ -11,12 +11,12 @@ import { useSignOut } from '../../useSignOut';
 import { DisplayPreferences } from '../display-preferences/DisplayPreferences';
 import type { LayoutFragment$key } from './__generated__/LayoutFragment.graphql';
 
-// Navigation hover colours match the home page tiles; other links use the neutral ink tone.
-const NAVIGATION_TONES: Readonly<Record<string, NavigationTone>> = { about: 'green', frameworks: 'orange', portfolio: 'blue', contact: 'berry' };
+// A page's accent colours its navigation hover, matching its home tile; ink is neutral.
+const NAVIGATION_TONES: Readonly<Record<string, NavigationTone>> = { INK: 'ink', GREEN: 'green', ORANGE: 'orange', BLUE: 'blue', BERRY: 'berry' };
 
 const LAYOUT_FRAGMENT = graphql`fragment LayoutFragment on RootQuery {
   viewer { id displayName role }
-  navigationPages: pages(first: 100) { nodes { id title slug status } }
+  navigationPages: placedPages(where: { home: false }, first: 100) { nodes { id title slug accent } }
   navigationPosts: posts(first: 100) { nodes { status } }
   navigationProducts: products(first: 100) { nodes { status } }
 }`;
@@ -73,12 +73,11 @@ export function Layout({ data, row, title, admin = false, children }: LayoutProp
 function useLayout(key: LayoutFragment$key, row: useDocumentMetadataRow | null | undefined, title: string | undefined, admin: boolean) {
   const data = useFragment(LAYOUT_FRAGMENT, key);
   const location = useLocation();
-  const navigation: NavigationLink[] = data.navigationPages?.nodes?.filter(value => value?.status === 'PUBLISHED' && value.slug !== 'home').map(value => ({ title: value!.title, href: PageURI.getURI({ slug: value!.slug }), tone: NAVIGATION_TONES[value!.slug] ?? 'ink' })) ?? [];
-  const order = ['about', 'frameworks', 'portfolio', 'contact'].map(slug => PageURI.getURI({ slug }));
-  navigation.sort((a, b) => {
-    const first = order.indexOf(a.href); const second = order.indexOf(b.href);
-    return (first < 0 ? order.length : first) - (second < 0 ? order.length : second);
-  });
+  // The server returns published pages placed in the navigation, in order. Home is the
+  // Home icon, never a text link.
+  const navigation: NavigationLink[] = (data.navigationPages?.nodes ?? [])
+    .filter(value => value != null && value.slug !== 'home')
+    .map(value => ({ title: value!.title, href: PageURI.getURI({ slug: value!.slug }), tone: NAVIGATION_TONES[value!.accent] ?? 'ink' }));
   if (data.navigationPosts?.nodes?.some(value => value?.status === 'PUBLISHED')) navigation.push({ title: 'News', href: PostListURI.getURI({}), tone: 'ink' });
   if (data.navigationProducts?.nodes?.some(value => value?.status === 'PUBLISHED')) navigation.push({ title: 'Products', href: ProductListURI.getURI({}), tone: 'ink' });
   useDocumentMetadata(row, title, admin);

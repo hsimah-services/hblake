@@ -34,6 +34,26 @@ final class Schema {
         }
         foreach($r->connectionConfigs() as $config) {
             $entity=$config['toType']; assert(is_string($entity));
+            if (isset($config['connectionArgs'])) {
+                // A spec query: its handler orders and filters. Its arguments arrive inside
+                // `where` as raw GraphQL values, but the resolver reads them beside the paging
+                // arguments and the handler takes enum arguments as PHP enums.
+                $resolve=$config['resolve']; assert(is_callable($resolve));
+                $declared=is_array($config['connectionArgs']) ? $config['connectionArgs'] : [];
+                $config['resolve']=static function($source,array $args) use($resolve,$declared): mixed {
+                    $where=is_array($args['where'] ?? null) ? $args['where'] : [];
+                    foreach ($where as $name=>$value) {
+                        $arg=$declared[$name] ?? null;
+                        $type=is_array($arg) ? ($arg['type'] ?? null) : null;
+                        $type=is_array($type) ? ($type['non_null'] ?? null) : $type;
+                        $enum='Hsimah\\Entity\\Enum\\'.(is_string($type) ? $type : '');
+                        if (is_string($value) && is_subclass_of($enum,\BackedEnum::class)) $where[$name]=$enum::from($value);
+                    }
+                    return $resolve($source,[...$where,...$args]);
+                };
+                $b->connection($config);
+                continue;
+            }
             $config['resolve']=static function($source,array $args) use($app,$entity): array {
                 $criteria=Criteria::for($entity);
                 $criteria=$entity === 'Product'

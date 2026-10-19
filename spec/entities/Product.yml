@@ -29,3 +29,14 @@ queries:
       graphql:
         field: productBySlug
     handler: true
+  recent:
+    description: Records newest-edited first, optionally of one publication status, under read policies.
+    args:
+      status: { type: PublicationStatus, nullable: true }
+    returns:
+      type: Product
+      cardinality: many
+    integrations:
+      graphql:
+        field: recentProducts
+    handler: true

@@ -9,12 +9,15 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Post/PostFinder.php
- * digest: sha256:474b942abd6ccec284107a51dc8779baf20ec5379db4bcfc422c47dade5b7baa
+ * digest: sha256:cb04c439cbfa7804c620009f988519fbf74fe445600c5f871756e1e2ac1cbc60
  */
 
 namespace Hsimah\Entity\Post;
 
+use Eleph\Runtime\Query\EntityQuery;
+use Hsimah\Entity\Enum\PublicationStatus;
 use Hsimah\Entity\Post\Contract\PostBySlugQuery;
+use Hsimah\Entity\Post\Contract\PostRecentQuery;
 
 /**
  * Collection-level queries over Post.
@@ -23,6 +26,7 @@ final class PostFinder
 {
     public function __construct(
         private readonly PostBySlugQuery $bySlugQuery,
+        private readonly PostRecentQuery $recentQuery,
     ) {
 
     }
@@ -31,5 +35,14 @@ final class PostFinder
         string $slug,
     ): ?Post {
         return $this->bySlugQuery->find($slug);
+    }
+
+    /**
+     * @return EntityQuery<Post>
+     */
+    public function recent(
+        ?PublicationStatus $status = null,
+    ): EntityQuery {
+        return $this->recentQuery->find($status);
     }
 }

@@ -157,6 +157,13 @@ The browser tests find elements by accessible role and name, not by test ids:
 - The palette in `client/src/styles/global.css` (`--site-tile-*` and the
   `light-dark()` `--site-*` tones) keeps every pair of tones at least ΔE2000 10 apart
   under simulated protanopia, deuteranopia and tritanopia, and AA contrast as text.
+- Page placement (Page.md): the `Main navigation` lists published pages with
+  `showInNavigation`; the home page's `region` named `Explore the site` links at most
+  four published pages with `featureOnHome`, by `homeOrder` then title. Drafts appear
+  in neither; `placedPages(where: { home })` returns the same lists. A featured page needs an `accent` other than `INK`, and orders are
+  0–999; the API rejects anything else. The admin page form has a `Placement` group
+  with `Show in navigation`, `Navigation order`, `Feature on home page`, `Home order`
+  and a `Colour` radio group.
 - The navigation marks the current page (`aria-current="page"`) or section
   (`aria-current="true"` on a collection's records) by more than colour: its 2px
   underline (a centred gradient `background-size` of `100% 2px`) stays drawn; other
@@ -194,12 +201,12 @@ The browser tests find elements by accessible role and name, not by test ids:
 - Login: fields labelled `Username` and `Password`, and a `Sign in`/`Log in` button.
   Signed-out visits to `/admin*` redirect to `/admin/login`. Sign-out is a button or
   link named `/sign out|log out/i`.
-- Content forms have fields labelled `Title`, `Slug`, `Content` (a textarea), `Excerpt`
+- Content forms have fields labelled `Title`, `Slug`, `Content`, `Excerpt`
   and, for products, `Enquiry URL`, with a `Save`/`Create` button. They have no
   inputs for id, status, publication time or timestamps. On a new record `Slug` follows
   `Title` (lowercase, accents folded, apostrophes dropped, other punctuation and spaces
   as single hyphens, at most 160 characters) until it is edited; clearing it resumes.
-  Edit forms never change an existing slug. Posts edit `Content` as rich
+  Edit forms never change an existing slug. Pages, posts and products edit `Content` as rich
   text: a `textbox` named `Content` (multiline, contenteditable) under a `toolbar` named
   `Formatting` (Bold, Italic, Strikethrough, Inline code, Heading 2, Heading 3,
   Bulleted list, Numbered list, Quote, Code block, Link, Image, Undo, Redo; toggles

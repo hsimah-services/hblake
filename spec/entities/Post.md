@@ -9,3 +9,7 @@ author accounts in this version. Every post is written by the site's single acco
 and shows a `By <display name>` byline; the public `Post.author` projection carries
 only that display name. Publication requires a nonblank body. Drafts
 never appear in anonymous lists, counts, node queries or direct links.
+
+The `recent` query (GraphQL `recentPosts(where: { status })`) lists records newest-edited
+first, optionally of one status, under read policies. The admin dashboard uses it for
+its counts and its Recently edited list.

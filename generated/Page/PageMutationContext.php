@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Page/PageMutationContext.php
- * digest: sha256:e738df57df66420c275cf809e070aba09cd6bf64554e27fc78c693d2e31247e0
+ * digest: sha256:8cc2554036751bd4989e3b1915161b3acb3b9d7bcd4131af718773162902a4b5
  */
 
 namespace Hsimah\Entity\Page;
@@ -18,6 +18,7 @@ use DateTimeImmutable;
 use Eleph\Runtime\Identity\Identifier;
 use Eleph\Runtime\Mutation\ActionCall;
 use Eleph\Runtime\Mutation\MutationContext;
+use Hsimah\Entity\Enum\PageAccent;
 use Hsimah\Entity\Enum\PublicationStatus;
 
 /**
@@ -202,6 +203,76 @@ final readonly class PageMutationContext implements MutationContext
     public function pendingUpdatedAt(): ?DateTimeImmutable {
         $value = $this->context->pending('updatedAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
+
+        return $value;
+    }
+
+    public function originalShowInNavigation(): ?bool {
+        $value = $this->context->original('showInNavigation');
+        assert(null === $value || is_bool($value));
+
+        return $value;
+    }
+
+    public function pendingShowInNavigation(): ?bool {
+        $value = $this->context->pending('showInNavigation');
+        assert(null === $value || is_bool($value));
+
+        return $value;
+    }
+
+    public function originalNavigationOrder(): ?int {
+        $value = $this->context->original('navigationOrder');
+        assert(null === $value || is_int($value));
+
+        return $value;
+    }
+
+    public function pendingNavigationOrder(): ?int {
+        $value = $this->context->pending('navigationOrder');
+        assert(null === $value || is_int($value));
+
+        return $value;
+    }
+
+    public function originalFeatureOnHome(): ?bool {
+        $value = $this->context->original('featureOnHome');
+        assert(null === $value || is_bool($value));
+
+        return $value;
+    }
+
+    public function pendingFeatureOnHome(): ?bool {
+        $value = $this->context->pending('featureOnHome');
+        assert(null === $value || is_bool($value));
+
+        return $value;
+    }
+
+    public function originalHomeOrder(): ?int {
+        $value = $this->context->original('homeOrder');
+        assert(null === $value || is_int($value));
+
+        return $value;
+    }
+
+    public function pendingHomeOrder(): ?int {
+        $value = $this->context->pending('homeOrder');
+        assert(null === $value || is_int($value));
+
+        return $value;
+    }
+
+    public function originalAccent(): ?PageAccent {
+        $value = $this->context->original('accent');
+        assert(null === $value || $value instanceof PageAccent);
+
+        return $value;
+    }
+
+    public function pendingAccent(): ?PageAccent {
+        $value = $this->context->pending('accent');
+        assert(null === $value || $value instanceof PageAccent);
 
         return $value;
     }

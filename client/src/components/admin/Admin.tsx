@@ -45,17 +45,16 @@ export function Admin({ queryRef }: AdminProps) {
 
 function useAdmin(queryRef: PreloadedQuery<AdminQuery>) {
   const data = usePreloadedQuery<AdminQuery>(ADMIN_QUERY, queryRef);
-  const count = (connection: { readonly nodes?: readonly ({ readonly status: string } | null | undefined)[] | null } | null | undefined) => {
-    const statuses = connection?.nodes?.map(node => node?.status) ?? [];
-    const published = statuses.filter(status => status === 'PUBLISHED').length;
-    return { published, drafts: statuses.length - published };
-  };
+  // Counts come from the server's totals, so they stay right however many records exist.
+  const count = (all: { readonly totalCount?: number | null } | null | undefined, published: { readonly totalCount?: number | null } | null | undefined) => ({
+    published: published?.totalCount ?? 0, drafts: (all?.totalCount ?? 0) - (published?.totalCount ?? 0),
+  });
   const types: readonly AdminDashboardType[] = [
-    { plural: 'Pages', singular: 'page', icon: 'page', tone: 'blue', list: AdminPageListURI.getURI({}), publishedList: AdminPageListURI.getURI({ status: 'published' }), draftList: AdminPageListURI.getURI({ status: 'draft' }), create: AdminPageCreateURI.getURI({}), ...count(data.pages) },
-    { plural: 'News', singular: 'article', icon: 'news', tone: 'green', list: AdminPostListURI.getURI({}), publishedList: AdminPostListURI.getURI({ status: 'published' }), draftList: AdminPostListURI.getURI({ status: 'draft' }), create: AdminPostCreateURI.getURI({}), ...count(data.posts) },
-    { plural: 'Products', singular: 'product', icon: 'product', tone: 'orange', list: AdminProductListURI.getURI({}), publishedList: AdminProductListURI.getURI({ status: 'published' }), draftList: AdminProductListURI.getURI({ status: 'draft' }), create: AdminProductCreateURI.getURI({}), ...count(data.products) },
+    { plural: 'Pages', singular: 'page', icon: 'page', tone: 'blue', list: AdminPageListURI.getURI({}), publishedList: AdminPageListURI.getURI({ status: 'published' }), draftList: AdminPageListURI.getURI({ status: 'draft' }), create: AdminPageCreateURI.getURI({}), ...count(data.pages, data.publishedPages) },
+    { plural: 'News', singular: 'article', icon: 'news', tone: 'green', list: AdminPostListURI.getURI({}), publishedList: AdminPostListURI.getURI({ status: 'published' }), draftList: AdminPostListURI.getURI({ status: 'draft' }), create: AdminPostCreateURI.getURI({}), ...count(data.posts, data.publishedPosts) },
+    { plural: 'Products', singular: 'product', icon: 'product', tone: 'orange', list: AdminProductListURI.getURI({}), publishedList: AdminProductListURI.getURI({ status: 'published' }), draftList: AdminProductListURI.getURI({ status: 'draft' }), create: AdminProductCreateURI.getURI({}), ...count(data.products, data.publishedProducts) },
   ];
-  // The five most recently updated records of any type.
+  // The five most recently edited records of any type, from each type's newest five.
   const recent = [
     ...(data.pages?.nodes ?? []).map(node => node && { ...node, type: 'Page', icon: 'page' as const, href: AdminPageDetailURI.getURI({ id: node.id }) }),
     ...(data.posts?.nodes ?? []).map(node => node && { ...node, type: 'Article', icon: 'news' as const, href: AdminPostDetailURI.getURI({ id: node.id }) }),

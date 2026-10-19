@@ -17,7 +17,7 @@ Contributor instructions live in [AGENTS.md](../AGENTS.md).
 
 - Standalone PHP with SQLite, rather than WordPress storage or hosting.
 - React/tsquid public site and admin, Relay over standalone Elephentity GraphQL.
-- Markdown editing with sanitized rendering; no rich text or block editor.
+- Rich-text editing stored as Markdown, with sanitized rendering; no block editor.
 - V1 has one operator-provisioned admin account. The model retains editor/admin
   roles; additional accounts and account lifecycle screens are outside v1.
 - Products are informational offerings with an enquiry link, without commerce.

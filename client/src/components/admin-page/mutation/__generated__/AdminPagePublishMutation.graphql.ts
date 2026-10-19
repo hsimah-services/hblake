@@ -1,6 +1,6 @@
 /**
- * @generated SignedSource<<2b48b1907f06660b2059e2234371fed5>>
- * @relayHash b65d2b8a24e467de34e009f249226b55
+ * @generated SignedSource<<b0a71e0a95691cf292c7da853d535e99>>
+ * @relayHash ff9bb49160b94d17bf077c7cd7b75f33
  * @lightSyntaxTransform
  */
 
@@ -8,9 +8,10 @@
 /* eslint-disable */
 // @ts-nocheck
 
-// @relayRequestID b65d2b8a24e467de34e009f249226b55
+// @relayRequestID ff9bb49160b94d17bf077c7cd7b75f33
 
 import { ConcreteRequest } from 'relay-runtime';
+export type PageAccent = "BERRY" | "BLUE" | "GREEN" | "INK" | "ORANGE" | "%future added value";
 export type PublicationStatus = "DRAFT" | "PUBLISHED" | "%future added value";
 export type PublishPageInput = {
   clientMutationId?: string | null | undefined;
@@ -22,11 +23,16 @@ export type AdminPagePublishMutation$variables = {
 export type AdminPagePublishMutation$data = {
   readonly publishPage: {
     readonly page: {
+      readonly accent: PageAccent;
       readonly content: string;
       readonly createdAt: string;
       readonly excerpt: string;
+      readonly featureOnHome: boolean;
+      readonly homeOrder: number;
       readonly id: string;
+      readonly navigationOrder: number;
       readonly publishedAt: string | null | undefined;
+      readonly showInNavigation: boolean;
       readonly slug: string;
       readonly status: PublicationStatus;
       readonly title: string;
@@ -132,6 +138,41 @@ v1 = [
             "kind": "ScalarField",
             "name": "updatedAt",
             "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "showInNavigation",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "navigationOrder",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "featureOnHome",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "homeOrder",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "accent",
+            "storageKey": null
           }
         ],
         "storageKey": null
@@ -158,16 +199,16 @@ return {
     "selections": (v1/*:: as any*/)
   },
   "params": {
-    "cacheID": "b65d2b8a24e467de34e009f249226b55",
-    "id": "b65d2b8a24e467de34e009f249226b55",
+    "cacheID": "ff9bb49160b94d17bf077c7cd7b75f33",
+    "id": "ff9bb49160b94d17bf077c7cd7b75f33",
     "metadata": {},
     "name": "AdminPagePublishMutation",
     "operationKind": "mutation",
-    "text": "mutation AdminPagePublishMutation(\n  $input: PublishPageInput!\n) {\n  publishPage(input: $input) {\n    page {\n      id\n      title\n      slug\n      content\n      excerpt\n      status\n      publishedAt\n      createdAt\n      updatedAt\n    }\n  }\n}\n"
+    "text": "mutation AdminPagePublishMutation(\n  $input: PublishPageInput!\n) {\n  publishPage(input: $input) {\n    page {\n      id\n      title\n      slug\n      content\n      excerpt\n      status\n      publishedAt\n      createdAt\n      updatedAt\n      showInNavigation\n      navigationOrder\n      featureOnHome\n      homeOrder\n      accent\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "0e7131650079dcdd7f577088020743fb";
+(node as any).hash = "d7a7a156fcc8ab4a2d1c9584b81431a6";
 
 export default node;

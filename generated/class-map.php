@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   class-map.php
- * digest: sha256:ac020a3739317ebfe67d5036f474b53db8ac3aa85cd76ffbc3b07b03bfba143e
+ * digest: sha256:42b0811955af6f71ad54b378edce6c42304bbeca8c5a23cafe3f15f4a85ff5a6
  */
 
 return [
@@ -21,12 +21,18 @@ return [
     ],
     'classes' => [
         'Hsimah\\Entity\\Catalogue' => 'Catalogue.php',
+        'Hsimah\\Entity\\Enum\\PageAccent' => 'Enum/PageAccent.php',
         'Hsimah\\Entity\\Enum\\PublicationStatus' => 'Enum/PublicationStatus.php',
         'Hsimah\\Entity\\Enum\\UserRole' => 'Enum/UserRole.php',
+        'Hsimah\\Entity\\Page\\Contract\\PageAccentVerifier' => 'Page/Contract/PageAccentVerifier.php',
         'Hsimah\\Entity\\Page\\Contract\\PageBySlugQuery' => 'Page/Contract/PageBySlugQuery.php',
         'Hsimah\\Entity\\Page\\Contract\\PageContentVerifier' => 'Page/Contract/PageContentVerifier.php',
+        'Hsimah\\Entity\\Page\\Contract\\PageHomeOrderVerifier' => 'Page/Contract/PageHomeOrderVerifier.php',
+        'Hsimah\\Entity\\Page\\Contract\\PageNavigationOrderVerifier' => 'Page/Contract/PageNavigationOrderVerifier.php',
+        'Hsimah\\Entity\\Page\\Contract\\PagePlacedQuery' => 'Page/Contract/PagePlacedQuery.php',
         'Hsimah\\Entity\\Page\\Contract\\PagePublishAction' => 'Page/Contract/PagePublishAction.php',
         'Hsimah\\Entity\\Page\\Contract\\PagePublishedAtVerifier' => 'Page/Contract/PagePublishedAtVerifier.php',
+        'Hsimah\\Entity\\Page\\Contract\\PageRecentQuery' => 'Page/Contract/PageRecentQuery.php',
         'Hsimah\\Entity\\Page\\Contract\\PageSlugVerifier' => 'Page/Contract/PageSlugVerifier.php',
         'Hsimah\\Entity\\Page\\Contract\\PageStatusVerifier' => 'Page/Contract/PageStatusVerifier.php',
         'Hsimah\\Entity\\Page\\Contract\\PageTitleVerifier' => 'Page/Contract/PageTitleVerifier.php',
@@ -56,6 +62,7 @@ return [
         'Hsimah\\Entity\\Post\\Contract\\PostContentVerifier' => 'Post/Contract/PostContentVerifier.php',
         'Hsimah\\Entity\\Post\\Contract\\PostPublishAction' => 'Post/Contract/PostPublishAction.php',
         'Hsimah\\Entity\\Post\\Contract\\PostPublishedAtVerifier' => 'Post/Contract/PostPublishedAtVerifier.php',
+        'Hsimah\\Entity\\Post\\Contract\\PostRecentQuery' => 'Post/Contract/PostRecentQuery.php',
         'Hsimah\\Entity\\Post\\Contract\\PostSlugVerifier' => 'Post/Contract/PostSlugVerifier.php',
         'Hsimah\\Entity\\Post\\Contract\\PostStatusVerifier' => 'Post/Contract/PostStatusVerifier.php',
         'Hsimah\\Entity\\Post\\Contract\\PostTitleVerifier' => 'Post/Contract/PostTitleVerifier.php',
@@ -82,6 +89,7 @@ return [
         'Hsimah\\Entity\\Product\\Contract\\ProductEnquiryUrlVerifier' => 'Product/Contract/ProductEnquiryUrlVerifier.php',
         'Hsimah\\Entity\\Product\\Contract\\ProductPublishAction' => 'Product/Contract/ProductPublishAction.php',
         'Hsimah\\Entity\\Product\\Contract\\ProductPublishedAtVerifier' => 'Product/Contract/ProductPublishedAtVerifier.php',
+        'Hsimah\\Entity\\Product\\Contract\\ProductRecentQuery' => 'Product/Contract/ProductRecentQuery.php',
         'Hsimah\\Entity\\Product\\Contract\\ProductSlugVerifier' => 'Product/Contract/ProductSlugVerifier.php',
         'Hsimah\\Entity\\Product\\Contract\\ProductStatusVerifier' => 'Product/Contract/ProductStatusVerifier.php',
         'Hsimah\\Entity\\Product\\Contract\\ProductTitleVerifier' => 'Product/Contract/ProductTitleVerifier.php',

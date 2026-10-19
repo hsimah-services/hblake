@@ -9,7 +9,11 @@ try {
         case 'install':
             $install=require dirname(__DIR__).'/generated/sqlite/install.php';
             assert(is_callable($install)); $install($db->pdo);
-            Auth::install($db); break;
+            Auth::install($db); \Hsimah\Migrations::markAllApplied($db); break;
+        case 'upgrade':
+            // Applies reviewed schema migrations. Take a backup first.
+            $applied=\Hsimah\Migrations::upgrade($db);
+            echo $applied===[] ? "Already up to date.\n" : 'Applied: '.implode(', ',$applied)."\n"; break;
         case 'bootstrap':
             $db->transaction(function() use($db): void {
                 if ((int)$db->scalar('SELECT COUNT(*) FROM hsimah_user')!==0) throw new RuntimeException('An account already exists.');

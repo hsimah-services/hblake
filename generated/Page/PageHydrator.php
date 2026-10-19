@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Page/PageHydrator.php
- * digest: sha256:96a196cd2ee1a6ca78a8658ee8070ebbcdd1ff3c5db9a07daee9f7194de6a4d5
+ * digest: sha256:7d0c28ff6bc5336f60ac80f7bd1579a88b32f8006e7dcac8d004045ea807dd92
  */
 
 namespace Hsimah\Entity\Page;
@@ -19,6 +19,7 @@ use Eleph\Runtime\Query\EdgeLoader;
 use Eleph\Runtime\Query\Hydrator;
 use Eleph\Runtime\Query\ValueDecoder;
 use Eleph\Runtime\Storage\Record;
+use Hsimah\Entity\Enum\PageAccent;
 use Hsimah\Entity\Enum\PublicationStatus;
 
 /**
@@ -48,6 +49,11 @@ final readonly class PageHydrator implements Hydrator
             $this->publishedAt($record),
             $this->createdAt($record),
             $this->updatedAt($record),
+            $this->showInNavigation($record),
+            $this->navigationOrder($record),
+            $this->featureOnHome($record),
+            $this->homeOrder($record),
+            $this->accent($record),
         );
     }
 
@@ -113,5 +119,45 @@ final readonly class PageHydrator implements Hydrator
         $value = $record->value('updatedAt');
 
         return $this->decode->datetime($value, 'Page.updatedAt');
+    }
+
+    private function showInNavigation(
+        Record $record,
+    ): bool {
+        $value = $record->value('showInNavigation');
+
+        return $this->decode->bool($value, 'Page.showInNavigation');
+    }
+
+    private function navigationOrder(
+        Record $record,
+    ): int {
+        $value = $record->value('navigationOrder');
+
+        return $this->decode->int($value, 'Page.navigationOrder');
+    }
+
+    private function featureOnHome(
+        Record $record,
+    ): bool {
+        $value = $record->value('featureOnHome');
+
+        return $this->decode->bool($value, 'Page.featureOnHome');
+    }
+
+    private function homeOrder(
+        Record $record,
+    ): int {
+        $value = $record->value('homeOrder');
+
+        return $this->decode->int($value, 'Page.homeOrder');
+    }
+
+    private function accent(
+        Record $record,
+    ): PageAccent {
+        $value = $record->value('accent');
+
+        return $this->decode->enum(PageAccent::class, $value, 'Page.accent');
     }
 }

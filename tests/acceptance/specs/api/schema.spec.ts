@@ -106,7 +106,7 @@ test('no type exposes credentials or session secrets', () => {
 
 test('content types expose the specified fields; posts link only an author display name', () => {
   const common = ['id', 'title', 'slug', 'content', 'excerpt', 'status', 'publishedAt', 'createdAt', 'updatedAt'];
-  const extra: Record<string, string[]> = { Page: [], Post: ['author'], Product: ['enquiryUrl'] };
+  const extra: Record<string, string[]> = { Page: ['showInNavigation', 'navigationOrder', 'featureOnHome', 'homeOrder', 'accent'], Post: ['author'], Product: ['enquiryUrl'] };
   for (const kind of KINDS) {
     const type = types.get(kind);
     expect(type, `GraphQL type ${kind}`).toBeTruthy();

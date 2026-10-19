@@ -23,3 +23,14 @@ queries:
       graphql:
         field: postBySlug
     handler: true
+  recent:
+    description: Records newest-edited first, optionally of one publication status, under read policies.
+    args:
+      status: { type: PublicationStatus, nullable: true }
+    returns:
+      type: Post
+      cardinality: many
+    integrations:
+      graphql:
+        field: recentPosts
+    handler: true

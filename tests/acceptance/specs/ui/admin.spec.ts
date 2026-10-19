@@ -27,10 +27,10 @@ test.afterAll(async () => {
   await api.dispose();
 });
 
-// Posts are written as rich text (ui/editor.spec.ts); their Markdown mode is the plain
+// Content is written as rich text (ui/editor.spec.ts); its Markdown mode is the plain
 // Content textarea these tests type raw Markdown into.
-const markdownSource = async (page: Page, kind: Kind): Promise<void> => {
-  if (kind === 'Post') await page.getByRole('radio', { name: 'Markdown' }).click();
+const markdownSource = async (page: Page, _kind: Kind): Promise<void> => {
+  await page.getByRole('radio', { name: 'Markdown' }).click();
 };
 
 const idFromUrl = (page: Page, kind: Kind): string => {

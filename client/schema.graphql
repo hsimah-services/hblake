@@ -25,6 +25,10 @@ type RootQuery {
   pages(first: Int, after: String, last: Int, before: String): RootQueryToPageConnection
   posts(first: Int, after: String, last: Int, before: String): RootQueryToPostConnection
   products(first: Int, after: String, last: Int, before: String): RootQueryToProductConnection
+  placedPages(first: Int, after: String, last: Int, before: String, where: RootQueryToPlacedPagesConnectionWhereArgs): RootQueryToPlacedPagesConnection
+  recentPages(first: Int, after: String, last: Int, before: String, where: RootQueryToRecentPagesConnectionWhereArgs): RootQueryToRecentPagesConnection
+  recentPosts(first: Int, after: String, last: Int, before: String, where: RootQueryToRecentPostsConnectionWhereArgs): RootQueryToRecentPostsConnection
+  recentProducts(first: Int, after: String, last: Int, before: String, where: RootQueryToRecentProductsConnectionWhereArgs): RootQueryToRecentProductsConnection
   node(id: ID!): Node
   viewer: Viewer
   adminUser(id: ID!): AdminUser
@@ -37,6 +41,14 @@ interface Node {
 enum PublicationStatus {
   DRAFT
   PUBLISHED
+}
+
+enum PageAccent {
+  INK
+  GREEN
+  ORANGE
+  BLUE
+  BERRY
 }
 
 enum UserRole {
@@ -102,6 +114,21 @@ type Page implements Node {
 
   ""
   updatedAt: String!
+
+  ""
+  showInNavigation: Boolean!
+
+  ""
+  navigationOrder: Int!
+
+  ""
+  featureOnHome: Boolean!
+
+  ""
+  homeOrder: Int!
+
+  ""
+  accent: PageAccent!
 }
 
 "Consulting article or business update."
@@ -211,6 +238,78 @@ type RootQueryToProductConnection {
   totalCount: Int
 }
 
+type RootQueryToPlacedPagesConnectionEdge {
+  cursor: String
+  node: Page
+}
+
+type RootQueryToPlacedPagesConnection {
+  nodes: [Page]
+  edges: [RootQueryToPlacedPagesConnectionEdge]
+  pageInfo: PageInfo!
+
+  "How many match, ignoring pagination."
+  totalCount: Int
+}
+
+input RootQueryToPlacedPagesConnectionWhereArgs {
+  home: Boolean!
+}
+
+type RootQueryToRecentPagesConnectionEdge {
+  cursor: String
+  node: Page
+}
+
+type RootQueryToRecentPagesConnection {
+  nodes: [Page]
+  edges: [RootQueryToRecentPagesConnectionEdge]
+  pageInfo: PageInfo!
+
+  "How many match, ignoring pagination."
+  totalCount: Int
+}
+
+input RootQueryToRecentPagesConnectionWhereArgs {
+  status: PublicationStatus
+}
+
+type RootQueryToRecentPostsConnectionEdge {
+  cursor: String
+  node: Post
+}
+
+type RootQueryToRecentPostsConnection {
+  nodes: [Post]
+  edges: [RootQueryToRecentPostsConnectionEdge]
+  pageInfo: PageInfo!
+
+  "How many match, ignoring pagination."
+  totalCount: Int
+}
+
+input RootQueryToRecentPostsConnectionWhereArgs {
+  status: PublicationStatus
+}
+
+type RootQueryToRecentProductsConnectionEdge {
+  cursor: String
+  node: Product
+}
+
+type RootQueryToRecentProductsConnection {
+  nodes: [Product]
+  edges: [RootQueryToRecentProductsConnectionEdge]
+  pageInfo: PageInfo!
+
+  "How many match, ignoring pagination."
+  totalCount: Int
+}
+
+input RootQueryToRecentProductsConnectionWhereArgs {
+  status: PublicationStatus
+}
+
 input CreatePageInput {
   title: String!
   slug: String!
@@ -218,6 +317,11 @@ input CreatePageInput {
   excerpt: String
   status: PublicationStatus
   publishedAt: String
+  showInNavigation: Boolean
+  navigationOrder: Int
+  featureOnHome: Boolean
+  homeOrder: Int
+  accent: PageAccent
   clientMutationId: String
 }
 
@@ -355,6 +459,11 @@ input UpdatePageInput {
   excerpt: String
   status: PublicationStatus
   publishedAt: String
+  showInNavigation: Boolean
+  navigationOrder: Int
+  featureOnHome: Boolean
+  homeOrder: Int
+  accent: PageAccent
   clientMutationId: String
 }
 

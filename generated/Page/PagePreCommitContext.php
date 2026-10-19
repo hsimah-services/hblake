@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Page/PagePreCommitContext.php
- * digest: sha256:5af2e1ee4bc8c740d292c98cdb435e45baf323509abfcbac435565f308a26c6e
+ * digest: sha256:7a6468391238e964d34c8ed78972c075e9eab559751d60de0256a62a50f5316b
  */
 
 namespace Hsimah\Entity\Page;
@@ -19,6 +19,7 @@ use Eleph\Runtime\Identity\Identifier;
 use Eleph\Runtime\Mutation\ActionCall;
 use Eleph\Runtime\Mutation\EdgeMutation;
 use Eleph\Runtime\Mutation\MutableMutationContext;
+use Hsimah\Entity\Enum\PageAccent;
 use Hsimah\Entity\Enum\PublicationStatus;
 
 /**
@@ -106,6 +107,36 @@ final readonly class PagePreCommitContext implements MutableMutationContext
         DateTimeImmutable $value,
     ): void {
         $this->context->set('updatedAt', $value);
+    }
+
+    public function setShowInNavigation(
+        bool $value,
+    ): void {
+        $this->context->set('showInNavigation', $value);
+    }
+
+    public function setNavigationOrder(
+        int $value,
+    ): void {
+        $this->context->set('navigationOrder', $value);
+    }
+
+    public function setFeatureOnHome(
+        bool $value,
+    ): void {
+        $this->context->set('featureOnHome', $value);
+    }
+
+    public function setHomeOrder(
+        int $value,
+    ): void {
+        $this->context->set('homeOrder', $value);
+    }
+
+    public function setAccent(
+        PageAccent $value,
+    ): void {
+        $this->context->set('accent', $value);
     }
 
     public function id(): Identifier {
@@ -268,6 +299,76 @@ final readonly class PagePreCommitContext implements MutableMutationContext
     public function pendingUpdatedAt(): ?DateTimeImmutable {
         $value = $this->context->pending('updatedAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
+
+        return $value;
+    }
+
+    public function originalShowInNavigation(): ?bool {
+        $value = $this->context->original('showInNavigation');
+        assert(null === $value || is_bool($value));
+
+        return $value;
+    }
+
+    public function pendingShowInNavigation(): ?bool {
+        $value = $this->context->pending('showInNavigation');
+        assert(null === $value || is_bool($value));
+
+        return $value;
+    }
+
+    public function originalNavigationOrder(): ?int {
+        $value = $this->context->original('navigationOrder');
+        assert(null === $value || is_int($value));
+
+        return $value;
+    }
+
+    public function pendingNavigationOrder(): ?int {
+        $value = $this->context->pending('navigationOrder');
+        assert(null === $value || is_int($value));
+
+        return $value;
+    }
+
+    public function originalFeatureOnHome(): ?bool {
+        $value = $this->context->original('featureOnHome');
+        assert(null === $value || is_bool($value));
+
+        return $value;
+    }
+
+    public function pendingFeatureOnHome(): ?bool {
+        $value = $this->context->pending('featureOnHome');
+        assert(null === $value || is_bool($value));
+
+        return $value;
+    }
+
+    public function originalHomeOrder(): ?int {
+        $value = $this->context->original('homeOrder');
+        assert(null === $value || is_int($value));
+
+        return $value;
+    }
+
+    public function pendingHomeOrder(): ?int {
+        $value = $this->context->pending('homeOrder');
+        assert(null === $value || is_int($value));
+
+        return $value;
+    }
+
+    public function originalAccent(): ?PageAccent {
+        $value = $this->context->original('accent');
+        assert(null === $value || $value instanceof PageAccent);
+
+        return $value;
+    }
+
+    public function pendingAccent(): ?PageAccent {
+        $value = $this->context->pending('accent');
+        assert(null === $value || $value instanceof PageAccent);
 
         return $value;
     }

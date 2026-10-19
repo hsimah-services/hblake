@@ -7,7 +7,7 @@ final class SiteContent {
     public static function replace(App $app): void {
         $source=file_get_contents(dirname(__DIR__,2).'/content/pages.json');
         if ($source===false) throw new \RuntimeException('Could not read site content.');
-        /** @var list<array{title:string,slug:string,excerpt:string,content:string}> $pages */
+        /** @var list<array<string,mixed>> $pages Content fields plus page placement (#13). */
         $pages=json_decode($source,true,512,JSON_THROW_ON_ERROR);
         $app->db->transaction(function() use($app,$pages): void {
             foreach (['hsimah_post','hsimah_product','hsimah_page'] as $table) $app->db->execute('DELETE FROM '.$table);
