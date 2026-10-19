@@ -46,6 +46,8 @@ final readonly class App {
         $c->set(\Hsimah\Entity\Page\Contract\PageDefaultItemKindVerifier::class, $kind);
         $c->set(\Hsimah\Entity\PageItem\Contract\PageItemKindVerifier::class, $kind);
         $c->set(\Hsimah\Entity\PageItem\Contract\PageItemEnquiryUrlVerifier::class, new EnquiryUrlVerifier());
+        $c->set(\Hsimah\Entity\PageItem\Contract\PageItemImageUrlVerifier::class, new ImageVerifier('url'));
+        $c->set(\Hsimah\Entity\PageItem\Contract\PageItemImageAltVerifier::class, new ImageVerifier('alt'));
         $c->set(\Hsimah\Entity\PageItem\Contract\PageItemOfPageQuery::class, new PageItemOfPage($runtime));
         $placement = new PagePlacement();
         $c->set(\Hsimah\Entity\Page\Contract\PageAccentVerifier::class, $placement);

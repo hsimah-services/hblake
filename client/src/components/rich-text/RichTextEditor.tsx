@@ -10,9 +10,11 @@ import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/Segme
 import { FileInput } from '@astryxdesign/core/FileInput';
 import { Button, Heading, IconButton, Stack, Text, TextArea, TextInput } from '@astryxdesign/core';
 import * as stylex from '@stylexjs/stylex';
+import { uploadImage } from '../../uploadImage';
 
 const IMAGE_TYPES = 'image/png,image/jpeg,image/webp';
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+
 
 /**
  * Markdown content edited as rich text (Tiptap), with a Markdown source mode that is a
@@ -188,15 +190,6 @@ function useImageForm(isOpen: boolean, onInsert: (src: string, alt: string) => v
     finally { setPending(false); }
   }
   return { file, alt, setAlt, error, pending, missingAlt, submit, setFile: (value: File | File[] | null) => { setFileState(Array.isArray(value) ? value[0] ?? null : value); } };
-}
-
-async function uploadImage(file: File): Promise<string> {
-  const csrf = await fetch('/auth/csrf', { credentials: 'same-origin', cache: 'no-store' }).then(response => response.json() as Promise<{ token: string }>);
-  const body = new FormData(); body.append('image', file);
-  const response = await fetch('/media', { method: 'POST', credentials: 'same-origin', headers: { 'X-CSRF-Token': csrf.token }, body });
-  const result = await response.json().catch(() => null) as { url?: unknown; error?: unknown } | null;
-  if (!response.ok || typeof result?.url !== 'string') throw new Error(typeof result?.error === 'string' ? result.error : 'The image could not be uploaded.');
-  return result.url;
 }
 
 function useModal(isOpen: boolean, onClose: () => void) {

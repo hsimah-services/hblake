@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 import { Api, expectRejected } from '../../lib/api.ts';
 import { KINDS, RESERVED_SLUGS, byId, bySlug, create, createOk, defaults, update, updateOk, uniqueSlug } from '../../lib/content.ts';
 import { RUN_ID } from '../../lib/env.ts';
+import { PNG, upload } from '../../lib/media.ts';
 
 // Field rules from website.md and Product.md (acceptance 6). Every rejection must also
 // leave storage untouched.
@@ -187,6 +188,36 @@ test.describe('Item enquiry URLs (shown for Products)', () => {
     expect(without.enquiryUrl).toBeNull();
     const withUrl = await createOk(api, 'Product', { enquiryUrl: 'https://example.com/x' });
     expect((await updateOk(api, 'Product', withUrl.id, { enquiryUrl: null })).enquiryUrl).toBeNull();
+  });
+});
+
+test.describe('item image', () => {
+  async function stored(): Promise<string> {
+    const response = await upload(api, { name: 'a.png', mimeType: 'image/png', buffer: PNG });
+    return (await response.json() as { url: string }).url;
+  }
+
+  test('an uploaded image with alt text is accepted and can be cleared', async () => {
+    const imageUrl = await stored();
+    const row = await createOk(api, 'Product', { imageUrl, imageAlt: 'A black square' });
+    expect(row).toMatchObject({ imageUrl, imageAlt: 'A black square' });
+    const cleared = await updateOk(api, 'Product', row.id, { imageUrl: null, imageAlt: null });
+    expect(cleared).toMatchObject({ imageUrl: null, imageAlt: null });
+    expect(await createOk(api, 'Product')).toMatchObject({ imageUrl: null, imageAlt: null });
+  });
+
+  test('alt text is required and only stored uploads are accepted', async () => {
+    const imageUrl = await stored();
+    const cases: Array<Record<string, unknown>> = [
+      { imageUrl }, { imageUrl, imageAlt: '   ' },
+      { imageUrl: 'https://example.com/a.png', imageAlt: 'x' }, { imageUrl: '/media/../etc/passwd', imageAlt: 'x' },
+      { imageUrl: 'javascript:alert(1)', imageAlt: 'x' }, { imageUrl: `/media/${'a'.repeat(32)}.svg`, imageAlt: 'x' },
+    ];
+    for (const overrides of cases) {
+      const input = defaults('Product', overrides);
+      expectRejected(await create(api, 'Product', input), `image ${JSON.stringify(overrides).slice(0, 80)}`);
+      expect(await bySlug(api, 'Product', input.slug as string)).toBeNull();
+    }
   });
 });
 

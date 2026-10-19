@@ -1,6 +1,6 @@
 /**
- * @generated SignedSource<<349f247546279f3b00762ba942e6c292>>
- * @relayHash 8f1a8f3a63833514bcb75fec7b71c5d7
+ * @generated SignedSource<<092bc52cb20d38fe9fd5d035978c5bae>>
+ * @relayHash 9807e453222d7c25398a8cbe3925f9b6
  * @lightSyntaxTransform
  */
 
@@ -8,7 +8,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-// @relayRequestID 8f1a8f3a63833514bcb75fec7b71c5d7
+// @relayRequestID 9807e453222d7c25398a8cbe3925f9b6
 
 import { ConcreteRequest } from 'relay-runtime';
 export type PublicationStatus = "DRAFT" | "PUBLISHED" | "%future added value";
@@ -27,6 +27,8 @@ export type AdminPageItemPublishMutation$data = {
       readonly enquiryUrl: string | null | undefined;
       readonly excerpt: string;
       readonly id: string;
+      readonly imageAlt: string | null | undefined;
+      readonly imageUrl: string | null | undefined;
       readonly kind: string;
       readonly publishedAt: string | null | undefined;
       readonly slug: string;
@@ -148,6 +150,20 @@ v1 = [
             "kind": "ScalarField",
             "name": "enquiryUrl",
             "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "imageUrl",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "imageAlt",
+            "storageKey": null
           }
         ],
         "storageKey": null
@@ -174,16 +190,16 @@ return {
     "selections": (v1/*:: as any*/)
   },
   "params": {
-    "cacheID": "8f1a8f3a63833514bcb75fec7b71c5d7",
-    "id": "8f1a8f3a63833514bcb75fec7b71c5d7",
+    "cacheID": "9807e453222d7c25398a8cbe3925f9b6",
+    "id": "9807e453222d7c25398a8cbe3925f9b6",
     "metadata": {},
     "name": "AdminPageItemPublishMutation",
     "operationKind": "mutation",
-    "text": "mutation AdminPageItemPublishMutation(\n  $input: PublishPageItemInput!\n) {\n  publishPageItem(input: $input) {\n    pageItem {\n      id\n      title\n      slug\n      content\n      excerpt\n      status\n      publishedAt\n      createdAt\n      updatedAt\n      kind\n      enquiryUrl\n    }\n  }\n}\n"
+    "text": "mutation AdminPageItemPublishMutation(\n  $input: PublishPageItemInput!\n) {\n  publishPageItem(input: $input) {\n    pageItem {\n      id\n      title\n      slug\n      content\n      excerpt\n      status\n      publishedAt\n      createdAt\n      updatedAt\n      kind\n      enquiryUrl\n      imageUrl\n      imageAlt\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "94a92f5ac161e571fef4ac803c27b269";
+(node as any).hash = "2ae97b785981a51e3f522c76624de183";
 
 export default node;

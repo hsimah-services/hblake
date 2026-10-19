@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Wiring.php
- * digest: sha256:8a3d5f2e1ce37cc21ef450bf451789e820e8fe89c73f060d6eaab2689ef83a7b
+ * digest: sha256:2add6c334d95d26cfbf16b4bd52de2705b646ab0095e53919334f14eb6999a13
  */
 
 namespace Hsimah\Entity;
@@ -19,6 +19,8 @@ use Eleph\Runtime\Query\ValueDecoder;
 use Hsimah\Entity\PageItem\Contract\PageItemBySlugQuery;
 use Hsimah\Entity\PageItem\Contract\PageItemContentVerifier;
 use Hsimah\Entity\PageItem\Contract\PageItemEnquiryUrlVerifier;
+use Hsimah\Entity\PageItem\Contract\PageItemImageAltVerifier;
+use Hsimah\Entity\PageItem\Contract\PageItemImageUrlVerifier;
 use Hsimah\Entity\PageItem\Contract\PageItemKindVerifier;
 use Hsimah\Entity\PageItem\Contract\PageItemOfPageQuery;
 use Hsimah\Entity\PageItem\Contract\PageItemPublishedAtVerifier;
@@ -89,7 +91,7 @@ final class Wiring
             PageItemHydrator::class => static fn (ContainerInterface $c): object => new PageItemHydrator(self::resolve($c, ValueDecoder::class)),
             PageItemInput::class => static fn (ContainerInterface $c): object => new PageItemInput(self::resolve($c, ValueDecoder::class)),
             PageItemSideEffects::class => static fn (ContainerInterface $c): object => new PageItemSideEffects(),
-            PageItemVerifiers::class => static fn (ContainerInterface $c): object => new PageItemVerifiers(self::resolve($c, PageItemTitleVerifier::class), self::resolve($c, PageItemSlugVerifier::class), self::resolve($c, PageItemContentVerifier::class), self::resolve($c, PageItemStatusVerifier::class), self::resolve($c, PageItemPublishedAtVerifier::class), self::resolve($c, PageItemKindVerifier::class), self::resolve($c, PageItemEnquiryUrlVerifier::class)),
+            PageItemVerifiers::class => static fn (ContainerInterface $c): object => new PageItemVerifiers(self::resolve($c, PageItemTitleVerifier::class), self::resolve($c, PageItemSlugVerifier::class), self::resolve($c, PageItemContentVerifier::class), self::resolve($c, PageItemStatusVerifier::class), self::resolve($c, PageItemPublishedAtVerifier::class), self::resolve($c, PageItemKindVerifier::class), self::resolve($c, PageItemEnquiryUrlVerifier::class), self::resolve($c, PageItemImageUrlVerifier::class), self::resolve($c, PageItemImageAltVerifier::class)),
             PageItemReadPolicies::class => static fn (ContainerInterface $c): object => new PageItemReadPolicies(self::resolve($c, PublishableContentVisibilityReadPolicy::class)),
             PageItemWritePolicies::class => static fn (ContainerInterface $c): object => new PageItemWritePolicies(self::resolve($c, PublishableContentStaffWritePolicy::class)),
             PageItemFinder::class => static fn (ContainerInterface $c): object => new PageItemFinder(self::resolve($c, PageItemBySlugQuery::class), self::resolve($c, PageItemOfPageQuery::class), self::resolve($c, PageItemRecentQuery::class)),

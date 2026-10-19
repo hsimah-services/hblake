@@ -46,6 +46,10 @@ final class Rules {
             || str_starts_with($value, 'mailto:') && filter_var(substr($value, 7), FILTER_VALIDATE_EMAIL) !== false);
         return self::check($valid, 'Use a valid HTTPS URL or mailto email address.');
     }
+    /** An uploaded image kept by Media (/media/<32 hex>.<ext>), with nonblank alt text. */
+    public static function image(string $url, ?string $alt): Verification {
+        return self::check(preg_match('#^/media/[a-f0-9]{32}\.(png|jpg|webp)$#D', $url) === 1 && $alt !== null && trim($alt) !== '', 'Use an image uploaded through the editor, with alt text.');
+    }
     public static function username(string $value): Verification {
         return self::check(preg_match('/^[a-z0-9][a-z0-9._-]{2,31}$/D', $value) === 1, 'Use 3–32 lowercase letters, digits, dots, hyphens or underscores, starting with a letter or digit.');
     }

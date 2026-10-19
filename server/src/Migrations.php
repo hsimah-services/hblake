@@ -12,7 +12,7 @@ use Eleph\SQLite\Database;
 final class Migrations {
     /** @return array<string, callable(Database): void> */
     private static function all(): array {
-        return ['0001-page-placement' => self::pagePlacement(...), '0002-page-items' => self::pageItems(...)];
+        return ['0001-page-placement' => self::pagePlacement(...), '0002-page-items' => self::pageItems(...), '0003-page-item-image' => self::pageItemImage(...)];
     }
 
     public static function markAllApplied(Database $db): void {
@@ -64,6 +64,11 @@ final class Migrations {
         if (!in_array('default_item_kind',self::columns($db->pdo,'hsimah_page'),true)) self::rebuild($db,'hsimah_page',['default_item_kind'=>'NULL','author_id'=>'NULL']);
         if (self::columns($db->pdo,'hsimah_page_item')===[]) foreach (self::generatedDefinition('hsimah_page_item') as $sql) $db->pdo->exec($sql);
         foreach (['hsimah_post','hsimah_product'] as $table) $db->pdo->exec('DROP TABLE IF EXISTS '.$table);
+    }
+
+    /** Optional image and alt text on each item. */
+    private static function pageItemImage(Database $db): void {
+        if (!in_array('image_url',self::columns($db->pdo,'hsimah_page_item'),true)) self::rebuild($db,'hsimah_page_item',['image_url'=>'NULL','image_alt'=>'NULL']);
     }
 
     /** @return list<string> the generated table statement, then its indexes */

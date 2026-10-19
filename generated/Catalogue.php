@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Catalogue.php
- * digest: sha256:f154f71872202dc07ab4d881332533d99782d0678538da31522a51a06bb1b5bc
+ * digest: sha256:435332f33b67ba41ba1c9d932b9e622e184b381e185bebb4048bae8e1cb4065e
  */
 
 namespace Hsimah\Entity;
@@ -219,7 +219,7 @@ final readonly class Catalogue implements EntityCatalogue
     ): array {
         return match ($entity) {
             'Page' => ['title', 'slug', 'content', 'excerpt', 'status', 'publishedAt', 'createdAt', 'updatedAt', 'defaultItemKind', 'showInNavigation', 'navigationOrder', 'featureOnHome', 'homeOrder', 'accent'],
-            'PageItem' => ['title', 'slug', 'content', 'excerpt', 'status', 'publishedAt', 'createdAt', 'updatedAt', 'kind', 'enquiryUrl'],
+            'PageItem' => ['title', 'slug', 'content', 'excerpt', 'status', 'publishedAt', 'createdAt', 'updatedAt', 'kind', 'enquiryUrl', 'imageUrl', 'imageAlt'],
             'User' => ['createdAt', 'updatedAt', 'username', 'displayName', 'role', 'active'],
             default => [],
         };
@@ -457,7 +457,7 @@ final readonly class Catalogue implements EntityCatalogue
      * @return list<string>
      */
     public function contracts(): array {
-        return ['Hsimah\\Entity\\PageItem\\Contract\\PageItemBySlugQuery', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemContentVerifier', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemEnquiryUrlVerifier', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemKindVerifier', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemOfPageQuery', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemPublishAction', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemPublishedAtVerifier', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemRecentQuery', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemSlugVerifier', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemStatusVerifier', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemTitleVerifier', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemUnpublishAction', 'Hsimah\\Entity\\Page\\Contract\\PageAccentVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageBySlugQuery', 'Hsimah\\Entity\\Page\\Contract\\PageContentVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageDefaultItemKindVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageHomeOrderVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageNavigationOrderVerifier', 'Hsimah\\Entity\\Page\\Contract\\PagePlacedQuery', 'Hsimah\\Entity\\Page\\Contract\\PagePublishAction', 'Hsimah\\Entity\\Page\\Contract\\PagePublishedAtVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageRecentQuery', 'Hsimah\\Entity\\Page\\Contract\\PageSlugVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageStatusVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageTitleVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageUnpublishAction', 'Hsimah\\Entity\\Pattern\\Publishable\\Contract\\PublishableContentStaffWritePolicy', 'Hsimah\\Entity\\Pattern\\Publishable\\Contract\\PublishableContentVisibilityReadPolicy', 'Hsimah\\Entity\\User\\Contract\\UserAdminAccountsWritePolicy', 'Hsimah\\Entity\\User\\Contract\\UserDisplayNameVerifier', 'Hsimah\\Entity\\User\\Contract\\UserStaffProfileReadPolicy', 'Hsimah\\Entity\\User\\Contract\\UserUsernameVerifier'];
+        return ['Hsimah\\Entity\\PageItem\\Contract\\PageItemBySlugQuery', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemContentVerifier', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemEnquiryUrlVerifier', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemImageAltVerifier', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemImageUrlVerifier', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemKindVerifier', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemOfPageQuery', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemPublishAction', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemPublishedAtVerifier', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemRecentQuery', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemSlugVerifier', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemStatusVerifier', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemTitleVerifier', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemUnpublishAction', 'Hsimah\\Entity\\Page\\Contract\\PageAccentVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageBySlugQuery', 'Hsimah\\Entity\\Page\\Contract\\PageContentVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageDefaultItemKindVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageHomeOrderVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageNavigationOrderVerifier', 'Hsimah\\Entity\\Page\\Contract\\PagePlacedQuery', 'Hsimah\\Entity\\Page\\Contract\\PagePublishAction', 'Hsimah\\Entity\\Page\\Contract\\PagePublishedAtVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageRecentQuery', 'Hsimah\\Entity\\Page\\Contract\\PageSlugVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageStatusVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageTitleVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageUnpublishAction', 'Hsimah\\Entity\\Pattern\\Publishable\\Contract\\PublishableContentStaffWritePolicy', 'Hsimah\\Entity\\Pattern\\Publishable\\Contract\\PublishableContentVisibilityReadPolicy', 'Hsimah\\Entity\\User\\Contract\\UserAdminAccountsWritePolicy', 'Hsimah\\Entity\\User\\Contract\\UserDisplayNameVerifier', 'Hsimah\\Entity\\User\\Contract\\UserStaffProfileReadPolicy', 'Hsimah\\Entity\\User\\Contract\\UserUsernameVerifier'];
     }
 
     /**

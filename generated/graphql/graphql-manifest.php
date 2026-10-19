@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   graphql-manifest.php
- * digest: sha256:88e54d8ecdd98e37c59c3ed76ea4817cae5f0ea484f3391d954126d35ed8ee7e
+ * digest: sha256:16890cc177547eec06a31ccccabec40203ea495fa4f75c4f648db3ca9fcdd38d
  */
 
 namespace Eleph\GraphQL\Manifest;
@@ -65,6 +65,8 @@ return new Manifest(
                 'updatedAt' => new FieldEntry('updatedAt', new GraphQLType('String', true, false), 'getUpdatedAt', null, FieldEncoding::Datetime, null),
                 'kind' => new FieldEntry('kind', new GraphQLType('String', true, false), 'getKind', null, FieldEncoding::Value, null),
                 'enquiryUrl' => new FieldEntry('enquiryUrl', new GraphQLType('String', false, false), 'getEnquiryUrl', null, FieldEncoding::Value, null),
+                'imageUrl' => new FieldEntry('imageUrl', new GraphQLType('String', false, false), 'getImageUrl', null, FieldEncoding::Value, null),
+                'imageAlt' => new FieldEntry('imageAlt', new GraphQLType('String', false, false), 'getImageAlt', null, FieldEncoding::Value, null),
                 'page' => new FieldEntry('page', new GraphQLType('Page', false, false), 'getPage', 'The page this item belongs to.', FieldEncoding::Value, null),
             ],
             [],
@@ -112,6 +114,8 @@ return new Manifest(
                 'publishedAt' => new GraphQLType('String', false, false),
                 'kind' => new GraphQLType('String', false, false),
                 'enquiryUrl' => new GraphQLType('String', false, false),
+                'imageUrl' => new GraphQLType('String', false, false),
+                'imageAlt' => new GraphQLType('String', false, false),
                 'page' => new GraphQLType('ID', false, false),
             ],
             null,
@@ -193,6 +197,8 @@ return new Manifest(
                 'publishedAt' => new GraphQLType('String', false, false),
                 'kind' => new GraphQLType('String', false, false),
                 'enquiryUrl' => new GraphQLType('String', false, false),
+                'imageUrl' => new GraphQLType('String', false, false),
+                'imageAlt' => new GraphQLType('String', false, false),
                 'page' => new GraphQLType('ID', false, false),
             ],
             null,

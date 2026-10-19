@@ -162,6 +162,12 @@ type PageItem implements Node {
   ""
   enquiryUrl: String
 
+  ""
+  imageUrl: String
+
+  ""
+  imageAlt: String
+
   "The page this item belongs to."
   page: Page
 
@@ -313,6 +319,8 @@ input CreatePageItemInput {
   publishedAt: String
   kind: String
   enquiryUrl: String
+  imageUrl: String
+  imageAlt: String
   page: ID
   clientMutationId: String
 }
@@ -414,6 +422,8 @@ input UpdatePageItemInput {
   publishedAt: String
   kind: String
   enquiryUrl: String
+  imageUrl: String
+  imageAlt: String
   page: ID
   clientMutationId: String
 }

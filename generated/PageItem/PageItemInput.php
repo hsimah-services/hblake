@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   PageItem/PageItemInput.php
- * digest: sha256:0830def7dc8f04413348daf4a137fb9c2a0e2df7fc54ec50b0b77141d7c7fb81
+ * digest: sha256:6f793bd5070d6db51e2ff1a2c01520934c3dc670aa0d4742703c307fb2c1627c
  */
 
 namespace Hsimah\Entity\PageItem;
@@ -112,6 +112,26 @@ final readonly class PageItemInput
         return $this->decode->string($value, 'PageItem.enquiryUrl');
     }
 
+    private function imageUrl(
+        mixed $value,
+    ): ?string {
+        if (null === $value) {
+            return null;
+        }
+
+        return $this->decode->string($value, 'PageItem.imageUrl');
+    }
+
+    private function imageAlt(
+        mixed $value,
+    ): ?string {
+        if (null === $value) {
+            return null;
+        }
+
+        return $this->decode->string($value, 'PageItem.imageAlt');
+    }
+
     /**
      * @return list<Identifier>
      */
@@ -190,6 +210,14 @@ final readonly class PageItemInput
 
         if (array_key_exists('enquiryUrl', $input)) {
             $buffer->set('enquiryUrl', $this->enquiryUrl($input['enquiryUrl']));
+        }
+
+        if (array_key_exists('imageUrl', $input)) {
+            $buffer->set('imageUrl', $this->imageUrl($input['imageUrl']));
+        }
+
+        if (array_key_exists('imageAlt', $input)) {
+            $buffer->set('imageAlt', $this->imageAlt($input['imageAlt']));
         }
 
         if (array_key_exists('author', $input)) {

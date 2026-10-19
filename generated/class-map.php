@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   class-map.php
- * digest: sha256:56076a87e53152f83de8d527bb6178904766db4f9eb4311804614a6204c4b34e
+ * digest: sha256:80f697675ddd46387f1bbd0fe252a64f0629b5fcd020901d8da28afe726d634d
  */
 
 return [
@@ -26,6 +26,8 @@ return [
         'Hsimah\\Entity\\PageItem\\Contract\\PageItemBySlugQuery' => 'PageItem/Contract/PageItemBySlugQuery.php',
         'Hsimah\\Entity\\PageItem\\Contract\\PageItemContentVerifier' => 'PageItem/Contract/PageItemContentVerifier.php',
         'Hsimah\\Entity\\PageItem\\Contract\\PageItemEnquiryUrlVerifier' => 'PageItem/Contract/PageItemEnquiryUrlVerifier.php',
+        'Hsimah\\Entity\\PageItem\\Contract\\PageItemImageAltVerifier' => 'PageItem/Contract/PageItemImageAltVerifier.php',
+        'Hsimah\\Entity\\PageItem\\Contract\\PageItemImageUrlVerifier' => 'PageItem/Contract/PageItemImageUrlVerifier.php',
         'Hsimah\\Entity\\PageItem\\Contract\\PageItemKindVerifier' => 'PageItem/Contract/PageItemKindVerifier.php',
         'Hsimah\\Entity\\PageItem\\Contract\\PageItemOfPageQuery' => 'PageItem/Contract/PageItemOfPageQuery.php',
         'Hsimah\\Entity\\PageItem\\Contract\\PageItemPublishAction' => 'PageItem/Contract/PageItemPublishAction.php',

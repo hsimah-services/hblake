@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   PageItem/PageItemMutationContext.php
- * digest: sha256:6d8c2f8431626d29de0247c8db4b21d5f8f6b60330b42b8285a7a4ab6ef864c6
+ * digest: sha256:f2da8f0044fad886ab695d4710cbf63d0b2cbb874c6e8be0385402c6a8e2b1a8
  */
 
 namespace Hsimah\Entity\PageItem;
@@ -229,6 +229,34 @@ final readonly class PageItemMutationContext implements MutationContext
 
     public function pendingEnquiryUrl(): ?string {
         $value = $this->context->pending('enquiryUrl');
+        assert(null === $value || is_string($value));
+
+        return $value;
+    }
+
+    public function originalImageUrl(): ?string {
+        $value = $this->context->original('imageUrl');
+        assert(null === $value || is_string($value));
+
+        return $value;
+    }
+
+    public function pendingImageUrl(): ?string {
+        $value = $this->context->pending('imageUrl');
+        assert(null === $value || is_string($value));
+
+        return $value;
+    }
+
+    public function originalImageAlt(): ?string {
+        $value = $this->context->original('imageAlt');
+        assert(null === $value || is_string($value));
+
+        return $value;
+    }
+
+    public function pendingImageAlt(): ?string {
+        $value = $this->context->pending('imageAlt');
         assert(null === $value || is_string($value));
 
         return $value;

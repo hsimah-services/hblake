@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   PageItem/PageItemWriteContext.php
- * digest: sha256:5827c8c32ff02bc8782a0d32f3a42d0f8f813e00b5916b187346aceed0572f51
+ * digest: sha256:4a45cf592cc5a7a99d9b9bdb3c28a87529e9e9667260249b1fa3061bec44580f
  */
 
 namespace Hsimah\Entity\PageItem;
@@ -197,6 +197,34 @@ final readonly class PageItemWriteContext implements WriteContext
 
     public function pendingEnquiryUrl(): ?string {
         $value = $this->context->mutation()?->pending('enquiryUrl');
+        assert(null === $value || is_string($value));
+
+        return $value;
+    }
+
+    public function originalImageUrl(): ?string {
+        $value = $this->context->mutation()?->original('imageUrl');
+        assert(null === $value || is_string($value));
+
+        return $value;
+    }
+
+    public function pendingImageUrl(): ?string {
+        $value = $this->context->mutation()?->pending('imageUrl');
+        assert(null === $value || is_string($value));
+
+        return $value;
+    }
+
+    public function originalImageAlt(): ?string {
+        $value = $this->context->mutation()?->original('imageAlt');
+        assert(null === $value || is_string($value));
+
+        return $value;
+    }
+
+    public function pendingImageAlt(): ?string {
+        $value = $this->context->mutation()?->pending('imageAlt');
         assert(null === $value || is_string($value));
 
         return $value;

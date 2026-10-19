@@ -1,6 +1,6 @@
 /**
- * @generated SignedSource<<b7aebed92f8e8be78e050500432cde6d>>
- * @relayHash 1f85b6eb41b03cb93957d826f256e727
+ * @generated SignedSource<<34680df8777bd1b8d588617f869a73ac>>
+ * @relayHash 1b45f6ce09e4d321ea0010a75c8ebfb7
  * @lightSyntaxTransform
  */
 
@@ -8,7 +8,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-// @relayRequestID 1f85b6eb41b03cb93957d826f256e727
+// @relayRequestID 1b45f6ce09e4d321ea0010a75c8ebfb7
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
@@ -38,6 +38,8 @@ export type PageQuery$data = {
       readonly content: string;
       readonly excerpt: string;
       readonly id: string;
+      readonly imageAlt: string | null | undefined;
+      readonly imageUrl: string | null | undefined;
       readonly publishedAt: string | null | undefined;
       readonly slug: string;
       readonly status: PublicationStatus;
@@ -210,6 +212,20 @@ v11 = {
         (v4/*:: as any*/),
         (v6/*:: as any*/),
         (v5/*:: as any*/),
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "imageUrl",
+          "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "imageAlt",
+          "storageKey": null
+        },
         (v7/*:: as any*/),
         (v8/*:: as any*/),
         {
@@ -355,16 +371,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "1f85b6eb41b03cb93957d826f256e727",
-    "id": "1f85b6eb41b03cb93957d826f256e727",
+    "cacheID": "1b45f6ce09e4d321ea0010a75c8ebfb7",
+    "id": "1b45f6ce09e4d321ea0010a75c8ebfb7",
     "metadata": {},
     "name": "PageQuery",
     "operationKind": "query",
-    "text": "query PageQuery(\n  $slug: String!\n  $after: String\n) {\n  ...LayoutFragment\n  pageBySlug(slug: $slug) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    defaultItemKind\n  }\n  pageItemsOfPage(where: {page: $slug}, first: 20, after: $after) {\n    nodes {\n      id\n      title\n      slug\n      excerpt\n      content\n      status\n      publishedAt\n      author {\n        displayName\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: placedPages(where: {home: false}, first: 100) {\n    nodes {\n      id\n      title\n      slug\n      accent\n    }\n  }\n}\n"
+    "text": "query PageQuery(\n  $slug: String!\n  $after: String\n) {\n  ...LayoutFragment\n  pageBySlug(slug: $slug) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    defaultItemKind\n  }\n  pageItemsOfPage(where: {page: $slug}, first: 20, after: $after) {\n    nodes {\n      id\n      title\n      slug\n      excerpt\n      content\n      imageUrl\n      imageAlt\n      status\n      publishedAt\n      author {\n        displayName\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: placedPages(where: {home: false}, first: 100) {\n    nodes {\n      id\n      title\n      slug\n      accent\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "cff41cad2d6ffa5400dc71f457ed6db6";
+(node as any).hash = "021f8ecdc8d9d9fb0b4ea4425378933a";
 
 export default node;

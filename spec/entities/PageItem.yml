@@ -20,6 +20,16 @@ fields:
     nullable: true
     maxLength: 2048
     verify: true
+  imageUrl:
+    type: string
+    nullable: true
+    maxLength: 100
+    verify: true
+  imageAlt:
+    type: string
+    nullable: true
+    maxLength: 300
+    verify: true
 queries:
   bySlug:
     description: Look up one item by exact canonical slug under read policies.

@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   storage-manifest.php
- * digest: sha256:0f351951341776dd09e1a78295b2d506c3558ac9d9e2460982374f8cac7c1da5
+ * digest: sha256:88c96896311eadfc19df4a40c1774ebaa16a9f550cf2278b4f7cd702c1fc91b2
  */
 
 namespace Eleph\SQLite\Manifest;
@@ -60,6 +60,8 @@ return new StorageManifest(
                 'updated_at' => new Column('updated_at', 'TEXT', false, false, null),
                 'kind' => new Column('kind', 'TEXT', false, false, null),
                 'enquiry_url' => new Column('enquiry_url', 'TEXT', true, false, null),
+                'image_url' => new Column('image_url', 'TEXT', true, false, null),
+                'image_alt' => new Column('image_alt', 'TEXT', true, false, null),
                 'author_id' => new Column('author_id', 'INTEGER', true, false, null),
                 'page_id' => new Column('page_id', 'INTEGER', true, false, null),
             ],
@@ -96,7 +98,7 @@ return new StorageManifest(
     ],
     columns: [
         'Page' => ['title' => 'title', 'slug' => 'slug', 'content' => 'content', 'excerpt' => 'excerpt', 'status' => 'status', 'publishedAt' => 'published_at', 'createdAt' => 'created_at', 'updatedAt' => 'updated_at', 'defaultItemKind' => 'default_item_kind', 'showInNavigation' => 'show_in_navigation', 'navigationOrder' => 'navigation_order', 'featureOnHome' => 'feature_on_home', 'homeOrder' => 'home_order', 'accent' => 'accent'],
-        'PageItem' => ['title' => 'title', 'slug' => 'slug', 'content' => 'content', 'excerpt' => 'excerpt', 'status' => 'status', 'publishedAt' => 'published_at', 'createdAt' => 'created_at', 'updatedAt' => 'updated_at', 'kind' => 'kind', 'enquiryUrl' => 'enquiry_url'],
+        'PageItem' => ['title' => 'title', 'slug' => 'slug', 'content' => 'content', 'excerpt' => 'excerpt', 'status' => 'status', 'publishedAt' => 'published_at', 'createdAt' => 'created_at', 'updatedAt' => 'updated_at', 'kind' => 'kind', 'enquiryUrl' => 'enquiry_url', 'imageUrl' => 'image_url', 'imageAlt' => 'image_alt'],
         'User' => ['createdAt' => 'created_at', 'updatedAt' => 'updated_at', 'username' => 'username', 'displayName' => 'display_name', 'role' => 'role', 'active' => 'active'],
     ],
     joinTables: [

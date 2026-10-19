@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   PageItem/PageItemMutator.php
- * digest: sha256:ab8ac374cc7cb9d3636b61115c6a87e32ee37da4a7318368bf2ab8fb0b80fe2c
+ * digest: sha256:df5872486a11b8b6b6c0d5d1a1b535105fa7678e940acbdd79fdae731f52980e
  */
 
 namespace Hsimah\Entity\PageItem;
@@ -97,6 +97,22 @@ final class PageItemMutator
         ?string $enquiryUrl,
     ): self {
         $this->buffer->set('enquiryUrl', $enquiryUrl);
+
+        return $this;
+    }
+
+    public function setImageUrl(
+        ?string $imageUrl,
+    ): self {
+        $this->buffer->set('imageUrl', $imageUrl);
+
+        return $this;
+    }
+
+    public function setImageAlt(
+        ?string $imageAlt,
+    ): self {
+        $this->buffer->set('imageAlt', $imageAlt);
 
         return $this;
     }

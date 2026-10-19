@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   PageItem/PageItemPreCommitContext.php
- * digest: sha256:f1003fd79bcded0578a26eb1c82487b88d54019893108498aee6418c56b717f0
+ * digest: sha256:c666a218d9ec3180bdb54f7f000f2a711c8f4e33b73acbf804330bf5513eafad
  */
 
 namespace Hsimah\Entity\PageItem;
@@ -118,6 +118,18 @@ final readonly class PageItemPreCommitContext implements MutableMutationContext
         ?string $value,
     ): void {
         $this->context->set('enquiryUrl', $value);
+    }
+
+    public function setImageUrl(
+        ?string $value,
+    ): void {
+        $this->context->set('imageUrl', $value);
+    }
+
+    public function setImageAlt(
+        ?string $value,
+    ): void {
+        $this->context->set('imageAlt', $value);
     }
 
     public function author(): EdgeMutation {
@@ -315,6 +327,34 @@ final readonly class PageItemPreCommitContext implements MutableMutationContext
 
     public function pendingEnquiryUrl(): ?string {
         $value = $this->context->pending('enquiryUrl');
+        assert(null === $value || is_string($value));
+
+        return $value;
+    }
+
+    public function originalImageUrl(): ?string {
+        $value = $this->context->original('imageUrl');
+        assert(null === $value || is_string($value));
+
+        return $value;
+    }
+
+    public function pendingImageUrl(): ?string {
+        $value = $this->context->pending('imageUrl');
+        assert(null === $value || is_string($value));
+
+        return $value;
+    }
+
+    public function originalImageAlt(): ?string {
+        $value = $this->context->original('imageAlt');
+        assert(null === $value || is_string($value));
+
+        return $value;
+    }
+
+    public function pendingImageAlt(): ?string {
+        $value = $this->context->pending('imageAlt');
         assert(null === $value || is_string($value));
 
         return $value;

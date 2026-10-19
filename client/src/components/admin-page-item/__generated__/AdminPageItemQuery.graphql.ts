@@ -1,6 +1,6 @@
 /**
- * @generated SignedSource<<b512dad89f0f012d2e46a0fb9406f8bf>>
- * @relayHash 3f5b211337428b9d7bd6796d02e313e2
+ * @generated SignedSource<<4c83484927412290e3c2bbb031333666>>
+ * @relayHash 80888ad7e4a513c9df6f23a24bc4c97d
  * @lightSyntaxTransform
  */
 
@@ -8,7 +8,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-// @relayRequestID 3f5b211337428b9d7bd6796d02e313e2
+// @relayRequestID 80888ad7e4a513c9df6f23a24bc4c97d
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
@@ -33,6 +33,8 @@ export type AdminPageItemQuery$data = {
     readonly enquiryUrl: string | null | undefined;
     readonly excerpt: string;
     readonly id: string;
+    readonly imageAlt: string | null | undefined;
+    readonly imageUrl: string | null | undefined;
     readonly kind: string;
     readonly page: {
       readonly id: string;
@@ -193,6 +195,20 @@ v8 = {
     {
       "alias": null,
       "args": null,
+      "kind": "ScalarField",
+      "name": "imageUrl",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "imageAlt",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
       "concreteType": "Author",
       "kind": "LinkedField",
       "name": "author",
@@ -328,16 +344,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "3f5b211337428b9d7bd6796d02e313e2",
-    "id": "3f5b211337428b9d7bd6796d02e313e2",
+    "cacheID": "80888ad7e4a513c9df6f23a24bc4c97d",
+    "id": "80888ad7e4a513c9df6f23a24bc4c97d",
     "metadata": {},
     "name": "AdminPageItemQuery",
     "operationKind": "query",
-    "text": "query AdminPageItemQuery(\n  $page: String!\n  $id: ID!\n) {\n  ...AdminLayoutFragment\n  pageBySlug(slug: $page) {\n    id\n    title\n    slug\n    defaultItemKind\n  }\n  pageItem(id: $id) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    kind\n    enquiryUrl\n    author {\n      displayName\n    }\n    page {\n      id\n    }\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  itemPages: pages(first: 100) {\n    nodes {\n      title\n      slug\n      defaultItemKind\n      itemCount\n      id\n    }\n  }\n}\n"
+    "text": "query AdminPageItemQuery(\n  $page: String!\n  $id: ID!\n) {\n  ...AdminLayoutFragment\n  pageBySlug(slug: $page) {\n    id\n    title\n    slug\n    defaultItemKind\n  }\n  pageItem(id: $id) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    kind\n    enquiryUrl\n    imageUrl\n    imageAlt\n    author {\n      displayName\n    }\n    page {\n      id\n    }\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  itemPages: pages(first: 100) {\n    nodes {\n      title\n      slug\n      defaultItemKind\n      itemCount\n      id\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "3f7034a6bbc8f82e1739205d0b3a63de";
+(node as any).hash = "efbe08a65c13073c64ee02975c5bb76d";
 
 export default node;

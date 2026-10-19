@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   PageItem/PageItemVerifiers.php
- * digest: sha256:50188ccbc14032c0b252a38d302b0af9c8433780f77ff4fd9dc6691ab1c8e6d4
+ * digest: sha256:4882797eb6a1dd6c740b43b95fe1b8dfc711d56c1b1c69dcf0a88cfac374863d
  */
 
 namespace Hsimah\Entity\PageItem;
@@ -21,6 +21,8 @@ use Eleph\Runtime\Verification\Verification;
 use Hsimah\Entity\Enum\PublicationStatus;
 use Hsimah\Entity\PageItem\Contract\PageItemContentVerifier;
 use Hsimah\Entity\PageItem\Contract\PageItemEnquiryUrlVerifier;
+use Hsimah\Entity\PageItem\Contract\PageItemImageAltVerifier;
+use Hsimah\Entity\PageItem\Contract\PageItemImageUrlVerifier;
 use Hsimah\Entity\PageItem\Contract\PageItemKindVerifier;
 use Hsimah\Entity\PageItem\Contract\PageItemPublishedAtVerifier;
 use Hsimah\Entity\PageItem\Contract\PageItemSlugVerifier;
@@ -40,6 +42,8 @@ final readonly class PageItemVerifiers implements EntityVerifiers
         private PageItemPublishedAtVerifier $publishedAtVerifier,
         private PageItemKindVerifier $kindVerifier,
         private PageItemEnquiryUrlVerifier $enquiryUrlVerifier,
+        private PageItemImageUrlVerifier $imageUrlVerifier,
+        private PageItemImageAltVerifier $imageAltVerifier,
     ) {
 
     }
@@ -48,7 +52,7 @@ final readonly class PageItemVerifiers implements EntityVerifiers
      * @return list<string>
      */
     public function verifiedFields(): array {
-        return ['title', 'slug', 'content', 'status', 'publishedAt', 'kind', 'enquiryUrl'];
+        return ['title', 'slug', 'content', 'status', 'publishedAt', 'kind', 'enquiryUrl', 'imageUrl', 'imageAlt'];
     }
 
     public function verify(
@@ -64,6 +68,8 @@ final readonly class PageItemVerifiers implements EntityVerifiers
             'publishedAt' => $this->verifyPublishedAt($value, $context),
             'kind' => $this->verifyKind($value, $context),
             'enquiryUrl' => $this->verifyEnquiryUrl($value, $context),
+            'imageUrl' => $this->verifyImageUrl($value, $context),
+            'imageAlt' => $this->verifyImageAlt($value, $context),
             default => Verification::ok(),
         };
     }
@@ -129,5 +135,23 @@ final readonly class PageItemVerifiers implements EntityVerifiers
         assert(null === $value || is_string($value));
 
         return $this->enquiryUrlVerifier->verify($value, PageItemMutationContext::of($context));
+    }
+
+    private function verifyImageUrl(
+        mixed $value,
+        MutationContext $context,
+    ): Verification {
+        assert(null === $value || is_string($value));
+
+        return $this->imageUrlVerifier->verify($value, PageItemMutationContext::of($context));
+    }
+
+    private function verifyImageAlt(
+        mixed $value,
+        MutationContext $context,
+    ): Verification {
+        assert(null === $value || is_string($value));
+
+        return $this->imageAltVerifier->verify($value, PageItemMutationContext::of($context));
     }
 }

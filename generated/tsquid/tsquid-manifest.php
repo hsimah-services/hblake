@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   tsquid-manifest.php
- * digest: sha256:04352dc0219472b911593b1e938b76d2ee79e5f9dca51b7bb264015beaff396d
+ * digest: sha256:7766f3d855744ba707f3fd2748b3c68755089f34d2c3eb4a118a87444b9ccce6
  */
 
 return new \Eleph\Tsquid\Manifest((object) ['routes' => [(object) ['fields' => (object) [], 'name' => 'Home', 'path' => '/', 'query' => (object) ['id' => '404959ecb5bc8dabcf0c4139cfb858eb', 'operation' => 'HomeQuery', 'text' => 'query HomeQuery {
@@ -61,7 +61,7 @@ fragment LayoutFragment on RootQuery {
     }
   }
 }
-', 'variables' => (object) []], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true], 'slug' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'Page', 'path' => '/pages/:slug', 'query' => (object) ['id' => '1f85b6eb41b03cb93957d826f256e727', 'operation' => 'PageQuery', 'text' => 'query PageQuery(
+', 'variables' => (object) []], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true], 'slug' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'Page', 'path' => '/pages/:slug', 'query' => (object) ['id' => '1b45f6ce09e4d321ea0010a75c8ebfb7', 'operation' => 'PageQuery', 'text' => 'query PageQuery(
   $slug: String!
   $after: String
 ) {
@@ -85,6 +85,8 @@ fragment LayoutFragment on RootQuery {
       slug
       excerpt
       content
+      imageUrl
+      imageAlt
       status
       publishedAt
       author {
@@ -113,7 +115,7 @@ fragment LayoutFragment on RootQuery {
     }
   }
 }
-', 'variables' => (object) ['after' => (object) ['input' => 'after'], 'slug' => (object) ['input' => 'slug']]], 'ssr' => true], (object) ['fields' => (object) ['page' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false], 'slug' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'PageItem', 'path' => '/:page/:slug', 'query' => (object) ['id' => '99abd120f51e83ff0a88de3964400827', 'operation' => 'PageItemQuery', 'text' => 'query PageItemQuery(
+', 'variables' => (object) ['after' => (object) ['input' => 'after'], 'slug' => (object) ['input' => 'slug']]], 'ssr' => true], (object) ['fields' => (object) ['page' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false], 'slug' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'PageItem', 'path' => '/:page/:slug', 'query' => (object) ['id' => 'c73279eb80cc006bcda8ecbcd3b58956', 'operation' => 'PageItemQuery', 'text' => 'query PageItemQuery(
   $page: String!
   $slug: String!
 ) {
@@ -135,6 +137,8 @@ fragment LayoutFragment on RootQuery {
     updatedAt
     kind
     enquiryUrl
+    imageUrl
+    imageAlt
     author {
       displayName
     }
@@ -467,7 +471,7 @@ fragment AdminLayoutFragment on RootQuery {
     }
   }
 }
-', 'variables' => (object) ['page' => (object) ['input' => 'page']]], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false], 'page' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminPageItemDetail', 'path' => '/admin/items/:page/:id', 'query' => (object) ['id' => '3f5b211337428b9d7bd6796d02e313e2', 'operation' => 'AdminPageItemQuery', 'text' => 'query AdminPageItemQuery(
+', 'variables' => (object) ['page' => (object) ['input' => 'page']]], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false], 'page' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminPageItemDetail', 'path' => '/admin/items/:page/:id', 'query' => (object) ['id' => '80888ad7e4a513c9df6f23a24bc4c97d', 'operation' => 'AdminPageItemQuery', 'text' => 'query AdminPageItemQuery(
   $page: String!
   $id: ID!
 ) {
@@ -490,6 +494,8 @@ fragment AdminLayoutFragment on RootQuery {
     updatedAt
     kind
     enquiryUrl
+    imageUrl
+    imageAlt
     author {
       displayName
     }
@@ -517,7 +523,7 @@ fragment AdminLayoutFragment on RootQuery {
     }
   }
 }
-', 'variables' => (object) ['id' => (object) ['input' => 'id'], 'page' => (object) ['input' => 'page']]], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false], 'page' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminPageItemEdit', 'path' => '/admin/items/:page/:id/edit', 'query' => (object) ['id' => '3f5b211337428b9d7bd6796d02e313e2', 'operation' => 'AdminPageItemQuery', 'text' => 'query AdminPageItemQuery(
+', 'variables' => (object) ['id' => (object) ['input' => 'id'], 'page' => (object) ['input' => 'page']]], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false], 'page' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminPageItemEdit', 'path' => '/admin/items/:page/:id/edit', 'query' => (object) ['id' => '80888ad7e4a513c9df6f23a24bc4c97d', 'operation' => 'AdminPageItemQuery', 'text' => 'query AdminPageItemQuery(
   $page: String!
   $id: ID!
 ) {
@@ -540,6 +546,8 @@ fragment AdminLayoutFragment on RootQuery {
     updatedAt
     kind
     enquiryUrl
+    imageUrl
+    imageAlt
     author {
       displayName
     }

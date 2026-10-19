@@ -4,10 +4,11 @@ import { Button, CheckboxInput, Heading, NumberInput, RadioList, RadioListItem, 
 import * as stylex from '@stylexjs/stylex';
 import { Markdown } from '../markdown/Markdown';
 import { RichTextEditor } from '../rich-text/RichTextEditor';
+import { ImageField } from '../image-field/ImageField';
 
 const CONTENT_FIELDS = ['title', 'slug', 'content', 'excerpt'];
 // What each kind of record adds: an item has an enquiry link and a kind label; a page chooses the kind of item it holds.
-const EXTRA_FIELDS: Readonly<Record<string, readonly string[]>> = { Item: ['enquiryUrl', 'kind'], Page: ['defaultItemKind'] };
+const EXTRA_FIELDS: Readonly<Record<string, readonly string[]>> = { Item: ['enquiryUrl', 'kind', 'imageUrl', 'imageAlt'], Page: ['defaultItemKind'] };
 const PROFILE_FIELDS = ['displayName'];
 // Page placement (#13), kept as strings in the form and converted on save.
 const PLACEMENT_DEFAULTS: Readonly<Record<string, string>> = { showInNavigation: 'true', navigationOrder: '100', featureOnHome: 'false', homeOrder: '100', accent: 'INK' };
@@ -46,6 +47,8 @@ export function ContentForm({ kind, row, defaults, save, detail, publication }: 
         {kind === 'Item' && <>
           <TextInput label="Enquiry URL" htmlName="enquiryUrl" value={form.values.enquiryUrl} onChange={value => form.change('enquiryUrl', value)} status={form.invalid.enquiryUrl ? { type: 'error' } : undefined} description="An https link or a mailto address. Shown as an Enquire link." />
           <TextInput label="Kind" htmlName="kind" value={form.values.kind} onChange={value => form.change('kind', value)} status={form.invalid.kind ? { type: 'error' } : undefined} description="What sort of item this is, such as Article or Product." />
+          <ImageField url={form.values.imageUrl} alt={form.values.imageAlt} altInvalid={form.invalid.imageAlt}
+            onChange={(url, alt) => { form.change('imageUrl', url); form.change('imageAlt', alt); }} />
         </>}
         {kind === 'Page' && <TextInput label="Item kind" htmlName="defaultItemKind" value={form.values.defaultItemKind} onChange={value => form.change('defaultItemKind', value)} status={form.invalid.defaultItemKind ? { type: 'error' } : undefined} description="Leave empty unless this page holds items. New items are given this kind." />}
         {kind === 'Page' && <fieldset {...stylex.props(styles.placement)}>
@@ -105,7 +108,7 @@ function useContentForm(kind: string, row: ContentFormRow | null | undefined, de
     try {
       const fields = kind === 'User' ? PROFILE_FIELDS : [...CONTENT_FIELDS, ...(EXTRA_FIELDS[kind] ?? [])];
       // Cleared optional fields are sent as null.
-      const nullable = ['enquiryUrl', 'defaultItemKind'];
+      const nullable = ['enquiryUrl', 'defaultItemKind', 'imageUrl', 'imageAlt'];
       const input: Record<string, unknown> = Object.fromEntries(fields.map(field => [field, nullable.includes(field) ? values[field].trim() || null : values[field]]));
       if (kind === 'Page') Object.assign(input, placementInput(values));
       if (row) input.id = row.id;
@@ -167,6 +170,7 @@ function validateValues(kind: string, values: Record<string, string>): Record<st
     if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(values.slug) || values.slug.length > 160) errors.slug = true;
     if (values.excerpt.length > 300) errors.excerpt = true;
     if (kind === 'Item' && values.enquiryUrl && !isSafeEnquiry(values.enquiryUrl)) errors.enquiryUrl = true;
+    if (kind === 'Item' && values.imageUrl && !values.imageAlt.trim()) errors.imageAlt = true;
     if (kind === 'Item' && (!values.kind.trim() || values.kind.length > 80)) errors.kind = true;
     if (kind === 'Page' && values.defaultItemKind.length > 80) errors.defaultItemKind = true;
     if (kind === 'Page') {

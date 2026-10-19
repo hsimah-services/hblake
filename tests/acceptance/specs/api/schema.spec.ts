@@ -126,7 +126,7 @@ test('content types expose the specified fields; everything links only an author
   const common = ['id', 'title', 'slug', 'content', 'excerpt', 'status', 'publishedAt', 'createdAt', 'updatedAt', 'author'];
   const extra: Record<string, string[]> = {
     Page: ['showInNavigation', 'navigationOrder', 'featureOnHome', 'homeOrder', 'accent', 'defaultItemKind', 'items', 'itemCount', 'publishedItemCount'],
-    PageItem: ['kind', 'enquiryUrl', 'page'],
+    PageItem: ['kind', 'enquiryUrl', 'imageUrl', 'imageAlt', 'page'],
   };
   for (const { type } of CONTENT) {
     const content = types.get(type);
@@ -154,7 +154,7 @@ test('create and update inputs never accept ids, authors or managed timestamps',
     expect(create).not.toContain('id');
   }
   const item = fieldNames(argInput('createPageItem'));
-  expect(item, 'an item is attached to a page and labelled with a kind').toEqual(expect.arrayContaining(['page', 'kind', 'enquiryUrl']));
+  expect(item, 'an item is attached to a page and labelled with a kind').toEqual(expect.arrayContaining(['page', 'kind', 'enquiryUrl', 'imageUrl', 'imageAlt']));
   expect(fieldNames(argInput('updatePageItem')), 'enquiryUrl can be changed').toContain('enquiryUrl');
   expect(fieldNames(argInput('createPage')), 'a page chooses its item kind').toContain('defaultItemKind');
 });

@@ -130,7 +130,7 @@ characters, such as `Article`, `Product` or `Framework`). There are no `Post` or
   `page`/`pageItem`; delete returns `deletedId`.
 - **Items:** `createPageItem` takes `page` (required: the id of an existing page with a
   `defaultItemKind`), `kind` (optional: defaults to the page's `defaultItemKind`) and the usual content
-  fields plus `enquiryUrl`. Item slugs are unique across all items. Deleting a page
+  fields plus `enquiryUrl`, `imageUrl` and `imageAlt` (an image stored through `POST /media`, which must have alt text). Item slugs are unique across all items. Deleting a page
   deletes its items. An item is visible to visitors only while it and its page are both
   published.
 - **Pages:** `Page.defaultItemKind` (nullable string, up to 80 characters) is the kind of item the

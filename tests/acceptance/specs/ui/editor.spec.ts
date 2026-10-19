@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
 import { Api } from '../../lib/api.ts';
-import { action, bySlug, hostPage, uniqueSlug } from '../../lib/content.ts';
+import { action, bySlug, ensurePage, hostPage, uniqueSlug } from '../../lib/content.ts';
 import { BASE_URL } from '../../lib/env.ts';
 import { PNG } from '../../lib/media.ts';
 import { signIn } from '../../lib/ui.ts';
@@ -117,6 +117,34 @@ test('an image needs alt text, uploads from the editor and appears on the publis
   const image = page.getByRole('main').getByRole('img', { name: 'A tiny black square' });
   await expect(image).toBeVisible();
   await expect.poll(() => image.evaluate(element => (element as HTMLImageElement).naturalWidth), 'the image loads').toBeGreaterThan(0);
+});
+
+test('an item image needs alt text and shows in the page list and on the item route', async ({ page }) => {
+  // A page of its own, so the item is listed whatever else is published.
+  const slug = uniqueSlug('cover');
+  const host = uniqueSlug('gallery');
+  await ensurePage(api, host, 'PUBLISHED', { defaultItemKind: 'Photo' });
+  await page.goto(`/admin/items/${host}/new`);
+  await page.getByLabel('Title').fill(`Cover ${slug}`);
+  await page.getByLabel('Slug').fill(slug);
+  await page.getByLabel('Excerpt').fill('Has a cover image.');
+  await page.getByRole('group', { name: 'Image' }).locator('input[type="file"]').setInputFiles({ name: 'cover.png', mimeType: 'image/png', buffer: PNG });
+  await expect(page.getByLabel('Image alt text')).toBeVisible();
+  await page.getByRole('button', { name: /^(create|save)/i }).click();
+  await expect(page.getByRole('alert').filter({ hasText: 'Please correct' }), 'alt text is required').toBeVisible();
+  await page.getByLabel('Image alt text').fill('A tiny cover square');
+  await page.getByRole('button', { name: /^(create|save)/i }).click();
+  await expect(page.getByRole('status').filter({ hasText: /created/i })).toBeVisible();
+  const item = await bySlug(api, 'Article', slug);
+  expect(item).toMatchObject({ imageAlt: 'A tiny cover square' });
+  await action(api, 'Article', 'publish', item!.id);
+
+  for (const path of [`/pages/${host}`, `/${host}/${slug}`]) {
+    await page.goto(path);
+    const image = page.getByRole('main').getByRole('img', { name: 'A tiny cover square' }).first();
+    await expect(image, path).toBeVisible();
+    await expect.poll(() => image.evaluate(element => (element as HTMLImageElement).naturalWidth), `${path} image loads`).toBeGreaterThan(0);
+  }
 });
 
 test('pages and products are written as rich text too, saved as Markdown', async ({ page }) => {

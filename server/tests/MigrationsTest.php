@@ -32,7 +32,7 @@ final class MigrationsTest extends TestCase {
             $db->execute("INSERT INTO hsimah_page (title, slug, content, excerpt, status, published_at, created_at, updated_at) VALUES (?, ?, 'Body', '', 'published', '2026-10-01 00:00:00', '2026-10-01 00:00:00', '2026-10-01 00:00:00')", [ucfirst($slug), $slug]);
         }
 
-        self::assertSame(['0001-page-placement','0002-page-items'], Migrations::upgrade($db));
+        self::assertSame(['0001-page-placement','0002-page-items','0003-page-item-image'], Migrations::upgrade($db));
         self::assertSame($expected, self::shape($db), 'the upgraded table matches a fresh install');
         $rows=$db->select('SELECT slug, title, show_in_navigation, navigation_order, feature_on_home, home_order, accent FROM hsimah_page ORDER BY id');
         self::assertSame(['slug'=>'home','title'=>'Home','show_in_navigation'=>0,'navigation_order'=>100,'feature_on_home'=>0,'home_order'=>100,'accent'=>'ink'], $rows[0]);
@@ -54,6 +54,17 @@ final class MigrationsTest extends TestCase {
         self::assertSame(0,(int)$db->scalar('SELECT COUNT(*) FROM hsimah_page_item'), 'the items table exists and is empty');
         self::assertSame(0,(int)$db->scalar("SELECT COUNT(*) FROM sqlite_master WHERE name IN ('hsimah_post','hsimah_product')"), 'the old tables are gone');
         self::assertSame([], Migrations::upgrade($db));
+    }
+
+    public function testItemsGainImageColumns(): void {
+        $db=new Database(':memory:');
+        $install=require dirname(__DIR__,2).'/generated/sqlite/install.php'; $install($db->pdo);
+        Migrations::markAllApplied($db);
+        $db->pdo->exec('DROP TABLE hsimah_page_item');
+        $db->pdo->exec('CREATE TABLE hsimah_page_item (id INTEGER PRIMARY KEY, title TEXT NOT NULL, slug TEXT NOT NULL, content TEXT NOT NULL, excerpt TEXT NOT NULL, status TEXT NOT NULL, published_at TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, kind TEXT NOT NULL, enquiry_url TEXT, author_id INTEGER, page_id INTEGER)');
+        $db->execute("DELETE FROM schema_migration WHERE id='0003-page-item-image'");
+        self::assertSame(['0003-page-item-image'], Migrations::upgrade($db));
+        self::assertContains('image_url', array_column($db->select('PRAGMA table_info(hsimah_page_item)'), 'name'));
     }
 
     public function testAFreshInstallNeedsNoUpgrade(): void {

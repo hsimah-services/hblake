@@ -1,6 +1,6 @@
 /**
- * @generated SignedSource<<b506a87ee4f456aa8afa0e86465f0459>>
- * @relayHash 99abd120f51e83ff0a88de3964400827
+ * @generated SignedSource<<26e1c4279922c3844bb9c08f007a9821>>
+ * @relayHash c73279eb80cc006bcda8ecbcd3b58956
  * @lightSyntaxTransform
  */
 
@@ -8,7 +8,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-// @relayRequestID 99abd120f51e83ff0a88de3964400827
+// @relayRequestID c73279eb80cc006bcda8ecbcd3b58956
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
@@ -32,6 +32,8 @@ export type PageItemQuery$data = {
     readonly enquiryUrl: string | null | undefined;
     readonly excerpt: string;
     readonly id: string;
+    readonly imageAlt: string | null | undefined;
+    readonly imageUrl: string | null | undefined;
     readonly kind: string;
     readonly page: {
       readonly id: string;
@@ -189,6 +191,20 @@ v7 = {
       "args": null,
       "kind": "ScalarField",
       "name": "enquiryUrl",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "imageUrl",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "imageAlt",
       "storageKey": null
     },
     {
@@ -378,16 +394,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "99abd120f51e83ff0a88de3964400827",
-    "id": "99abd120f51e83ff0a88de3964400827",
+    "cacheID": "c73279eb80cc006bcda8ecbcd3b58956",
+    "id": "c73279eb80cc006bcda8ecbcd3b58956",
     "metadata": {},
     "name": "PageItemQuery",
     "operationKind": "query",
-    "text": "query PageItemQuery(\n  $page: String!\n  $slug: String!\n) {\n  ...LayoutFragment\n  pageBySlug(slug: $page) {\n    id\n    title\n    slug\n  }\n  pageItemBySlug(slug: $slug) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    kind\n    enquiryUrl\n    author {\n      displayName\n    }\n    page {\n      id\n    }\n  }\n  pageOrder: pageItemsOfPage(where: {page: $page}, first: 100) {\n    nodes {\n      slug\n      title\n      status\n      id\n    }\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: placedPages(where: {home: false}, first: 100) {\n    nodes {\n      id\n      title\n      slug\n      accent\n    }\n  }\n}\n"
+    "text": "query PageItemQuery(\n  $page: String!\n  $slug: String!\n) {\n  ...LayoutFragment\n  pageBySlug(slug: $page) {\n    id\n    title\n    slug\n  }\n  pageItemBySlug(slug: $slug) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    kind\n    enquiryUrl\n    imageUrl\n    imageAlt\n    author {\n      displayName\n    }\n    page {\n      id\n    }\n  }\n  pageOrder: pageItemsOfPage(where: {page: $page}, first: 100) {\n    nodes {\n      slug\n      title\n      status\n      id\n    }\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: placedPages(where: {home: false}, first: 100) {\n    nodes {\n      id\n      title\n      slug\n      accent\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "fead91724207d1393a2f581f4857c154";
+(node as any).hash = "ad672c1c38893ad21a895242f16d6429";
 
 export default node;

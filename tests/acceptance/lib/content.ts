@@ -39,6 +39,8 @@ export interface Content {
   // Items only.
   kind?: string;
   enquiryUrl?: string | null;
+  imageUrl?: string | null;
+  imageAlt?: string | null;
   page?: { id: string; slug: string };
 }
 
@@ -59,7 +61,7 @@ export const noun = (kind: Kind): string => kind.toLowerCase();
 
 export function selection(kind: Kind): string {
   const common = 'id title slug content excerpt status publishedAt createdAt updatedAt author { displayName }';
-  return isItem(kind) ? `${common} kind enquiryUrl page { id slug }` : common;
+  return isItem(kind) ? `${common} kind enquiryUrl imageUrl imageAlt page { id slug }` : common;
 }
 
 // The operator session that finds or creates the pages items attach to.

@@ -26,7 +26,7 @@ export function AdminDetail({ kind, row, edit, list, mutate }: AdminDetailProps)
       <Button label={row.status === 'PUBLISHED' ? 'Unpublish' : 'Publish'} icon={<AdminIcon name={row.status === 'PUBLISHED' ? 'unpublish' : 'publish'} />} clickAction={detail.publish} isLoading={detail.pending} />
       <Button label="Delete" variant="destructive" icon={<AdminIcon name="delete" />} onClick={detail.ask} />
     </Stack>
-    <section aria-label={`${kind} content`} {...stylex.props(styles.content)}><Markdown content={row.content ?? ''} />{row.enquiryUrl && <a href={row.enquiryUrl}>Enquire</a>}</section>
+    <section aria-label={`${kind} content`} {...stylex.props(styles.content)}>{row.imageUrl && <img src={row.imageUrl} alt={row.imageAlt ?? ''} {...stylex.props(styles.image)} />}<Markdown content={row.content ?? ''} />{row.enquiryUrl && <a href={row.enquiryUrl}>Enquire</a>}</section>
     <ConfirmDelete isOpen={detail.asking} onCancel={detail.cancel} onConfirm={detail.confirmDelete} isPending={detail.pending}
       title={`Delete “${row.title}”?`} description={`This permanently removes the ${kind.toLowerCase()}. It cannot be undone.`} />
   </Stack></article> : <Heading level={1}>Not found</Heading>;
@@ -54,10 +54,11 @@ function useAdminDetail(row: AdminDetailProps['row'], list: string, mutate: Admi
   return { error, pending, asking, publish, confirmDelete, ask: () => { setAsking(true); }, cancel: () => { setAsking(false); } };
 }
 
-type AdminDetailRow = { readonly id: string; readonly title: string; readonly status: string; readonly createdAt?: string | null; readonly updatedAt?: string | null; readonly publishedAt?: string | null; readonly content?: string | null; readonly enquiryUrl?: string | null; readonly author?: { readonly displayName: string } | null };
+type AdminDetailRow = { readonly id: string; readonly title: string; readonly status: string; readonly createdAt?: string | null; readonly updatedAt?: string | null; readonly publishedAt?: string | null; readonly content?: string | null; readonly enquiryUrl?: string | null; readonly imageUrl?: string | null; readonly imageAlt?: string | null; readonly author?: { readonly displayName: string } | null };
 type AdminDetailProps = { kind: string; row?: AdminDetailRow | null; edit: string; list: string; mutate: (action: string, input: Record<string, unknown>) => Promise<Record<string, unknown>> };
 
 const styles = stylex.create({
+  image: { display: 'block', maxWidth: '100%', maxHeight: '20rem', objectFit: 'contain', marginBottom: '1rem', borderRadius: 'var(--radius-element)' },
   header: { flexWrap: 'wrap' },
   facts: { display: 'flex', flexWrap: 'wrap', gap: '0.5rem 2rem', margin: 0 },
   fact: { display: 'flex', flexDirection: 'column', gap: '0.15rem' },

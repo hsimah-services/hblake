@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   install.php
- * digest: sha256:3651e49d963eb276f35830ca82887297618533c587fd94b9e1029b4a274efbaa
+ * digest: sha256:2d141dea1175d0fa2986bbb1d85e2f87131491d04a6aae71e581d7773571f2d1
  */
 
 /**
@@ -63,6 +63,8 @@ return static function (\PDO $database, string $prefix = ''): void {
     ' . '"updated_at" TEXT NOT NULL' . ',
     ' . '"kind" TEXT NOT NULL CHECK (length("kind") <= 80)' . ',
     ' . '"enquiry_url" TEXT CHECK (length("enquiry_url") <= 2048)' . ',
+    ' . '"image_url" TEXT CHECK (length("image_url") <= 100)' . ',
+    ' . '"image_alt" TEXT CHECK (length("image_alt") <= 300)' . ',
     ' . '"author_id" INTEGER' . ' REFERENCES ' . $table('hsimah_user') . '("id") ON DELETE RESTRICT' . ',
     ' . '"page_id" INTEGER' . ' REFERENCES ' . $table('hsimah_page') . '("id") ON DELETE RESTRICT' . '
 )',

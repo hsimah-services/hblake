@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   PageItem/PageItemHydrator.php
- * digest: sha256:189ea1551530126075bc49522aeb9f028828c415c31c76d50c2c36837ab7e3de
+ * digest: sha256:bdac357bdeafbb77976685e889f833d00d64b18697172919a8f6e4ba3d2ebaab
  */
 
 namespace Hsimah\Entity\PageItem;
@@ -51,6 +51,8 @@ final readonly class PageItemHydrator implements Hydrator
             $this->updatedAt($record),
             $this->kind($record),
             $this->enquiryUrl($record),
+            $this->imageUrl($record),
+            $this->imageAlt($record),
         );
     }
 
@@ -132,5 +134,21 @@ final readonly class PageItemHydrator implements Hydrator
         $value = $record->value('enquiryUrl');
 
         return null === $value ? null : $this->decode->string($value, 'PageItem.enquiryUrl');
+    }
+
+    private function imageUrl(
+        Record $record,
+    ): ?string {
+        $value = $record->value('imageUrl');
+
+        return null === $value ? null : $this->decode->string($value, 'PageItem.imageUrl');
+    }
+
+    private function imageAlt(
+        Record $record,
+    ): ?string {
+        $value = $record->value('imageAlt');
+
+        return null === $value ? null : $this->decode->string($value, 'PageItem.imageAlt');
     }
 }

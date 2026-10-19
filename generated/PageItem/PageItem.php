@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   PageItem/PageItem.php
- * digest: sha256:f07d35425994c560a4a4afcaf0ebab8ed1dc549ad56159c8fc9ed944d1278adb
+ * digest: sha256:5a7d4806a49654af1ab1e28e20e614b438064ff301e79a8c00f1610e103bca91
  */
 
 namespace Hsimah\Entity\PageItem;
@@ -40,6 +40,8 @@ final class PageItem implements Publishable
         private readonly DateTimeImmutable $updatedAt,
         private readonly string $kind,
         private readonly ?string $enquiryUrl,
+        private readonly ?string $imageUrl,
+        private readonly ?string $imageAlt,
     ) {
 
     }
@@ -88,6 +90,14 @@ final class PageItem implements Publishable
         return $this->enquiryUrl;
     }
 
+    public function getImageUrl(): ?string {
+        return $this->imageUrl;
+    }
+
+    public function getImageAlt(): ?string {
+        return $this->imageAlt;
+    }
+
     /**
      * @return User|null
      */
@@ -121,7 +131,9 @@ final class PageItem implements Publishable
         DateTimeImmutable $updatedAt,
         string $kind,
         ?string $enquiryUrl,
+        ?string $imageUrl,
+        ?string $imageAlt,
     ): self {
-        return new self($id, $edges, $title, $slug, $content, $excerpt, $status, $publishedAt, $createdAt, $updatedAt, $kind, $enquiryUrl);
+        return new self($id, $edges, $title, $slug, $content, $excerpt, $status, $publishedAt, $createdAt, $updatedAt, $kind, $enquiryUrl, $imageUrl, $imageAlt);
     }
 }

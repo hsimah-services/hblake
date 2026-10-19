@@ -31,8 +31,8 @@
       },
       "query": {
         "operation": "PageQuery",
-        "id": "1f85b6eb41b03cb93957d826f256e727",
-        "text": "query PageQuery(\n  $slug: String!\n  $after: String\n) {\n  ...LayoutFragment\n  pageBySlug(slug: $slug) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    defaultItemKind\n  }\n  pageItemsOfPage(where: {page: $slug}, first: 20, after: $after) {\n    nodes {\n      id\n      title\n      slug\n      excerpt\n      content\n      status\n      publishedAt\n      author {\n        displayName\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: placedPages(where: {home: false}, first: 100) {\n    nodes {\n      id\n      title\n      slug\n      accent\n    }\n  }\n}\n",
+        "id": "1b45f6ce09e4d321ea0010a75c8ebfb7",
+        "text": "query PageQuery(\n  $slug: String!\n  $after: String\n) {\n  ...LayoutFragment\n  pageBySlug(slug: $slug) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    defaultItemKind\n  }\n  pageItemsOfPage(where: {page: $slug}, first: 20, after: $after) {\n    nodes {\n      id\n      title\n      slug\n      excerpt\n      content\n      imageUrl\n      imageAlt\n      status\n      publishedAt\n      author {\n        displayName\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: placedPages(where: {home: false}, first: 100) {\n    nodes {\n      id\n      title\n      slug\n      accent\n    }\n  }\n}\n",
         "variables": {
           "after": {
             "input": "after"
@@ -61,8 +61,8 @@
       },
       "query": {
         "operation": "PageItemQuery",
-        "id": "99abd120f51e83ff0a88de3964400827",
-        "text": "query PageItemQuery(\n  $page: String!\n  $slug: String!\n) {\n  ...LayoutFragment\n  pageBySlug(slug: $page) {\n    id\n    title\n    slug\n  }\n  pageItemBySlug(slug: $slug) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    kind\n    enquiryUrl\n    author {\n      displayName\n    }\n    page {\n      id\n    }\n  }\n  pageOrder: pageItemsOfPage(where: {page: $page}, first: 100) {\n    nodes {\n      slug\n      title\n      status\n      id\n    }\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: placedPages(where: {home: false}, first: 100) {\n    nodes {\n      id\n      title\n      slug\n      accent\n    }\n  }\n}\n",
+        "id": "c73279eb80cc006bcda8ecbcd3b58956",
+        "text": "query PageItemQuery(\n  $page: String!\n  $slug: String!\n) {\n  ...LayoutFragment\n  pageBySlug(slug: $page) {\n    id\n    title\n    slug\n  }\n  pageItemBySlug(slug: $slug) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    kind\n    enquiryUrl\n    imageUrl\n    imageAlt\n    author {\n      displayName\n    }\n    page {\n      id\n    }\n  }\n  pageOrder: pageItemsOfPage(where: {page: $page}, first: 100) {\n    nodes {\n      slug\n      title\n      status\n      id\n    }\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: placedPages(where: {home: false}, first: 100) {\n    nodes {\n      id\n      title\n      slug\n      accent\n    }\n  }\n}\n",
         "variables": {
           "page": {
             "input": "page"
@@ -265,8 +265,8 @@
       },
       "query": {
         "operation": "AdminPageItemQuery",
-        "id": "3f5b211337428b9d7bd6796d02e313e2",
-        "text": "query AdminPageItemQuery(\n  $page: String!\n  $id: ID!\n) {\n  ...AdminLayoutFragment\n  pageBySlug(slug: $page) {\n    id\n    title\n    slug\n    defaultItemKind\n  }\n  pageItem(id: $id) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    kind\n    enquiryUrl\n    author {\n      displayName\n    }\n    page {\n      id\n    }\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  itemPages: pages(first: 100) {\n    nodes {\n      title\n      slug\n      defaultItemKind\n      itemCount\n      id\n    }\n  }\n}\n",
+        "id": "80888ad7e4a513c9df6f23a24bc4c97d",
+        "text": "query AdminPageItemQuery(\n  $page: String!\n  $id: ID!\n) {\n  ...AdminLayoutFragment\n  pageBySlug(slug: $page) {\n    id\n    title\n    slug\n    defaultItemKind\n  }\n  pageItem(id: $id) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    kind\n    enquiryUrl\n    imageUrl\n    imageAlt\n    author {\n      displayName\n    }\n    page {\n      id\n    }\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  itemPages: pages(first: 100) {\n    nodes {\n      title\n      slug\n      defaultItemKind\n      itemCount\n      id\n    }\n  }\n}\n",
         "variables": {
           "id": {
             "input": "id"
@@ -295,8 +295,8 @@
       },
       "query": {
         "operation": "AdminPageItemQuery",
-        "id": "3f5b211337428b9d7bd6796d02e313e2",
-        "text": "query AdminPageItemQuery(\n  $page: String!\n  $id: ID!\n) {\n  ...AdminLayoutFragment\n  pageBySlug(slug: $page) {\n    id\n    title\n    slug\n    defaultItemKind\n  }\n  pageItem(id: $id) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    kind\n    enquiryUrl\n    author {\n      displayName\n    }\n    page {\n      id\n    }\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  itemPages: pages(first: 100) {\n    nodes {\n      title\n      slug\n      defaultItemKind\n      itemCount\n      id\n    }\n  }\n}\n",
+        "id": "80888ad7e4a513c9df6f23a24bc4c97d",
+        "text": "query AdminPageItemQuery(\n  $page: String!\n  $id: ID!\n) {\n  ...AdminLayoutFragment\n  pageBySlug(slug: $page) {\n    id\n    title\n    slug\n    defaultItemKind\n  }\n  pageItem(id: $id) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    kind\n    enquiryUrl\n    imageUrl\n    imageAlt\n    author {\n      displayName\n    }\n    page {\n      id\n    }\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  itemPages: pages(first: 100) {\n    nodes {\n      title\n      slug\n      defaultItemKind\n      itemCount\n      id\n    }\n  }\n}\n",
         "variables": {
           "id": {
             "input": "id"

@@ -1,6 +1,6 @@
 /**
- * @generated SignedSource<<175c1707847e11812976c32d5295fbc4>>
- * @relayHash bd1520533da4040507af44f0b3053b5a
+ * @generated SignedSource<<744ab14dad9d888f653d0a40ab72a13c>>
+ * @relayHash 5cc9f1b56e4137be4565154279a91d6b
  * @lightSyntaxTransform
  */
 
@@ -8,7 +8,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-// @relayRequestID bd1520533da4040507af44f0b3053b5a
+// @relayRequestID 5cc9f1b56e4137be4565154279a91d6b
 
 import { ConcreteRequest } from 'relay-runtime';
 export type PublicationStatus = "DRAFT" | "PUBLISHED" | "%future added value";
@@ -17,6 +17,8 @@ export type CreatePageItemInput = {
   content?: string | null | undefined;
   enquiryUrl?: string | null | undefined;
   excerpt?: string | null | undefined;
+  imageAlt?: string | null | undefined;
+  imageUrl?: string | null | undefined;
   kind?: string | null | undefined;
   page?: string | null | undefined;
   publishedAt?: string | null | undefined;
@@ -35,6 +37,8 @@ export type AdminPageItemCreateMutation$data = {
       readonly enquiryUrl: string | null | undefined;
       readonly excerpt: string;
       readonly id: string;
+      readonly imageAlt: string | null | undefined;
+      readonly imageUrl: string | null | undefined;
       readonly kind: string;
       readonly publishedAt: string | null | undefined;
       readonly slug: string;
@@ -156,6 +160,20 @@ v1 = [
             "kind": "ScalarField",
             "name": "enquiryUrl",
             "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "imageUrl",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "imageAlt",
+            "storageKey": null
           }
         ],
         "storageKey": null
@@ -182,16 +200,16 @@ return {
     "selections": (v1/*:: as any*/)
   },
   "params": {
-    "cacheID": "bd1520533da4040507af44f0b3053b5a",
-    "id": "bd1520533da4040507af44f0b3053b5a",
+    "cacheID": "5cc9f1b56e4137be4565154279a91d6b",
+    "id": "5cc9f1b56e4137be4565154279a91d6b",
     "metadata": {},
     "name": "AdminPageItemCreateMutation",
     "operationKind": "mutation",
-    "text": "mutation AdminPageItemCreateMutation(\n  $input: CreatePageItemInput!\n) {\n  createPageItem(input: $input) {\n    pageItem {\n      id\n      title\n      slug\n      content\n      excerpt\n      status\n      publishedAt\n      createdAt\n      updatedAt\n      kind\n      enquiryUrl\n    }\n  }\n}\n"
+    "text": "mutation AdminPageItemCreateMutation(\n  $input: CreatePageItemInput!\n) {\n  createPageItem(input: $input) {\n    pageItem {\n      id\n      title\n      slug\n      content\n      excerpt\n      status\n      publishedAt\n      createdAt\n      updatedAt\n      kind\n      enquiryUrl\n      imageUrl\n      imageAlt\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "ca21f23aaf1957860cd80280975c7ca6";
+(node as any).hash = "5a64fda8a52e7c580ea8a00e9511f2a4";
 
 export default node;
