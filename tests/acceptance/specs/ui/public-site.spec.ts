@@ -6,6 +6,8 @@ import {
   createOk,
   createPublished,
   ensurePage,
+  hostPage,
+  listPath,
   pageOf,
   publicPath,
   uniqueSlug,
@@ -15,8 +17,9 @@ import {
 import { BASE_URL, OPERATOR, RUN_ID } from '../../lib/env.ts';
 import { contrastOf, notFound, signIn, xssFired } from '../../lib/ui.ts';
 
-// The public site (website.md): client-rendered pages, lists, navigation, safe
-// Markdown, metadata and the not-found state (acceptance 9 and 10).
+// The public site (website.md): client-rendered pages, the items they hold, navigation,
+// safe Markdown, metadata and the not-found state (acceptance 9 and 10). News and
+// Products are Pages; an Article or a Product is an item of one, at /<page>/<item>.
 
 let api: Api;
 
@@ -48,13 +51,13 @@ test.describe('home', () => {
 });
 
 test.describe('content pages', () => {
-  test('a published post renders its Markdown and metadata', async ({ page }) => {
-    const post = await createPublished(api, 'Post', {
+  test('a published article renders its Markdown and metadata', async ({ page }) => {
+    const post = await createPublished(api, 'Article', {
       title: `Rendered ${RUN_ID}`,
       excerpt: `A summary for ${RUN_ID}.`,
       content: `Intro paragraph.\n\n## Section ${RUN_ID}\n\nSome **strong** words and a [link](https://example.com/).`,
     });
-    await page.goto(publicPath('Post', post.slug));
+    await page.goto(publicPath('Article', post.slug));
     const main = page.getByRole('main');
     await expect(main.getByRole('heading', { name: post.title, level: 1 })).toBeVisible();
     await expect(main.getByRole('heading', { name: `Section ${RUN_ID}`, level: 2 })).toBeVisible();
@@ -64,12 +67,12 @@ test.describe('content pages', () => {
 
     await expect(page).toHaveTitle(new RegExp(post.title));
     await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', post.excerpt);
-    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `${BASE_URL}${publicPath('Post', post.slug)}`);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `${BASE_URL}${publicPath('Article', post.slug)}`);
     await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', new RegExp(post.title));
   });
 
   test('Markdown is rendered with raw HTML disabled and unsafe URLs removed', async ({ page }) => {
-    const post = await createPublished(api, 'Post', {
+    const post = await createPublished(api, 'Article', {
       title: `Hostile ${RUN_ID}`,
       content: [
         'Safe text.',
@@ -81,7 +84,7 @@ test.describe('content pages', () => {
         '![bad image](javascript:window.__xss="image")',
       ].join('\n\n'),
     });
-    await page.goto(publicPath('Post', post.slug));
+    await page.goto(publicPath('Article', post.slug));
     const main = page.getByRole('main');
     await expect(main.getByText('Safe text.')).toBeVisible();
 
@@ -93,34 +96,37 @@ test.describe('content pages', () => {
   });
 
   test('unknown and unpublished content render the same not-found state', async ({ page }) => {
-    const draft = await createOk(api, 'Post', { title: `Unreleased ${RUN_ID}` });
+    const draft = await createOk(api, 'Article', { title: `Unreleased ${RUN_ID}` });
     const unpublished = await createPublished(api, 'Page', { title: `Withdrawn ${RUN_ID}` });
     await unpublishOk(api, 'Page', unpublished.id);
 
+    const article = await createPublished(api, 'Article', { title: `On another page ${RUN_ID}` });
     for (const path of [
       `/news/missing-${RUN_ID}`,
       `/pages/missing-${RUN_ID}`,
       `/products/missing-${RUN_ID}`,
-      publicPath('Post', draft.slug),
+      `/missing-${RUN_ID}/${article.slug}`,
+      `/products/${article.slug}`,
+      publicPath('Article', draft.slug),
       publicPath('Page', unpublished.slug),
     ]) {
       await page.goto(path);
       await expect(notFound(page), path).toBeVisible();
     }
-    await page.goto(publicPath('Post', draft.slug));
+    await page.goto(publicPath('Article', draft.slug));
     await expect(page.getByText(draft.title)).toHaveCount(0);
   });
 
   test('the signed-in operator can preview a draft at its public URL', async ({ page }) => {
-    const draft = await createOk(api, 'Post', { title: `Preview ${RUN_ID}` });
+    const draft = await createOk(api, 'Article', { title: `Preview ${RUN_ID}` });
     await signIn(page);
-    await page.goto(publicPath('Post', draft.slug));
+    await page.goto(publicPath('Article', draft.slug));
     await expect(page.getByRole('heading', { name: draft.title, level: 1 })).toBeVisible();
   });
 });
 
 test.describe('products', () => {
-  test('an enquiry link is shown only when the product has one', async ({ page }) => {
+  test('an enquiry link is shown only when the item has one', async ({ page }) => {
     const https = await createPublished(api, 'Product', { enquiryUrl: 'https://example.com/enquire' });
     const mailto = await createPublished(api, 'Product', { enquiryUrl: 'mailto:hello@example.com' });
     const none = await createPublished(api, 'Product');
@@ -134,55 +140,56 @@ test.describe('products', () => {
     await expect(page.getByRole('main').getByRole('link', { name: /enquir/i })).toHaveCount(0);
   });
 
-  test('the product list is ordered by title', async ({ page }) => {
-    const b = await createPublished(api, 'Product', { title: `00 ${RUN_ID} beta` });
-    const a = await createPublished(api, 'Product', { title: `00 ${RUN_ID} alpha` });
-    await page.goto('/products');
-    const links = page.getByRole('main').getByRole('link', { name: new RegExp(`00 ${RUN_ID}`) });
-    await expect(links).toContainText([a.title, b.title]);
-    await expect(links.first()).toHaveAttribute('href', publicPath('Product', a.slug));
+  test('a page lists only its own items, newest first, under its own content', async ({ page }) => {
+    const product = await createPublished(api, 'Product', { title: `Own product ${RUN_ID}` });
+    const article = await createPublished(api, 'Article', { title: `Elsewhere ${RUN_ID}` });
+    await page.goto(listPath('Product'));
+    const main = page.getByRole('main');
+    await expect(main.getByRole('heading', { level: 1 })).toHaveText('Products');
+    await expect(main.getByRole('link', { name: product.title })).toHaveAttribute('href', publicPath('Product', product.slug));
+    await expect(main.getByText(article.title), "another page's items").toHaveCount(0);
   });
 });
 
 test.describe('news details', () => {
   test('articles show their date and reading time, and link to newer and older news', async ({ page }) => {
-    const older = await createPublished(api, 'Post', { title: `Older story ${RUN_ID}`, content: `${'word '.repeat(450)}end.` });
-    const newer = await createPublished(api, 'Post', { title: `Newer story ${RUN_ID}` });
-    await page.goto(publicPath('Post', older.slug));
+    const older = await createPublished(api, 'Article', { title: `Older story ${RUN_ID}`, content: `${'word '.repeat(450)}end.` });
+    const newer = await createPublished(api, 'Article', { title: `Newer story ${RUN_ID}` });
+    await page.goto(publicPath('Article', older.slug));
     const byline = page.getByRole('main').getByText(/^By .* min read$/);
     await expect(byline).toContainText('2 min read');
     await expect(byline.locator('time')).toHaveAttribute('datetime', older.publishedAt!);
     const more = page.getByRole('navigation', { name: 'More news' });
-    await expect(more.getByRole('link', { name: newer.title })).toHaveAttribute('href', publicPath('Post', newer.slug));
-    await page.goto(publicPath('Post', newer.slug));
+    await expect(more.getByRole('link', { name: newer.title })).toHaveAttribute('href', publicPath('Article', newer.slug));
+    await page.goto(publicPath('Article', newer.slug));
     await expect(page.getByRole('navigation', { name: 'More news' }).getByRole('link', { name: older.title })).toBeVisible();
 
-    await page.goto('/news');
+    await page.goto(listPath('Article'));
     const item = page.getByRole('main').locator('article', { has: page.getByRole('link', { name: newer.title }) });
     await expect(item.locator('time')).toHaveAttribute('datetime', newer.publishedAt!);
     await expect(item).toContainText(/\d+ min read/);
   });
 });
 
-test.describe('post list', () => {
-  test('lists published posts newest first and links to them', async ({ page }) => {
-    const draft = await createOk(api, 'Post', { title: `Listed draft ${RUN_ID}` });
-    const older = await createPublished(api, 'Post', { title: `Listed older ${RUN_ID}` });
-    const newer = await createPublished(api, 'Post', { title: `Listed newer ${RUN_ID}` });
-    await page.goto('/news');
+test.describe('item list', () => {
+  test('a page lists its published items newest first and links to them', async ({ page }) => {
+    const draft = await createOk(api, 'Article', { title: `Listed draft ${RUN_ID}` });
+    const older = await createPublished(api, 'Article', { title: `Listed older ${RUN_ID}` });
+    const newer = await createPublished(api, 'Article', { title: `Listed newer ${RUN_ID}` });
+    await page.goto(listPath('Article'));
     const main = page.getByRole('main');
     const ours = main.getByRole('link', { name: new RegExp(`Listed (older|newer|draft) ${RUN_ID}`) });
     await expect(ours).toContainText([newer.title, older.title]);
     await expect(main.getByText(draft.title)).toHaveCount(0);
     await expect(main.locator('article', { has: page.getByRole('link', { name: newer.title }) })).toContainText(`By ${OPERATOR.displayName}`);
     await ours.first().click();
-    await expect(page).toHaveURL(`${BASE_URL}${publicPath('Post', newer.slug)}`);
+    await expect(page).toHaveURL(`${BASE_URL}${publicPath('Article', newer.slug)}`);
   });
 
-  test('more than one page of posts offers a next page through the URL cursor', async ({ page }) => {
-    const { totalCount } = await pageOf(api, 'Post');
-    for (let i = totalCount; i < 21; i += 1) await createPublished(api, 'Post');
-    await page.goto('/news');
+  test('more than one page of items offers a next page through the URL cursor', async ({ page }) => {
+    const { totalCount } = await pageOf(api, 'Article');
+    for (let i = totalCount; i < 21; i += 1) await createPublished(api, 'Article');
+    await page.goto(listPath('Article'));
     const next = page.getByRole('link', { name: /next|older|more/i }).or(page.getByRole('button', { name: /next|older|more/i }));
     await next.first().click();
     await expect(page).toHaveURL(/[?&]after=/);
@@ -228,26 +235,29 @@ test.describe('page placement', () => {
 });
 
 test.describe('navigation', () => {
-  test('links to published pages and non-empty collections only', async ({ page }) => {
+  test('links to published pages only, News and Products among them', async ({ page }) => {
     await ensurePage(api, 'services', 'PUBLISHED', { title: 'Services' });
     await ensurePage(api, 'about', 'DRAFT', { title: 'About' });
+    await hostPage('Article');
+    await hostPage('Product');
     await page.goto('/');
     await expect(page.locator('nav a[href="/pages/services"]').first()).toBeVisible();
     await expect(page.locator('nav a[href="/pages/about"]')).toHaveCount(0);
-    await expect(page.locator('nav a[href="/news"]').first()).toBeVisible();
-    await expect(page.locator('nav a[href="/products"]').first()).toBeVisible();
+    await expect(page.locator('nav a[href="/pages/news"]').first()).toBeVisible();
+    await expect(page.locator('nav a[href="/pages/products"]').first()).toBeVisible();
+    await expect(page.locator('nav a[href="/news"], nav a[href="/products"]'), 'the old collection addresses').toHaveCount(0);
   });
 
   test('the navigation marks the current page and section', async ({ page }) => {
     await ensurePage(api, 'services', 'PUBLISHED', { title: 'Services' });
-    const post = await createPublished(api, 'Post');
+    const post = await createPublished(api, 'Article');
     const nav = page.getByRole('navigation', { name: 'Main navigation' });
     const current = nav.locator('a[aria-current]');
     for (const [path, href, value] of [
       ['/', '/', 'page'],
       ['/pages/services', '/pages/services', 'page'],
-      ['/news', '/news', 'page'],
-      [publicPath('Post', post.slug), '/news', 'true'],
+      [listPath('Article'), '/pages/news', 'page'],
+      [publicPath('Article', post.slug), '/pages/news', 'true'],
     ] as const) {
       await page.goto(path);
       await expect(current, `${path}: one current link`).toHaveCount(1);
@@ -281,8 +291,9 @@ test.describe('navigation', () => {
   });
 
   test('every public route has a consistent header, navigation and footer', async ({ page }) => {
-    const post = await createPublished(api, 'Post');
-    for (const path of ['/', '/news', '/products', publicPath('Post', post.slug), `/pages/missing-${uniqueSlug()}`]) {
+    const post = await createPublished(api, 'Article');
+    await hostPage('Product');
+    for (const path of ['/', listPath('Article'), listPath('Product'), publicPath('Article', post.slug), `/pages/missing-${uniqueSlug()}`]) {
       await page.goto(path);
       await expect(page.getByRole('banner'), `${path} header`).toBeVisible();
       await expect(page.getByRole('navigation').first(), `${path} navigation`).toBeVisible();
@@ -292,43 +303,41 @@ test.describe('navigation', () => {
 });
 
 test.describe('navigation across list pages', () => {
-  test('later pages of a list keep the same site navigation', async ({ page }) => {
-    // website.md: the Products link depends only on whether published products exist,
-    // not on how far through the post list the visitor has paged.
-    if ((await walk(api, 'Product')).nodes.every(node => node.status !== 'PUBLISHED')) await createPublished(api, 'Product');
-    const products = (await walk(api, 'Product')).totalCount;
-    const pagesPastProducts = Math.ceil(products / 20) + 1;
-    const posts = async (): Promise<number> => (await walk(api, 'Post')).nodes.filter(node => node.status === 'PUBLISHED').length;
-    for (let i = await posts(); i < pagesPastProducts * 20 + 1; i += 1) await createPublished(api, 'Post');
+  test('later pages of a page\'s items keep the same site navigation', async ({ page }) => {
+    // The navigation depends on which pages are published, not on how far through a
+    // page's items the visitor has paged.
+    await hostPage('Product');
+    const published = async (): Promise<number> => (await walk(api, 'Article')).nodes.filter(node => node.status === 'PUBLISHED').length;
+    for (let i = await published(); i < 41; i += 1) await createPublished(api, 'Article');
 
-    await page.goto('/news');
-    const productsLink = page.locator('nav a[href="/products"]').first();
-    await expect(productsLink, '/news links to /products').toBeVisible();
-    for (let step = 1; step <= pagesPastProducts; step += 1) {
+    await page.goto(listPath('Article'));
+    const productsLink = page.locator('nav a[href="/pages/products"]').first();
+    await expect(productsLink, 'News links to Products').toBeVisible();
+    for (let step = 1; step <= 2; step += 1) {
       const url = page.url();
       await page.getByRole('link', { name: /next|older|more/i }).or(page.getByRole('button', { name: /next|older|more/i })).first().click();
       await expect(page).not.toHaveURL(url);
       await expect(page).toHaveURL(/[?&]after=/);
       await expect(page.getByRole('main').getByRole('link').first()).toBeVisible();
-      await expect(productsLink, `post list page ${step + 1} still links to /products`).toBeVisible();
+      await expect(productsLink, `item page ${step + 1} still links to Products`).toBeVisible();
     }
   });
 });
 
 test.describe('client-side routing', () => {
   test('following site links does not reload the document', async ({ page }) => {
-    const post = await createPublished(api, 'Post');
+    const post = await createPublished(api, 'Article');
     await page.goto('/');
     await page.evaluate(() => ((window as unknown as { __document?: string }).__document = 'first-load'));
     const sameDocument = (): Promise<boolean> =>
       page.evaluate(() => (window as unknown as { __document?: string }).__document === 'first-load');
 
-    await page.locator('nav a[href="/news"]').first().click();
-    await expect(page).toHaveURL(`${BASE_URL}/news`);
+    await page.locator('nav a[href="/pages/news"]').first().click();
+    await expect(page).toHaveURL(`${BASE_URL}/pages/news`);
     expect(await sameDocument(), 'navigation link handled by the router').toBe(true);
 
-    await page.getByRole('main').locator(`a[href="${publicPath('Post', post.slug)}"]`).first().click();
-    await expect(page).toHaveURL(`${BASE_URL}${publicPath('Post', post.slug)}`);
+    await page.getByRole('main').locator(`a[href="${publicPath('Article', post.slug)}"]`).first().click();
+    await expect(page).toHaveURL(`${BASE_URL}${publicPath('Article', post.slug)}`);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(post.title);
     expect(await sameDocument(), 'list link handled by the router').toBe(true);
   });
@@ -338,27 +347,27 @@ test.describe('client-side routing', () => {
     new RegExp(`"operationName":"${name}"|\\b(query|mutation) ${name}\\b`).test(body ?? '');
 
   test('hovering a link before following it fetches the route query once', async ({ page }) => {
-    await createPublished(api, 'Post');
-    const isPostList = (request: Request): boolean =>
-      new URL(request.url()).pathname === '/graphql' && isOperation(request.postData(), 'PostListQuery');
-    const postLists: Request[] = [];
-    page.on('request', request => { if (isPostList(request)) postLists.push(request); });
+    await createPublished(api, 'Article');
+    const isPageQuery = (request: Request): boolean =>
+      new URL(request.url()).pathname === '/graphql' && isOperation(request.postData(), 'PageQuery');
+    const pageQueries: Request[] = [];
+    page.on('request', request => { if (isPageQuery(request)) pageQueries.push(request); });
     await page.goto('/');
-    const link = page.locator('nav a[href="/news"]').first();
+    const link = page.locator('nav a[href="/pages/news"]').first();
     await link.hover();
     // Let any hover preload finish before following the link.
-    await page.waitForResponse(response => isPostList(response.request()), { timeout: 3_000 }).catch(() => undefined);
+    await page.waitForResponse(response => isPageQuery(response.request()), { timeout: 3_000 }).catch(() => undefined);
     await link.click();
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('News');
     await page.waitForLoadState('networkidle');
-    expect(postLists, 'one PostListQuery request for one navigation').toHaveLength(1);
+    expect(pageQueries, 'one PageQuery request for one navigation').toHaveLength(1);
   });
 
   test('a route query that returns errors is not shown as missing content', async ({ page }) => {
     // A resolver failure yields partial data: every route field null, plus errors.
-    const post = await createPublished(api, 'Post');
+    const post = await createPublished(api, 'Article');
     await page.route('**/graphql', async route => {
-      if (!isOperation(route.request().postData(), 'PostQuery')) return route.continue();
+      if (!isOperation(route.request().postData(), 'PageItemQuery')) return route.continue();
       const response = await route.fetch();
       const { data } = await response.json() as { data: Record<string, unknown> };
       await route.fulfill({ response, json: {
@@ -366,9 +375,9 @@ test.describe('client-side routing', () => {
         errors: [{ message: 'Internal server error' }],
       } });
     });
-    await page.goto('/news');
-    await page.getByRole('main').locator(`a[href="${publicPath('Post', post.slug)}"]`).first().click();
-    await expect(page).toHaveURL(`${BASE_URL}${publicPath('Post', post.slug)}`);
+    await page.goto(listPath('Article'));
+    await page.getByRole('main').locator(`a[href="${publicPath('Article', post.slug)}"]`).first().click();
+    await expect(page).toHaveURL(`${BASE_URL}${publicPath('Article', post.slug)}`);
     await expect(page.getByText(/error|went wrong|try again|could not/i).first()).toBeVisible();
     await expect(notFound(page)).toHaveCount(0);
     expect(await page.title()).not.toMatch(/not found/i);
@@ -381,8 +390,8 @@ for (const colorScheme of ['light', 'dark'] as const) {
 
     test('headings, body text, links and buttons meet WCAG AA contrast', async ({ page }) => {
       // website.md: public and admin UI follow the system colour scheme legibly.
-      const post = await createPublished(api, 'Post');
-      for (const path of ['/', '/news', publicPath('Post', post.slug), '/admin/login']) {
+      const post = await createPublished(api, 'Article');
+      for (const path of ['/', listPath('Article'), publicPath('Article', post.slug), '/admin/login']) {
         await page.goto(path);
         const targets = [
           page.getByRole('heading', { level: 1 }),
@@ -402,10 +411,10 @@ for (const colorScheme of ['light', 'dark'] as const) {
 }
 
 test.describe('document titles', () => {
-  test('lists and the home page have descriptive titles', async ({ page }) => {
-    await createPublished(api, 'Post');
+  test('pages that hold items and the sign-in page have descriptive titles', async ({ page }) => {
+    await createPublished(api, 'Article');
     await createPublished(api, 'Product');
-    for (const [path, title] of [['/news', /^News\b/], ['/products', /^Products\b/], ['/admin/login', /^Sign in\b/]] as const) {
+    for (const [path, title] of [[listPath('Article'), /^News\b/], [listPath('Product'), /^Products\b/], ['/admin/login', /^Sign in\b/]] as const) {
       await page.goto(path);
       await expect(page, path).toHaveTitle(title);
     }
@@ -414,12 +423,12 @@ test.describe('document titles', () => {
 
 test.describe('initial data', () => {
   test('public routes render from inlined data without a GraphQL request', async ({ page }) => {
-    const post = await createPublished(api, 'Post');
+    const post = await createPublished(api, 'Article');
     const product = await createPublished(api, 'Product');
     const routes: [string, string][] = [
-      [publicPath('Post', post.slug), post.title],
+      [publicPath('Article', post.slug), post.title],
       [publicPath('Product', product.slug), product.title],
-      ['/news', 'News'],
+      [listPath('Article'), 'News'],
     ];
     for (const [path, heading] of routes) {
       const requests: string[] = [];

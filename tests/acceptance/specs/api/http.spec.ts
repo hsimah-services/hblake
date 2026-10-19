@@ -68,25 +68,20 @@ test('GraphQL introspection and queries are served on /graphql over POST', async
   await ctx.dispose();
 });
 
-test('old /posts addresses redirect permanently to /news', async () => {
+test('the removed Post and Product addresses are not served as content', async () => {
   const api = await request.newContext({ baseURL: BASE_URL });
-  for (const [from, to] of [
-    ['/posts', '/news'],
-    ['/posts/some-story', '/news/some-story'],
-    ['/admin/posts?after=abc', '/admin/news?after=abc'],
-    ['/admin/posts/xyz/edit', '/admin/news/xyz/edit'],
-  ]) {
-    const response = await api.get(from, { maxRedirects: 0 });
-    expect(response.status(), from).toBe(301);
-    expect(response.headers()['location'], from).toBe(to);
+  for (const path of ['/posts', '/posts/some-story', '/admin/posts', '/admin/news', '/admin/products']) {
+    const response = await api.get(path, { maxRedirects: 0 });
+    expect(response.status(), path).not.toBe(301);
+    expect(response.headers()['location'], `${path} does not redirect`).toBeUndefined();
   }
   await api.dispose();
 });
 
 test('the News Atom feed lists published articles only, safely escaped', async () => {
   const operator = await Api.operator();
-  const published = await createPublished(operator, 'Post', { title: `Feed & <friends> ${uniqueSlug()}` });
-  const draft = await createOk(operator, 'Post', { title: `Feed draft ${uniqueSlug()}` });
+  const published = await createPublished(operator, 'Article', { title: `Feed & <friends> ${uniqueSlug()}` });
+  const draft = await createOk(operator, 'Article', { title: `Feed draft ${uniqueSlug()}` });
   await operator.dispose();
   const api = await request.newContext({ baseURL: BASE_URL });
   const response = await api.get('/news/feed.xml');

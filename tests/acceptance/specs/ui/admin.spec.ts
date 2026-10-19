@@ -8,6 +8,8 @@ import {
   byId,
   bySlug,
   createOk,
+  hostPage,
+  isItem,
   pageOf,
   uniqueSlug,
 } from '../../lib/content.ts';
@@ -15,12 +17,15 @@ import { BASE_URL, OPERATOR, RUN_ID } from '../../lib/env.ts';
 import { announcedError, confirmation, forbiddenControls, signIn, tabTo, xssFired } from '../../lib/ui.ts';
 
 // Content administration (ui/admin.md, ui/admin.yml, acceptance 7). Field labels follow
-// admin.yml: Title, Slug, Content, Excerpt and, for products, Enquiry URL.
+// admin.yml: Title, Slug, Content, Excerpt and, for items, Enquiry URL and Kind. The
+// items of a page are administered at /admin/items/<page slug>.
 
 let api: Api;
 
 test.beforeAll(async () => {
   api = await Api.operator();
+  await hostPage('Article');
+  await hostPage('Product');
 });
 
 test.afterAll(async () => {
@@ -41,7 +46,7 @@ const idFromUrl = (page: Page, kind: Kind): string => {
 
 test.describe('access', () => {
   test('signed-out visitors are sent to the login page', async ({ page }) => {
-    for (const path of ['/admin', '/admin/pages', '/admin/news/new', '/admin/products']) {
+    for (const path of ['/admin', '/admin/pages', '/admin/items/news/new', '/admin/items/products']) {
       await page.goto(path);
       await expect(page, path).toHaveURL(`${BASE_URL}/admin/login`);
     }
@@ -66,7 +71,7 @@ test.describe('access', () => {
     await page.keyboard.press('Enter');
     await expect(page).toHaveURL(`${BASE_URL}/admin`);
     const main = page.getByRole('main');
-    for (const href of ['/admin/pages', '/admin/news', '/admin/products']) {
+    for (const href of ['/admin/pages', '/admin/items/news', '/admin/items/products']) {
       await expect(main.locator(`a[href="${href}"]`).first()).toBeVisible();
     }
     const viewer = (await api.viewer())!;
@@ -128,7 +133,7 @@ for (const kind of KINDS) {
     });
 
     test('forms accept only the allowlisted fields', async ({ page }) => {
-      const expected = kind === 'Product' ? ['Title', 'Slug', 'Content', 'Excerpt', 'Enquiry URL'] : ['Title', 'Slug', 'Content', 'Excerpt'];
+      const expected = isItem(kind) ? ['Title', 'Slug', 'Content', 'Excerpt', 'Enquiry URL', 'Kind'] : ['Title', 'Slug', 'Content', 'Excerpt', 'Item kind'];
       const row = await createOk(api, kind);
       for (const path of [`${adminPath(kind)}/new`, `${adminPath(kind)}/${encodeURIComponent(row.id)}/edit`]) {
         await page.goto(path);
@@ -254,7 +259,7 @@ test.describe('forms in detail', () => {
 
   test('an enquiry URL can be cleared', async ({ page }) => {
     const row = await createOk(api, 'Product', { enquiryUrl: 'https://example.com/clear-me' });
-    await page.goto(`/admin/products/${encodeURIComponent(row.id)}/edit`);
+    await page.goto(`/admin/items/products/${encodeURIComponent(row.id)}/edit`);
     await expect(page.getByLabel('Enquiry URL')).toHaveValue('https://example.com/clear-me');
     await page.getByLabel('Enquiry URL').fill('');
     await page.getByRole('button', { name: /^save/i }).click();
@@ -263,12 +268,12 @@ test.describe('forms in detail', () => {
   });
 
   test('an excerpt can be cleared without touching other fields', async ({ page }) => {
-    const row = await createOk(api, 'Post', { excerpt: 'Remove me.' });
-    await page.goto(`/admin/news/${encodeURIComponent(row.id)}/edit`);
+    const row = await createOk(api, 'Article', { excerpt: 'Remove me.' });
+    await page.goto(`/admin/items/news/${encodeURIComponent(row.id)}/edit`);
     await page.getByLabel('Excerpt').fill('');
     await page.getByRole('button', { name: /^save/i }).click();
     await expect(confirmation(page)).toBeVisible();
-    await expect.poll(async () => byId(api, 'Post', row.id)).toMatchObject({ excerpt: '', title: row.title, content: row.content });
+    await expect.poll(async () => byId(api, 'Article', row.id)).toMatchObject({ excerpt: '', title: row.title, content: row.content });
   });
 
   test('a refused write explains itself without transport details and keeps input', async ({ page }) => {
@@ -311,32 +316,79 @@ test.describe('forms in detail', () => {
   });
 
   test('admin lists page in bounded steps with the cursor in the URL', async ({ page }) => {
-    const { totalCount } = await pageOf(api, 'Post');
-    for (let i = totalCount; i < 21; i += 1) await createOk(api, 'Post');
-    await page.goto('/admin/news');
-    const records = page.getByRole('main').locator('a[href^="/admin/news/"]');
+    const { totalCount } = await pageOf(api, 'Article');
+    for (let i = totalCount; i < 21; i += 1) await createOk(api, 'Article');
+    await page.goto('/admin/items/news');
+    const records = page.getByRole('main').locator('a[href^="/admin/items/news/"]');
     await expect(records.first()).toBeVisible();
     const ids = await records.evaluateAll(links =>
-      [...new Set(links.map(link => link.getAttribute('href')!.split('/')[3]).filter(id => id && id !== 'new'))],
+      [...new Set(links.map(link => link.getAttribute('href')!.split('/')[4]).filter(id => id && id !== 'new'))],
     );
     expect(ids.length, 'at most 20 records per page').toBeLessThanOrEqual(20);
     expect(ids.length).toBeGreaterThan(0);
     await page.getByRole('link', { name: /next|older|more/i }).or(page.getByRole('button', { name: /next|older|more/i })).first().click();
-    await expect(page).toHaveURL(/\/admin\/news\?(.*&)?after=/);
+    await expect(page).toHaveURL(/\/admin\/items\/news\?(.*&)?after=/);
   });
 
   test('records created in the admin are not public until published', async ({ page }) => {
     const slug = uniqueSlug('ui-private');
-    await page.goto('/admin/news/new');
+    await page.goto('/admin/items/news/new');
     await page.getByLabel('Title').fill(`Private ${slug}`);
     await page.getByLabel('Slug').fill(slug);
-    await markdownSource(page, 'Post');
+    await markdownSource(page, 'Article');
     await page.getByLabel('Content').fill('Not yet.');
     await page.getByRole('button', { name: /^(save|create)/i }).click();
     await expect(confirmation(page)).toBeVisible();
     const anonymous = await Api.anonymous();
-    expect(await bySlug(anonymous, 'Post', slug)).toBeNull();
+    expect(await bySlug(anonymous, 'Article', slug)).toBeNull();
     await anonymous.dispose();
+  });
+});
+
+test.describe('items in the admin', () => {
+  test.beforeEach(async ({ page }) => {
+    await signIn(page);
+  });
+
+  test('a new item is attached to the page of its section and defaults to the page\'s kind', async ({ page }) => {
+    const slug = uniqueSlug('ui-kind');
+    await page.goto('/admin/items/products/new');
+    await expect(page.getByLabel('Kind')).toHaveValue('Product');
+    await page.getByLabel('Title').fill(`Kinded ${slug}`);
+    await page.getByLabel('Slug').fill(slug);
+    await page.getByRole('button', { name: /^(save|create)/i }).click();
+    await expect(confirmation(page)).toBeVisible();
+    expect(await bySlug(api, 'Product', slug)).toMatchObject({ kind: 'Product', page: { slug: 'products' } });
+  });
+
+  test('the kind of an item can be changed to another kind of the same page', async ({ page }) => {
+    const row = await createOk(api, 'Article');
+    await page.goto(`/admin/items/news/${encodeURIComponent(row.id)}/edit`);
+    await page.getByLabel('Kind').fill('Case study');
+    await page.getByRole('button', { name: /^save/i }).click();
+    await expect(confirmation(page)).toBeVisible();
+    await expect.poll(async () => (await byId(api, 'Article', row.id))?.kind).toBe('Case study');
+  });
+
+  test('a page chooses the kind of item it holds', async ({ page }) => {
+    const row = await createOk(api, 'Page');
+    await page.goto(`/admin/pages/${encodeURIComponent(row.id)}/edit`);
+    await expect(page.getByLabel('Item kind')).toHaveValue('');
+    await page.getByLabel('Item kind').fill('Framework');
+    await page.getByRole('button', { name: /^save/i }).click();
+    await expect(confirmation(page)).toBeVisible();
+    const saved = await api.ok('query($id: ID!) { page(id: $id) { itemKind } }', { id: row.id });
+    expect(saved.page.itemKind).toBe('Framework');
+    await page.goto('/admin');
+    await expect(page.getByRole('navigation', { name: 'Administration' }).getByRole('link', { name: new RegExp(`^${row.title}`) })).toBeVisible();
+  });
+
+  test('the author is shown on records and is not an editable field', async ({ page }) => {
+    const row = await createOk(api, 'Article');
+    await page.goto(`/admin/items/news/${encodeURIComponent(row.id)}`);
+    await expect(page.getByRole('main').getByText(OPERATOR.displayName).first()).toBeVisible();
+    await page.goto(`/admin/items/news/${encodeURIComponent(row.id)}/edit`);
+    await expect(page.getByLabel('Author')).toHaveCount(0);
   });
 });
 
@@ -347,8 +399,8 @@ test.describe('dialogs and routing', () => {
 
   test('the delete confirmation is a modal dialog', async ({ page }) => {
     // WAI-ARIA modal dialog pattern: focus moves in, stays in, Escape closes, focus returns.
-    const row = await createOk(api, 'Post');
-    await page.goto(`${adminPath('Post')}/${encodeURIComponent(row.id)}`);
+    const row = await createOk(api, 'Article');
+    await page.goto(`${adminPath('Article')}/${encodeURIComponent(row.id)}`);
     const trigger = page.getByRole('button', { name: /^delete/i });
     await trigger.focus();
     await page.keyboard.press('Enter');
@@ -369,24 +421,24 @@ test.describe('dialogs and routing', () => {
     await page.keyboard.press('Escape');
     await expect(dialog, 'Escape closes the dialog').toBeHidden();
     await expect(trigger, 'focus returns to the Delete button').toBeFocused();
-    expect(await byId(api, 'Post', row.id), 'Escape deletes nothing').not.toBeNull();
+    expect(await byId(api, 'Article', row.id), 'Escape deletes nothing').not.toBeNull();
   });
 
   test('admin links do not reload the document', async ({ page }) => {
-    const row = await createOk(api, 'Post');
+    const row = await createOk(api, 'Article');
     await page.goto('/admin');
     await page.evaluate(() => ((window as unknown as { __document?: string }).__document = 'first-load'));
     const sameDocument = (): Promise<boolean> =>
       page.evaluate(() => (window as unknown as { __document?: string }).__document === 'first-load');
 
     await page.getByRole('main').getByRole('link', { name: /^news$/i }).click();
-    await expect(page).toHaveURL(`${BASE_URL}${adminPath('Post')}`);
+    await expect(page).toHaveURL(`${BASE_URL}${adminPath('Article')}`);
     expect(await sameDocument(), 'section link handled by the router').toBe(true);
 
-    await page.goto(`${adminPath('Post')}/${encodeURIComponent(row.id)}`);
+    await page.goto(`${adminPath('Article')}/${encodeURIComponent(row.id)}`);
     await page.evaluate(() => ((window as unknown as { __document?: string }).__document = 'first-load'));
     await page.getByRole('link', { name: /^edit$/i }).click();
-    await expect(page).toHaveURL(`${BASE_URL}${adminPath('Post')}/${encodeURIComponent(row.id)}/edit`);
+    await expect(page).toHaveURL(`${BASE_URL}${adminPath('Article')}/${encodeURIComponent(row.id)}/edit`);
     await expect(page.getByLabel('Title')).toHaveValue(row.title);
     expect(await sameDocument(), 'edit link handled by the router').toBe(true);
   });
@@ -398,15 +450,15 @@ test.describe('document titles', () => {
   });
 
   test('admin screens are titled for what they show, never "Not found"', async ({ page }) => {
-    const row = await createOk(api, 'Post');
+    const row = await createOk(api, 'Article');
     const screens: [string, RegExp][] = [
       ['/admin', /^Dashboard\b/],
       ['/admin/pages', /^Pages\b/],
-      ['/admin/news', /^News\b/],
-      ['/admin/products', /^Products\b/],
-      ['/admin/news/new', /^New article\b/],
-      [`/admin/news/${encodeURIComponent(row.id)}`, new RegExp(`^${row.title}\\b`)],
-      [`/admin/news/${encodeURIComponent(row.id)}/edit`, new RegExp(`^Edit ${row.title}\\b`)],
+      ['/admin/items/news', /^News\b/],
+      ['/admin/items/products', /^Products\b/],
+      ['/admin/items/news/new', /^New article\b/],
+      [`/admin/items/news/${encodeURIComponent(row.id)}`, new RegExp(`^${row.title}\\b`)],
+      [`/admin/items/news/${encodeURIComponent(row.id)}/edit`, new RegExp(`^Edit ${row.title}\\b`)],
     ];
     for (const [path, title] of screens) {
       await page.goto(path);

@@ -4,7 +4,11 @@ import path from 'node:path';
 import { expect, test } from '@playwright/test';
 
 import { Api } from '../../lib/api.ts';
-import { KINDS, collection, field } from '../../lib/content.ts';
+// Articles and Products are PageItems, so the schema has two content types.
+const CONTENT = [
+  { type: 'Page', field: 'page' },
+  { type: 'PageItem', field: 'pageItem' },
+] as const;
 import { REPO_ROOT } from '../../lib/env.ts';
 
 // The GraphQL surface: generated content operations, the application-owned viewer and
@@ -69,19 +73,33 @@ const argInput = (name: string): FullType | undefined => {
   return input ? types.get(named(input.type)) : undefined;
 };
 
-test('content root fields exist for every kind', () => {
+test('content root fields exist for every content type', () => {
   const roots = fieldNames(queryType);
-  for (const kind of KINDS) {
-    expect(roots).toEqual(expect.arrayContaining([field(kind), collection(kind), `${field(kind)}BySlug`]));
+  for (const { field } of CONTENT) {
+    expect(roots).toEqual(expect.arrayContaining([field, `${field}s`, `${field}BySlug`]));
   }
+  expect(roots, 'the items of one page').toContain('pageItemsOfPage');
   expect(roots).toEqual(expect.arrayContaining(['node', 'viewer', 'adminUser']));
 });
 
-test('content mutations exist for every kind', () => {
+test('there are no Post or Product types, fields or operations', () => {
+  for (const name of ['Post', 'Product']) expect(types.has(name), `GraphQL type ${name}`).toBe(false);
+  const everything = [...fieldNames(queryType), ...fieldNames(mutationType)];
+  expect(everything.filter(name => /post|product/i.test(name))).toEqual([]);
+});
+
+test('items are listed by page, newest published first, with a page filter', () => {
+  const ofPage = (queryType.fields ?? []).find(f => f.name === 'pageItemsOfPage');
+  expect(ofPage?.args?.map(arg => arg.name).sort()).toEqual(['after', 'first', 'where']);
+  const where = types.get(named(ofPage!.args!.find(arg => arg.name === 'where')!.type));
+  expect(fieldNames(where), 'filtered by the slug of the page').toEqual(['page']);
+});
+
+test('content mutations exist for every content type', () => {
   const mutations = fieldNames(mutationType);
-  for (const kind of KINDS) {
+  for (const { type } of CONTENT) {
     expect(mutations).toEqual(
-      expect.arrayContaining([`create${kind}`, `update${kind}`, `publish${kind}`, `unpublish${kind}`, `delete${kind}`]),
+      expect.arrayContaining([`create${type}`, `update${type}`, `publish${type}`, `unpublish${type}`, `delete${type}`]),
     );
   }
   expect(mutations).toContain('updateAdminUser');
@@ -104,35 +122,41 @@ test('no type exposes credentials or session secrets', () => {
   expect(offending).toEqual([]);
 });
 
-test('content types expose the specified fields; posts link only an author display name', () => {
-  const common = ['id', 'title', 'slug', 'content', 'excerpt', 'status', 'publishedAt', 'createdAt', 'updatedAt'];
-  const extra: Record<string, string[]> = { Page: ['showInNavigation', 'navigationOrder', 'featureOnHome', 'homeOrder', 'accent'], Post: ['author'], Product: ['enquiryUrl'] };
-  for (const kind of KINDS) {
-    const type = types.get(kind);
-    expect(type, `GraphQL type ${kind}`).toBeTruthy();
-    expect(fieldNames(type).sort()).toEqual([...common, ...extra[kind]].sort());
+test('content types expose the specified fields; everything links only an author display name', () => {
+  const common = ['id', 'title', 'slug', 'content', 'excerpt', 'status', 'publishedAt', 'createdAt', 'updatedAt', 'author'];
+  const extra: Record<string, string[]> = {
+    Page: ['showInNavigation', 'navigationOrder', 'featureOnHome', 'homeOrder', 'accent', 'itemKind'],
+    PageItem: ['kind', 'enquiryUrl', 'page'],
+  };
+  for (const { type } of CONTENT) {
+    const content = types.get(type);
+    expect(content, `GraphQL type ${type}`).toBeTruthy();
+    expect(fieldNames(content).sort()).toEqual([...common, ...extra[type]].sort());
+    const author = typeOf(content!, 'author');
+    expect(author?.kind, `${type}.author`).toBe('OBJECT');
+    expect(fieldNames(author), `the public author projection of ${type}`).toEqual(['displayName']);
   }
-  const author = typeOf(types.get('Post')!, 'author');
-  expect(author?.kind).toBe('OBJECT');
-  expect(fieldNames(author), 'the public author projection').toEqual(['displayName']);
+  expect(fieldNames(typeOf(types.get('PageItem')!, 'page')).sort(), 'an item links its page').toEqual(
+    fieldNames(types.get('Page')).sort(),
+  );
 });
 
-test('create and update inputs never accept ids or managed timestamps', () => {
-  for (const kind of KINDS) {
-    const create = fieldNames(argInput(`create${kind}`));
-    const update = fieldNames(argInput(`update${kind}`));
-    expect(create, `create${kind} input`).toEqual(expect.arrayContaining(['title', 'slug', 'content', 'excerpt']));
-    expect(update, `update${kind} input`).toContain('id');
-    for (const managed of ['createdAt', 'updatedAt']) {
-      expect(create).not.toContain(managed);
-      expect(update).not.toContain(managed);
+test('create and update inputs never accept ids, authors or managed timestamps', () => {
+  for (const { type } of CONTENT) {
+    const create = fieldNames(argInput(`create${type}`));
+    const update = fieldNames(argInput(`update${type}`));
+    expect(create, `create${type} input`).toEqual(expect.arrayContaining(['title', 'slug', 'content', 'excerpt']));
+    expect(update, `update${type} input`).toContain('id');
+    for (const managed of ['createdAt', 'updatedAt', 'author']) {
+      expect(create, `create${type} ${managed}`).not.toContain(managed);
+      expect(update, `update${type} ${managed}`).not.toContain(managed);
     }
     expect(create).not.toContain('id');
-    if (kind === 'Product') {
-      expect(create).toContain('enquiryUrl');
-      expect(update).toContain('enquiryUrl');
-    }
   }
+  const item = fieldNames(argInput('createPageItem'));
+  expect(item, 'an item is attached to a page and labelled with a kind').toEqual(expect.arrayContaining(['pageId', 'kind', 'enquiryUrl']));
+  expect(fieldNames(argInput('updatePageItem')), 'enquiryUrl can be changed').toContain('enquiryUrl');
+  expect(fieldNames(argInput('createPage')), 'a page chooses its item kind').toContain('itemKind');
 });
 
 test('publication status is the DRAFT/PUBLISHED enum', () => {

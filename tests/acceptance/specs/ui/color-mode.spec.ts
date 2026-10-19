@@ -28,8 +28,8 @@ for (const system of ['light', 'dark'] as const) {
     const other = system === 'light' ? 'dark' : 'light';
 
     test(`the toggle switches to ${other} mode, says so, and keeps AA contrast`, async ({ page }) => {
-      const post = await createPublished(api, 'Post');
-      await page.goto(publicPath('Post', post.slug));
+      const post = await createPublished(api, 'Article');
+      await page.goto(publicPath('Article', post.slug));
       expect(await scheme(page)).toMatch(new RegExp(system));
       const toggle = page.getByRole('banner').getByRole('button', { name: `Switch to ${other} mode` });
       await toggle.click();

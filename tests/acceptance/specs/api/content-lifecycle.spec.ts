@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import { Api, expectRejected } from '../../lib/api.ts';
+import { OPERATOR } from '../../lib/env.ts';
 import {
   KINDS,
   UTC_TIMESTAMP,
@@ -10,15 +11,19 @@ import {
   createOk,
   defaults,
   expectRecent,
+  HOSTS,
   field,
+  hostPage,
+  publishOk,
   remove,
+  typeName,
   sleep,
   update,
   updateOk,
   uniqueSlug,
 } from '../../lib/content.ts';
 
-// Shared Content and Timestamps behaviour for Page, Post and Product (acceptance 2).
+// Shared Content and Timestamps behaviour for Page and for PageItem (as Article and Product) (acceptance 2).
 
 let api: Api;
 
@@ -53,7 +58,7 @@ for (const kind of KINDS) {
       const slug = uniqueSlug(field(kind));
       const result = await create(api, kind, { title: `Minimal ${slug}`, slug });
       expect(result.errors).toEqual([]);
-      expect(result.data[`create${kind}`][field(kind)]).toMatchObject({ content: '', excerpt: '', status: 'DRAFT' });
+      expect(result.data[`create${typeName(kind)}`][field(kind)]).toMatchObject({ content: '', excerpt: '', status: 'DRAFT' });
     });
 
     test('update changes fields, advances updatedAt and keeps createdAt', async () => {
@@ -91,9 +96,116 @@ for (const kind of KINDS) {
       const row = await createOk(api, kind);
       const result = await remove(api, kind, row.id);
       expect(result.errors).toEqual([]);
-      expect(result.data[`delete${kind}`].deletedId).toBe(row.id);
+      expect(result.data[`delete${typeName(kind)}`].deletedId).toBe(row.id);
       expect(await byId(api, kind, row.id)).toBeNull();
       expect(await bySlug(api, kind, row.slug)).toBeNull();
     });
   });
 }
+
+test.describe('authorship', () => {
+  for (const kind of KINDS) {
+    test(`${kind}: the signed-in author is recorded by the server`, async () => {
+      const row = await createOk(api, kind);
+      expect(row.author, `${kind}.author`).toEqual({ displayName: OPERATOR.displayName });
+      const updated = await updateOk(api, kind, row.id, { title: `${row.title} again` });
+      expect(updated.author, 'editing keeps the author').toEqual({ displayName: OPERATOR.displayName });
+    });
+
+    test(`${kind}: clients cannot choose the author`, async () => {
+      const viewer = (await api.viewer())!;
+      for (const author of [viewer.id, 'someone-else', { displayName: 'Somebody' }]) {
+        const input = defaults(kind, { author } as Record<string, unknown>);
+        expectRejected(await create(api, kind, input), `author ${JSON.stringify(author)} is not an input`);
+        expect(await bySlug(api, kind, input.slug as string), 'nothing was created').toBeNull();
+      }
+    });
+  }
+});
+
+test.describe('items belong to a page', () => {
+  test('an item is attached to its page and labelled with a kind', async () => {
+    const host = await hostPage('Article');
+    const row = await createOk(api, 'Article');
+    expect(row.page).toEqual({ id: host.id, slug: HOSTS.Article.slug });
+    expect(row.kind).toBe('Article');
+    const product = await createOk(api, 'Product');
+    expect(product.page?.slug).toBe(HOSTS.Product.slug);
+    expect(product.kind).toBe('Product');
+  });
+
+  test('a page chooses the kind of item it holds, and new items default to it', async () => {
+    const host = await hostPage('Article');
+    const page = (await api.ok('query($id: ID!) { page(id: $id) { itemKind } }', { id: host.id })).page;
+    expect(page.itemKind).toBe('Article');
+    const slug = uniqueSlug('default-kind');
+    const result = await api.graphql(
+      'mutation($input: CreatePageItemInput!) { createPageItem(input: $input) { pageItem { kind } } }',
+      { input: { pageId: host.id, title: `Default kind ${slug}`, slug } },
+    );
+    expect(result.errors).toEqual([]);
+    expect(result.data.createPageItem.pageItem.kind).toBe('Article');
+  });
+
+  test('one page can hold items of several kinds', async () => {
+    const host = await hostPage('Article');
+    const row = await createOk(api, 'Article', { kind: 'Framework' });
+    expect(row.kind).toBe('Framework');
+    expect(row.page?.id).toBe(host.id);
+  });
+
+  test('an item needs an existing page that holds items', async () => {
+    const plain = await createOk(api, 'Page');
+    const attempts: [string, Record<string, unknown>][] = [
+      ['a page that holds no items', { pageId: plain.id }],
+      ['a missing page id', { pageId: 'no-such-page' }],
+      ['an item id as the page', { pageId: (await createOk(api, 'Product')).id }],
+      ['a blank kind', { kind: '  ' }],
+      ['a kind over 80 characters', { kind: 'k'.repeat(81) }],
+    ];
+    for (const [label, extra] of attempts) {
+      const input = defaults('Article', extra);
+      expectRejected(await create(api, 'Article', input), label);
+      expect(await bySlug(api, 'Article', input.slug as string), `${label}: nothing stored`).toBeNull();
+    }
+    const result = await api.graphql(
+      'mutation($input: CreatePageItemInput!) { createPageItem(input: $input) { pageItem { id } } }',
+      { input: { title: 'No page', slug: uniqueSlug('no-page') } },
+    );
+    expectRejected(result, 'an item without a page');
+  });
+
+  test('item slugs are unique across every item, whatever its page', async () => {
+    const article = await createOk(api, 'Article');
+    expectRejected(await create(api, 'Product', defaults('Product', { slug: article.slug })), 'same slug on another page');
+  });
+
+  test('deleting a page deletes its items', async () => {
+    const slug = uniqueSlug('doomed');
+    const page = await createOk(api, 'Page', { slug, itemKind: 'Note' });
+    const result = await api.graphql(
+      'mutation($input: CreatePageItemInput!) { createPageItem(input: $input) { pageItem { id } } }',
+      { input: { pageId: page.id, title: 'Goes with its page', slug: uniqueSlug('goes') } },
+    );
+    expect(result.errors).toEqual([]);
+    const itemId = result.data.createPageItem.pageItem.id as string;
+    expect((await remove(api, 'Page', page.id)).errors).toEqual([]);
+    expect(await byId(api, 'Article', itemId), 'the item went with its page').toBeNull();
+  });
+
+  test('a published item is visible only while its page is published', async () => {
+    const slug = uniqueSlug('draft-host');
+    const page = await createOk(api, 'Page', { slug, itemKind: 'Note' });
+    const created = await api.graphql(
+      'mutation($input: CreatePageItemInput!) { createPageItem(input: $input) { pageItem { id slug } } }',
+      { input: { pageId: page.id, title: 'On a draft page', slug: uniqueSlug('on-draft') } },
+    );
+    const item = created.data.createPageItem.pageItem as { id: string; slug: string };
+    const anonymous = await Api.anonymous();
+    await publishOk(api, 'Article', item.id);
+    expect(await bySlug(anonymous, 'Article', item.slug), 'invisible while its page is a draft').toBeNull();
+    await publishOk(api, 'Page', page.id);
+    expect((await bySlug(anonymous, 'Article', item.slug))?.id).toBe(item.id);
+    await anonymous.dispose();
+  });
+});

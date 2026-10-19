@@ -14,6 +14,7 @@ import {
   defaults,
   field,
   remove,
+  typeName,
   update,
   walk,
 } from '../../lib/content.ts';
@@ -59,7 +60,7 @@ for (const kind of KINDS) {
       const lookups = [
         await bySlugRaw(anonymous, kind, draft.slug),
         await byIdRaw(anonymous, kind, draft.id),
-        await anonymous.graphql(`query Node($id: ID!) { node(id: $id) { id ... on ${kind} { title } } }`, { id: draft.id }),
+        await anonymous.graphql(`query Node($id: ID!) { node(id: $id) { id ... on ${typeName(kind)} { title } } }`, { id: draft.id }),
       ];
       for (const result of lookups) {
         expect(result.body).not.toContain(draft.title);
@@ -70,7 +71,7 @@ for (const kind of KINDS) {
     test('anonymous lookups return published rows', async () => {
       expect((await bySlugRaw(anonymous, kind, published.slug)).data?.[`${field(kind)}BySlug`]?.id).toBe(published.id);
       expect((await byIdRaw(anonymous, kind, published.id)).data?.[field(kind)]?.id).toBe(published.id);
-      const node = await anonymous.graphql(`query Node($id: ID!) { node(id: $id) { id ... on ${kind} { title } } }`, {
+      const node = await anonymous.graphql(`query Node($id: ID!) { node(id: $id) { id ... on ${typeName(kind)} { title } } }`, {
         id: published.id,
       });
       expect(node.data?.node).toMatchObject({ id: published.id, title: published.title });
@@ -103,18 +104,21 @@ for (const kind of KINDS) {
   });
 }
 
-test('ids of one kind never resolve as another kind', async () => {
-  const post = await createPublished(operator, 'Post', { title: `Cross-type ${Date.now()}` });
+test('ids of one type never resolve as another type', async () => {
+  const item = await createPublished(operator, 'Article', { title: `Cross-type ${Date.now()}` });
+  const page = await createPublished(operator, 'Page', { title: `Cross-type page ${Date.now()}` });
   for (const api of [anonymous, operator]) {
-    for (const kind of ['Page', 'Product'] as const) {
-      const result = await byIdRaw(api, kind, post.id);
-      expect(result.data?.[field(kind)] ?? null, `${field(kind)}(id: <Post id>)`).toBeNull();
-      expect(result.body).not.toContain(post.title);
-    }
+    const asPage = await byIdRaw(api, 'Page', item.id);
+    expect(asPage.data?.page ?? null, 'page(id: <PageItem id>)').toBeNull();
+    expect(asPage.body).not.toContain(item.title);
+    const asItem = await byIdRaw(api, 'Article', page.id);
+    expect(asItem.data?.pageItem ?? null, 'pageItem(id: <Page id>)').toBeNull();
+    expect(asItem.body).not.toContain(page.title);
   }
-  const wrongUpdate = await update(operator, 'Page', post.id, { title: 'Hijacked' });
-  expectRejected(wrongUpdate, 'updatePage with a Post id');
-  expect((await byId(operator, 'Post', post.id))?.title).toBe(post.title);
+  expectRejected(await update(operator, 'Page', item.id, { title: 'Hijacked' }), 'updatePage with a PageItem id');
+  expectRejected(await update(operator, 'Article', page.id, { title: 'Hijacked' }), 'updatePageItem with a Page id');
+  expect((await byId(operator, 'Article', item.id))?.title).toBe(item.title);
+  expect((await byId(operator, 'Page', page.id))?.title).toBe(page.title);
 });
 
 test('the operator profile is not readable anonymously', async () => {
@@ -127,10 +131,14 @@ test('the operator profile is not readable anonymously', async () => {
   expect(await anonymous.viewer()).toBeNull();
 });
 
-test('visitors see a post author by display name only', async () => {
-  const post = await createPublished(operator, 'Post');
-  const result = await anonymous.graphql('query Byline($slug: String!) { postBySlug(slug: $slug) { author { displayName } } }', { slug: post.slug });
-  expect(result.errors).toEqual([]);
-  expect(result.data?.postBySlug?.author).toEqual({ displayName: OPERATOR.displayName });
-  expect(result.body).not.toContain(OPERATOR.username);
+test('visitors see an author by display name only, on pages and items alike', async () => {
+  const item = await createPublished(operator, 'Article');
+  const page = await createPublished(operator, 'Page');
+  const itemResult = await anonymous.graphql('query Byline($slug: String!) { pageItemBySlug(slug: $slug) { author { displayName } } }', { slug: item.slug });
+  expect(itemResult.errors).toEqual([]);
+  expect(itemResult.data?.pageItemBySlug?.author).toEqual({ displayName: OPERATOR.displayName });
+  const pageResult = await anonymous.graphql('query Byline($slug: String!) { pageBySlug(slug: $slug) { author { displayName } } }', { slug: page.slug });
+  expect(pageResult.errors).toEqual([]);
+  expect(pageResult.data?.pageBySlug?.author).toEqual({ displayName: OPERATOR.displayName });
+  expect(itemResult.body + pageResult.body).not.toContain(OPERATOR.username);
 });

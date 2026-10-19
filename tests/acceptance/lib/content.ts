@@ -4,11 +4,26 @@ import { Api, type GraphQLResult } from './api.ts';
 import { RUN_ID } from './env.ts';
 
 // GraphQL names follow from the spec and elephentity-codegen-graphql-php: the
-// `graphql.singular`/`plural` integration settings give `page`/`pages`, mutations are
-// `create{Type}`, `update{Type}`, `{action}{Type}` and `delete{Type}` taking
-// `input: {Name}Input!`, and their payload carries the row under the lcfirst type name.
-export type Kind = 'Page' | 'Post' | 'Product';
-export const KINDS: readonly Kind[] = ['Page', 'Post', 'Product'];
+// `graphql.singular`/`plural` integration settings give `page`/`pages` and
+// `pageItem`/`pageItems`, mutations are `create{Type}`, `update{Type}`, `{action}{Type}`
+// and `delete{Type}` taking `input: {Name}Input!`, and their payload carries the row
+// under the lcfirst type name.
+//
+// Articles and Products are not types of their own: both are PageItems (spec/entities/
+// PageItem.md) attached to a Page that holds items — News and Products — and labelled by
+// their `kind`. `Kind` names what a test is about; `typeName` is the GraphQL type.
+export type Kind = 'Page' | 'Article' | 'Product';
+export const KINDS: readonly Kind[] = ['Page', 'Article', 'Product'];
+export type ItemKind = Exclude<Kind, 'Page'>;
+
+/** The seeded page each item kind lives on, and the label its items are given. */
+export const HOSTS: Record<ItemKind, { slug: string; title: string; itemKind: ItemKind }> = {
+  Article: { slug: 'news', title: 'News', itemKind: 'Article' },
+  Product: { slug: 'products', title: 'Products', itemKind: 'Product' },
+};
+
+/** Page slugs that would shadow a fixed route (tests/README.md, "Reserved slugs"). */
+export const RESERVED_SLUGS = ['admin', 'assets', 'auth', 'graphql', 'media', 'pages'] as const;
 
 export interface Content {
   id: string;
@@ -20,20 +35,47 @@ export interface Content {
   publishedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  author?: { displayName: string };
+  // Items only.
+  kind?: string;
   enquiryUrl?: string | null;
+  page?: { id: string; slug: string };
 }
 
 export type ContentInput = Partial<Omit<Content, 'id'>> & Record<string, unknown>;
 
-export const field = (kind: Kind): string => kind.charAt(0).toLowerCase() + kind.slice(1);
+export const isItem = (kind: Kind): kind is ItemKind => kind !== 'Page';
+export const typeName = (kind: Kind): 'Page' | 'PageItem' => (isItem(kind) ? 'PageItem' : 'Page');
+export const field = (kind: Kind): string => (isItem(kind) ? 'pageItem' : 'page');
 export const collection = (kind: Kind): string => `${field(kind)}s`;
-export const publicPath = (kind: Kind, slug: string): string =>
-  ({ Page: `/pages/${slug}`, Post: `/news/${slug}`, Product: `/products/${slug}` })[kind];
-// Posts are presented as News, at /news and /admin/news.
-export const adminPath = (kind: Kind): string => (kind === 'Post' ? '/admin/news' : `/admin/${collection(kind)}`);
+/** Pages live at /pages/<slug>; an item lives at /<its page's slug>/<its slug>. */
+export const publicPath = (kind: Kind, slug: string): string => (isItem(kind) ? `/${HOSTS[kind].slug}/${slug}` : `/pages/${slug}`);
+/** A page that holds items is listed at its own page address, /pages/<slug>. */
+export const listPath = (kind: ItemKind): string => `/pages/${HOSTS[kind].slug}`;
+/** Admin sections: /admin/pages, and /admin/items/<page slug> for the items of a page. */
+export const adminPath = (kind: Kind): string => (isItem(kind) ? `/admin/items/${HOSTS[kind].slug}` : '/admin/pages');
+/** The lowercase label used in "New article" and "No products". */
+export const noun = (kind: Kind): string => kind.toLowerCase();
 
 export function selection(kind: Kind): string {
-  return `id title slug content excerpt status publishedAt createdAt updatedAt${kind === 'Product' ? ' enquiryUrl' : ''}`;
+  const common = 'id title slug content excerpt status publishedAt createdAt updatedAt author { displayName }';
+  return isItem(kind) ? `${common} kind enquiryUrl page { id slug }` : common;
+}
+
+// The operator session that finds or creates the pages items attach to.
+let hostSession: Promise<Api> | undefined;
+const hosts = new Map<ItemKind, Promise<Content>>();
+
+/** The published page whose items carry this kind: seeded, else created on demand. */
+export function hostPage(kind: ItemKind): Promise<Content> {
+  let host = hosts.get(kind);
+  if (!host) {
+    hostSession ??= Api.operator();
+    const { slug, title, itemKind } = HOSTS[kind];
+    host = hostSession.then(api => ensurePage(api, slug, 'PUBLISHED', { title, itemKind }));
+    hosts.set(kind, host);
+  }
+  return host;
 }
 
 let counter = 0;
@@ -45,7 +87,7 @@ export function uniqueSlug(label = 't'): string {
 }
 
 export function defaults(kind: Kind, overrides: ContentInput = {}): ContentInput {
-  const slug = (overrides.slug as string | undefined) ?? uniqueSlug(field(kind));
+  const slug = (overrides.slug as string | undefined) ?? uniqueSlug(noun(kind));
   return {
     title: `${kind} ${slug}`,
     slug,
@@ -55,38 +97,45 @@ export function defaults(kind: Kind, overrides: ContentInput = {}): ContentInput
   };
 }
 
-export function create(api: Api, kind: Kind, input: ContentInput): Promise<GraphQLResult> {
+/** An item's input: attached to the kind's page and labelled with the kind, unless given. */
+async function withHost(kind: Kind, input: ContentInput): Promise<ContentInput> {
+  if (!isItem(kind)) return input;
+  return { pageId: (await hostPage(kind)).id, kind, ...input };
+}
+
+export async function create(api: Api, kind: Kind, input: ContentInput): Promise<GraphQLResult> {
+  const type = typeName(kind);
   return api.graphql(
-    `mutation Create($input: Create${kind}Input!) { create${kind}(input: $input) { ${field(kind)} { ${selection(kind)} } } }`,
-    { input },
+    `mutation Create($input: Create${type}Input!) { create${type}(input: $input) { ${field(kind)} { ${selection(kind)} } } }`,
+    { input: await withHost(kind, input) },
   );
 }
 
 export async function createOk(api: Api, kind: Kind, overrides: ContentInput = {}): Promise<Content> {
   const input = defaults(kind, overrides);
   const result = await create(api, kind, input);
-  expect(result.errors, `create${kind} errors: ${result.body.slice(0, 500)}`).toEqual([]);
-  const row = result.data?.[`create${kind}`]?.[field(kind)] as Content | undefined;
-  expect(row, `create${kind} returns the created ${kind}`).toBeTruthy();
+  expect(result.errors, `create${typeName(kind)} errors: ${result.body.slice(0, 500)}`).toEqual([]);
+  const row = result.data?.[`create${typeName(kind)}`]?.[field(kind)] as Content | undefined;
+  expect(row, `create${typeName(kind)} returns the created ${kind}`).toBeTruthy();
   return row!;
 }
 
 export function update(api: Api, kind: Kind, id: string, input: ContentInput): Promise<GraphQLResult> {
   return api.graphql(
-    `mutation Update($input: Update${kind}Input!) { update${kind}(input: $input) { ${field(kind)} { ${selection(kind)} } } }`,
+    `mutation Update($input: Update${typeName(kind)}Input!) { update${typeName(kind)}(input: $input) { ${field(kind)} { ${selection(kind)} } } }`,
     { input: { id, ...input } },
   );
 }
 
 export async function updateOk(api: Api, kind: Kind, id: string, input: ContentInput): Promise<Content> {
   const result = await update(api, kind, id, input);
-  expect(result.errors, `update${kind} errors: ${result.body.slice(0, 500)}`).toEqual([]);
-  return result.data[`update${kind}`][field(kind)] as Content;
+  expect(result.errors, `update${typeName(kind)} errors: ${result.body.slice(0, 500)}`).toEqual([]);
+  return result.data[`update${typeName(kind)}`][field(kind)] as Content;
 }
 
 export function action(api: Api, kind: Kind, name: 'publish' | 'unpublish', id: string): Promise<GraphQLResult> {
-  const mutation = `${name}${kind}`;
-  const inputType = `${name.charAt(0).toUpperCase()}${name.slice(1)}${kind}Input`;
+  const mutation = `${name}${typeName(kind)}`;
+  const inputType = `${name.charAt(0).toUpperCase()}${name.slice(1)}${typeName(kind)}Input`;
   return api.graphql(
     `mutation Action($input: ${inputType}!) { ${mutation}(input: $input) { ${field(kind)} { ${selection(kind)} } } }`,
     { input: { id } },
@@ -95,18 +144,18 @@ export function action(api: Api, kind: Kind, name: 'publish' | 'unpublish', id: 
 
 export async function publishOk(api: Api, kind: Kind, id: string): Promise<Content> {
   const result = await action(api, kind, 'publish', id);
-  expect(result.errors, `publish${kind} errors: ${result.body.slice(0, 500)}`).toEqual([]);
-  return result.data[`publish${kind}`][field(kind)] as Content;
+  expect(result.errors, `publish${typeName(kind)} errors: ${result.body.slice(0, 500)}`).toEqual([]);
+  return result.data[`publish${typeName(kind)}`][field(kind)] as Content;
 }
 
 export async function unpublishOk(api: Api, kind: Kind, id: string): Promise<Content> {
   const result = await action(api, kind, 'unpublish', id);
-  expect(result.errors, `unpublish${kind} errors: ${result.body.slice(0, 500)}`).toEqual([]);
-  return result.data[`unpublish${kind}`][field(kind)] as Content;
+  expect(result.errors, `unpublish${typeName(kind)} errors: ${result.body.slice(0, 500)}`).toEqual([]);
+  return result.data[`unpublish${typeName(kind)}`][field(kind)] as Content;
 }
 
 export function remove(api: Api, kind: Kind, id: string): Promise<GraphQLResult> {
-  return api.graphql(`mutation Delete($input: Delete${kind}Input!) { delete${kind}(input: $input) { deletedId } }`, {
+  return api.graphql(`mutation Delete($input: Delete${typeName(kind)}Input!) { delete${typeName(kind)}(input: $input) { deletedId } }`, {
     input: { id },
   });
 }
@@ -141,9 +190,12 @@ export interface ConnectionPage {
   nodes: Content[];
 }
 
+const connectionName = (kind: Kind): string => (isItem(kind) ? 'pageItemsOfPage' : collection(kind));
+
 export function pageOfRaw(api: Api, kind: Kind, args: { first?: number; after?: string | null } = {}): Promise<GraphQLResult> {
   const params: string[] = [];
   const variables: Record<string, unknown> = {};
+  if (isItem(kind)) params.push(`where: { page: ${JSON.stringify(HOSTS[kind].slug)} }`);
   if (args.first !== undefined) {
     params.push('first: $first');
     variables.first = args.first;
@@ -153,8 +205,10 @@ export function pageOfRaw(api: Api, kind: Kind, args: { first?: number; after?: 
     variables.after = args.after;
   }
   const declared = [args.first !== undefined ? '$first: Int' : '', args.after ? '$after: String' : ''].filter(Boolean).join(', ');
+  // Items are read through the connection of their page: pageItemsOfPage(where: { page }).
+  const name = connectionName(kind);
   return api.graphql(
-    `query Page${declared ? `(${declared})` : ''} { ${collection(kind)}${params.length ? `(${params.join(', ')})` : ''} { totalCount pageInfo { hasNextPage endCursor } nodes { ${selection(kind)} } } }`,
+    `query Page${declared ? `(${declared})` : ''} { ${name}${params.length ? `(${params.join(', ')})` : ''} { totalCount pageInfo { hasNextPage endCursor } nodes { ${selection(kind)} } } }`,
     variables,
   );
 }
@@ -162,7 +216,7 @@ export function pageOfRaw(api: Api, kind: Kind, args: { first?: number; after?: 
 export async function pageOf(api: Api, kind: Kind, args: { first?: number; after?: string | null } = {}): Promise<ConnectionPage> {
   const result = await pageOfRaw(api, kind, args);
   expect(result.errors, `${collection(kind)} errors: ${result.body.slice(0, 500)}`).toEqual([]);
-  return result.data[collection(kind)] as ConnectionPage;
+  return result.data[connectionName(kind)] as ConnectionPage;
 }
 
 /**
@@ -178,7 +232,7 @@ export async function walk(api: Api, kind: Kind, first = 100): Promise<{ nodes: 
     const result = await pageOfRaw(api, kind, { first, after });
     expect(result.errors, `${collection(kind)} errors: ${result.body.slice(0, 500)}`).toEqual([]);
     bodies.push(result.body);
-    const page = result.data[collection(kind)] as ConnectionPage;
+    const page = result.data[connectionName(kind)] as ConnectionPage;
     totalCount = page.totalCount;
     nodes.push(...page.nodes);
     if (!page.pageInfo.hasNextPage) return { nodes, totalCount, bodies };

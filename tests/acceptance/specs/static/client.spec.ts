@@ -70,7 +70,7 @@ test('each entrypoint preloads a query of its own, defined in its own directory'
 });
 
 test('links and redirects use the generated URI builders, not hand-written route paths', () => {
-  const literal = /(['"`])\/(admin|pages|posts|news|products)\b[^'"`]*\1?/g;
+  const literal = /(['"`])\/(admin|pages|posts|news|products|items)\b[^'"`]*\1?/g;
   const found = sourceFiles(CLIENT_SRC).flatMap(file =>
     fs
       .readFileSync(file, 'utf8')

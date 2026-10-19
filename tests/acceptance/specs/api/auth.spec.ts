@@ -62,7 +62,7 @@ test('mutations require the CSRF token and apply nothing without it', async () =
 
 test('queries do not need a CSRF token', async () => {
   const api = await Api.anonymous();
-  const result = await api.graphql('query { posts(first: 1) { totalCount } }');
+  const result = await api.graphql('query { pageItems(first: 1) { totalCount } }');
   expect(result.status).toBe(200);
   expect(result.errors).toEqual([]);
   await api.dispose();
@@ -127,10 +127,10 @@ test.describe('sessions are created only when needed', () => {
   test('anonymous reads do not create a session', async () => {
     // Crawlers and first-time visitors must not each leave a session row behind.
     const api = await Api.anonymous();
-    const query = await api.ctx.post('/graphql', { data: { query: '{ posts(first: 1) { totalCount } }' } });
+    const query = await api.ctx.post('/graphql', { data: { query: '{ pageItems(first: 1) { totalCount } }' } });
     expect(query.status()).toBe(200);
     expect(setCookies(query).map(cookie => cookie.name), 'Set-Cookie on an anonymous GraphQL query').toEqual([]);
-    for (const path of ['/', '/news', '/admin/login']) {
+    for (const path of ['/', '/pages/news', '/admin/login']) {
       const response = await api.ctx.get(path);
       expect(setCookies(response).map(cookie => cookie.name), `Set-Cookie on GET ${path}`).toEqual([]);
     }
@@ -139,9 +139,9 @@ test.describe('sessions are created only when needed', () => {
 
   test('a cookieless mutation is refused without creating a session', async () => {
     const api = await Api.anonymous();
-    const input = defaults('Post');
+    const input = defaults('Article');
     const response = await api.ctx.post('/graphql', {
-      data: { query: 'mutation($input: CreatePostInput!) { createPost(input: $input) { post { id } } }', variables: { input } },
+      data: { query: 'mutation($input: CreatePageItemInput!) { createPageItem(input: $input) { pageItem { id } } }', variables: { input } },
       headers: { 'X-CSRF-Token': 'not-a-token' },
     });
     expect(response.status()).toBe(403);

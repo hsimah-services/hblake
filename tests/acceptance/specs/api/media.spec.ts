@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 import { Api } from '../../lib/api.ts';
 import { JPEG, PNG, jpegWithExif, upload } from '../../lib/media.ts';
 
-// Post images (spec/website.md, issue #14): staff upload PNG, JPEG or WebP images to
+// Item images (spec/website.md, issue #14): staff upload PNG, JPEG or WebP images to
 // POST /media; the server checks them by content, bounds their size, strips metadata by
 // re-encoding and stores them under random names that GET /media/<name> serves.
 

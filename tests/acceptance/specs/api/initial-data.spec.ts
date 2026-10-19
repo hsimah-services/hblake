@@ -42,20 +42,21 @@ test.afterAll(async () => {
 });
 
 test('a public route inlines its query response and is not shared-cacheable', async () => {
-  const post = await createPublished(operator, 'Post');
-  const { response, payload } = await html(visitor, publicPath('Post', post.slug));
+  const post = await createPublished(operator, 'Article');
+  const { response, payload } = await html(visitor, publicPath('Article', post.slug));
   expect(payload, 'the route HTML carries #tsquid-data').not.toBeNull();
   expect(payload!.version).toBe(1);
   expect(payload!.responses, 'exactly the route query').toHaveLength(1);
   const [entry] = payload!.responses;
-  expect(entry.variables).toEqual({ slug: post.slug });
+  expect(entry.variables, 'the page and item segments of /<page>/<item>').toEqual({ page: 'news', slug: post.slug });
   expect(JSON.stringify(entry.response.data)).toContain(post.title);
   expect(response.headers()['cache-control'] ?? '').toMatch(/private|no-store/);
   expect(setCookies(response).map(cookie => cookie.name), 'no session for an anonymous page view').toEqual([]);
 });
 
-test('list routes bind their URL cursor', async () => {
-  for (const path of ['/news', '/products']) {
+test('page routes bind their URL cursor', async () => {
+  await createPublished(operator, 'Product');
+  for (const path of ['/pages/news', '/pages/products']) {
     const { payload } = await html(visitor, path);
     expect(payload?.responses, `${path} inlines its list query`).toHaveLength(1);
     expect(payload!.responses[0].variables.after ?? null).toBeNull();
@@ -63,8 +64,8 @@ test('list routes bind their URL cursor', async () => {
 });
 
 test('drafts are inlined only for staff', async () => {
-  const draft = await createOk(operator, 'Post', { title: `Draft ${uniqueSlug('secret')}` });
-  const path = publicPath('Post', draft.slug);
+  const draft = await createOk(operator, 'Article', { title: `Draft ${uniqueSlug('secret')}` });
+  const path = publicPath('Article', draft.slug);
   const anonymous = await html(visitor, path);
   expect(anonymous.body, 'a visitor never receives draft text').not.toContain(draft.title);
   expect(anonymous.body).not.toContain(draft.content);
@@ -83,15 +84,15 @@ test('private profile data is inlined only for the operator', async () => {
 
 test('inlined content cannot break out of its script element', async () => {
   const hostile = '</script><script>window.__xss=1</script><!--';
-  const post = await createPublished(operator, 'Post', { title: `T ${hostile}`, excerpt: hostile, content: `${hostile}\n\n</SCRIPT >` });
-  const { body, payload } = await html(visitor, publicPath('Post', post.slug));
+  const post = await createPublished(operator, 'Article', { title: `T ${hostile}`, excerpt: hostile, content: `${hostile}\n\n</SCRIPT >` });
+  const { body, payload } = await html(visitor, publicPath('Article', post.slug));
   expect(payload, 'the payload parses up to its own closing tag').not.toBeNull();
   expect(JSON.stringify(payload)).toContain(hostile);
   expect(body).not.toContain('<script>window.__xss');
 });
 
 test('URLs that match no route get the plain shell', async () => {
-  for (const path of [`/nothing-${uniqueSlug()}`, '/news/a/b/c', '/news/%E0%A4%A']) {
+  for (const path of [`/nothing-${uniqueSlug()}`, '/news/a/b/c', '/news/%E0%A4%A', '/pages/a/b']) {
     const { payload } = await html(visitor, path);
     expect(payload, path).toBeNull();
   }

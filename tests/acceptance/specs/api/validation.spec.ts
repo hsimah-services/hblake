@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import { Api, expectRejected } from '../../lib/api.ts';
-import { KINDS, byId, bySlug, create, createOk, defaults, update, updateOk, uniqueSlug } from '../../lib/content.ts';
+import { KINDS, RESERVED_SLUGS, byId, bySlug, create, createOk, defaults, update, updateOk, uniqueSlug } from '../../lib/content.ts';
 import { RUN_ID } from '../../lib/env.ts';
 
 // Field rules from website.md and Product.md (acceptance 6). Every rejection must also
@@ -18,6 +18,25 @@ test.afterAll(async () => {
 });
 
 test.describe('slugs', () => {
+  test('a page slug may not shadow a fixed route', async () => {
+    // /<page>/<item> would otherwise collide with /admin, /pages, /auth, /graphql, /media
+    // and /assets (tests/README.md, "Reserved slugs").
+    for (const slug of RESERVED_SLUGS) {
+      expectRejected(await create(api, 'Page', defaults('Page', { slug })), `page slug ${slug}`);
+      expect(await bySlug(api, 'Page', slug), `no page stored at ${slug}`).toBeNull();
+    }
+    const row = await createOk(api, 'Page');
+    for (const slug of RESERVED_SLUGS) {
+      expectRejected(await update(api, 'Page', row.id, { slug }), `renaming a page to ${slug}`);
+    }
+    expect((await byId(api, 'Page', row.id))?.slug).toBe(row.slug);
+  });
+
+  test('a reserved word is fine inside a longer slug and as an item slug', async () => {
+    expect((await createOk(api, 'Page', { slug: `admin-${uniqueSlug('x')}` })).slug).toMatch(/^admin-/);
+    expect((await createOk(api, 'Article', { slug: `media-${uniqueSlug('x')}` })).slug).toMatch(/^media-/);
+  });
+
   const valid = (): string[] => [
     `a${RUN_ID}`,
     `${RUN_ID}-1-2-3`,
@@ -53,11 +72,11 @@ test.describe('slugs', () => {
   });
 
   test('anything else is rejected on update', async () => {
-    const row = await createOk(api, 'Post');
+    const row = await createOk(api, 'Article');
     for (const slug of invalid()) {
-      expectRejected(await update(api, 'Post', row.id, { slug }), `slug ${JSON.stringify(slug)} should be rejected`);
+      expectRejected(await update(api, 'Article', row.id, { slug }), `slug ${JSON.stringify(slug)} should be rejected`);
     }
-    expect((await byId(api, 'Post', row.id))?.slug).toBe(row.slug);
+    expect((await byId(api, 'Article', row.id))?.slug).toBe(row.slug);
   });
 
   for (const kind of KINDS) {
@@ -89,16 +108,16 @@ test.describe('slugs', () => {
 test.describe('titles', () => {
   for (const title of ['', '   ', '\t\n']) {
     test(`title ${JSON.stringify(title)} is rejected`, async () => {
-      const input = defaults('Post', { title });
-      expectRejected(await create(api, 'Post', input));
-      expect(await bySlug(api, 'Post', input.slug as string)).toBeNull();
+      const input = defaults('Article', { title });
+      expectRejected(await create(api, 'Article', input));
+      expect(await bySlug(api, 'Article', input.slug as string)).toBeNull();
     });
   }
 
   test('a title cannot be blanked on update', async () => {
-    const row = await createOk(api, 'Post');
-    expectRejected(await update(api, 'Post', row.id, { title: '  ' }));
-    expect((await byId(api, 'Post', row.id))?.title).toBe(row.title);
+    const row = await createOk(api, 'Article');
+    expectRejected(await update(api, 'Article', row.id, { title: '  ' }));
+    expect((await byId(api, 'Article', row.id))?.title).toBe(row.title);
   });
 
   test('titles are limited to 200 characters', async () => {
@@ -111,29 +130,29 @@ test.describe('titles', () => {
 
 test.describe('excerpts', () => {
   test('excerpts are limited to 300 characters', async () => {
-    expect((await createOk(api, 'Post', { excerpt: 'e'.repeat(300) })).excerpt).toHaveLength(300);
-    const input = defaults('Post', { excerpt: 'e'.repeat(301) });
-    expectRejected(await create(api, 'Post', input));
-    expect(await bySlug(api, 'Post', input.slug as string)).toBeNull();
+    expect((await createOk(api, 'Article', { excerpt: 'e'.repeat(300) })).excerpt).toHaveLength(300);
+    const input = defaults('Article', { excerpt: 'e'.repeat(301) });
+    expectRejected(await create(api, 'Article', input));
+    expect(await bySlug(api, 'Article', input.slug as string)).toBeNull();
   });
 });
 
 test.describe('bodies', () => {
   test('requests over 1 MiB are refused and nothing is stored', async () => {
-    const input = defaults('Post', { content: 'x'.repeat(1024 * 1024 + 1) });
-    const result = await create(api, 'Post', input);
+    const input = defaults('Article', { content: 'x'.repeat(1024 * 1024 + 1) });
+    const result = await create(api, 'Article', input);
     expectRejected(result, 'a body over 1 MiB');
-    expect(await bySlug(api, 'Post', input.slug as string)).toBeNull();
+    expect(await bySlug(api, 'Article', input.slug as string)).toBeNull();
   });
 
   test('a large body under the limit is accepted', async () => {
     const content = `# Large\n\n${'Lorem ipsum dolor sit amet. '.repeat(18_000)}`;
     expect(content.length).toBeLessThan(600_000);
-    expect((await createOk(api, 'Post', { content })).content).toBe(content);
+    expect((await createOk(api, 'Article', { content })).content).toBe(content);
   });
 });
 
-test.describe('Product enquiry URLs', () => {
+test.describe('Item enquiry URLs (shown for Products)', () => {
   const accepted = ['https://example.com/contact', 'https://example.com/a?b=c#d', 'mailto:hello@example.com'];
   const rejected = [
     'http://example.com',

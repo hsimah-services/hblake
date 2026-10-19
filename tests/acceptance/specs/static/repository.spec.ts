@@ -62,13 +62,20 @@ test('the generated tree is committed for every entity and target', () => {
   const config = readJson(path.join(REPO_ROOT, 'eleph.json'));
   const php = path.join(REPO_ROOT, config.targets.php.output);
   const expected = [
-    ...['Page', 'Post', 'Product', 'User'].map(entity => path.join(php, entity, `${entity}.php`)),
+    ...['Page', 'PageItem', 'User'].map(entity => path.join(php, entity, `${entity}.php`)),
     path.join(php, 'Catalogue.php'),
     path.join(REPO_ROOT, config.targets.sqlite.output, 'install.php'),
     path.join(REPO_ROOT, config.targets.sqlite.output, 'storage-manifest.php'),
     path.join(REPO_ROOT, config.targets['graphql-php'].output, 'graphql-manifest.php'),
   ];
   expect(expected.filter(file => !fs.existsSync(file)).map(file => path.relative(REPO_ROOT, file))).toEqual([]);
+});
+
+test('Post and Product are gone from the model', () => {
+  for (const name of ['Post', 'Product']) {
+    expect(fs.existsSync(path.join(REPO_ROOT, 'spec/entities', `${name}.yml`)), `spec/entities/${name}.yml`).toBe(false);
+    expect(fs.existsSync(path.join(REPO_ROOT, 'generated', name)), `generated/${name}`).toBe(false);
+  }
 });
 
 test('User is not exposed through the generated GraphQL manifest', () => {

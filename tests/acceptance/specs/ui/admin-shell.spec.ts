@@ -1,11 +1,12 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
 import { Api } from '../../lib/api.ts';
-import { adminPath, byId, createOk, type Kind } from '../../lib/content.ts';
+import { adminPath, byId, createOk, hostPage, type Kind } from '../../lib/content.ts';
 import { BASE_URL, RUN_ID } from '../../lib/env.ts';
 import { signIn } from '../../lib/ui.ts';
 
-// The WordPress-style admin (spec/ui/admin.md): a sidebar of content types, a table of
+// The WordPress-style admin (spec/ui/admin.md): a sidebar of Pages and of each page that
+// holds items (News, Products), at /admin/pages and /admin/items/<page>, a table of
 // each type's records with view, edit and delete actions, an "Add new" form, relative
 // timestamps with the absolute time available on hover, focus and to screen readers.
 
@@ -13,6 +14,12 @@ let api: Api;
 
 test.beforeAll(async () => {
   api = await Api.operator();
+});
+
+test.beforeAll(async () => {
+  // The sidebar has a section for each page that holds items.
+  await hostPage('Article');
+  await hostPage('Product');
 });
 
 test.beforeEach(async ({ page }) => {
@@ -43,8 +50,29 @@ async function openListAt(page: Page, kind: Kind, title: string): Promise<Locato
   throw new Error(`no row for "${title}" in the ${kind} list`);
 }
 
+test('a page that holds items gets its own sidebar section, named by the page', async ({ page }) => {
+  const title = `Notes ${RUN_ID}`;
+  const slug = `notes-${RUN_ID}`.toLowerCase();
+  await createOk(api, 'Page', { title, slug, itemKind: 'Note' });
+  await page.goto('/admin');
+  const link = sidebar(page).getByRole('link', { name: new RegExp(`^${title}\\b`) });
+  await expect(link).toHaveAttribute('href', `/admin/items/${slug}`);
+  await link.click();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(title);
+  await expect(page.getByRole('main').getByRole('link', { name: /^new note$/i })).toBeVisible();
+});
+
+test('a page that holds no items has no section', async ({ page }) => {
+  const row = await createOk(api, 'Page', { title: `Plain ${RUN_ID}` });
+  await page.goto('/admin');
+  await expect(sidebar(page).getByRole('link', { name: new RegExp(`^Plain ${RUN_ID}`) })).toHaveCount(0);
+  const response = await page.goto(`/admin/items/${row.slug}`);
+  expect(response?.status()).toBeLessThan(500);
+  await expect(page.getByText(/not found/i).first()).toBeVisible();
+});
+
 test('the sidebar lists the content types and marks the current one', async ({ page }) => {
-  await page.goto(adminPath('Post'));
+  await page.goto(adminPath('Article'));
   for (const name of ['Dashboard', 'Pages', 'News', 'Products', 'Settings']) {
     await expect(sidebar(page).getByRole('link', { name: new RegExp(`^${name}\\b`) }), name).toBeVisible();
   }
@@ -57,8 +85,8 @@ test('the sidebar lists the content types and marks the current one', async ({ p
 
 for (const [kind, columns] of [
   ['Page', ['Title', 'Actions', 'Slug', 'Status', 'Updated']],
-  ['Post', ['Title', 'Actions', 'Slug', 'Status', 'Published', 'Updated']],
-  ['Product', ['Title', 'Actions', 'Slug', 'Status', 'Updated']],
+  ['Article', ['Title', 'Actions', 'Slug', 'Status', 'Published', 'Updated']],
+  ['Product', ['Title', 'Actions', 'Slug', 'Status', 'Published', 'Updated']],
 ] as [Kind, string[]][]) {
   test(`${kind.toLowerCase()} records are listed in a table with the specified columns`, async ({ page }) => {
     const row = await createOk(api, kind, { title: `Tabled ${kind} ${RUN_ID}` });
@@ -72,8 +100,8 @@ for (const [kind, columns] of [
 }
 
 test('timestamps read relatively, with the absolute time on focus and for screen readers', async ({ page }) => {
-  const row = await createOk(api, 'Post', { title: `Timed ${RUN_ID}` });
-  const record = await openListAt(page, 'Post', row.title);
+  const row = await createOk(api, 'Article', { title: `Timed ${RUN_ID}` });
+  const record = await openListAt(page, 'Article', row.title);
   const time = record.locator('time').last();
   await expect(time).toHaveAttribute('datetime', /^\d{4}-\d{2}-\d{2}T/);
   await expect(time).toHaveText(/now|second|minute|ago/i);
@@ -91,29 +119,29 @@ test('timestamps read relatively, with the absolute time on focus and for screen
 });
 
 test('each row opens from its title and is edited or deleted from its own actions cell', async ({ page }) => {
-  const row = await createOk(api, 'Post', { title: `Row actions ${RUN_ID}` });
-  await (await openListAt(page, 'Post', row.title)).getByRole('link', { name: row.title, exact: true }).click();
-  await expect(page).toHaveURL(`${BASE_URL}${adminPath('Post')}/${encodeURIComponent(row.id)}`);
+  const row = await createOk(api, 'Article', { title: `Row actions ${RUN_ID}` });
+  await (await openListAt(page, 'Article', row.title)).getByRole('link', { name: row.title, exact: true }).click();
+  await expect(page).toHaveURL(`${BASE_URL}${adminPath('Article')}/${encodeURIComponent(row.id)}`);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(row.title);
 
-  await (await openListAt(page, 'Post', row.title)).getByRole('link', { name: `Edit “${row.title}”` }).click();
-  await expect(page).toHaveURL(`${BASE_URL}${adminPath('Post')}/${encodeURIComponent(row.id)}/edit`);
+  await (await openListAt(page, 'Article', row.title)).getByRole('link', { name: `Edit “${row.title}”` }).click();
+  await expect(page).toHaveURL(`${BASE_URL}${adminPath('Article')}/${encodeURIComponent(row.id)}/edit`);
   await expect(page.getByLabel('Title')).toHaveValue(row.title);
 
-  const remove = (await openListAt(page, 'Post', row.title)).getByRole('button', { name: `Delete “${row.title}”` });
+  const remove = (await openListAt(page, 'Article', row.title)).getByRole('button', { name: `Delete “${row.title}”` });
   await remove.click();
   const dialog = page.getByRole('alertdialog').or(page.getByRole('dialog'));
   await expect(dialog).toContainText(row.title);
   await dialog.getByRole('button', { name: /cancel/i }).click();
   await expect(dialog).toBeHidden();
-  expect(await byId(api, 'Post', row.id), 'cancelling keeps the record').not.toBeNull();
+  expect(await byId(api, 'Article', row.id), 'cancelling keeps the record').not.toBeNull();
 
   await remove.click();
   await dialog.getByRole('button', { name: /^delete$/i }).click();
   await expect(page.getByRole('status').filter({ hasText: /deleted/i }), 'the deletion is announced').toBeVisible();
-  await expect(page, 'deleting from the list stays on the list').toHaveURL(new RegExp(`^${BASE_URL}${adminPath('Post')}(\\?|$)`));
+  await expect(page, 'deleting from the list stays on the list').toHaveURL(new RegExp(`^${BASE_URL}${adminPath('Article')}(\\?|$)`));
   await expect(rowOf(page, row.title)).toHaveCount(0);
-  await expect.poll(async () => byId(api, 'Post', row.id)).toBeNull();
+  await expect.poll(async () => byId(api, 'Article', row.id)).toBeNull();
   await expect(page.getByRole('heading', { level: 1 }), 'focus does not fall to the page').toBeFocused();
 });
 
@@ -129,8 +157,8 @@ test.describe('on a phone', () => {
   test.use({ viewport: { width: 360, height: 740 }, isMobile: true, hasTouch: true });
 
   test('row actions stay in view and the sidebar opens from a menu button', async ({ page }) => {
-    const row = await createOk(api, 'Post', { title: `Phone ${RUN_ID}` });
-    await openListAt(page, 'Post', row.title);
+    const row = await createOk(api, 'Article', { title: `Phone ${RUN_ID}` });
+    await openListAt(page, 'Article', row.title);
     for (const name of [`Edit “${row.title}”`, `Delete “${row.title}”`]) {
       const action = rowOf(page, row.title).getByRole(name.startsWith('Delete') ? 'button' : 'link', { name });
       const box = await action.boundingBox();
@@ -160,18 +188,18 @@ test('columns sort the listed records and say how they are sorted', async ({ pag
 });
 
 test('the dashboard draft count opens the list filtered to drafts', async ({ page }) => {
-  await createOk(api, 'Post', { title: `Filter draft ${RUN_ID}` });
+  await createOk(api, 'Article', { title: `Filter draft ${RUN_ID}` });
   await page.goto('/admin');
-  const drafts = page.getByRole('main').locator(`a[href="${adminPath('Post')}?status=draft"]`);
+  const drafts = page.getByRole('main').locator(`a[href="${adminPath('Article')}?status=draft"]`);
   await expect(drafts).toHaveText(/^\d+ drafts?$/);
   await drafts.click();
-  await expect(page).toHaveURL(`${BASE_URL}${adminPath('Post')}?status=draft`);
+  await expect(page).toHaveURL(`${BASE_URL}${adminPath('Article')}?status=draft`);
   await expect(page.getByRole('main').getByText(/showing drafts only/i)).toBeVisible();
   const statuses = await page.getByRole('main').getByRole('row').locator('td').filter({ hasText: /^(Draft|Published)$/ }).allTextContents();
   expect(statuses.length).toBeGreaterThan(0);
   expect(new Set(statuses)).toEqual(new Set(['Draft']));
   await page.getByRole('main').getByRole('link', { name: /^show all news$/i }).click();
-  await expect(page).toHaveURL(`${BASE_URL}${adminPath('Post')}`);
+  await expect(page).toHaveURL(`${BASE_URL}${adminPath('Article')}`);
 });
 
 test('the edit screen publishes from its side panel, only once changes are saved', async ({ page }) => {
