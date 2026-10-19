@@ -1,9 +1,9 @@
 # Website behavior
 
 The hblake site introduces Hamish Blake and the open frameworks behind his work.
-Owner-provided launch content consists of Home, About, Frameworks, Portfolio and
-Contact us. The homepage shows up to four large coloured links to pages featured on
-it (page placement, see Page.md; the launch content features About, Frameworks,
+Owner-provided launch content consists of Home, About, Portfolio and Contact us, plus
+the Products page, which holds the open frameworks (Elephentity, tsquid, Markr) as items. The homepage shows up to four large coloured links to pages featured on
+it (page placement, see Page.md; the launch content features About, Products,
 Portfolio and Contact us), followed by the latest published News item ("Latest news") when one exists. News, Products and
 any other page that holds items may have none. News and Products are pages that hold items
 (see PageItem.md): Articles and Products.
@@ -22,7 +22,7 @@ Astryx/StyleX conventions with keyboard access, visible focus and responsive lay
 Owner-approved content lives in content/pages.json and can replace existing Page,
 PageItem records with the explicit operator command `replace-content`.
 That command preserves accounts, credentials and sessions, and publishes the seed
-pages (the five launch pages plus News and Products) through the normal runtime contracts in one transaction.
+pages (the four launch pages plus News and Products) through the normal runtime contracts in one transaction.
 
 | Route | Behavior |
 | --- | --- |

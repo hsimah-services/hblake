@@ -72,9 +72,9 @@ V1 is client-rendered; each route's HTML carries its query response as tsquid in
 
 ## Launch content
 
-`content/pages.json` contains the owner-approved Home, About, Frameworks, Portfolio
+`content/pages.json` contains the owner-approved Home, About, Portfolio
 and Contact us copy. After installation, replace all Page and PageItem content
-with these seven published pages (the five launch pages plus the empty News and Products pages, which hold items):
+with these six published pages (the four launch pages plus the News and Products pages, which hold items):
 
 ```sh
 scripts/php php server/console.php replace-content

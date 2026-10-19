@@ -31,8 +31,8 @@ pages for the home page (`home: true`) or the navigation (`home: false`) in that
 so the site never filters a partial page list.
 
 News and Products are ordinary pages that hold items (below), so they are placed like any
-other page. The launch content adds both after Contact us in the navigation.
-The launch content features About, Frameworks, Portfolio and Contact us in that
+other page. The launch content places Products second in the navigation, as an orange home tile, and News last.
+The launch content features About, Products, Portfolio and Contact us in that
 order (green, orange, blue, berry) and keeps Home out of the navigation; migration
 `0001-page-placement` sets the same on databases created before placement.
 
@@ -44,7 +44,7 @@ its counts and its Recently edited list.
 
 `defaultItemKind` (nullable text, up to 80 characters) makes a page hold items. A page with
 a kind holds [PageItems](PageItem.md); new items take that kind unless given another
-(a page such as Frameworks holds several kinds). `null` means the page holds none.
+(a page can hold several kinds). `null` means the page holds none.
 A page with items shows its content, then its published items, newest first, with
 cursor pagination (`?after=`). `itemCount` and `publishedItemCount` give the items the
 viewer can read, all and published, for the admin sidebar and dashboard.

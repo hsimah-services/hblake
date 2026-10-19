@@ -18,10 +18,10 @@ final class SiteContentTest extends TestCase {
         $app->runtime->create('PageItem',['title'=>'Old item','slug'=>'old-item','kind'=>'Article','page'=>(string)$old->id->raw()]);
         SiteContent::replace($app);
         SiteContent::replace($app);
-        self::assertSame(7,(int)$db->scalar('SELECT COUNT(*) FROM hsimah_page WHERE status=?',['published']));
+        self::assertSame(6,(int)$db->scalar('SELECT COUNT(*) FROM hsimah_page WHERE status=?',['published']));
         self::assertSame(0,(int)$db->scalar('SELECT COUNT(*) FROM hsimah_page_item'));
         self::assertSame(['Article','Product'],array_column($db->select("SELECT default_item_kind FROM hsimah_page WHERE slug IN ('news','products') ORDER BY slug"),'default_item_kind'));
-        self::assertSame(7,(int)$db->scalar('SELECT COUNT(*) FROM hsimah_page WHERE author_id IS NOT NULL'),'seeded pages are written by the operator');
+        self::assertSame(6,(int)$db->scalar('SELECT COUNT(*) FROM hsimah_page WHERE author_id IS NOT NULL'),'seeded pages are written by the operator');
         self::assertSame('preserved',$db->scalar('SELECT password_hash FROM auth_credential'));
         self::assertSame(1,(int)$db->scalar('SELECT COUNT(*) FROM hsimah_user'));
     }

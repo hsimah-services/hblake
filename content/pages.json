@@ -3,7 +3,7 @@
     "title": "Home",
     "slug": "home",
     "excerpt": "Software engineering, open platforms, and tools built to last.",
-    "content": "## Software built with care\n\nScalable backend systems. Clean, efficient interfaces. Open tools and platforms.\n\nExplore our frameworks, get to know the person behind them, or connect to talk about your project.",
+    "content": "## Software built with care\n\nScalable backend systems. Clean, efficient interfaces. Open tools and platforms.\n\nExplore our products, get to know the person behind them, or connect to talk about your project.",
     "showInNavigation": false
   },
   {
@@ -17,21 +17,10 @@
     "accent": "green"
   },
   {
-    "title": "Frameworks",
-    "slug": "frameworks",
-    "excerpt": "Explore Elephentity, tsquid, and Markr: tools for business logic, application structure, and publishing.",
-    "content": "## Open tools, shared foundations\n\nThese projects reflect our commitment to making useful tools available to others.\n\n### ![](/assets/elephentity.svg) Elephentity\n\nA framework for building PHP business logic from readable specifications. It generates the surrounding code for data models and storage, with explicit contracts for application-specific rules.\n\n[Explore Elephentity on GitHub](https://github.com/hsimah-services/elephentity)\n\n### ![](/assets/tsquid.png) tsquid\n\nTools for structuring React applications, connecting routes and their data, and checking that application architecture stays consistent.\n\n[Explore tsquid on GitHub](https://github.com/hsimah-services/tsquid)\n\n### Markr\n\nA minimal static blog engine. Markdown posts are prerendered to plain HTML at build time, with no JavaScript required to read them. Markr powers my personal blog.\n\n[Explore Markr on GitHub](https://github.com/hsimah-services/markr) · [See Markr in action](https://hsimah.com)\n",
-    "navigationOrder": 2,
-    "featureOnHome": true,
-    "homeOrder": 2,
-    "accent": "orange",
-    "defaultItemKind": "Framework"
-  },
-  {
     "title": "Portfolio",
     "slug": "portfolio",
     "excerpt": "Customer projects will be shared with their permission.",
-    "content": "## Under construction\n\nWe’re seeking permission from existing customers to share their projects. Check back for examples of our work.\n\nIn the meantime, [explore our open frameworks](/pages/frameworks).",
+    "content": "## Under construction\n\nWe’re seeking permission from existing customers to share their projects. Check back for examples of our work.\n\nIn the meantime, [explore our products](/pages/products).",
     "navigationOrder": 3,
     "featureOnHome": true,
     "homeOrder": 3,
@@ -41,7 +30,7 @@
     "title": "Contact us",
     "slug": "contact",
     "excerpt": "Connect with Hamish Blake on LinkedIn or explore our work on GitHub.",
-    "content": "## Let’s connect\n\nTo get in touch about a project, connect with me on LinkedIn. You can also find our frameworks and follow their development on GitHub.\n\n- [Hamish Blake on LinkedIn](https://www.linkedin.com/in/hamishblake/)\n- [Hamish Blake on GitHub](https://github.com/hsimah)\n- [hsimah-services on GitHub](https://github.com/hsimah-services)",
+    "content": "## Let’s connect\n\nTo get in touch about a project, connect with me on LinkedIn. You can also find our products and follow their development on GitHub.\n\n- [Hamish Blake on LinkedIn](https://www.linkedin.com/in/hamishblake/)\n- [Hamish Blake on GitHub](https://github.com/hsimah)\n- [hsimah-services on GitHub](https://github.com/hsimah-services)",
     "navigationOrder": 4,
     "featureOnHome": true,
     "homeOrder": 4,
@@ -58,9 +47,12 @@
   {
     "title": "Products",
     "slug": "products",
-    "excerpt": "Products and offerings.",
-    "content": "Products and offerings.",
-    "navigationOrder": 6,
-    "defaultItemKind": "Product"
+    "excerpt": "Explore Elephentity, tsquid, and Markr: tools for business logic, application structure, and publishing.",
+    "content": "## Open tools, shared foundations\n\nThese projects reflect our commitment to making useful tools available to others.",
+    "navigationOrder": 2,
+    "defaultItemKind": "Product",
+    "featureOnHome": true,
+    "homeOrder": 2,
+    "accent": "orange"
   }
 ]
