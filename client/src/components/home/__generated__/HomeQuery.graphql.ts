@@ -1,6 +1,6 @@
 /**
- * @generated SignedSource<<64ee1c4ccc5c18bff6655df2e373941e>>
- * @relayHash 4e52b7a904a0b69cc1b4088cbe5434f5
+ * @generated SignedSource<<da40bcf1658cea72443b007a7eeaaaaa>>
+ * @relayHash 404959ecb5bc8dabcf0c4139cfb858eb
  * @lightSyntaxTransform
  */
 
@@ -8,7 +8,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-// @relayRequestID 4e52b7a904a0b69cc1b4088cbe5434f5
+// @relayRequestID 404959ecb5bc8dabcf0c4139cfb858eb
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
@@ -25,7 +25,7 @@ export type HomeQuery$data = {
       readonly title: string;
     } | null | undefined> | null | undefined;
   } | null | undefined;
-  readonly latestPosts: {
+  readonly latestNews: {
     readonly nodes: ReadonlyArray<{
       readonly excerpt: string;
       readonly id: string;
@@ -130,39 +130,44 @@ v5 = {
   "storageKey": "placedPages(first:4,where:{\"home\":true})"
 },
 v6 = {
-  "kind": "Literal",
-  "name": "first",
-  "value": 100
-},
-v7 = [
-  (v6/*:: as any*/)
-],
-v8 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "status",
   "storageKey": null
 },
-v9 = {
+v7 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "publishedAt",
   "storageKey": null
 },
-v10 = {
-  "alias": "latestPosts",
-  "args": (v7/*:: as any*/),
-  "concreteType": "RootQueryToPostConnection",
+v8 = {
+  "alias": "latestNews",
+  "args": [
+    {
+      "kind": "Literal",
+      "name": "first",
+      "value": 1
+    },
+    {
+      "kind": "Literal",
+      "name": "where",
+      "value": {
+        "page": "news"
+      }
+    }
+  ],
+  "concreteType": "RootQueryToPageItemsOfPageConnection",
   "kind": "LinkedField",
-  "name": "posts",
+  "name": "pageItemsOfPage",
   "plural": false,
   "selections": [
     {
       "alias": null,
       "args": null,
-      "concreteType": "Post",
+      "concreteType": "PageItem",
       "kind": "LinkedField",
       "name": "nodes",
       "plural": true,
@@ -171,15 +176,15 @@ v10 = {
         (v1/*:: as any*/),
         (v2/*:: as any*/),
         (v3/*:: as any*/),
-        (v8/*:: as any*/),
-        (v9/*:: as any*/)
+        (v6/*:: as any*/),
+        (v7/*:: as any*/)
       ],
       "storageKey": null
     }
   ],
-  "storageKey": "posts(first:100)"
+  "storageKey": "pageItemsOfPage(first:1,where:{\"page\":\"news\"})"
 },
-v11 = {
+v9 = {
   "alias": null,
   "args": [
     {
@@ -204,8 +209,8 @@ v11 = {
       "storageKey": null
     },
     (v3/*:: as any*/),
-    (v8/*:: as any*/),
-    (v9/*:: as any*/),
+    (v6/*:: as any*/),
+    (v7/*:: as any*/),
     {
       "alias": null,
       "args": null,
@@ -222,11 +227,7 @@ v11 = {
     }
   ],
   "storageKey": "pageBySlug(slug:\"home\")"
-},
-v12 = [
-  (v8/*:: as any*/),
-  (v0/*:: as any*/)
-];
+};
 return {
   "fragment": {
     "argumentDefinitions": [],
@@ -240,8 +241,8 @@ return {
         "name": "LayoutFragment"
       },
       (v5/*:: as any*/),
-      (v10/*:: as any*/),
-      (v11/*:: as any*/)
+      (v8/*:: as any*/),
+      (v9/*:: as any*/)
     ],
     "type": "RootQuery",
     "abstractKey": null
@@ -281,7 +282,11 @@ return {
       {
         "alias": "navigationPages",
         "args": [
-          (v6/*:: as any*/),
+          {
+            "kind": "Literal",
+            "name": "first",
+            "value": 100
+          },
           {
             "kind": "Literal",
             "name": "where",
@@ -313,64 +318,22 @@ return {
         ],
         "storageKey": "placedPages(first:100,where:{\"home\":false})"
       },
-      {
-        "alias": "navigationPosts",
-        "args": (v7/*:: as any*/),
-        "concreteType": "RootQueryToPostConnection",
-        "kind": "LinkedField",
-        "name": "posts",
-        "plural": false,
-        "selections": [
-          {
-            "alias": null,
-            "args": null,
-            "concreteType": "Post",
-            "kind": "LinkedField",
-            "name": "nodes",
-            "plural": true,
-            "selections": (v12/*:: as any*/),
-            "storageKey": null
-          }
-        ],
-        "storageKey": "posts(first:100)"
-      },
-      {
-        "alias": "navigationProducts",
-        "args": (v7/*:: as any*/),
-        "concreteType": "RootQueryToProductConnection",
-        "kind": "LinkedField",
-        "name": "products",
-        "plural": false,
-        "selections": [
-          {
-            "alias": null,
-            "args": null,
-            "concreteType": "Product",
-            "kind": "LinkedField",
-            "name": "nodes",
-            "plural": true,
-            "selections": (v12/*:: as any*/),
-            "storageKey": null
-          }
-        ],
-        "storageKey": "products(first:100)"
-      },
       (v5/*:: as any*/),
-      (v10/*:: as any*/),
-      (v11/*:: as any*/)
+      (v8/*:: as any*/),
+      (v9/*:: as any*/)
     ]
   },
   "params": {
-    "cacheID": "4e52b7a904a0b69cc1b4088cbe5434f5",
-    "id": "4e52b7a904a0b69cc1b4088cbe5434f5",
+    "cacheID": "404959ecb5bc8dabcf0c4139cfb858eb",
+    "id": "404959ecb5bc8dabcf0c4139cfb858eb",
     "metadata": {},
     "name": "HomeQuery",
     "operationKind": "query",
-    "text": "query HomeQuery {\n  ...LayoutFragment\n  homePages: placedPages(where: {home: true}, first: 4) {\n    nodes {\n      id\n      title\n      slug\n      excerpt\n      accent\n    }\n  }\n  latestPosts: posts(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      excerpt\n      status\n      publishedAt\n    }\n  }\n  pageBySlug(slug: \"home\") {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: placedPages(where: {home: false}, first: 100) {\n    nodes {\n      id\n      title\n      slug\n      accent\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n"
+    "text": "query HomeQuery {\n  ...LayoutFragment\n  homePages: placedPages(where: {home: true}, first: 4) {\n    nodes {\n      id\n      title\n      slug\n      excerpt\n      accent\n    }\n  }\n  latestNews: pageItemsOfPage(where: {page: \"news\"}, first: 1) {\n    nodes {\n      id\n      title\n      slug\n      excerpt\n      status\n      publishedAt\n    }\n  }\n  pageBySlug(slug: \"home\") {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: placedPages(where: {home: false}, first: 100) {\n    nodes {\n      id\n      title\n      slug\n      accent\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "ffe769d0473e91ab3e8201a674304367";
+(node as any).hash = "b57b09bd1cec6568c70307fddc478b69";
 
 export default node;

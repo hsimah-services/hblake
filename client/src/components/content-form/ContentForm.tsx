@@ -5,19 +5,21 @@ import * as stylex from '@stylexjs/stylex';
 import { Markdown } from '../markdown/Markdown';
 import { RichTextEditor } from '../rich-text/RichTextEditor';
 
-const CONTENT_FIELDS = ['title', 'slug', 'content', 'excerpt', 'enquiryUrl'];
+const CONTENT_FIELDS = ['title', 'slug', 'content', 'excerpt'];
+// What each kind of record adds: an item has an enquiry link and a kind label; a page chooses the kind of item it holds.
+const EXTRA_FIELDS: Readonly<Record<string, readonly string[]>> = { Item: ['enquiryUrl', 'kind'], Page: ['defaultItemKind'] };
 const PROFILE_FIELDS = ['displayName'];
 // Page placement (#13), kept as strings in the form and converted on save.
 const PLACEMENT_DEFAULTS: Readonly<Record<string, string>> = { showInNavigation: 'true', navigationOrder: '100', featureOnHome: 'false', homeOrder: '100', accent: 'INK' };
 const ACCENTS = [['INK', 'None (no home tile)'], ['GREEN', 'Green'], ['ORANGE', 'Orange'], ['BLUE', 'Blue'], ['BERRY', 'Berry']] as const;
 
-export function ContentForm({ kind, row, save, detail, publication }: ContentFormProps) {
-  const form = useContentForm(kind, row, save, detail);
+export function ContentForm({ kind, row, defaults, save, detail, publication }: ContentFormProps) {
+  const form = useContentForm(kind, row, defaults, save, detail);
   const publish = usePublication(publication, form.dirty);
   if (kind === 'User') return <form ref={form.element} onSubmit={form.submit} noValidate>
     <Stack gap={4} align="stretch">
       {form.error && <p role="alert">{form.error}</p>}
-      <TextInput label="Display name" htmlName="displayName" description="Shown as the author of posts." value={form.values.displayName} onChange={value => form.change('displayName', value)} status={form.invalid.displayName ? { type: 'error' } : undefined} />
+      <TextInput label="Display name" htmlName="displayName" description="Shown as the author of what you write." value={form.values.displayName} onChange={value => form.change('displayName', value)} status={form.invalid.displayName ? { type: 'error' } : undefined} />
       <Button type="submit" label="Save" isLoading={form.pending} />
     </Stack>
   </form>;
@@ -29,7 +31,7 @@ export function ContentForm({ kind, row, save, detail, publication }: ContentFor
       <Stack gap={4} align="stretch" xstyle={styles.main}>
         <TextInput label="Title" htmlName="title" value={form.values.title} onChange={value => form.change('title', value)} status={form.invalid.title ? { type: 'error' } : undefined} />
         <TextInput label="Slug" htmlName="slug" value={form.values.slug} onChange={value => form.change('slug', value)} status={form.invalid.slug ? { type: 'error' } : undefined} description={row ? 'Changing the slug changes the public URL.' : 'Filled in from the title until you edit it. Lowercase letters and numbers separated by hyphens.'} />
-        {/* Pages, posts and products are written as rich text, stored as Markdown. */}
+        {/* Pages and items are written as rich text, stored as Markdown. */}
         <RichTextEditor label="Content" name="content" value={form.values.content} onChange={value => form.change('content', value)} invalid={form.invalid.content} />
         <section aria-label="Markdown preview"><Heading level={2}>Preview</Heading><Markdown content={form.values.content} /></section>
       </Stack>
@@ -41,7 +43,11 @@ export function ContentForm({ kind, row, save, detail, publication }: ContentFor
           {form.dirty && <Text color="secondary" size="sm">Save your changes before publishing.</Text>}
         </Stack>}
         <TextInput label="Excerpt" htmlName="excerpt" value={form.values.excerpt} onChange={value => form.change('excerpt', value)} status={form.invalid.excerpt ? { type: 'error' } : undefined} description="Shown in lists and search results." />
-        {kind === 'Product' && <TextInput label="Enquiry URL" htmlName="enquiryUrl" value={form.values.enquiryUrl} onChange={value => form.change('enquiryUrl', value)} status={form.invalid.enquiryUrl ? { type: 'error' } : undefined} />}
+        {kind === 'Item' && <>
+          <TextInput label="Enquiry URL" htmlName="enquiryUrl" value={form.values.enquiryUrl} onChange={value => form.change('enquiryUrl', value)} status={form.invalid.enquiryUrl ? { type: 'error' } : undefined} description="An https link or a mailto address. Shown as an Enquire link." />
+          <TextInput label="Kind" htmlName="kind" value={form.values.kind} onChange={value => form.change('kind', value)} status={form.invalid.kind ? { type: 'error' } : undefined} description="What sort of item this is, such as Article or Product." />
+        </>}
+        {kind === 'Page' && <TextInput label="Item kind" htmlName="defaultItemKind" value={form.values.defaultItemKind} onChange={value => form.change('defaultItemKind', value)} status={form.invalid.defaultItemKind ? { type: 'error' } : undefined} description="Leave empty unless this page holds items. New items are given this kind." />}
         {kind === 'Page' && <fieldset {...stylex.props(styles.placement)}>
           <legend {...stylex.props(styles.legend)}>Placement</legend>
           <Stack gap={3} align="stretch">
@@ -59,8 +65,8 @@ export function ContentForm({ kind, row, save, detail, publication }: ContentFor
   </form>;
 }
 
-function useContentForm(kind: string, row: ContentFormRow | null | undefined, save: ContentFormProps['save'], detail: ContentFormProps['detail']) {
-  const initial = initialValues(row);
+function useContentForm(kind: string, row: ContentFormRow | null | undefined, defaults: ContentFormProps['defaults'], save: ContentFormProps['save'], detail: ContentFormProps['detail']) {
+  const initial = initialValues(row, defaults);
   const [values, setValues] = useState(initial);
   const [invalid, setInvalid] = useState<Record<string, boolean>>({});
   const [error, setError] = useState('');
@@ -97,8 +103,10 @@ function useContentForm(kind: string, row: ContentFormRow | null | undefined, sa
     if (first) { setError('Please correct the highlighted fields.'); element.current?.querySelector<HTMLElement>(`[name="${first}"]`)?.focus(); return; }
     setPending(true); setError('');
     try {
-      const fields = kind === 'User' ? PROFILE_FIELDS : kind === 'Product' ? CONTENT_FIELDS : CONTENT_FIELDS.slice(0, 4);
-      const input: Record<string, unknown> = Object.fromEntries(fields.map(field => [field, field === 'enquiryUrl' ? values[field] || null : values[field]]));
+      const fields = kind === 'User' ? PROFILE_FIELDS : [...CONTENT_FIELDS, ...(EXTRA_FIELDS[kind] ?? [])];
+      // Cleared optional fields are sent as null.
+      const nullable = ['enquiryUrl', 'defaultItemKind'];
+      const input: Record<string, unknown> = Object.fromEntries(fields.map(field => [field, nullable.includes(field) ? values[field].trim() || null : values[field]]));
       if (kind === 'Page') Object.assign(input, placementInput(values));
       if (row) input.id = row.id;
       const id = await save(input);
@@ -132,9 +140,10 @@ function usePublication(publication: ContentFormProps['publication'], dirty: boo
   return { pending, error, toggle };
 }
 
-function initialValues(row: ContentFormRow | null | undefined): Record<string, string> {
+function initialValues(row: ContentFormRow | null | undefined, defaults: Readonly<Record<string, string>> | undefined): Record<string, string> {
+  const fields = [...CONTENT_FIELDS, ...PROFILE_FIELDS, ...Object.values(EXTRA_FIELDS).flat()];
   return {
-    ...Object.fromEntries([...CONTENT_FIELDS, ...PROFILE_FIELDS].map(field => [field, typeof row?.[field] === 'string' ? row[field] : ''])),
+    ...Object.fromEntries(fields.map(field => [field, typeof row?.[field] === 'string' ? row[field] : defaults?.[field] ?? ''])),
     ...Object.fromEntries(Object.entries(PLACEMENT_DEFAULTS).map(([field, fallback]) => {
       const value = row?.[field];
       return [field, typeof value === 'boolean' || typeof value === 'number' || typeof value === 'string' ? String(value) : fallback];
@@ -157,7 +166,9 @@ function validateValues(kind: string, values: Record<string, string>): Record<st
     if (!values.title.trim() || values.title.length > 200) errors.title = true;
     if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(values.slug) || values.slug.length > 160) errors.slug = true;
     if (values.excerpt.length > 300) errors.excerpt = true;
-    if (kind === 'Product' && values.enquiryUrl && !isSafeEnquiry(values.enquiryUrl)) errors.enquiryUrl = true;
+    if (kind === 'Item' && values.enquiryUrl && !isSafeEnquiry(values.enquiryUrl)) errors.enquiryUrl = true;
+    if (kind === 'Item' && (!values.kind.trim() || values.kind.length > 80)) errors.kind = true;
+    if (kind === 'Page' && values.defaultItemKind.length > 80) errors.defaultItemKind = true;
     if (kind === 'Page') {
       for (const field of ['navigationOrder', 'homeOrder']) if (!/^\d{1,3}$/.test(values[field])) errors[field] = true;
       if (values.featureOnHome === 'true' && values.accent === 'INK') errors.accent = true;
@@ -173,7 +184,8 @@ function isSafeEnquiry(value: string): boolean {
 
 type ContentFormRow = { readonly id: string; readonly [field: string]: unknown };
 type ContentFormProps = {
-  kind: string; row?: ContentFormRow | null; save: (input: Record<string, unknown>) => Promise<string>; detail: (id: string) => string;
+  /** `Page`, `Item` (of a page) or `User` (the profile). */
+  kind: string; row?: ContentFormRow | null; defaults?: Readonly<Record<string, string>>; save: (input: Record<string, unknown>) => Promise<string>; detail: (id: string) => string;
   /** The saved record's status and its publish/unpublish action (edit screens). */
   publication?: { status: string; toggle: () => Promise<unknown> };
 };

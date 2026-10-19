@@ -7,28 +7,21 @@ type RootQuery {
   "One Page by id."
   page(id: ID!): Page
 
-  "One Post by id."
-  post(id: ID!): Post
-
-  "One Product by id."
-  product(id: ID!): Product
+  "One PageItem by id."
+  pageItem(id: ID!): PageItem
 
   "Look up one content record by exact canonical slug under read policies."
   pageBySlug(slug: String!): Page
 
-  "Look up one content record by exact canonical slug under read policies."
-  postBySlug(slug: String!): Post
-
-  "Look up one content record by exact canonical slug under read policies."
-  productBySlug(slug: String!): Product
+  "Look up one item by exact canonical slug under read policies."
+  pageItemBySlug(slug: String!): PageItem
 
   pages(first: Int, after: String, last: Int, before: String): RootQueryToPageConnection
-  posts(first: Int, after: String, last: Int, before: String): RootQueryToPostConnection
-  products(first: Int, after: String, last: Int, before: String): RootQueryToProductConnection
+  pageItems(first: Int, after: String, last: Int, before: String): RootQueryToPageItemConnection
+  pageItemsOfPage(first: Int, after: String, last: Int, before: String, where: RootQueryToPageItemsOfPageConnectionWhereArgs): RootQueryToPageItemsOfPageConnection
   placedPages(first: Int, after: String, last: Int, before: String, where: RootQueryToPlacedPagesConnectionWhereArgs): RootQueryToPlacedPagesConnection
+  recentPageItems(first: Int, after: String, last: Int, before: String, where: RootQueryToRecentPageItemsConnectionWhereArgs): RootQueryToRecentPageItemsConnection
   recentPages(first: Int, after: String, last: Int, before: String, where: RootQueryToRecentPagesConnectionWhereArgs): RootQueryToRecentPagesConnection
-  recentPosts(first: Int, after: String, last: Int, before: String, where: RootQueryToRecentPostsConnectionWhereArgs): RootQueryToRecentPostsConnection
-  recentProducts(first: Int, after: String, last: Int, before: String, where: RootQueryToRecentProductsConnectionWhereArgs): RootQueryToRecentProductsConnection
   node(id: ID!): Node
   viewer: Viewer
   adminUser(id: ID!): AdminUser
@@ -58,20 +51,15 @@ enum UserRole {
 
 type RootMutation {
   createPage(input: CreatePageInput!): CreatePagePayload
-  createPost(input: CreatePostInput!): CreatePostPayload
-  createProduct(input: CreateProductInput!): CreateProductPayload
+  createPageItem(input: CreatePageItemInput!): CreatePageItemPayload
   deletePage(input: DeletePageInput!): DeletePagePayload
-  deletePost(input: DeletePostInput!): DeletePostPayload
-  deleteProduct(input: DeleteProductInput!): DeleteProductPayload
+  deletePageItem(input: DeletePageItemInput!): DeletePageItemPayload
   publishPage(input: PublishPageInput!): PublishPagePayload
-  publishPost(input: PublishPostInput!): PublishPostPayload
-  publishProduct(input: PublishProductInput!): PublishProductPayload
+  publishPageItem(input: PublishPageItemInput!): PublishPageItemPayload
   unpublishPage(input: UnpublishPageInput!): UnpublishPagePayload
-  unpublishPost(input: UnpublishPostInput!): UnpublishPostPayload
-  unpublishProduct(input: UnpublishProductInput!): UnpublishProductPayload
+  unpublishPageItem(input: UnpublishPageItemInput!): UnpublishPageItemPayload
   updatePage(input: UpdatePageInput!): UpdatePagePayload
-  updatePost(input: UpdatePostInput!): UpdatePostPayload
-  updateProduct(input: UpdateProductInput!): UpdateProductPayload
+  updatePageItem(input: UpdatePageItemInput!): UpdatePageItemPayload
   updateAdminUser(input: UpdateAdminUserInput!): UpdateAdminUserPayload
 }
 
@@ -116,6 +104,9 @@ type Page implements Node {
   updatedAt: String!
 
   ""
+  defaultItemKind: String
+
+  ""
   showInNavigation: Boolean!
 
   ""
@@ -129,10 +120,15 @@ type Page implements Node {
 
   ""
   accent: PageAccent!
+
+  itemCount: Int!
+  publishedItemCount: Int!
+  author: Author
+  items(first: Int, after: String, last: Int, before: String): PageToPageItemConnection
 }
 
-"Consulting article or business update."
-type Post implements Node {
+"Item attached to a page, such as a news article, product or framework entry, grouped by kind."
+type PageItem implements Node {
   "The globally unique identifier, opaque and safe to use as a cache key."
   id: ID!
 
@@ -159,41 +155,31 @@ type Post implements Node {
 
   ""
   updatedAt: String!
+
+  ""
+  kind: String!
+
+  ""
+  enquiryUrl: String
+
+  "The page this item belongs to."
+  page: Page
 
   author: Author
 }
 
-"Software product or consulting offering."
-type Product implements Node {
-  "The globally unique identifier, opaque and safe to use as a cache key."
-  id: ID!
+type PageToPageItemConnectionEdge {
+  cursor: String
+  node: PageItem
+}
 
-  ""
-  title: String!
+type PageToPageItemConnection {
+  nodes: [PageItem]
+  edges: [PageToPageItemConnectionEdge]
+  pageInfo: PageInfo!
 
-  ""
-  slug: String!
-
-  ""
-  content: String!
-
-  ""
-  excerpt: String!
-
-  ""
-  status: PublicationStatus!
-
-  ""
-  publishedAt: String
-
-  ""
-  createdAt: String!
-
-  ""
-  updatedAt: String!
-
-  ""
-  enquiryUrl: String
+  "How many match, ignoring pagination."
+  totalCount: Int
 }
 
 type RootQueryToPageConnectionEdge {
@@ -210,32 +196,36 @@ type RootQueryToPageConnection {
   totalCount: Int
 }
 
-type RootQueryToPostConnectionEdge {
+type RootQueryToPageItemConnectionEdge {
   cursor: String
-  node: Post
+  node: PageItem
 }
 
-type RootQueryToPostConnection {
-  nodes: [Post]
-  edges: [RootQueryToPostConnectionEdge]
+type RootQueryToPageItemConnection {
+  nodes: [PageItem]
+  edges: [RootQueryToPageItemConnectionEdge]
   pageInfo: PageInfo!
 
   "How many match, ignoring pagination."
   totalCount: Int
 }
 
-type RootQueryToProductConnectionEdge {
+type RootQueryToPageItemsOfPageConnectionEdge {
   cursor: String
-  node: Product
+  node: PageItem
 }
 
-type RootQueryToProductConnection {
-  nodes: [Product]
-  edges: [RootQueryToProductConnectionEdge]
+type RootQueryToPageItemsOfPageConnection {
+  nodes: [PageItem]
+  edges: [RootQueryToPageItemsOfPageConnectionEdge]
   pageInfo: PageInfo!
 
   "How many match, ignoring pagination."
   totalCount: Int
+}
+
+input RootQueryToPageItemsOfPageConnectionWhereArgs {
+  page: String!
 }
 
 type RootQueryToPlacedPagesConnectionEdge {
@@ -256,6 +246,25 @@ input RootQueryToPlacedPagesConnectionWhereArgs {
   home: Boolean!
 }
 
+type RootQueryToRecentPageItemsConnectionEdge {
+  cursor: String
+  node: PageItem
+}
+
+type RootQueryToRecentPageItemsConnection {
+  nodes: [PageItem]
+  edges: [RootQueryToRecentPageItemsConnectionEdge]
+  pageInfo: PageInfo!
+
+  "How many match, ignoring pagination."
+  totalCount: Int
+}
+
+input RootQueryToRecentPageItemsConnectionWhereArgs {
+  kind: String
+  status: PublicationStatus
+}
+
 type RootQueryToRecentPagesConnectionEdge {
   cursor: String
   node: Page
@@ -274,42 +283,6 @@ input RootQueryToRecentPagesConnectionWhereArgs {
   status: PublicationStatus
 }
 
-type RootQueryToRecentPostsConnectionEdge {
-  cursor: String
-  node: Post
-}
-
-type RootQueryToRecentPostsConnection {
-  nodes: [Post]
-  edges: [RootQueryToRecentPostsConnectionEdge]
-  pageInfo: PageInfo!
-
-  "How many match, ignoring pagination."
-  totalCount: Int
-}
-
-input RootQueryToRecentPostsConnectionWhereArgs {
-  status: PublicationStatus
-}
-
-type RootQueryToRecentProductsConnectionEdge {
-  cursor: String
-  node: Product
-}
-
-type RootQueryToRecentProductsConnection {
-  nodes: [Product]
-  edges: [RootQueryToRecentProductsConnectionEdge]
-  pageInfo: PageInfo!
-
-  "How many match, ignoring pagination."
-  totalCount: Int
-}
-
-input RootQueryToRecentProductsConnectionWhereArgs {
-  status: PublicationStatus
-}
-
 input CreatePageInput {
   title: String!
   slug: String!
@@ -317,6 +290,7 @@ input CreatePageInput {
   excerpt: String
   status: PublicationStatus
   publishedAt: String
+  defaultItemKind: String
   showInNavigation: Boolean
   navigationOrder: Int
   featureOnHome: Boolean
@@ -330,34 +304,21 @@ type CreatePagePayload {
   clientMutationId: String
 }
 
-input CreatePostInput {
+input CreatePageItemInput {
   title: String!
   slug: String!
   content: String
   excerpt: String
   status: PublicationStatus
   publishedAt: String
-  clientMutationId: String
-}
-
-type CreatePostPayload {
-  post: Post
-  clientMutationId: String
-}
-
-input CreateProductInput {
-  title: String!
-  slug: String!
-  content: String
-  excerpt: String
-  status: PublicationStatus
-  publishedAt: String
+  kind: String
   enquiryUrl: String
+  page: ID
   clientMutationId: String
 }
 
-type CreateProductPayload {
-  product: Product
+type CreatePageItemPayload {
+  pageItem: PageItem
   clientMutationId: String
 }
 
@@ -371,22 +332,12 @@ type DeletePagePayload {
   clientMutationId: String
 }
 
-input DeletePostInput {
+input DeletePageItemInput {
   id: ID!
   clientMutationId: String
 }
 
-type DeletePostPayload {
-  deletedId: ID
-  clientMutationId: String
-}
-
-input DeleteProductInput {
-  id: ID!
-  clientMutationId: String
-}
-
-type DeleteProductPayload {
+type DeletePageItemPayload {
   deletedId: ID
   clientMutationId: String
 }
@@ -401,23 +352,13 @@ type PublishPagePayload {
   clientMutationId: String
 }
 
-input PublishPostInput {
+input PublishPageItemInput {
   id: ID!
   clientMutationId: String
 }
 
-type PublishPostPayload {
-  post: Post
-  clientMutationId: String
-}
-
-input PublishProductInput {
-  id: ID!
-  clientMutationId: String
-}
-
-type PublishProductPayload {
-  product: Product
+type PublishPageItemPayload {
+  pageItem: PageItem
   clientMutationId: String
 }
 
@@ -431,23 +372,13 @@ type UnpublishPagePayload {
   clientMutationId: String
 }
 
-input UnpublishPostInput {
+input UnpublishPageItemInput {
   id: ID!
   clientMutationId: String
 }
 
-type UnpublishPostPayload {
-  post: Post
-  clientMutationId: String
-}
-
-input UnpublishProductInput {
-  id: ID!
-  clientMutationId: String
-}
-
-type UnpublishProductPayload {
-  product: Product
+type UnpublishPageItemPayload {
+  pageItem: PageItem
   clientMutationId: String
 }
 
@@ -459,6 +390,7 @@ input UpdatePageInput {
   excerpt: String
   status: PublicationStatus
   publishedAt: String
+  defaultItemKind: String
   showInNavigation: Boolean
   navigationOrder: Int
   featureOnHome: Boolean
@@ -472,7 +404,7 @@ type UpdatePagePayload {
   clientMutationId: String
 }
 
-input UpdatePostInput {
+input UpdatePageItemInput {
   id: ID!
   title: String
   slug: String
@@ -480,28 +412,14 @@ input UpdatePostInput {
   excerpt: String
   status: PublicationStatus
   publishedAt: String
-  clientMutationId: String
-}
-
-type UpdatePostPayload {
-  post: Post
-  clientMutationId: String
-}
-
-input UpdateProductInput {
-  id: ID!
-  title: String
-  slug: String
-  content: String
-  excerpt: String
-  status: PublicationStatus
-  publishedAt: String
+  kind: String
   enquiryUrl: String
+  page: ID
   clientMutationId: String
 }
 
-type UpdateProductPayload {
-  product: Product
+type UpdatePageItemPayload {
+  pageItem: PageItem
   clientMutationId: String
 }
 

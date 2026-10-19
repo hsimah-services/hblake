@@ -1,6 +1,6 @@
 /**
- * @generated SignedSource<<e6b41dcf23c1289dcdbff71066c26680>>
- * @relayHash 8f4b5eccc449933db2c386792c607389
+ * @generated SignedSource<<37fc28e736da0473990fb36769dffa14>>
+ * @relayHash e6f898d9f0cf98d1e4ed0058292c289f
  * @lightSyntaxTransform
  */
 
@@ -8,7 +8,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-// @relayRequestID 8f4b5eccc449933db2c386792c607389
+// @relayRequestID e6f898d9f0cf98d1e4ed0058292c289f
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
@@ -75,23 +75,7 @@ v3 = {
     (v2/*:: as any*/)
   ],
   "storageKey": null
-},
-v4 = [
-  {
-    "kind": "Literal",
-    "name": "first",
-    "value": 1
-  }
-],
-v5 = [
-  {
-    "alias": null,
-    "args": null,
-    "kind": "ScalarField",
-    "name": "totalCount",
-    "storageKey": null
-  }
-];
+};
 return {
   "fragment": {
     "argumentDefinitions": (v0/*:: as any*/),
@@ -130,44 +114,95 @@ return {
       },
       {
         "alias": "pageCount",
-        "args": (v4/*:: as any*/),
+        "args": [
+          {
+            "kind": "Literal",
+            "name": "first",
+            "value": 1
+          }
+        ],
         "concreteType": "RootQueryToPageConnection",
         "kind": "LinkedField",
         "name": "pages",
         "plural": false,
-        "selections": (v5/*:: as any*/),
+        "selections": [
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "totalCount",
+            "storageKey": null
+          }
+        ],
         "storageKey": "pages(first:1)"
       },
       {
-        "alias": "postCount",
-        "args": (v4/*:: as any*/),
-        "concreteType": "RootQueryToPostConnection",
+        "alias": "itemPages",
+        "args": [
+          {
+            "kind": "Literal",
+            "name": "first",
+            "value": 100
+          }
+        ],
+        "concreteType": "RootQueryToPageConnection",
         "kind": "LinkedField",
-        "name": "posts",
+        "name": "pages",
         "plural": false,
-        "selections": (v5/*:: as any*/),
-        "storageKey": "posts(first:1)"
-      },
-      {
-        "alias": "productCount",
-        "args": (v4/*:: as any*/),
-        "concreteType": "RootQueryToProductConnection",
-        "kind": "LinkedField",
-        "name": "products",
-        "plural": false,
-        "selections": (v5/*:: as any*/),
-        "storageKey": "products(first:1)"
+        "selections": [
+          {
+            "alias": null,
+            "args": null,
+            "concreteType": "Page",
+            "kind": "LinkedField",
+            "name": "nodes",
+            "plural": true,
+            "selections": [
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "title",
+                "storageKey": null
+              },
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "slug",
+                "storageKey": null
+              },
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "defaultItemKind",
+                "storageKey": null
+              },
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "itemCount",
+                "storageKey": null
+              },
+              (v1/*:: as any*/)
+            ],
+            "storageKey": null
+          }
+        ],
+        "storageKey": "pages(first:100)"
       },
       (v3/*:: as any*/)
     ]
   },
   "params": {
-    "cacheID": "8f4b5eccc449933db2c386792c607389",
-    "id": "8f4b5eccc449933db2c386792c607389",
+    "cacheID": "e6f898d9f0cf98d1e4ed0058292c289f",
+    "id": "e6f898d9f0cf98d1e4ed0058292c289f",
     "metadata": {},
     "name": "AdminUserQuery",
     "operationKind": "query",
-    "text": "query AdminUserQuery(\n  $id: ID!\n) {\n  ...AdminLayoutFragment\n  adminUser(id: $id) {\n    id\n    username\n    displayName\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  postCount: posts(first: 1) {\n    totalCount\n  }\n  productCount: products(first: 1) {\n    totalCount\n  }\n}\n"
+    "text": "query AdminUserQuery(\n  $id: ID!\n) {\n  ...AdminLayoutFragment\n  adminUser(id: $id) {\n    id\n    username\n    displayName\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  itemPages: pages(first: 100) {\n    nodes {\n      title\n      slug\n      defaultItemKind\n      itemCount\n      id\n    }\n  }\n}\n"
   }
 };
 })();

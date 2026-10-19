@@ -3,7 +3,7 @@ import { useLocation } from 'react-router';
 import { graphql, useFragment } from 'react-relay';
 import { Link, Stack } from '@astryxdesign/core';
 import * as stylex from '@stylexjs/stylex';
-import { HomeURI, PageURI, PostListURI, ProductListURI, AdminHomeURI } from '../../routes/__generated__/routes';
+import { HomeURI, PageURI, AdminHomeURI } from '../../routes/__generated__/routes';
 import { SITE_NAME } from '../../SiteName';
 import { useColorMode } from '../../useColorMode';
 import { useDocumentMetadata, type useDocumentMetadataRow } from '../../useDocumentMetadata';
@@ -11,14 +11,14 @@ import { useSignOut } from '../../useSignOut';
 import { DisplayPreferences } from '../display-preferences/DisplayPreferences';
 import type { LayoutFragment$key } from './__generated__/LayoutFragment.graphql';
 
+const PAGES_PREFIX = PageURI.getURI({ slug: 'x' }).slice(0, -1);
+
 // A page's accent colours its navigation hover, matching its home tile; ink is neutral.
 const NAVIGATION_TONES: Readonly<Record<string, NavigationTone>> = { INK: 'ink', GREEN: 'green', ORANGE: 'orange', BLUE: 'blue', BERRY: 'berry' };
 
 const LAYOUT_FRAGMENT = graphql`fragment LayoutFragment on RootQuery {
   viewer { id displayName role }
   navigationPages: placedPages(where: { home: false }, first: 100) { nodes { id title slug accent } }
-  navigationPosts: posts(first: 100) { nodes { status } }
-  navigationProducts: products(first: 100) { nodes { status } }
 }`;
 
 export function Layout({ data, row, title, admin = false, children }: LayoutProps) {
@@ -78,8 +78,6 @@ function useLayout(key: LayoutFragment$key, row: useDocumentMetadataRow | null |
   const navigation: NavigationLink[] = (data.navigationPages?.nodes ?? [])
     .filter(value => value != null && value.slug !== 'home')
     .map(value => ({ title: value!.title, href: PageURI.getURI({ slug: value!.slug }), tone: NAVIGATION_TONES[value!.accent] ?? 'ink' }));
-  if (data.navigationPosts?.nodes?.some(value => value?.status === 'PUBLISHED')) navigation.push({ title: 'News', href: PostListURI.getURI({}), tone: 'ink' });
-  if (data.navigationProducts?.nodes?.some(value => value?.status === 'PUBLISHED')) navigation.push({ title: 'Products', href: ProductListURI.getURI({}), tone: 'ink' });
   useDocumentMetadata(row, title, admin);
   const session = useSignOut(data.viewer != null);
   const marked = navigation.map(link => ({ ...link, current: currentOf(link.href, location.pathname) }));
@@ -107,10 +105,12 @@ function useMenu(path: string) {
   return { open, element, button, keyDown, toggle: () => { setOpen(value => !value); } };
 }
 
-// The link for this URL is the current page; a collection link stays current on its records.
+// The link for this URL is the current page. A page that holds items stays current, as a
+// section, on its items at /<page-slug>/<item-slug>.
 function currentOf(href: string, path: string): 'page' | 'true' | undefined {
   if (path === href) return 'page';
-  return href !== '/' && path.startsWith(`${href}/`) ? 'true' : undefined;
+  const slug = href.startsWith(PAGES_PREFIX) ? href.slice(PAGES_PREFIX.length) : null;
+  return slug && path.startsWith(`/${slug}/`) ? 'true' : undefined;
 }
 
 type NavigationTone = 'green' | 'orange' | 'blue' | 'berry' | 'ink';

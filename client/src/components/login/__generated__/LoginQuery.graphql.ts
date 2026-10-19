@@ -1,6 +1,6 @@
 /**
- * @generated SignedSource<<939aed78a540201fbbd8779600fe61fd>>
- * @relayHash d37a9715d22dcc403e32982ee359e205
+ * @generated SignedSource<<5e21089e15f35ada26ffc9edbfa368a6>>
+ * @relayHash 7e61ed614efefee483119985d10401d8
  * @lightSyntaxTransform
  */
 
@@ -8,7 +8,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-// @relayRequestID d37a9715d22dcc403e32982ee359e205
+// @relayRequestID 7e61ed614efefee483119985d10401d8
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
@@ -28,25 +28,7 @@ var v0 = {
   "kind": "ScalarField",
   "name": "id",
   "storageKey": null
-},
-v1 = {
-  "kind": "Literal",
-  "name": "first",
-  "value": 100
-},
-v2 = [
-  (v1/*:: as any*/)
-],
-v3 = [
-  {
-    "alias": null,
-    "args": null,
-    "kind": "ScalarField",
-    "name": "status",
-    "storageKey": null
-  },
-  (v0/*:: as any*/)
-];
+};
 return {
   "fragment": {
     "argumentDefinitions": [],
@@ -98,7 +80,11 @@ return {
       {
         "alias": "navigationPages",
         "args": [
-          (v1/*:: as any*/),
+          {
+            "kind": "Literal",
+            "name": "first",
+            "value": 100
+          },
           {
             "kind": "Literal",
             "name": "where",
@@ -147,58 +133,16 @@ return {
           }
         ],
         "storageKey": "placedPages(first:100,where:{\"home\":false})"
-      },
-      {
-        "alias": "navigationPosts",
-        "args": (v2/*:: as any*/),
-        "concreteType": "RootQueryToPostConnection",
-        "kind": "LinkedField",
-        "name": "posts",
-        "plural": false,
-        "selections": [
-          {
-            "alias": null,
-            "args": null,
-            "concreteType": "Post",
-            "kind": "LinkedField",
-            "name": "nodes",
-            "plural": true,
-            "selections": (v3/*:: as any*/),
-            "storageKey": null
-          }
-        ],
-        "storageKey": "posts(first:100)"
-      },
-      {
-        "alias": "navigationProducts",
-        "args": (v2/*:: as any*/),
-        "concreteType": "RootQueryToProductConnection",
-        "kind": "LinkedField",
-        "name": "products",
-        "plural": false,
-        "selections": [
-          {
-            "alias": null,
-            "args": null,
-            "concreteType": "Product",
-            "kind": "LinkedField",
-            "name": "nodes",
-            "plural": true,
-            "selections": (v3/*:: as any*/),
-            "storageKey": null
-          }
-        ],
-        "storageKey": "products(first:100)"
       }
     ]
   },
   "params": {
-    "cacheID": "d37a9715d22dcc403e32982ee359e205",
-    "id": "d37a9715d22dcc403e32982ee359e205",
+    "cacheID": "7e61ed614efefee483119985d10401d8",
+    "id": "7e61ed614efefee483119985d10401d8",
     "metadata": {},
     "name": "LoginQuery",
     "operationKind": "query",
-    "text": "query LoginQuery {\n  ...LayoutFragment\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: placedPages(where: {home: false}, first: 100) {\n    nodes {\n      id\n      title\n      slug\n      accent\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n"
+    "text": "query LoginQuery {\n  ...LayoutFragment\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: placedPages(where: {home: false}, first: 100) {\n    nodes {\n      id\n      title\n      slug\n      accent\n    }\n  }\n}\n"
   }
 };
 })();

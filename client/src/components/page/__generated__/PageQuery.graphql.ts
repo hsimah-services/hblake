@@ -1,6 +1,6 @@
 /**
- * @generated SignedSource<<9eebb052bc37ac8f6e902769547ce674>>
- * @relayHash b6d82761bc756c51d1b4dc39a2ea5496
+ * @generated SignedSource<<b7aebed92f8e8be78e050500432cde6d>>
+ * @relayHash 1f85b6eb41b03cb93957d826f256e727
  * @lightSyntaxTransform
  */
 
@@ -8,18 +8,20 @@
 /* eslint-disable */
 // @ts-nocheck
 
-// @relayRequestID b6d82761bc756c51d1b4dc39a2ea5496
+// @relayRequestID 1f85b6eb41b03cb93957d826f256e727
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
 export type PublicationStatus = "DRAFT" | "PUBLISHED" | "%future added value";
 export type PageQuery$variables = {
+  after?: string | null | undefined;
   slug: string;
 };
 export type PageQuery$data = {
   readonly pageBySlug: {
     readonly content: string;
     readonly createdAt: string;
+    readonly defaultItemKind: string | null | undefined;
     readonly excerpt: string;
     readonly id: string;
     readonly publishedAt: string | null | undefined;
@@ -27,6 +29,24 @@ export type PageQuery$data = {
     readonly status: PublicationStatus;
     readonly title: string;
     readonly updatedAt: string;
+  } | null | undefined;
+  readonly pageItemsOfPage: {
+    readonly nodes: ReadonlyArray<{
+      readonly author: {
+        readonly displayName: string;
+      } | null | undefined;
+      readonly content: string;
+      readonly excerpt: string;
+      readonly id: string;
+      readonly publishedAt: string | null | undefined;
+      readonly slug: string;
+      readonly status: PublicationStatus;
+      readonly title: string;
+    } | null | undefined> | null | undefined;
+    readonly pageInfo: {
+      readonly endCursor: string | null | undefined;
+      readonly hasNextPage: boolean;
+    };
   } | null | undefined;
   readonly " $fragmentSpreads": FragmentRefs<"LayoutFragment">;
 };
@@ -36,42 +56,66 @@ export type PageQuery = {
 };
 
 const node: ConcreteRequest = (function(){
-var v0 = [
-  {
-    "defaultValue": null,
-    "kind": "LocalArgument",
-    "name": "slug"
-  }
-],
+var v0 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "after"
+},
 v1 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "slug"
+},
+v2 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "id",
   "storageKey": null
 },
-v2 = {
+v3 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "title",
   "storageKey": null
 },
-v3 = {
+v4 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "slug",
   "storageKey": null
 },
-v4 = {
+v5 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "content",
+  "storageKey": null
+},
+v6 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "excerpt",
+  "storageKey": null
+},
+v7 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "status",
   "storageKey": null
 },
-v5 = {
+v8 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "publishedAt",
+  "storageKey": null
+},
+v9 = {
   "alias": null,
   "args": [
     {
@@ -85,31 +129,13 @@ v5 = {
   "name": "pageBySlug",
   "plural": false,
   "selections": [
-    (v1/*:: as any*/),
     (v2/*:: as any*/),
     (v3/*:: as any*/),
-    {
-      "alias": null,
-      "args": null,
-      "kind": "ScalarField",
-      "name": "content",
-      "storageKey": null
-    },
-    {
-      "alias": null,
-      "args": null,
-      "kind": "ScalarField",
-      "name": "excerpt",
-      "storageKey": null
-    },
     (v4/*:: as any*/),
-    {
-      "alias": null,
-      "args": null,
-      "kind": "ScalarField",
-      "name": "publishedAt",
-      "storageKey": null
-    },
+    (v5/*:: as any*/),
+    (v6/*:: as any*/),
+    (v7/*:: as any*/),
+    (v8/*:: as any*/),
     {
       "alias": null,
       "args": null,
@@ -123,25 +149,118 @@ v5 = {
       "kind": "ScalarField",
       "name": "updatedAt",
       "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "defaultItemKind",
+      "storageKey": null
     }
   ],
   "storageKey": null
 },
-v6 = {
-  "kind": "Literal",
-  "name": "first",
-  "value": 100
+v10 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "displayName",
+  "storageKey": null
 },
-v7 = [
-  (v6/*:: as any*/)
-],
-v8 = [
-  (v4/*:: as any*/),
-  (v1/*:: as any*/)
-];
+v11 = {
+  "alias": null,
+  "args": [
+    {
+      "kind": "Variable",
+      "name": "after",
+      "variableName": "after"
+    },
+    {
+      "kind": "Literal",
+      "name": "first",
+      "value": 20
+    },
+    {
+      "fields": [
+        {
+          "kind": "Variable",
+          "name": "page",
+          "variableName": "slug"
+        }
+      ],
+      "kind": "ObjectValue",
+      "name": "where"
+    }
+  ],
+  "concreteType": "RootQueryToPageItemsOfPageConnection",
+  "kind": "LinkedField",
+  "name": "pageItemsOfPage",
+  "plural": false,
+  "selections": [
+    {
+      "alias": null,
+      "args": null,
+      "concreteType": "PageItem",
+      "kind": "LinkedField",
+      "name": "nodes",
+      "plural": true,
+      "selections": [
+        (v2/*:: as any*/),
+        (v3/*:: as any*/),
+        (v4/*:: as any*/),
+        (v6/*:: as any*/),
+        (v5/*:: as any*/),
+        (v7/*:: as any*/),
+        (v8/*:: as any*/),
+        {
+          "alias": null,
+          "args": null,
+          "concreteType": "Author",
+          "kind": "LinkedField",
+          "name": "author",
+          "plural": false,
+          "selections": [
+            (v10/*:: as any*/)
+          ],
+          "storageKey": null
+        }
+      ],
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "concreteType": "PageInfo",
+      "kind": "LinkedField",
+      "name": "pageInfo",
+      "plural": false,
+      "selections": [
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "hasNextPage",
+          "storageKey": null
+        },
+        {
+          "alias": null,
+          "args": null,
+          "kind": "ScalarField",
+          "name": "endCursor",
+          "storageKey": null
+        }
+      ],
+      "storageKey": null
+    }
+  ],
+  "storageKey": null
+};
 return {
   "fragment": {
-    "argumentDefinitions": (v0/*:: as any*/),
+    "argumentDefinitions": [
+      (v0/*:: as any*/),
+      (v1/*:: as any*/)
+    ],
     "kind": "Fragment",
     "metadata": null,
     "name": "PageQuery",
@@ -151,14 +270,18 @@ return {
         "kind": "FragmentSpread",
         "name": "LayoutFragment"
       },
-      (v5/*:: as any*/)
+      (v9/*:: as any*/),
+      (v11/*:: as any*/)
     ],
     "type": "RootQuery",
     "abstractKey": null
   },
   "kind": "Request",
   "operation": {
-    "argumentDefinitions": (v0/*:: as any*/),
+    "argumentDefinitions": [
+      (v1/*:: as any*/),
+      (v0/*:: as any*/)
+    ],
     "kind": "Operation",
     "name": "PageQuery",
     "selections": [
@@ -170,14 +293,8 @@ return {
         "name": "viewer",
         "plural": false,
         "selections": [
-          (v1/*:: as any*/),
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "displayName",
-            "storageKey": null
-          },
+          (v2/*:: as any*/),
+          (v10/*:: as any*/),
           {
             "alias": null,
             "args": null,
@@ -191,7 +308,11 @@ return {
       {
         "alias": "navigationPages",
         "args": [
-          (v6/*:: as any*/),
+          {
+            "kind": "Literal",
+            "name": "first",
+            "value": 100
+          },
           {
             "kind": "Literal",
             "name": "where",
@@ -213,9 +334,9 @@ return {
             "name": "nodes",
             "plural": true,
             "selections": [
-              (v1/*:: as any*/),
               (v2/*:: as any*/),
               (v3/*:: as any*/),
+              (v4/*:: as any*/),
               {
                 "alias": null,
                 "args": null,
@@ -229,62 +350,21 @@ return {
         ],
         "storageKey": "placedPages(first:100,where:{\"home\":false})"
       },
-      {
-        "alias": "navigationPosts",
-        "args": (v7/*:: as any*/),
-        "concreteType": "RootQueryToPostConnection",
-        "kind": "LinkedField",
-        "name": "posts",
-        "plural": false,
-        "selections": [
-          {
-            "alias": null,
-            "args": null,
-            "concreteType": "Post",
-            "kind": "LinkedField",
-            "name": "nodes",
-            "plural": true,
-            "selections": (v8/*:: as any*/),
-            "storageKey": null
-          }
-        ],
-        "storageKey": "posts(first:100)"
-      },
-      {
-        "alias": "navigationProducts",
-        "args": (v7/*:: as any*/),
-        "concreteType": "RootQueryToProductConnection",
-        "kind": "LinkedField",
-        "name": "products",
-        "plural": false,
-        "selections": [
-          {
-            "alias": null,
-            "args": null,
-            "concreteType": "Product",
-            "kind": "LinkedField",
-            "name": "nodes",
-            "plural": true,
-            "selections": (v8/*:: as any*/),
-            "storageKey": null
-          }
-        ],
-        "storageKey": "products(first:100)"
-      },
-      (v5/*:: as any*/)
+      (v9/*:: as any*/),
+      (v11/*:: as any*/)
     ]
   },
   "params": {
-    "cacheID": "b6d82761bc756c51d1b4dc39a2ea5496",
-    "id": "b6d82761bc756c51d1b4dc39a2ea5496",
+    "cacheID": "1f85b6eb41b03cb93957d826f256e727",
+    "id": "1f85b6eb41b03cb93957d826f256e727",
     "metadata": {},
     "name": "PageQuery",
     "operationKind": "query",
-    "text": "query PageQuery(\n  $slug: String!\n) {\n  ...LayoutFragment\n  pageBySlug(slug: $slug) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: placedPages(where: {home: false}, first: 100) {\n    nodes {\n      id\n      title\n      slug\n      accent\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n"
+    "text": "query PageQuery(\n  $slug: String!\n  $after: String\n) {\n  ...LayoutFragment\n  pageBySlug(slug: $slug) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    defaultItemKind\n  }\n  pageItemsOfPage(where: {page: $slug}, first: 20, after: $after) {\n    nodes {\n      id\n      title\n      slug\n      excerpt\n      content\n      status\n      publishedAt\n      author {\n        displayName\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: placedPages(where: {home: false}, first: 100) {\n    nodes {\n      id\n      title\n      slug\n      accent\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "c97780737c1720a23f920221365984b2";
+(node as any).hash = "cff41cad2d6ffa5400dc71f457ed6db6";
 
 export default node;

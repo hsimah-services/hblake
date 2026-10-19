@@ -6,7 +6,9 @@ import { AdminIcon } from '../admin-icon/AdminIcon';
 import { AdminTimestamp } from '../admin-timestamp/AdminTimestamp';
 import { ADMIN_QUERY } from './AdminQuery';
 import type { AdminQuery } from './__generated__/AdminQuery.graphql';
-import { AdminPageCreateURI, AdminPageDetailURI, AdminPageListURI, AdminPostCreateURI, AdminPostDetailURI, AdminPostListURI, AdminProductCreateURI, AdminProductDetailURI, AdminProductListURI, AdminUserDetailURI } from '../../routes/__generated__/routes';
+import { AdminPageCreateURI, AdminPageDetailURI, AdminPageItemCreateURI, AdminPageItemDetailURI, AdminPageItemListURI, AdminPageListURI, AdminUserDetailURI } from '../../routes/__generated__/routes';
+
+const ITEM_TONES = ['green', 'orange', 'blue'] as const;
 
 export function Admin({ queryRef }: AdminProps) {
   const dashboard = useAdmin(queryRef);
@@ -31,7 +33,7 @@ export function Admin({ queryRef }: AdminProps) {
     </div>
     <section aria-labelledby="recent-heading">
       <Heading level={2} id="recent-heading" xstyle={styles.recentHeading}>Recently edited</Heading>
-      {dashboard.recent.length === 0 ? <Text color="secondary">Nothing yet. Start with a new page or article.</Text>
+      {dashboard.recent.length === 0 ? <Text color="secondary">Nothing yet. Start with a new page.</Text>
         : <ul {...stylex.props(styles.recent)}>{dashboard.recent.map(item => <li key={item.id} {...stylex.props(styles.recentItem)}>
           <AdminIcon name={item.icon} />
           <Link href={item.href} weight="semibold" color="inherit" xstyle={styles.recentLink}>{item.title}</Link>
@@ -49,16 +51,20 @@ function useAdmin(queryRef: PreloadedQuery<AdminQuery>) {
   const count = (all: { readonly totalCount?: number | null } | null | undefined, published: { readonly totalCount?: number | null } | null | undefined) => ({
     published: published?.totalCount ?? 0, drafts: (all?.totalCount ?? 0) - (published?.totalCount ?? 0),
   });
+  const holders = (data.itemPages?.nodes ?? []).flatMap(page => page != null && page.defaultItemKind != null ? [page] : []);
   const types: readonly AdminDashboardType[] = [
     { plural: 'Pages', singular: 'page', icon: 'page', tone: 'blue', list: AdminPageListURI.getURI({}), publishedList: AdminPageListURI.getURI({ status: 'published' }), draftList: AdminPageListURI.getURI({ status: 'draft' }), create: AdminPageCreateURI.getURI({}), ...count(data.pages, data.publishedPages) },
-    { plural: 'News', singular: 'article', icon: 'news', tone: 'green', list: AdminPostListURI.getURI({}), publishedList: AdminPostListURI.getURI({ status: 'published' }), draftList: AdminPostListURI.getURI({ status: 'draft' }), create: AdminPostCreateURI.getURI({}), ...count(data.posts, data.publishedPosts) },
-    { plural: 'Products', singular: 'product', icon: 'product', tone: 'orange', list: AdminProductListURI.getURI({}), publishedList: AdminProductListURI.getURI({ status: 'published' }), draftList: AdminProductListURI.getURI({ status: 'draft' }), create: AdminProductCreateURI.getURI({}), ...count(data.products, data.publishedProducts) },
+    // One card for each page that holds items.
+    ...holders.map((page, index): AdminDashboardType => ({
+      plural: page.title, singular: page.defaultItemKind?.toLowerCase() ?? 'item', icon: page.defaultItemKind === 'Product' ? 'product' : 'news', tone: ITEM_TONES[index % ITEM_TONES.length],
+      list: AdminPageItemListURI.getURI({ page: page.slug }), publishedList: AdminPageItemListURI.getURI({ page: page.slug, status: 'published' }), draftList: AdminPageItemListURI.getURI({ page: page.slug, status: 'draft' }),
+      create: AdminPageItemCreateURI.getURI({ page: page.slug }), ...count({ totalCount: page.itemCount }, { totalCount: page.publishedItemCount }),
+    })),
   ];
   // The five most recently edited records of any type, from each type's newest five.
   const recent = [
     ...(data.pages?.nodes ?? []).map(node => node && { ...node, type: 'Page', icon: 'page' as const, href: AdminPageDetailURI.getURI({ id: node.id }) }),
-    ...(data.posts?.nodes ?? []).map(node => node && { ...node, type: 'Article', icon: 'news' as const, href: AdminPostDetailURI.getURI({ id: node.id }) }),
-    ...(data.products?.nodes ?? []).map(node => node && { ...node, type: 'Product', icon: 'product' as const, href: AdminProductDetailURI.getURI({ id: node.id }) }),
+    ...(data.items?.nodes ?? []).map(node => node && { ...node, type: node.kind, icon: node.kind === 'Product' ? 'product' as const : 'news' as const, href: AdminPageItemDetailURI.getURI({ page: node.page?.slug ?? '', id: node.id }) }),
   ].filter(item => item != null).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)).slice(0, 5);
   return { data, types, recent, settings: data.viewer?.id ? AdminUserDetailURI.getURI({ id: data.viewer.id }) : undefined };
 }

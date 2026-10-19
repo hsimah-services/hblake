@@ -16,6 +16,7 @@ export function AdminDetail({ kind, row, edit, list, mutate }: AdminDetailProps)
     </Stack>
     {detail.error && <p role="alert">{detail.error}</p>}
     <dl {...stylex.props(styles.facts)}>
+      {row.author && <div {...stylex.props(styles.fact)}><dt><Text color="secondary">Author</Text></dt><dd {...stylex.props(styles.value)}>{row.author.displayName}</dd></div>}
       <AdminDetail_Fact label="Created" value={row.createdAt} />
       <AdminDetail_Fact label="Updated" value={row.updatedAt} />
       <AdminDetail_Fact label="Published" value={row.publishedAt} />
@@ -53,7 +54,7 @@ function useAdminDetail(row: AdminDetailProps['row'], list: string, mutate: Admi
   return { error, pending, asking, publish, confirmDelete, ask: () => { setAsking(true); }, cancel: () => { setAsking(false); } };
 }
 
-type AdminDetailRow = { readonly id: string; readonly title: string; readonly status: string; readonly createdAt?: string | null; readonly updatedAt?: string | null; readonly publishedAt?: string | null; readonly content?: string | null; readonly enquiryUrl?: string | null };
+type AdminDetailRow = { readonly id: string; readonly title: string; readonly status: string; readonly createdAt?: string | null; readonly updatedAt?: string | null; readonly publishedAt?: string | null; readonly content?: string | null; readonly enquiryUrl?: string | null; readonly author?: { readonly displayName: string } | null };
 type AdminDetailProps = { kind: string; row?: AdminDetailRow | null; edit: string; list: string; mutate: (action: string, input: Record<string, unknown>) => Promise<Record<string, unknown>> };
 
 const styles = stylex.create({

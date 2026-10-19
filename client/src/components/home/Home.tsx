@@ -1,7 +1,7 @@
 import { usePreloadedQuery, type PreloadedQuery } from 'react-relay';
 import { Heading, Link } from '@astryxdesign/core';
 import * as stylex from '@stylexjs/stylex';
-import { PageURI, PostURI } from '../../routes/__generated__/routes';
+import { PageItemURI, PageURI } from '../../routes/__generated__/routes';
 import { Layout } from '../layout/Layout';
 import { HOME_QUERY } from './HomeQuery';
 import type { HomeQuery } from './__generated__/HomeQuery.graphql';
@@ -26,7 +26,7 @@ export function Home({ queryRef }: HomeProps) {
       </section>}
       {latest && <section {...stylex.props(styles.latest)}>
         <Heading level={2}>Latest news</Heading>
-        <Heading level={3}><Link href={PostURI.getURI({ slug: latest.slug })}>{latest.title}</Link></Heading>
+        <Heading level={3}><Link href={PageItemURI.getURI({ page: 'news', slug: latest.slug })}>{latest.title}</Link></Heading>
         {latest.publishedAt && <time dateTime={latest.publishedAt}>{new Date(latest.publishedAt).toLocaleDateString('en', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })}</time>}
         <p>{latest.excerpt}</p>
       </section>}
@@ -41,7 +41,7 @@ function useHome(queryRef: PreloadedQuery<HomeQuery>) {
   const tiles = (data.homePages?.nodes ?? [])
     .flatMap(page => page && TILE_TONES[page.accent] ? [{ ...page, tone: TILE_TONES[page.accent] }] : [])
     .slice(0, 4);
-  const latest = data.latestPosts?.nodes?.find(post => post?.status === 'PUBLISHED');
+  const latest = data.latestNews?.nodes?.find(item => item?.status === 'PUBLISHED');
   return { data, tiles, latest };
 }
 

@@ -8,8 +8,8 @@
       "fields": {},
       "query": {
         "operation": "HomeQuery",
-        "id": "4e52b7a904a0b69cc1b4088cbe5434f5",
-        "text": "query HomeQuery {\n  ...LayoutFragment\n  homePages: placedPages(where: {home: true}, first: 4) {\n    nodes {\n      id\n      title\n      slug\n      excerpt\n      accent\n    }\n  }\n  latestPosts: posts(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      excerpt\n      status\n      publishedAt\n    }\n  }\n  pageBySlug(slug: \"home\") {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: placedPages(where: {home: false}, first: 100) {\n    nodes {\n      id\n      title\n      slug\n      accent\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n",
+        "id": "404959ecb5bc8dabcf0c4139cfb858eb",
+        "text": "query HomeQuery {\n  ...LayoutFragment\n  homePages: placedPages(where: {home: true}, first: 4) {\n    nodes {\n      id\n      title\n      slug\n      excerpt\n      accent\n    }\n  }\n  latestNews: pageItemsOfPage(where: {page: \"news\"}, first: 1) {\n    nodes {\n      id\n      title\n      slug\n      excerpt\n      status\n      publishedAt\n    }\n  }\n  pageBySlug(slug: \"home\") {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: placedPages(where: {home: false}, first: 100) {\n    nodes {\n      id\n      title\n      slug\n      accent\n    }\n  }\n}\n",
         "variables": {}
       }
     },
@@ -18,6 +18,11 @@
       "path": "/pages/:slug",
       "ssr": true,
       "fields": {
+        "after": {
+          "kind": "string",
+          "optional": true,
+          "in": "query"
+        },
         "slug": {
           "kind": "string",
           "optional": false,
@@ -26,9 +31,12 @@
       },
       "query": {
         "operation": "PageQuery",
-        "id": "b6d82761bc756c51d1b4dc39a2ea5496",
-        "text": "query PageQuery(\n  $slug: String!\n) {\n  ...LayoutFragment\n  pageBySlug(slug: $slug) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: placedPages(where: {home: false}, first: 100) {\n    nodes {\n      id\n      title\n      slug\n      accent\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n",
+        "id": "1f85b6eb41b03cb93957d826f256e727",
+        "text": "query PageQuery(\n  $slug: String!\n  $after: String\n) {\n  ...LayoutFragment\n  pageBySlug(slug: $slug) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    defaultItemKind\n  }\n  pageItemsOfPage(where: {page: $slug}, first: 20, after: $after) {\n    nodes {\n      id\n      title\n      slug\n      excerpt\n      content\n      status\n      publishedAt\n      author {\n        displayName\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: placedPages(where: {home: false}, first: 100) {\n    nodes {\n      id\n      title\n      slug\n      accent\n    }\n  }\n}\n",
         "variables": {
+          "after": {
+            "input": "after"
+          },
           "slug": {
             "input": "slug"
           }
@@ -36,32 +44,15 @@
       }
     },
     {
-      "name": "PostList",
-      "path": "/news",
+      "name": "PageItem",
+      "path": "/:page/:slug",
       "ssr": true,
       "fields": {
-        "after": {
+        "page": {
           "kind": "string",
-          "optional": true,
-          "in": "query"
-        }
-      },
-      "query": {
-        "operation": "PostListQuery",
-        "id": "1ac8036107bedef4da37b33e69a53cd0",
-        "text": "query PostListQuery(\n  $after: String\n) {\n  ...LayoutFragment\n  posts(first: 20, after: $after) {\n    nodes {\n      id\n      title\n      slug\n      excerpt\n      content\n      status\n      publishedAt\n      author {\n        displayName\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: placedPages(where: {home: false}, first: 100) {\n    nodes {\n      id\n      title\n      slug\n      accent\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n",
-        "variables": {
-          "after": {
-            "input": "after"
-          }
-        }
-      }
-    },
-    {
-      "name": "Post",
-      "path": "/news/:slug",
-      "ssr": true,
-      "fields": {
+          "optional": false,
+          "in": "path"
+        },
         "slug": {
           "kind": "string",
           "optional": false,
@@ -69,54 +60,13 @@
         }
       },
       "query": {
-        "operation": "PostQuery",
-        "id": "888ac00703d0936daac4e6818de432d9",
-        "text": "query PostQuery(\n  $slug: String!\n) {\n  ...LayoutFragment\n  postBySlug(slug: $slug) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    author {\n      displayName\n    }\n  }\n  newsOrder: posts(first: 100) {\n    nodes {\n      slug\n      title\n      status\n      id\n    }\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: placedPages(where: {home: false}, first: 100) {\n    nodes {\n      id\n      title\n      slug\n      accent\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n",
+        "operation": "PageItemQuery",
+        "id": "99abd120f51e83ff0a88de3964400827",
+        "text": "query PageItemQuery(\n  $page: String!\n  $slug: String!\n) {\n  ...LayoutFragment\n  pageBySlug(slug: $page) {\n    id\n    title\n    slug\n  }\n  pageItemBySlug(slug: $slug) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    kind\n    enquiryUrl\n    author {\n      displayName\n    }\n    page {\n      id\n    }\n  }\n  pageOrder: pageItemsOfPage(where: {page: $page}, first: 100) {\n    nodes {\n      slug\n      title\n      status\n      id\n    }\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: placedPages(where: {home: false}, first: 100) {\n    nodes {\n      id\n      title\n      slug\n      accent\n    }\n  }\n}\n",
         "variables": {
-          "slug": {
-            "input": "slug"
-          }
-        }
-      }
-    },
-    {
-      "name": "ProductList",
-      "path": "/products",
-      "ssr": true,
-      "fields": {
-        "after": {
-          "kind": "string",
-          "optional": true,
-          "in": "query"
-        }
-      },
-      "query": {
-        "operation": "ProductListQuery",
-        "id": "3a7aada6f3d04856268b608c6f55a031",
-        "text": "query ProductListQuery(\n  $after: String\n) {\n  ...LayoutFragment\n  products(first: 20, after: $after) {\n    nodes {\n      id\n      title\n      slug\n      excerpt\n      status\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: placedPages(where: {home: false}, first: 100) {\n    nodes {\n      id\n      title\n      slug\n      accent\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n",
-        "variables": {
-          "after": {
-            "input": "after"
-          }
-        }
-      }
-    },
-    {
-      "name": "Product",
-      "path": "/products/:slug",
-      "ssr": true,
-      "fields": {
-        "slug": {
-          "kind": "string",
-          "optional": false,
-          "in": "path"
-        }
-      },
-      "query": {
-        "operation": "ProductQuery",
-        "id": "fe08f28a953ca5fd3e6b5df722114859",
-        "text": "query ProductQuery(\n  $slug: String!\n) {\n  ...LayoutFragment\n  productBySlug(slug: $slug) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    enquiryUrl\n  }\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: placedPages(where: {home: false}, first: 100) {\n    nodes {\n      id\n      title\n      slug\n      accent\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n",
-        "variables": {
+          "page": {
+            "input": "page"
+          },
           "slug": {
             "input": "slug"
           }
@@ -130,8 +80,8 @@
       "fields": {},
       "query": {
         "operation": "LoginQuery",
-        "id": "d37a9715d22dcc403e32982ee359e205",
-        "text": "query LoginQuery {\n  ...LayoutFragment\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: placedPages(where: {home: false}, first: 100) {\n    nodes {\n      id\n      title\n      slug\n      accent\n    }\n  }\n  navigationPosts: posts(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n  navigationProducts: products(first: 100) {\n    nodes {\n      status\n      id\n    }\n  }\n}\n",
+        "id": "7e61ed614efefee483119985d10401d8",
+        "text": "query LoginQuery {\n  ...LayoutFragment\n}\n\nfragment LayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n    role\n  }\n  navigationPages: placedPages(where: {home: false}, first: 100) {\n    nodes {\n      id\n      title\n      slug\n      accent\n    }\n  }\n}\n",
         "variables": {}
       }
     },
@@ -142,8 +92,8 @@
       "fields": {},
       "query": {
         "operation": "AdminQuery",
-        "id": "df6da31fccdfbbb4d2e17d9a9535a8fe",
-        "text": "query AdminQuery {\n  ...AdminLayoutFragment\n  viewer {\n    id\n  }\n  pages: recentPages(first: 5) {\n    totalCount\n    nodes {\n      id\n      title\n      status\n      updatedAt\n    }\n  }\n  publishedPages: recentPages(where: {status: PUBLISHED}, first: 0) {\n    totalCount\n  }\n  posts: recentPosts(first: 5) {\n    totalCount\n    nodes {\n      id\n      title\n      status\n      updatedAt\n    }\n  }\n  publishedPosts: recentPosts(where: {status: PUBLISHED}, first: 0) {\n    totalCount\n  }\n  products: recentProducts(first: 5) {\n    totalCount\n    nodes {\n      id\n      title\n      status\n      updatedAt\n    }\n  }\n  publishedProducts: recentProducts(where: {status: PUBLISHED}, first: 0) {\n    totalCount\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  postCount: posts(first: 1) {\n    totalCount\n  }\n  productCount: products(first: 1) {\n    totalCount\n  }\n}\n",
+        "id": "fe6ba302ad7792cfdc34a49b507cafbb",
+        "text": "query AdminQuery {\n  ...AdminLayoutFragment\n  viewer {\n    id\n  }\n  pages: recentPages(first: 5) {\n    totalCount\n    nodes {\n      id\n      title\n      status\n      updatedAt\n    }\n  }\n  publishedPages: recentPages(where: {status: PUBLISHED}, first: 0) {\n    totalCount\n  }\n  items: recentPageItems(first: 5) {\n    totalCount\n    nodes {\n      id\n      title\n      status\n      updatedAt\n      kind\n      page {\n        slug\n        id\n      }\n    }\n  }\n  itemPages: pages(first: 100) {\n    nodes {\n      id\n      title\n      slug\n      defaultItemKind\n      itemCount\n      publishedItemCount\n    }\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  itemPages: pages(first: 100) {\n    nodes {\n      title\n      slug\n      defaultItemKind\n      itemCount\n      id\n    }\n  }\n}\n",
         "variables": {}
       }
     },
@@ -170,8 +120,8 @@
       },
       "query": {
         "operation": "AdminPageListQuery",
-        "id": "12cfe7b9258ead963a590592ea023a28",
-        "text": "query AdminPageListQuery(\n  $after: String\n) {\n  ...AdminLayoutFragment\n  pages(first: 20, after: $after) {\n    nodes {\n      id\n      title\n      slug\n      status\n      updatedAt\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  postCount: posts(first: 1) {\n    totalCount\n  }\n  productCount: products(first: 1) {\n    totalCount\n  }\n}\n",
+        "id": "be3bdd28dabcc3953db1e46cdd69f5fd",
+        "text": "query AdminPageListQuery(\n  $after: String\n) {\n  ...AdminLayoutFragment\n  pages(first: 20, after: $after) {\n    nodes {\n      id\n      title\n      slug\n      status\n      updatedAt\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  itemPages: pages(first: 100) {\n    nodes {\n      title\n      slug\n      defaultItemKind\n      itemCount\n      id\n    }\n  }\n}\n",
         "variables": {
           "after": {
             "input": "after"
@@ -186,8 +136,8 @@
       "fields": {},
       "query": {
         "operation": "AdminPageCreateQuery",
-        "id": "49a713d009cbfd87d8987bdc99e625fd",
-        "text": "query AdminPageCreateQuery {\n  ...AdminLayoutFragment\n  viewer {\n    id\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  postCount: posts(first: 1) {\n    totalCount\n  }\n  productCount: products(first: 1) {\n    totalCount\n  }\n}\n",
+        "id": "69e56867e0cb2eca2978db0d9acf4a6a",
+        "text": "query AdminPageCreateQuery {\n  ...AdminLayoutFragment\n  viewer {\n    id\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  itemPages: pages(first: 100) {\n    nodes {\n      title\n      slug\n      defaultItemKind\n      itemCount\n      id\n    }\n  }\n}\n",
         "variables": {}
       }
     },
@@ -204,8 +154,8 @@
       },
       "query": {
         "operation": "AdminPageQuery",
-        "id": "afeea4bbb1763e1df2fb425509d3b68e",
-        "text": "query AdminPageQuery(\n  $id: ID!\n) {\n  ...AdminLayoutFragment\n  page(id: $id) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    showInNavigation\n    navigationOrder\n    featureOnHome\n    homeOrder\n    accent\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  postCount: posts(first: 1) {\n    totalCount\n  }\n  productCount: products(first: 1) {\n    totalCount\n  }\n}\n",
+        "id": "9e76b83f71b9f1115c88a05349f5d9a4",
+        "text": "query AdminPageQuery(\n  $id: ID!\n) {\n  ...AdminLayoutFragment\n  page(id: $id) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    showInNavigation\n    navigationOrder\n    featureOnHome\n    homeOrder\n    accent\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  itemPages: pages(first: 100) {\n    nodes {\n      title\n      slug\n      defaultItemKind\n      itemCount\n      id\n    }\n  }\n}\n",
         "variables": {
           "id": {
             "input": "id"
@@ -226,8 +176,8 @@
       },
       "query": {
         "operation": "AdminPageQuery",
-        "id": "afeea4bbb1763e1df2fb425509d3b68e",
-        "text": "query AdminPageQuery(\n  $id: ID!\n) {\n  ...AdminLayoutFragment\n  page(id: $id) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    showInNavigation\n    navigationOrder\n    featureOnHome\n    homeOrder\n    accent\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  postCount: posts(first: 1) {\n    totalCount\n  }\n  productCount: products(first: 1) {\n    totalCount\n  }\n}\n",
+        "id": "9e76b83f71b9f1115c88a05349f5d9a4",
+        "text": "query AdminPageQuery(\n  $id: ID!\n) {\n  ...AdminLayoutFragment\n  page(id: $id) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    showInNavigation\n    navigationOrder\n    featureOnHome\n    homeOrder\n    accent\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  itemPages: pages(first: 100) {\n    nodes {\n      title\n      slug\n      defaultItemKind\n      itemCount\n      id\n    }\n  }\n}\n",
         "variables": {
           "id": {
             "input": "id"
@@ -236,14 +186,19 @@
       }
     },
     {
-      "name": "AdminPostList",
-      "path": "/admin/news",
+      "name": "AdminPageItemList",
+      "path": "/admin/items/:page",
       "ssr": true,
       "fields": {
         "after": {
           "kind": "string",
           "optional": true,
           "in": "query"
+        },
+        "page": {
+          "kind": "string",
+          "optional": false,
+          "in": "path"
         },
         "q": {
           "kind": "string",
@@ -257,156 +212,97 @@
         }
       },
       "query": {
-        "operation": "AdminPostListQuery",
-        "id": "dff86c06acb2c466cabe1662792b5987",
-        "text": "query AdminPostListQuery(\n  $after: String\n) {\n  ...AdminLayoutFragment\n  posts(first: 20, after: $after) {\n    nodes {\n      id\n      title\n      slug\n      status\n      updatedAt\n      publishedAt\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  postCount: posts(first: 1) {\n    totalCount\n  }\n  productCount: products(first: 1) {\n    totalCount\n  }\n}\n",
+        "operation": "AdminPageItemListQuery",
+        "id": "77d958892bbd6d13b3eeac72ea6fe955",
+        "text": "query AdminPageItemListQuery(\n  $page: String!\n  $after: String\n) {\n  ...AdminLayoutFragment\n  pageBySlug(slug: $page) {\n    id\n    title\n    slug\n    defaultItemKind\n  }\n  pageItemsOfPage(where: {page: $page}, first: 20, after: $after) {\n    nodes {\n      id\n      title\n      slug\n      status\n      updatedAt\n      publishedAt\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  itemPages: pages(first: 100) {\n    nodes {\n      title\n      slug\n      defaultItemKind\n      itemCount\n      id\n    }\n  }\n}\n",
         "variables": {
           "after": {
             "input": "after"
+          },
+          "page": {
+            "input": "page"
           }
         }
       }
     },
     {
-      "name": "AdminPostCreate",
-      "path": "/admin/news/new",
-      "ssr": true,
-      "fields": {},
-      "query": {
-        "operation": "AdminPostCreateQuery",
-        "id": "9507ce88faf42861274aff138dfb666d",
-        "text": "query AdminPostCreateQuery {\n  ...AdminLayoutFragment\n  viewer {\n    id\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  postCount: posts(first: 1) {\n    totalCount\n  }\n  productCount: products(first: 1) {\n    totalCount\n  }\n}\n",
-        "variables": {}
-      }
-    },
-    {
-      "name": "AdminPostDetail",
-      "path": "/admin/news/:id",
+      "name": "AdminPageItemCreate",
+      "path": "/admin/items/:page/new",
       "ssr": true,
       "fields": {
-        "id": {
+        "page": {
           "kind": "string",
           "optional": false,
           "in": "path"
         }
       },
       "query": {
-        "operation": "AdminPostQuery",
-        "id": "61b146c4d4458157331be252570c9ab6",
-        "text": "query AdminPostQuery(\n  $id: ID!\n) {\n  ...AdminLayoutFragment\n  post(id: $id) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  postCount: posts(first: 1) {\n    totalCount\n  }\n  productCount: products(first: 1) {\n    totalCount\n  }\n}\n",
+        "operation": "AdminPageItemCreateQuery",
+        "id": "816de6cb94d21ad1432beca3ac3db2b6",
+        "text": "query AdminPageItemCreateQuery(\n  $page: String!\n) {\n  ...AdminLayoutFragment\n  viewer {\n    id\n  }\n  pageBySlug(slug: $page) {\n    id\n    title\n    slug\n    defaultItemKind\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  itemPages: pages(first: 100) {\n    nodes {\n      title\n      slug\n      defaultItemKind\n      itemCount\n      id\n    }\n  }\n}\n",
         "variables": {
-          "id": {
-            "input": "id"
+          "page": {
+            "input": "page"
           }
         }
       }
     },
     {
-      "name": "AdminPostEdit",
-      "path": "/admin/news/:id/edit",
+      "name": "AdminPageItemDetail",
+      "path": "/admin/items/:page/:id",
       "ssr": true,
       "fields": {
         "id": {
           "kind": "string",
           "optional": false,
           "in": "path"
-        }
-      },
-      "query": {
-        "operation": "AdminPostQuery",
-        "id": "61b146c4d4458157331be252570c9ab6",
-        "text": "query AdminPostQuery(\n  $id: ID!\n) {\n  ...AdminLayoutFragment\n  post(id: $id) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  postCount: posts(first: 1) {\n    totalCount\n  }\n  productCount: products(first: 1) {\n    totalCount\n  }\n}\n",
-        "variables": {
-          "id": {
-            "input": "id"
-          }
-        }
-      }
-    },
-    {
-      "name": "AdminProductList",
-      "path": "/admin/products",
-      "ssr": true,
-      "fields": {
-        "after": {
-          "kind": "string",
-          "optional": true,
-          "in": "query"
         },
-        "q": {
+        "page": {
           "kind": "string",
-          "optional": true,
-          "in": "query"
+          "optional": false,
+          "in": "path"
+        }
+      },
+      "query": {
+        "operation": "AdminPageItemQuery",
+        "id": "3f5b211337428b9d7bd6796d02e313e2",
+        "text": "query AdminPageItemQuery(\n  $page: String!\n  $id: ID!\n) {\n  ...AdminLayoutFragment\n  pageBySlug(slug: $page) {\n    id\n    title\n    slug\n    defaultItemKind\n  }\n  pageItem(id: $id) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    kind\n    enquiryUrl\n    author {\n      displayName\n    }\n    page {\n      id\n    }\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  itemPages: pages(first: 100) {\n    nodes {\n      title\n      slug\n      defaultItemKind\n      itemCount\n      id\n    }\n  }\n}\n",
+        "variables": {
+          "id": {
+            "input": "id"
+          },
+          "page": {
+            "input": "page"
+          }
+        }
+      }
+    },
+    {
+      "name": "AdminPageItemEdit",
+      "path": "/admin/items/:page/:id/edit",
+      "ssr": true,
+      "fields": {
+        "id": {
+          "kind": "string",
+          "optional": false,
+          "in": "path"
         },
-        "status": {
-          "kind": "string",
-          "optional": true,
-          "in": "query"
-        }
-      },
-      "query": {
-        "operation": "AdminProductListQuery",
-        "id": "913a8cc640ffe8bc7bb23bab5533e0fd",
-        "text": "query AdminProductListQuery(\n  $after: String\n) {\n  ...AdminLayoutFragment\n  products(first: 20, after: $after) {\n    nodes {\n      id\n      title\n      slug\n      status\n      updatedAt\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  postCount: posts(first: 1) {\n    totalCount\n  }\n  productCount: products(first: 1) {\n    totalCount\n  }\n}\n",
-        "variables": {
-          "after": {
-            "input": "after"
-          }
-        }
-      }
-    },
-    {
-      "name": "AdminProductCreate",
-      "path": "/admin/products/new",
-      "ssr": true,
-      "fields": {},
-      "query": {
-        "operation": "AdminProductCreateQuery",
-        "id": "e2c07990c6624cadc34e0c9ad727587d",
-        "text": "query AdminProductCreateQuery {\n  ...AdminLayoutFragment\n  viewer {\n    id\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  postCount: posts(first: 1) {\n    totalCount\n  }\n  productCount: products(first: 1) {\n    totalCount\n  }\n}\n",
-        "variables": {}
-      }
-    },
-    {
-      "name": "AdminProductDetail",
-      "path": "/admin/products/:id",
-      "ssr": true,
-      "fields": {
-        "id": {
+        "page": {
           "kind": "string",
           "optional": false,
           "in": "path"
         }
       },
       "query": {
-        "operation": "AdminProductQuery",
-        "id": "04edab7bcc1d60619c62ade975d9bb52",
-        "text": "query AdminProductQuery(\n  $id: ID!\n) {\n  ...AdminLayoutFragment\n  product(id: $id) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    enquiryUrl\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  postCount: posts(first: 1) {\n    totalCount\n  }\n  productCount: products(first: 1) {\n    totalCount\n  }\n}\n",
+        "operation": "AdminPageItemQuery",
+        "id": "3f5b211337428b9d7bd6796d02e313e2",
+        "text": "query AdminPageItemQuery(\n  $page: String!\n  $id: ID!\n) {\n  ...AdminLayoutFragment\n  pageBySlug(slug: $page) {\n    id\n    title\n    slug\n    defaultItemKind\n  }\n  pageItem(id: $id) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    kind\n    enquiryUrl\n    author {\n      displayName\n    }\n    page {\n      id\n    }\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  itemPages: pages(first: 100) {\n    nodes {\n      title\n      slug\n      defaultItemKind\n      itemCount\n      id\n    }\n  }\n}\n",
         "variables": {
           "id": {
             "input": "id"
-          }
-        }
-      }
-    },
-    {
-      "name": "AdminProductEdit",
-      "path": "/admin/products/:id/edit",
-      "ssr": true,
-      "fields": {
-        "id": {
-          "kind": "string",
-          "optional": false,
-          "in": "path"
-        }
-      },
-      "query": {
-        "operation": "AdminProductQuery",
-        "id": "04edab7bcc1d60619c62ade975d9bb52",
-        "text": "query AdminProductQuery(\n  $id: ID!\n) {\n  ...AdminLayoutFragment\n  product(id: $id) {\n    id\n    title\n    slug\n    content\n    excerpt\n    status\n    publishedAt\n    createdAt\n    updatedAt\n    enquiryUrl\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  postCount: posts(first: 1) {\n    totalCount\n  }\n  productCount: products(first: 1) {\n    totalCount\n  }\n}\n",
-        "variables": {
-          "id": {
-            "input": "id"
+          },
+          "page": {
+            "input": "page"
           }
         }
       }
@@ -424,8 +320,8 @@
       },
       "query": {
         "operation": "AdminUserQuery",
-        "id": "8f4b5eccc449933db2c386792c607389",
-        "text": "query AdminUserQuery(\n  $id: ID!\n) {\n  ...AdminLayoutFragment\n  adminUser(id: $id) {\n    id\n    username\n    displayName\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  postCount: posts(first: 1) {\n    totalCount\n  }\n  productCount: products(first: 1) {\n    totalCount\n  }\n}\n",
+        "id": "e6f898d9f0cf98d1e4ed0058292c289f",
+        "text": "query AdminUserQuery(\n  $id: ID!\n) {\n  ...AdminLayoutFragment\n  adminUser(id: $id) {\n    id\n    username\n    displayName\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  itemPages: pages(first: 100) {\n    nodes {\n      title\n      slug\n      defaultItemKind\n      itemCount\n      id\n    }\n  }\n}\n",
         "variables": {
           "id": {
             "input": "id"
@@ -446,8 +342,8 @@
       },
       "query": {
         "operation": "AdminUserQuery",
-        "id": "8f4b5eccc449933db2c386792c607389",
-        "text": "query AdminUserQuery(\n  $id: ID!\n) {\n  ...AdminLayoutFragment\n  adminUser(id: $id) {\n    id\n    username\n    displayName\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  postCount: posts(first: 1) {\n    totalCount\n  }\n  productCount: products(first: 1) {\n    totalCount\n  }\n}\n",
+        "id": "e6f898d9f0cf98d1e4ed0058292c289f",
+        "text": "query AdminUserQuery(\n  $id: ID!\n) {\n  ...AdminLayoutFragment\n  adminUser(id: $id) {\n    id\n    username\n    displayName\n  }\n}\n\nfragment AdminLayoutFragment on RootQuery {\n  viewer {\n    id\n    displayName\n  }\n  pageCount: pages(first: 1) {\n    totalCount\n  }\n  itemPages: pages(first: 100) {\n    nodes {\n      title\n      slug\n      defaultItemKind\n      itemCount\n      id\n    }\n  }\n}\n",
         "variables": {
           "id": {
             "input": "id"

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<fceed807354808d6814003b297eb49b4>>
+ * @generated SignedSource<<1c4e3d66d3680f77432eb0afca50abbd>>
  * @relayHash 8497761f27c0e3a4ed9ca0a52d09ce69
  * @lightSyntaxTransform
  */
@@ -17,6 +17,7 @@ export type CreatePageInput = {
   accent?: PageAccent | null | undefined;
   clientMutationId?: string | null | undefined;
   content?: string | null | undefined;
+  defaultItemKind?: string | null | undefined;
   excerpt?: string | null | undefined;
   featureOnHome?: boolean | null | undefined;
   homeOrder?: number | null | undefined;

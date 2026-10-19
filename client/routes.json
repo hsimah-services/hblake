@@ -16,55 +16,27 @@
       "fields": {
         "slug": {
           "kind": "string"
+        },
+        "after": {
+          "kind": "string",
+          "optional": true
         }
       },
       "query": "PageQuery"
     },
     {
-      "name": "PostList",
-      "entryPoint": "src/components/post/Post.entrypoint.ts",
-      "path": "/news",
+      "name": "PageItem",
+      "entryPoint": "src/components/page-item/PageItem.entrypoint.ts",
+      "path": "/:page/:slug",
       "fields": {
-        "after": {
-          "kind": "string",
-          "optional": true
-        }
-      },
-      "query": "PostListQuery"
-    },
-    {
-      "name": "Post",
-      "entryPoint": "src/components/post/Post.entrypoint.ts",
-      "path": "/news/:slug",
-      "fields": {
+        "page": {
+          "kind": "string"
+        },
         "slug": {
           "kind": "string"
         }
       },
-      "query": "PostQuery"
-    },
-    {
-      "name": "ProductList",
-      "entryPoint": "src/components/product/Product.entrypoint.ts",
-      "path": "/products",
-      "fields": {
-        "after": {
-          "kind": "string",
-          "optional": true
-        }
-      },
-      "query": "ProductListQuery"
-    },
-    {
-      "name": "Product",
-      "entryPoint": "src/components/product/Product.entrypoint.ts",
-      "path": "/products/:slug",
-      "fields": {
-        "slug": {
-          "kind": "string"
-        }
-      },
-      "query": "ProductQuery"
+      "query": "PageItemQuery"
     },
     {
       "name": "Login",
@@ -130,10 +102,13 @@
       "query": "AdminPageQuery"
     },
     {
-      "name": "AdminPostList",
-      "entryPoint": "src/components/admin-post/AdminPost.entrypoint.ts",
-      "path": "/admin/news",
+      "name": "AdminPageItemList",
+      "entryPoint": "src/components/admin-page-item/AdminPageItem.entrypoint.ts",
+      "path": "/admin/items/:page",
       "fields": {
+        "page": {
+          "kind": "string"
+        },
         "after": {
           "kind": "string",
           "optional": true
@@ -147,85 +122,46 @@
           "optional": true
         }
       },
-      "query": "AdminPostListQuery"
+      "query": "AdminPageItemListQuery"
     },
     {
-      "name": "AdminPostCreate",
-      "entryPoint": "src/components/admin-post/AdminPost.entrypoint.ts",
-      "path": "/admin/news/new",
-      "fields": {},
-      "query": "AdminPostCreateQuery"
-    },
-    {
-      "name": "AdminPostDetail",
-      "entryPoint": "src/components/admin-post/AdminPost.entrypoint.ts",
-      "path": "/admin/news/:id",
+      "name": "AdminPageItemCreate",
+      "entryPoint": "src/components/admin-page-item/AdminPageItem.entrypoint.ts",
+      "path": "/admin/items/:page/new",
       "fields": {
-        "id": {
+        "page": {
           "kind": "string"
         }
       },
-      "query": "AdminPostQuery"
+      "query": "AdminPageItemCreateQuery"
     },
     {
-      "name": "AdminPostEdit",
-      "entryPoint": "src/components/admin-post/AdminPost.entrypoint.ts",
-      "path": "/admin/news/:id/edit",
+      "name": "AdminPageItemDetail",
+      "entryPoint": "src/components/admin-page-item/AdminPageItem.entrypoint.ts",
+      "path": "/admin/items/:page/:id",
       "fields": {
-        "id": {
+        "page": {
           "kind": "string"
-        }
-      },
-      "query": "AdminPostQuery"
-    },
-    {
-      "name": "AdminProductList",
-      "entryPoint": "src/components/admin-product/AdminProduct.entrypoint.ts",
-      "path": "/admin/products",
-      "fields": {
-        "after": {
-          "kind": "string",
-          "optional": true
         },
-        "status": {
-          "kind": "string",
-          "optional": true
+        "id": {
+          "kind": "string"
+        }
+      },
+      "query": "AdminPageItemQuery"
+    },
+    {
+      "name": "AdminPageItemEdit",
+      "entryPoint": "src/components/admin-page-item/AdminPageItem.entrypoint.ts",
+      "path": "/admin/items/:page/:id/edit",
+      "fields": {
+        "page": {
+          "kind": "string"
         },
-        "q": {
-          "kind": "string",
-          "optional": true
-        }
-      },
-      "query": "AdminProductListQuery"
-    },
-    {
-      "name": "AdminProductCreate",
-      "entryPoint": "src/components/admin-product/AdminProduct.entrypoint.ts",
-      "path": "/admin/products/new",
-      "fields": {},
-      "query": "AdminProductCreateQuery"
-    },
-    {
-      "name": "AdminProductDetail",
-      "entryPoint": "src/components/admin-product/AdminProduct.entrypoint.ts",
-      "path": "/admin/products/:id",
-      "fields": {
         "id": {
           "kind": "string"
         }
       },
-      "query": "AdminProductQuery"
-    },
-    {
-      "name": "AdminProductEdit",
-      "entryPoint": "src/components/admin-product/AdminProduct.entrypoint.ts",
-      "path": "/admin/products/:id/edit",
-      "fields": {
-        "id": {
-          "kind": "string"
-        }
-      },
-      "query": "AdminProductQuery"
+      "query": "AdminPageItemQuery"
     },
     {
       "name": "AdminUserDetail",

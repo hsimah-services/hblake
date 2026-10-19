@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c8910b81a1f1a7eff22698145b465dc2>>
+ * @generated SignedSource<<e82bf0c2c4e61c201410c3e8876812c7>>
  * @lightSyntaxTransform
  */
 
@@ -9,7 +9,6 @@
 
 import { ReaderFragment } from 'relay-runtime';
 export type PageAccent = "BERRY" | "BLUE" | "GREEN" | "INK" | "ORANGE" | "%future added value";
-export type PublicationStatus = "DRAFT" | "PUBLISHED" | "%future added value";
 export type UserRole = "ADMIN" | "EDITOR" | "%future added value";
 import { FragmentRefs } from "relay-runtime";
 export type LayoutFragment$data = {
@@ -19,16 +18,6 @@ export type LayoutFragment$data = {
       readonly id: string;
       readonly slug: string;
       readonly title: string;
-    } | null | undefined> | null | undefined;
-  } | null | undefined;
-  readonly navigationPosts: {
-    readonly nodes: ReadonlyArray<{
-      readonly status: PublicationStatus;
-    } | null | undefined> | null | undefined;
-  } | null | undefined;
-  readonly navigationProducts: {
-    readonly nodes: ReadonlyArray<{
-      readonly status: PublicationStatus;
     } | null | undefined> | null | undefined;
   } | null | undefined;
   readonly viewer: {
@@ -50,24 +39,7 @@ var v0 = {
   "kind": "ScalarField",
   "name": "id",
   "storageKey": null
-},
-v1 = {
-  "kind": "Literal",
-  "name": "first",
-  "value": 100
-},
-v2 = [
-  (v1/*:: as any*/)
-],
-v3 = [
-  {
-    "alias": null,
-    "args": null,
-    "kind": "ScalarField",
-    "name": "status",
-    "storageKey": null
-  }
-];
+};
 return {
   "argumentDefinitions": [],
   "kind": "Fragment",
@@ -103,7 +75,11 @@ return {
     {
       "alias": "navigationPages",
       "args": [
-        (v1/*:: as any*/),
+        {
+          "kind": "Literal",
+          "name": "first",
+          "value": 100
+        },
         {
           "kind": "Literal",
           "name": "where",
@@ -152,48 +128,6 @@ return {
         }
       ],
       "storageKey": "placedPages(first:100,where:{\"home\":false})"
-    },
-    {
-      "alias": "navigationPosts",
-      "args": (v2/*:: as any*/),
-      "concreteType": "RootQueryToPostConnection",
-      "kind": "LinkedField",
-      "name": "posts",
-      "plural": false,
-      "selections": [
-        {
-          "alias": null,
-          "args": null,
-          "concreteType": "Post",
-          "kind": "LinkedField",
-          "name": "nodes",
-          "plural": true,
-          "selections": (v3/*:: as any*/),
-          "storageKey": null
-        }
-      ],
-      "storageKey": "posts(first:100)"
-    },
-    {
-      "alias": "navigationProducts",
-      "args": (v2/*:: as any*/),
-      "concreteType": "RootQueryToProductConnection",
-      "kind": "LinkedField",
-      "name": "products",
-      "plural": false,
-      "selections": [
-        {
-          "alias": null,
-          "args": null,
-          "concreteType": "Product",
-          "kind": "LinkedField",
-          "name": "nodes",
-          "plural": true,
-          "selections": (v3/*:: as any*/),
-          "storageKey": null
-        }
-      ],
-      "storageKey": "products(first:100)"
     }
   ],
   "type": "RootQuery",
@@ -201,6 +135,6 @@ return {
 };
 })();
 
-(node as any).hash = "c8347900960f641a8904c20a3a96ccc6";
+(node as any).hash = "5748de58f88cb6542bada2850bb632a1";
 
 export default node;

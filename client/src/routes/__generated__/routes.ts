@@ -5,24 +5,17 @@ import { createRouteContextRegistry, type RouteContextValue } from "@tsquid/rout
 export enum RouteName {
   Home = "Home",
   Page = "Page",
-  PostList = "PostList",
-  Post = "Post",
-  ProductList = "ProductList",
-  Product = "Product",
+  PageItem = "PageItem",
   Login = "Login",
   AdminHome = "AdminHome",
   AdminPageList = "AdminPageList",
   AdminPageCreate = "AdminPageCreate",
   AdminPageDetail = "AdminPageDetail",
   AdminPageEdit = "AdminPageEdit",
-  AdminPostList = "AdminPostList",
-  AdminPostCreate = "AdminPostCreate",
-  AdminPostDetail = "AdminPostDetail",
-  AdminPostEdit = "AdminPostEdit",
-  AdminProductList = "AdminProductList",
-  AdminProductCreate = "AdminProductCreate",
-  AdminProductDetail = "AdminProductDetail",
-  AdminProductEdit = "AdminProductEdit",
+  AdminPageItemList = "AdminPageItemList",
+  AdminPageItemCreate = "AdminPageItemCreate",
+  AdminPageItemDetail = "AdminPageItemDetail",
+  AdminPageItemEdit = "AdminPageItemEdit",
   AdminUserDetail = "AdminUserDetail",
   AdminUserEdit = "AdminUserEdit",
 }
@@ -37,71 +30,35 @@ export const HomeRouteQuery = {
 } as const;
 
 export type PageInputType = {
+  after?: string;
   slug: string;
 };
-export const PageURI = createURI<PageInputType>("/pages/:slug", {"slug":{"kind":"string","optional":false}});
+export const PageURI = createURI<PageInputType>("/pages/:slug", {"after":{"kind":"string","optional":true},"slug":{"kind":"string","optional":false}});
 
 export const PageRouteQuery = {
   operation: "PageQuery",
   getVariables: <I extends PageInputType>(input: I) : {
+    "after": NonNullable<(I & PageInputType)["after"]> | null;
     "slug": I["slug"];
   } => ({
+    "after": input.after ?? (null),
     "slug": input.slug,
   }),
 } as const;
 
-export type PostListInputType = {
-  after?: string;
-};
-export const PostListURI = createURI<PostListInputType>("/news", {"after":{"kind":"string","optional":true}});
-
-export const PostListRouteQuery = {
-  operation: "PostListQuery",
-  getVariables: <I extends PostListInputType>(input: I) : {
-    "after": NonNullable<(I & PostListInputType)["after"]> | null;
-  } => ({
-    "after": input.after ?? (null),
-  }),
-} as const;
-
-export type PostInputType = {
+export type PageItemInputType = {
+  page: string;
   slug: string;
 };
-export const PostURI = createURI<PostInputType>("/news/:slug", {"slug":{"kind":"string","optional":false}});
+export const PageItemURI = createURI<PageItemInputType>("/:page/:slug", {"page":{"kind":"string","optional":false},"slug":{"kind":"string","optional":false}});
 
-export const PostRouteQuery = {
-  operation: "PostQuery",
-  getVariables: <I extends PostInputType>(input: I) : {
+export const PageItemRouteQuery = {
+  operation: "PageItemQuery",
+  getVariables: <I extends PageItemInputType>(input: I) : {
+    "page": I["page"];
     "slug": I["slug"];
   } => ({
-    "slug": input.slug,
-  }),
-} as const;
-
-export type ProductListInputType = {
-  after?: string;
-};
-export const ProductListURI = createURI<ProductListInputType>("/products", {"after":{"kind":"string","optional":true}});
-
-export const ProductListRouteQuery = {
-  operation: "ProductListQuery",
-  getVariables: <I extends ProductListInputType>(input: I) : {
-    "after": NonNullable<(I & ProductListInputType)["after"]> | null;
-  } => ({
-    "after": input.after ?? (null),
-  }),
-} as const;
-
-export type ProductInputType = {
-  slug: string;
-};
-export const ProductURI = createURI<ProductInputType>("/products/:slug", {"slug":{"kind":"string","optional":false}});
-
-export const ProductRouteQuery = {
-  operation: "ProductQuery",
-  getVariables: <I extends ProductInputType>(input: I) : {
-    "slug": I["slug"];
-  } => ({
+    "page": input.page,
     "slug": input.slug,
   }),
 } as const;
@@ -177,109 +134,70 @@ export const AdminPageEditRouteQuery = {
   }),
 } as const;
 
-export type AdminPostListInputType = {
+export type AdminPageItemListInputType = {
   after?: string;
+  page: string;
   q?: string;
   status?: string;
 };
-export const AdminPostListURI = createURI<AdminPostListInputType>("/admin/news", {"after":{"kind":"string","optional":true},"q":{"kind":"string","optional":true},"status":{"kind":"string","optional":true}});
+export const AdminPageItemListURI = createURI<AdminPageItemListInputType>("/admin/items/:page", {"after":{"kind":"string","optional":true},"page":{"kind":"string","optional":false},"q":{"kind":"string","optional":true},"status":{"kind":"string","optional":true}});
 
-export const AdminPostListRouteQuery = {
-  operation: "AdminPostListQuery",
-  getVariables: <I extends AdminPostListInputType>(input: I) : {
-    "after": NonNullable<(I & AdminPostListInputType)["after"]> | null;
+export const AdminPageItemListRouteQuery = {
+  operation: "AdminPageItemListQuery",
+  getVariables: <I extends AdminPageItemListInputType>(input: I) : {
+    "after": NonNullable<(I & AdminPageItemListInputType)["after"]> | null;
+    "page": I["page"];
   } => ({
     "after": input.after ?? (null),
+    "page": input.page,
   }),
 } as const;
 
-export type AdminPostCreateInputType = {
+export type AdminPageItemCreateInputType = {
+  page: string;
 };
-export const AdminPostCreateURI = createURI<AdminPostCreateInputType>("/admin/news/new", {});
+export const AdminPageItemCreateURI = createURI<AdminPageItemCreateInputType>("/admin/items/:page/new", {"page":{"kind":"string","optional":false}});
 
-export const AdminPostCreateRouteQuery = {
-  operation: "AdminPostCreateQuery",
-  getVariables: (_input?: AdminPostCreateInputType) => ({}),
+export const AdminPageItemCreateRouteQuery = {
+  operation: "AdminPageItemCreateQuery",
+  getVariables: <I extends AdminPageItemCreateInputType>(input: I) : {
+    "page": I["page"];
+  } => ({
+    "page": input.page,
+  }),
 } as const;
 
-export type AdminPostDetailInputType = {
+export type AdminPageItemDetailInputType = {
   id: string;
+  page: string;
 };
-export const AdminPostDetailURI = createURI<AdminPostDetailInputType>("/admin/news/:id", {"id":{"kind":"string","optional":false}});
+export const AdminPageItemDetailURI = createURI<AdminPageItemDetailInputType>("/admin/items/:page/:id", {"id":{"kind":"string","optional":false},"page":{"kind":"string","optional":false}});
 
-export const AdminPostDetailRouteQuery = {
-  operation: "AdminPostQuery",
-  getVariables: <I extends AdminPostDetailInputType>(input: I) : {
+export const AdminPageItemDetailRouteQuery = {
+  operation: "AdminPageItemQuery",
+  getVariables: <I extends AdminPageItemDetailInputType>(input: I) : {
     "id": I["id"];
+    "page": I["page"];
   } => ({
     "id": input.id,
+    "page": input.page,
   }),
 } as const;
 
-export type AdminPostEditInputType = {
+export type AdminPageItemEditInputType = {
   id: string;
+  page: string;
 };
-export const AdminPostEditURI = createURI<AdminPostEditInputType>("/admin/news/:id/edit", {"id":{"kind":"string","optional":false}});
+export const AdminPageItemEditURI = createURI<AdminPageItemEditInputType>("/admin/items/:page/:id/edit", {"id":{"kind":"string","optional":false},"page":{"kind":"string","optional":false}});
 
-export const AdminPostEditRouteQuery = {
-  operation: "AdminPostQuery",
-  getVariables: <I extends AdminPostEditInputType>(input: I) : {
+export const AdminPageItemEditRouteQuery = {
+  operation: "AdminPageItemQuery",
+  getVariables: <I extends AdminPageItemEditInputType>(input: I) : {
     "id": I["id"];
+    "page": I["page"];
   } => ({
     "id": input.id,
-  }),
-} as const;
-
-export type AdminProductListInputType = {
-  after?: string;
-  q?: string;
-  status?: string;
-};
-export const AdminProductListURI = createURI<AdminProductListInputType>("/admin/products", {"after":{"kind":"string","optional":true},"q":{"kind":"string","optional":true},"status":{"kind":"string","optional":true}});
-
-export const AdminProductListRouteQuery = {
-  operation: "AdminProductListQuery",
-  getVariables: <I extends AdminProductListInputType>(input: I) : {
-    "after": NonNullable<(I & AdminProductListInputType)["after"]> | null;
-  } => ({
-    "after": input.after ?? (null),
-  }),
-} as const;
-
-export type AdminProductCreateInputType = {
-};
-export const AdminProductCreateURI = createURI<AdminProductCreateInputType>("/admin/products/new", {});
-
-export const AdminProductCreateRouteQuery = {
-  operation: "AdminProductCreateQuery",
-  getVariables: (_input?: AdminProductCreateInputType) => ({}),
-} as const;
-
-export type AdminProductDetailInputType = {
-  id: string;
-};
-export const AdminProductDetailURI = createURI<AdminProductDetailInputType>("/admin/products/:id", {"id":{"kind":"string","optional":false}});
-
-export const AdminProductDetailRouteQuery = {
-  operation: "AdminProductQuery",
-  getVariables: <I extends AdminProductDetailInputType>(input: I) : {
-    "id": I["id"];
-  } => ({
-    "id": input.id,
-  }),
-} as const;
-
-export type AdminProductEditInputType = {
-  id: string;
-};
-export const AdminProductEditURI = createURI<AdminProductEditInputType>("/admin/products/:id/edit", {"id":{"kind":"string","optional":false}});
-
-export const AdminProductEditRouteQuery = {
-  operation: "AdminProductQuery",
-  getVariables: <I extends AdminProductEditInputType>(input: I) : {
-    "id": I["id"];
-  } => ({
-    "id": input.id,
+    "page": input.page,
   }),
 } as const;
 
@@ -314,48 +232,34 @@ export const AdminUserEditRouteQuery = {
 export type RouteContextType =
   RouteContextValue<HomeInputType, RouteName.Home>
   | RouteContextValue<PageInputType, RouteName.Page>
-  | RouteContextValue<PostListInputType, RouteName.PostList>
-  | RouteContextValue<PostInputType, RouteName.Post>
-  | RouteContextValue<ProductListInputType, RouteName.ProductList>
-  | RouteContextValue<ProductInputType, RouteName.Product>
+  | RouteContextValue<PageItemInputType, RouteName.PageItem>
   | RouteContextValue<LoginInputType, RouteName.Login>
   | RouteContextValue<AdminHomeInputType, RouteName.AdminHome>
   | RouteContextValue<AdminPageListInputType, RouteName.AdminPageList>
   | RouteContextValue<AdminPageCreateInputType, RouteName.AdminPageCreate>
   | RouteContextValue<AdminPageDetailInputType, RouteName.AdminPageDetail>
   | RouteContextValue<AdminPageEditInputType, RouteName.AdminPageEdit>
-  | RouteContextValue<AdminPostListInputType, RouteName.AdminPostList>
-  | RouteContextValue<AdminPostCreateInputType, RouteName.AdminPostCreate>
-  | RouteContextValue<AdminPostDetailInputType, RouteName.AdminPostDetail>
-  | RouteContextValue<AdminPostEditInputType, RouteName.AdminPostEdit>
-  | RouteContextValue<AdminProductListInputType, RouteName.AdminProductList>
-  | RouteContextValue<AdminProductCreateInputType, RouteName.AdminProductCreate>
-  | RouteContextValue<AdminProductDetailInputType, RouteName.AdminProductDetail>
-  | RouteContextValue<AdminProductEditInputType, RouteName.AdminProductEdit>
+  | RouteContextValue<AdminPageItemListInputType, RouteName.AdminPageItemList>
+  | RouteContextValue<AdminPageItemCreateInputType, RouteName.AdminPageItemCreate>
+  | RouteContextValue<AdminPageItemDetailInputType, RouteName.AdminPageItemDetail>
+  | RouteContextValue<AdminPageItemEditInputType, RouteName.AdminPageItemEdit>
   | RouteContextValue<AdminUserDetailInputType, RouteName.AdminUserDetail>
   | RouteContextValue<AdminUserEditInputType, RouteName.AdminUserEdit>;
 
 const ROUTE_CONTEXT = createRouteContextRegistry<RouteContextType>();
 export const HomeRouteContext = ROUTE_CONTEXT.forRoute(RouteName.Home);
 export const PageRouteContext = ROUTE_CONTEXT.forRoute(RouteName.Page);
-export const PostListRouteContext = ROUTE_CONTEXT.forRoute(RouteName.PostList);
-export const PostRouteContext = ROUTE_CONTEXT.forRoute(RouteName.Post);
-export const ProductListRouteContext = ROUTE_CONTEXT.forRoute(RouteName.ProductList);
-export const ProductRouteContext = ROUTE_CONTEXT.forRoute(RouteName.Product);
+export const PageItemRouteContext = ROUTE_CONTEXT.forRoute(RouteName.PageItem);
 export const LoginRouteContext = ROUTE_CONTEXT.forRoute(RouteName.Login);
 export const AdminHomeRouteContext = ROUTE_CONTEXT.forRoute(RouteName.AdminHome);
 export const AdminPageListRouteContext = ROUTE_CONTEXT.forRoute(RouteName.AdminPageList);
 export const AdminPageCreateRouteContext = ROUTE_CONTEXT.forRoute(RouteName.AdminPageCreate);
 export const AdminPageDetailRouteContext = ROUTE_CONTEXT.forRoute(RouteName.AdminPageDetail);
 export const AdminPageEditRouteContext = ROUTE_CONTEXT.forRoute(RouteName.AdminPageEdit);
-export const AdminPostListRouteContext = ROUTE_CONTEXT.forRoute(RouteName.AdminPostList);
-export const AdminPostCreateRouteContext = ROUTE_CONTEXT.forRoute(RouteName.AdminPostCreate);
-export const AdminPostDetailRouteContext = ROUTE_CONTEXT.forRoute(RouteName.AdminPostDetail);
-export const AdminPostEditRouteContext = ROUTE_CONTEXT.forRoute(RouteName.AdminPostEdit);
-export const AdminProductListRouteContext = ROUTE_CONTEXT.forRoute(RouteName.AdminProductList);
-export const AdminProductCreateRouteContext = ROUTE_CONTEXT.forRoute(RouteName.AdminProductCreate);
-export const AdminProductDetailRouteContext = ROUTE_CONTEXT.forRoute(RouteName.AdminProductDetail);
-export const AdminProductEditRouteContext = ROUTE_CONTEXT.forRoute(RouteName.AdminProductEdit);
+export const AdminPageItemListRouteContext = ROUTE_CONTEXT.forRoute(RouteName.AdminPageItemList);
+export const AdminPageItemCreateRouteContext = ROUTE_CONTEXT.forRoute(RouteName.AdminPageItemCreate);
+export const AdminPageItemDetailRouteContext = ROUTE_CONTEXT.forRoute(RouteName.AdminPageItemDetail);
+export const AdminPageItemEditRouteContext = ROUTE_CONTEXT.forRoute(RouteName.AdminPageItemEdit);
 export const AdminUserDetailRouteContext = ROUTE_CONTEXT.forRoute(RouteName.AdminUserDetail);
 export const AdminUserEditRouteContext = ROUTE_CONTEXT.forRoute(RouteName.AdminUserEdit);
 
@@ -395,45 +299,24 @@ export function useAdminPageRouteContext(): AdminPageRouteContextType {
   }
 }
 
-export type AdminPostEntryPointParams =
-  { currentRoute: RouteName.AdminPostList; input: AdminPostListInputType }
-  | { currentRoute: RouteName.AdminPostCreate; input: AdminPostCreateInputType }
-  | { currentRoute: RouteName.AdminPostDetail; input: AdminPostDetailInputType }
-  | { currentRoute: RouteName.AdminPostEdit; input: AdminPostEditInputType };
+export type AdminPageItemEntryPointParams =
+  { currentRoute: RouteName.AdminPageItemList; input: AdminPageItemListInputType }
+  | { currentRoute: RouteName.AdminPageItemCreate; input: AdminPageItemCreateInputType }
+  | { currentRoute: RouteName.AdminPageItemDetail; input: AdminPageItemDetailInputType }
+  | { currentRoute: RouteName.AdminPageItemEdit; input: AdminPageItemEditInputType };
 
-export type AdminPostRouteContextType = Extract<RouteContextType, { currentRoute: RouteName.AdminPostList | RouteName.AdminPostCreate | RouteName.AdminPostDetail | RouteName.AdminPostEdit }>;
-export function useAdminPostRouteContext(): AdminPostRouteContextType {
+export type AdminPageItemRouteContextType = Extract<RouteContextType, { currentRoute: RouteName.AdminPageItemList | RouteName.AdminPageItemCreate | RouteName.AdminPageItemDetail | RouteName.AdminPageItemEdit }>;
+export function useAdminPageItemRouteContext(): AdminPageItemRouteContextType {
   const context = ROUTE_CONTEXT.useRouteContext();
   const currentRoute = context.currentRoute;
   switch (context.currentRoute) {
-    case RouteName.AdminPostList:
-    case RouteName.AdminPostCreate:
-    case RouteName.AdminPostDetail:
-    case RouteName.AdminPostEdit:
+    case RouteName.AdminPageItemList:
+    case RouteName.AdminPageItemCreate:
+    case RouteName.AdminPageItemDetail:
+    case RouteName.AdminPageItemEdit:
       return context;
     default:
-      throw new Error('useAdminPostRouteContext requires the AdminPost entrypoint; current route is ' + currentRoute);
-  }
-}
-
-export type AdminProductEntryPointParams =
-  { currentRoute: RouteName.AdminProductList; input: AdminProductListInputType }
-  | { currentRoute: RouteName.AdminProductCreate; input: AdminProductCreateInputType }
-  | { currentRoute: RouteName.AdminProductDetail; input: AdminProductDetailInputType }
-  | { currentRoute: RouteName.AdminProductEdit; input: AdminProductEditInputType };
-
-export type AdminProductRouteContextType = Extract<RouteContextType, { currentRoute: RouteName.AdminProductList | RouteName.AdminProductCreate | RouteName.AdminProductDetail | RouteName.AdminProductEdit }>;
-export function useAdminProductRouteContext(): AdminProductRouteContextType {
-  const context = ROUTE_CONTEXT.useRouteContext();
-  const currentRoute = context.currentRoute;
-  switch (context.currentRoute) {
-    case RouteName.AdminProductList:
-    case RouteName.AdminProductCreate:
-    case RouteName.AdminProductDetail:
-    case RouteName.AdminProductEdit:
-      return context;
-    default:
-      throw new Error('useAdminProductRouteContext requires the AdminProduct entrypoint; current route is ' + currentRoute);
+      throw new Error('useAdminPageItemRouteContext requires the AdminPageItem entrypoint; current route is ' + currentRoute);
   }
 }
 
@@ -499,36 +382,17 @@ export function usePageRouteContext(): PageRouteContextType {
   }
 }
 
-export type PostEntryPointParams =
-  { currentRoute: RouteName.PostList; input: PostListInputType }
-  | { currentRoute: RouteName.Post; input: PostInputType };
+export type PageItemEntryPointParams =
+  { currentRoute: RouteName.PageItem; input: PageItemInputType };
 
-export type PostRouteContextType = Extract<RouteContextType, { currentRoute: RouteName.PostList | RouteName.Post }>;
-export function usePostRouteContext(): PostRouteContextType {
+export type PageItemRouteContextType = Extract<RouteContextType, { currentRoute: RouteName.PageItem }>;
+export function usePageItemRouteContext(): PageItemRouteContextType {
   const context = ROUTE_CONTEXT.useRouteContext();
   const currentRoute = context.currentRoute;
   switch (context.currentRoute) {
-    case RouteName.PostList:
-    case RouteName.Post:
+    case RouteName.PageItem:
       return context;
     default:
-      throw new Error('usePostRouteContext requires the Post entrypoint; current route is ' + currentRoute);
-  }
-}
-
-export type ProductEntryPointParams =
-  { currentRoute: RouteName.ProductList; input: ProductListInputType }
-  | { currentRoute: RouteName.Product; input: ProductInputType };
-
-export type ProductRouteContextType = Extract<RouteContextType, { currentRoute: RouteName.ProductList | RouteName.Product }>;
-export function useProductRouteContext(): ProductRouteContextType {
-  const context = ROUTE_CONTEXT.useRouteContext();
-  const currentRoute = context.currentRoute;
-  switch (context.currentRoute) {
-    case RouteName.ProductList:
-    case RouteName.Product:
-      return context;
-    default:
-      throw new Error('useProductRouteContext requires the Product entrypoint; current route is ' + currentRoute);
+      throw new Error('usePageItemRouteContext requires the PageItem entrypoint; current route is ' + currentRoute);
   }
 }

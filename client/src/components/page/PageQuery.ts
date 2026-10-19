@@ -1,6 +1,7 @@
 import { graphql } from 'react-relay';
 
-export const PAGE_QUERY = graphql`query PageQuery($slug: String!) {
+export const PAGE_QUERY = graphql`query PageQuery($slug: String!, $after: String) {
   ...LayoutFragment
-  pageBySlug(slug: $slug) { id title slug content excerpt status publishedAt createdAt updatedAt }
+  pageBySlug(slug: $slug) { id title slug content excerpt status publishedAt createdAt updatedAt defaultItemKind }
+  pageItemsOfPage(where: { page: $slug }, first: 20, after: $after) { nodes { id title slug excerpt content status publishedAt author { displayName } } pageInfo { hasNextPage endCursor } }
 }`;
