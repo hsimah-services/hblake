@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Page/PageHydrator.php
- * digest: sha256:7d0c28ff6bc5336f60ac80f7bd1579a88b32f8006e7dcac8d004045ea807dd92
+ * digest: sha256:ef7f38cdecdcb624a44e3df52649975763cc5aa04f4dc30861d5c1d7b5fb32cc
  */
 
 namespace Hsimah\Entity\Page;
@@ -41,6 +41,7 @@ final readonly class PageHydrator implements Hydrator
     ): Page {
         return Page::of(
             $record->id,
+            $edges,
             $this->title($record),
             $this->slug($record),
             $this->content($record),
@@ -49,6 +50,7 @@ final readonly class PageHydrator implements Hydrator
             $this->publishedAt($record),
             $this->createdAt($record),
             $this->updatedAt($record),
+            $this->defaultItemKind($record),
             $this->showInNavigation($record),
             $this->navigationOrder($record),
             $this->featureOnHome($record),
@@ -119,6 +121,14 @@ final readonly class PageHydrator implements Hydrator
         $value = $record->value('updatedAt');
 
         return $this->decode->datetime($value, 'Page.updatedAt');
+    }
+
+    private function defaultItemKind(
+        Record $record,
+    ): ?string {
+        $value = $record->value('defaultItemKind');
+
+        return null === $value ? null : $this->decode->string($value, 'Page.defaultItemKind');
     }
 
     private function showInNavigation(

@@ -20,7 +20,8 @@ Contributor instructions live in [AGENTS.md](../AGENTS.md).
 - Rich-text editing stored as Markdown, with sanitized rendering; no block editor.
 - V1 has one operator-provisioned admin account. The model retains editor/admin
   roles; additional accounts and account lifecycle screens are outside v1.
-- Products are informational offerings with an enquiry link, without commerce.
+- Articles, products and framework entries are PageItems attached to pages that hold items.
+  Products are informational offerings with an enquiry link, without commerce.
 - No public registration. Staff login uses server sessions and operator bootstrap.
 - Two publication states, draft and published; no scheduled publication or revisions.
 - UTC creation/update timestamps and first publication timestamp.

@@ -10,12 +10,14 @@ input, never unchecked numeric conversion.
 
 The admin uses a WordPress-style shell (Astryx AppShell): a top bar with the site
 name, View site, display preferences and Sign out, and a sidebar navigation named
-"Administration" with Dashboard, Pages, News (posts) and Products (each with its record
-count) and Settings. The current item carries `aria-current`; on phones the sidebar
+"Administration" with Dashboard, Pages, one section for each page that holds items
+(News, Products, ...; each with its record count) and Settings. A page’s items are at
+`/admin/items/<page-slug>`; their form adds Enquiry URL and Kind, and the page form
+adds Item kind. The current item carries `aria-current`; on phones the sidebar
 opens from a menu button. The Dashboard shows each type's published and draft counts
 with links to manage it and add a new one.
 
-Page, post and product content is edited as rich text (Tiptap, MIT) with a formatting toolbar and a
+Page and item content is edited as rich text (Tiptap, MIT) with a formatting toolbar and a
 Markdown source mode; Markdown remains the stored format, so the existing renderer and
 sanitizer apply. Links accept only https/http, mailto or site paths. Images are added
 from the editor with required alt text and upload to the media endpoint.

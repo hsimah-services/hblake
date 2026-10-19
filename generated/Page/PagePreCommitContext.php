@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Page/PagePreCommitContext.php
- * digest: sha256:7a6468391238e964d34c8ed78972c075e9eab559751d60de0256a62a50f5316b
+ * digest: sha256:1e4a6111c013f00ec7bbe88e35cf1c0ffb5b95fd366b7f228387b21a8163e93d
  */
 
 namespace Hsimah\Entity\Page;
@@ -109,6 +109,12 @@ final readonly class PagePreCommitContext implements MutableMutationContext
         $this->context->set('updatedAt', $value);
     }
 
+    public function setDefaultItemKind(
+        ?string $value,
+    ): void {
+        $this->context->set('defaultItemKind', $value);
+    }
+
     public function setShowInNavigation(
         bool $value,
     ): void {
@@ -137,6 +143,10 @@ final readonly class PagePreCommitContext implements MutableMutationContext
         PageAccent $value,
     ): void {
         $this->context->set('accent', $value);
+    }
+
+    public function author(): EdgeMutation {
+        return $this->context->edge('author');
     }
 
     public function id(): Identifier {
@@ -303,6 +313,20 @@ final readonly class PagePreCommitContext implements MutableMutationContext
         return $value;
     }
 
+    public function originalDefaultItemKind(): ?string {
+        $value = $this->context->original('defaultItemKind');
+        assert(null === $value || is_string($value));
+
+        return $value;
+    }
+
+    public function pendingDefaultItemKind(): ?string {
+        $value = $this->context->pending('defaultItemKind');
+        assert(null === $value || is_string($value));
+
+        return $value;
+    }
+
     public function originalShowInNavigation(): ?bool {
         $value = $this->context->original('showInNavigation');
         assert(null === $value || is_bool($value));
@@ -371,6 +395,14 @@ final readonly class PagePreCommitContext implements MutableMutationContext
         assert(null === $value || $value instanceof PageAccent);
 
         return $value;
+    }
+
+    public function pendingAuthor(): ?Identifier {
+        return $this->context->pendingEdge('author')[0] ?? null;
+    }
+
+    public function isAuthorChanged(): bool {
+        return $this->context->isEdgeChanged('author');
     }
 
     public static function of(

@@ -7,7 +7,7 @@ application tests in server/tests. The original acceptance tests are unchanged.
 1. Eleph fmt/validate accept every entity, type and pattern with the actual SQLite
    and GraphQL integrations installed. generate --check reports no artifact drift;
    eleph check verifies real accessors. tsquid route and UI checks are deterministic.
-2. Creating Page, Post or Product reuses shared fields and starts as draft. Runtime
+2. Creating a Page or PageItem reuses shared fields and starts as draft. Runtime
    supplies UTC createdAt/updatedAt; client attempts to set managed fields fail.
 3. Publish commits status/time together; repeated publish retains first time.
    Unpublish removes public visibility immediately. Invalid direct updates cannot
@@ -18,7 +18,7 @@ application tests in server/tests. The original acceptance tests are unchanged.
    single admin can update their displayName and password; bootstrap refuses additional
    accounts. Inactive users and expired sessions cannot operate the API.
 5. User has no generated GraphQL exposure. Public content queries do not expose
-   the username, credentials or account links; posts carry only the author display
+   the username, credentials or account links; pages and items carry only the author display
    name. Viewer/admin/author DTOs enforce their allowlists.
 6. Duplicate/invalid slugs, duplicate or invalid usernames, unsafe enquiry URLs,
    oversized bodies/excerpts and injected HTML/script Markdown produce safe
@@ -28,7 +28,7 @@ application tests in server/tests. The original acceptance tests are unchanged.
 8. Login/logout, CSRF, cookie settings, session rotation, rate limits and
    session revocation are verified through HTTP-level checks.
 9. Unknown/draft pages return public 404; home canonicalization works. Empty
-   posts/products render cleanly. Ordering has ID tie-breakers.
+   pages without items render cleanly. Ordering has ID tie-breakers.
    V1 accepts short/empty policy-filtered pages and slow counts; continuation
    remains available through pageInfo without exposing drafts.
 10. The client renders published content and updates document metadata. Route HTML

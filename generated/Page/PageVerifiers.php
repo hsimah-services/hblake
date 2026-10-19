@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Page/PageVerifiers.php
- * digest: sha256:99eaff943fb32f2ccf802d18e0346b0b820462bdf3aeaba252847fcbd9ae37cf
+ * digest: sha256:3f3980a6d34885318448b46a14058ab023da2d9823f06a8c6bead1f4c0a698b5
  */
 
 namespace Hsimah\Entity\Page;
@@ -22,6 +22,7 @@ use Hsimah\Entity\Enum\PageAccent;
 use Hsimah\Entity\Enum\PublicationStatus;
 use Hsimah\Entity\Page\Contract\PageAccentVerifier;
 use Hsimah\Entity\Page\Contract\PageContentVerifier;
+use Hsimah\Entity\Page\Contract\PageDefaultItemKindVerifier;
 use Hsimah\Entity\Page\Contract\PageHomeOrderVerifier;
 use Hsimah\Entity\Page\Contract\PageNavigationOrderVerifier;
 use Hsimah\Entity\Page\Contract\PagePublishedAtVerifier;
@@ -40,6 +41,7 @@ final readonly class PageVerifiers implements EntityVerifiers
         private PageContentVerifier $contentVerifier,
         private PageStatusVerifier $statusVerifier,
         private PagePublishedAtVerifier $publishedAtVerifier,
+        private PageDefaultItemKindVerifier $defaultItemKindVerifier,
         private PageNavigationOrderVerifier $navigationOrderVerifier,
         private PageHomeOrderVerifier $homeOrderVerifier,
         private PageAccentVerifier $accentVerifier,
@@ -51,7 +53,7 @@ final readonly class PageVerifiers implements EntityVerifiers
      * @return list<string>
      */
     public function verifiedFields(): array {
-        return ['title', 'slug', 'content', 'status', 'publishedAt', 'navigationOrder', 'homeOrder', 'accent'];
+        return ['title', 'slug', 'content', 'status', 'publishedAt', 'defaultItemKind', 'navigationOrder', 'homeOrder', 'accent'];
     }
 
     public function verify(
@@ -65,6 +67,7 @@ final readonly class PageVerifiers implements EntityVerifiers
             'content' => $this->verifyContent($value, $context),
             'status' => $this->verifyStatus($value, $context),
             'publishedAt' => $this->verifyPublishedAt($value, $context),
+            'defaultItemKind' => $this->verifyDefaultItemKind($value, $context),
             'navigationOrder' => $this->verifyNavigationOrder($value, $context),
             'homeOrder' => $this->verifyHomeOrder($value, $context),
             'accent' => $this->verifyAccent($value, $context),
@@ -115,6 +118,15 @@ final readonly class PageVerifiers implements EntityVerifiers
         assert(null === $value || $value instanceof DateTimeImmutable);
 
         return $this->publishedAtVerifier->verify($value, PageMutationContext::of($context));
+    }
+
+    private function verifyDefaultItemKind(
+        mixed $value,
+        MutationContext $context,
+    ): Verification {
+        assert(null === $value || is_string($value));
+
+        return $this->defaultItemKindVerifier->verify($value, PageMutationContext::of($context));
     }
 
     private function verifyNavigationOrder(

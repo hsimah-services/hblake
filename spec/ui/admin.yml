@@ -6,22 +6,15 @@ entities:
     source: graphql
     list: [title, slug, status, updatedAt]
     detail: [title, slug, content, excerpt, status, publishedAt, createdAt, updatedAt]
-    create: [title, slug, content, excerpt, showInNavigation, navigationOrder, featureOnHome, homeOrder, accent]
-    edit: [title, slug, content, excerpt, showInNavigation, navigationOrder, featureOnHome, homeOrder, accent]
+    create: [title, slug, content, excerpt, showInNavigation, navigationOrder, featureOnHome, homeOrder, accent, defaultItemKind]
+    edit: [title, slug, content, excerpt, showInNavigation, navigationOrder, featureOnHome, homeOrder, accent, defaultItemKind]
     actions: [publish, unpublish, delete]
-  Post:
+  PageItem:
     source: graphql
     list: [title, slug, status, publishedAt, updatedAt]
-    detail: [title, slug, content, excerpt, status, publishedAt, createdAt, updatedAt]
-    create: [title, slug, content, excerpt]
-    edit: [title, slug, content, excerpt]
-    actions: [publish, unpublish, delete]
-  Product:
-    source: graphql
-    list: [title, slug, status, updatedAt]
-    detail: [title, slug, content, excerpt, enquiryUrl, status, publishedAt, createdAt, updatedAt]
-    create: [title, slug, content, excerpt, enquiryUrl]
-    edit: [title, slug, content, excerpt, enquiryUrl]
+    detail: [title, slug, content, excerpt, kind, enquiryUrl, author, status, publishedAt, createdAt, updatedAt]
+    create: [title, slug, content, excerpt, enquiryUrl, kind]
+    edit: [title, slug, content, excerpt, enquiryUrl, kind]
     actions: [publish, unpublish, delete]
   User:
     source: privateAdminDto

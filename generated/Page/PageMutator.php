@@ -9,12 +9,13 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Page/PageMutator.php
- * digest: sha256:5d28e73fec7cea6e5a20eb5e56ff4e13ae67b55014ddcfb24d2bee0d04167893
+ * digest: sha256:47fbd613482b4c2602b0afc5cee0d4d155260d8a7f2c0b6c2104f4d40dd4e3de
  */
 
 namespace Hsimah\Entity\Page;
 
 use DateTimeImmutable;
+use Eleph\Runtime\Identity\Identifier;
 use Eleph\Runtime\Mutation\MutationBuffer;
 use Hsimah\Entity\Enum\PageAccent;
 use Hsimah\Entity\Enum\PublicationStatus;
@@ -85,6 +86,14 @@ final class PageMutator
         return $this;
     }
 
+    public function setDefaultItemKind(
+        ?string $defaultItemKind,
+    ): self {
+        $this->buffer->set('defaultItemKind', $defaultItemKind);
+
+        return $this;
+    }
+
     public function setShowInNavigation(
         bool $showInNavigation,
     ): self {
@@ -121,6 +130,17 @@ final class PageMutator
         PageAccent $accent,
     ): self {
         $this->buffer->set('accent', $accent);
+
+        return $this;
+    }
+
+    /**
+     * Point this at one User, or at nothing.
+     */
+    public function setAuthor(
+        ?Identifier $author,
+    ): self {
+        $this->buffer->edge('author')->set(null === $author ? [] : [$author]);
 
         return $this;
     }

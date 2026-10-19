@@ -12,6 +12,11 @@ policies:
     read: deny
     write: deny
 fields:
+  defaultItemKind:
+    type: string
+    nullable: true
+    maxLength: 80
+    verify: true
   showInNavigation:
     type: bool
     default: true

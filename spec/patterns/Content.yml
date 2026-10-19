@@ -20,3 +20,9 @@ fields:
     type: string
     default: ''
     maxLength: 300
+edges:
+  author:
+    to: User
+    cardinality: one
+    description: The staff member who wrote the content.
+    onDelete: restrict

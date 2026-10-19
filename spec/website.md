@@ -4,8 +4,9 @@ The hblake site introduces Hamish Blake and the open frameworks behind his work.
 Owner-provided launch content consists of Home, About, Frameworks, Portfolio and
 Contact us. The homepage shows up to four large coloured links to pages featured on
 it (page placement, see Page.md; the launch content features About, Frameworks,
-Portfolio and Contact us), followed by the latest published post ("Latest news") when one exists. News and Products may
-remain empty. Posts are presented to visitors and in the admin as News.
+Portfolio and Contact us), followed by the latest published News item ("Latest news") when one exists. News, Products and
+any other page that holds items may have none. News and Products are pages that hold items
+(see PageItem.md): Articles and Products.
 News carries hbla.ke's business and technical writing; personal writing stays on
 hsimah.com, which the footer links. The two do not otherwise cross-link.
 
@@ -19,27 +20,28 @@ Public typography and spacing prioritize readable content. The UI follows tsquid
 Astryx/StyleX conventions with keyboard access, visible focus and responsive layouts.
 
 Owner-approved content lives in content/pages.json and can replace existing Page,
-Post and Product records with the explicit operator command `replace-content`.
-That command preserves accounts, credentials and sessions, and publishes the five
-pages through the normal runtime contracts in one transaction.
+PageItem records with the explicit operator command `replace-content`.
+That command preserves accounts, credentials and sessions, and publishes the seed
+pages (the five launch pages plus News and Products) through the normal runtime contracts in one transaction.
 
 | Route | Behavior |
 | --- | --- |
 | `/` | Published Page with slug `home`; meaningful unavailable state if absent |
 | `/pages/:slug` | Published Page by exact slug; home redirects to `/` |
-| `/news` | Published posts as News, newest first, cursor pagination, empty state |
-| `/news/feed.xml` | Atom feed of published News, newest first |
-| `/news/:slug` | Published post or 404. Old `/posts…` and `/admin/posts…` URLs redirect (301) to `/news…` and `/admin/news…` |
-| `/products` | Published offerings, title ascending then ID, pagination |
-| `/products/:slug` | Published offering, optional safe enquiry link, or 404 |
+| `/pages/:slug` | A page holds its content and, when it holds items, its published items newest first, with cursor pagination and an empty state ("No news") |
+| `/:page/:item` | Published item of a published page, optional safe enquiry link, or 404. Found only under its own page |
+| `/news/feed.xml` | Atom feed of the News page's published items, newest first |
 | `/admin/login` | Staff login |
 | `/admin` | Dashboard: counts per content type, links to manage and add each, and settings |
-| `/admin/{pages,news,products}` | Authorized content management views (News manages posts) |
+| `/admin/pages` | Authorized page management views |
+| `/admin/items/:page` | Authorized management views for the items of a page that holds items (News, Products) |
 | `/admin/users/:id` and `/admin/users/:id/edit` | Settings (username, display name, password change) and display-name edit |
 
-Navigation omits a link whose backing page is missing or draft. Show News and
-Products navigation when published records exist. No arbitrary user-defined route
-catch-all; Page URLs are namespaced to avoid collisions with admin and collections.
+Navigation omits a link whose backing page is missing or draft; News and Products appear
+as the pages they are. No arbitrary user-defined route catch-all; page slugs that would
+shadow a fixed route (`admin`, `assets`, `auth`, `graphql`, `media`, `pages`) are
+reserved, because items live at `/<page-slug>/<item-slug>`. The old `/news`, `/products`,
+`/posts` and `/admin/news` addresses are gone and are not redirected.
 
 Unique slugs are lowercase ASCII letters/digits separated by single hyphens,
 1–160 characters. Creation can suggest a slug from a title; server validation is
@@ -48,7 +50,7 @@ titles change. A deliberate slug change changes the URL; redirects/history are
 outside this version and the edit screen must make the consequence clear.
 
 Markdown bodies store source text. Render with raw HTML disabled and sanitize
-output and URLs. Posts may contain images uploaded by staff: PNG, JPEG or WebP up to
+output and URLs. Items may contain images uploaded by staff: PNG, JPEG or WebP up to
 5 MB, checked by content, re-encoded so no camera or location metadata survives,
 stored under random names in a private media directory beside the database and
 served from `/media/<name>`. Every image has alt text. Backups include the images. Draft content may be blank. Published content requires a nonblank

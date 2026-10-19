@@ -43,13 +43,13 @@ omits the automatic databaseId field to retain the specified content allowlist.
 User is excluded from the generic GraphQL manifest. Safe application-owned
 User admin fields: id, username, displayName, restricted to admins. `viewer` returns id, displayName, role to the authenticated
 user. Credentials never occur in generated model fields or Relay query artifacts.
-The public author projection, `Post.author`, is an explicit allowlist of
+The public author projection, `Page.author` and `PageItem.author`, is an explicit allowlist of
 displayName, read from trusted storage for the single account.
 
 ## Shared behavior
 
-Content contributes title, unique slug, Markdown content and excerpt to Page,
-Post and Product. Publishable contributes status, publishedAt, actions and shared
+Content contributes title, unique slug, Markdown content and excerpt to Page
+and PageItem. Publishable contributes status, publishedAt, actions and shared
 read/write policy contracts. Timestamps contributes runtime-managed times to all
 four entities. Publication verifier/action implementations can share application
 helpers while implementing every generated interface. Spec patterns are sealed.
@@ -82,10 +82,10 @@ backup/restore procedures handle populated databases. No existing data is presen
 The frontend uses tsquid's route catalogue, URI builders, route contexts, Relay
 entrypoints, Astryx and StyleX. The spec route catalogue becomes the client
 `routes.json` once entrypoints exist. Routes share one entrypoint per entity: public
-Post list/detail use post/Post.entrypoint.ts; each admin content entity groups
-list/create/detail/edit under admin-page, admin-post or admin-product. Login, Home,
-Page, Admin and the operator profile each have their own module: 22 routes across
-10 entrypoints. Each route names one Relay query whose variables come only from its
+a page’s items use page-item/PageItem.entrypoint.ts (the page lists them in Page); each admin content entity groups
+list/create/detail/edit under admin-page or admin-page-item. Login, Home,
+Page, Admin and the operator profile each have their own module: 15 routes across
+8 entrypoints. Each route names one Relay query whose variables come only from its
 URL (`query` in routes.json): list, create and detail routes of one entity use
 separate queries, and the entrypoint preloads the query for the current route. Component directories are lowercase kebab-case and module names
 start with the directory's PascalCase entity name.

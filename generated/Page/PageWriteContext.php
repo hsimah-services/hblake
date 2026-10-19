@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Page/PageWriteContext.php
- * digest: sha256:c52db38cd3d209fe6f2f03740ac58704c2341ab1bb7ec59e08f69cbf57de0302
+ * digest: sha256:324031a707cc0f4941a992b3cf5df577728e631f62fcfeca374205400741388d
  */
 
 namespace Hsimah\Entity\Page;
@@ -171,6 +171,20 @@ final readonly class PageWriteContext implements WriteContext
     public function pendingUpdatedAt(): ?DateTimeImmutable {
         $value = $this->context->mutation()?->pending('updatedAt');
         assert(null === $value || $value instanceof DateTimeImmutable);
+
+        return $value;
+    }
+
+    public function originalDefaultItemKind(): ?string {
+        $value = $this->context->mutation()?->original('defaultItemKind');
+        assert(null === $value || is_string($value));
+
+        return $value;
+    }
+
+    public function pendingDefaultItemKind(): ?string {
+        $value = $this->context->mutation()?->pending('defaultItemKind');
+        assert(null === $value || is_string($value));
 
         return $value;
     }

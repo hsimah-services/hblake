@@ -9,10 +9,10 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   tsquid-manifest.php
- * digest: sha256:8d9f0a4e7c5f154c83b25b9c7ef44707431160b31c92cbcc900b542615f381fe
+ * digest: sha256:04352dc0219472b911593b1e938b76d2ee79e5f9dca51b7bb264015beaff396d
  */
 
-return new \Eleph\Tsquid\Manifest((object) ['routes' => [(object) ['fields' => (object) [], 'name' => 'Home', 'path' => '/', 'query' => (object) ['id' => '4e52b7a904a0b69cc1b4088cbe5434f5', 'operation' => 'HomeQuery', 'text' => 'query HomeQuery {
+return new \Eleph\Tsquid\Manifest((object) ['routes' => [(object) ['fields' => (object) [], 'name' => 'Home', 'path' => '/', 'query' => (object) ['id' => '404959ecb5bc8dabcf0c4139cfb858eb', 'operation' => 'HomeQuery', 'text' => 'query HomeQuery {
   ...LayoutFragment
   homePages: placedPages(where: {home: true}, first: 4) {
     nodes {
@@ -23,7 +23,7 @@ return new \Eleph\Tsquid\Manifest((object) ['routes' => [(object) ['fields' => (
       accent
     }
   }
-  latestPosts: posts(first: 100) {
+  latestNews: pageItemsOfPage(where: {page: "news"}, first: 1) {
     nodes {
       id
       title
@@ -60,21 +60,10 @@ fragment LayoutFragment on RootQuery {
       accent
     }
   }
-  navigationPosts: posts(first: 100) {
-    nodes {
-      status
-      id
-    }
-  }
-  navigationProducts: products(first: 100) {
-    nodes {
-      status
-      id
-    }
-  }
 }
-', 'variables' => (object) []], 'ssr' => true], (object) ['fields' => (object) ['slug' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'Page', 'path' => '/pages/:slug', 'query' => (object) ['id' => 'b6d82761bc756c51d1b4dc39a2ea5496', 'operation' => 'PageQuery', 'text' => 'query PageQuery(
+', 'variables' => (object) []], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true], 'slug' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'Page', 'path' => '/pages/:slug', 'query' => (object) ['id' => '1f85b6eb41b03cb93957d826f256e727', 'operation' => 'PageQuery', 'text' => 'query PageQuery(
   $slug: String!
+  $after: String
 ) {
   ...LayoutFragment
   pageBySlug(slug: $slug) {
@@ -87,41 +76,9 @@ fragment LayoutFragment on RootQuery {
     publishedAt
     createdAt
     updatedAt
+    defaultItemKind
   }
-}
-
-fragment LayoutFragment on RootQuery {
-  viewer {
-    id
-    displayName
-    role
-  }
-  navigationPages: placedPages(where: {home: false}, first: 100) {
-    nodes {
-      id
-      title
-      slug
-      accent
-    }
-  }
-  navigationPosts: posts(first: 100) {
-    nodes {
-      status
-      id
-    }
-  }
-  navigationProducts: products(first: 100) {
-    nodes {
-      status
-      id
-    }
-  }
-}
-', 'variables' => (object) ['slug' => (object) ['input' => 'slug']]], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'PostList', 'path' => '/news', 'query' => (object) ['id' => '1ac8036107bedef4da37b33e69a53cd0', 'operation' => 'PostListQuery', 'text' => 'query PostListQuery(
-  $after: String
-) {
-  ...LayoutFragment
-  posts(first: 20, after: $after) {
+  pageItemsOfPage(where: {page: $slug}, first: 20, after: $after) {
     nodes {
       id
       title
@@ -155,24 +112,18 @@ fragment LayoutFragment on RootQuery {
       accent
     }
   }
-  navigationPosts: posts(first: 100) {
-    nodes {
-      status
-      id
-    }
-  }
-  navigationProducts: products(first: 100) {
-    nodes {
-      status
-      id
-    }
-  }
 }
-', 'variables' => (object) ['after' => (object) ['input' => 'after']]], 'ssr' => true], (object) ['fields' => (object) ['slug' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'Post', 'path' => '/news/:slug', 'query' => (object) ['id' => '888ac00703d0936daac4e6818de432d9', 'operation' => 'PostQuery', 'text' => 'query PostQuery(
+', 'variables' => (object) ['after' => (object) ['input' => 'after'], 'slug' => (object) ['input' => 'slug']]], 'ssr' => true], (object) ['fields' => (object) ['page' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false], 'slug' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'PageItem', 'path' => '/:page/:slug', 'query' => (object) ['id' => '99abd120f51e83ff0a88de3964400827', 'operation' => 'PageItemQuery', 'text' => 'query PageItemQuery(
+  $page: String!
   $slug: String!
 ) {
   ...LayoutFragment
-  postBySlug(slug: $slug) {
+  pageBySlug(slug: $page) {
+    id
+    title
+    slug
+  }
+  pageItemBySlug(slug: $slug) {
     id
     title
     slug
@@ -182,11 +133,16 @@ fragment LayoutFragment on RootQuery {
     publishedAt
     createdAt
     updatedAt
+    kind
+    enquiryUrl
     author {
       displayName
     }
+    page {
+      id
+    }
   }
-  newsOrder: posts(first: 100) {
+  pageOrder: pageItemsOfPage(where: {page: $page}, first: 100) {
     nodes {
       slug
       title
@@ -210,111 +166,8 @@ fragment LayoutFragment on RootQuery {
       accent
     }
   }
-  navigationPosts: posts(first: 100) {
-    nodes {
-      status
-      id
-    }
-  }
-  navigationProducts: products(first: 100) {
-    nodes {
-      status
-      id
-    }
-  }
 }
-', 'variables' => (object) ['slug' => (object) ['input' => 'slug']]], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'ProductList', 'path' => '/products', 'query' => (object) ['id' => '3a7aada6f3d04856268b608c6f55a031', 'operation' => 'ProductListQuery', 'text' => 'query ProductListQuery(
-  $after: String
-) {
-  ...LayoutFragment
-  products(first: 20, after: $after) {
-    nodes {
-      id
-      title
-      slug
-      excerpt
-      status
-    }
-    pageInfo {
-      hasNextPage
-      endCursor
-    }
-  }
-}
-
-fragment LayoutFragment on RootQuery {
-  viewer {
-    id
-    displayName
-    role
-  }
-  navigationPages: placedPages(where: {home: false}, first: 100) {
-    nodes {
-      id
-      title
-      slug
-      accent
-    }
-  }
-  navigationPosts: posts(first: 100) {
-    nodes {
-      status
-      id
-    }
-  }
-  navigationProducts: products(first: 100) {
-    nodes {
-      status
-      id
-    }
-  }
-}
-', 'variables' => (object) ['after' => (object) ['input' => 'after']]], 'ssr' => true], (object) ['fields' => (object) ['slug' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'Product', 'path' => '/products/:slug', 'query' => (object) ['id' => 'fe08f28a953ca5fd3e6b5df722114859', 'operation' => 'ProductQuery', 'text' => 'query ProductQuery(
-  $slug: String!
-) {
-  ...LayoutFragment
-  productBySlug(slug: $slug) {
-    id
-    title
-    slug
-    content
-    excerpt
-    status
-    publishedAt
-    createdAt
-    updatedAt
-    enquiryUrl
-  }
-}
-
-fragment LayoutFragment on RootQuery {
-  viewer {
-    id
-    displayName
-    role
-  }
-  navigationPages: placedPages(where: {home: false}, first: 100) {
-    nodes {
-      id
-      title
-      slug
-      accent
-    }
-  }
-  navigationPosts: posts(first: 100) {
-    nodes {
-      status
-      id
-    }
-  }
-  navigationProducts: products(first: 100) {
-    nodes {
-      status
-      id
-    }
-  }
-}
-', 'variables' => (object) ['slug' => (object) ['input' => 'slug']]], 'ssr' => true], (object) ['fields' => (object) [], 'name' => 'Login', 'path' => '/admin/login', 'query' => (object) ['id' => 'd37a9715d22dcc403e32982ee359e205', 'operation' => 'LoginQuery', 'text' => 'query LoginQuery {
+', 'variables' => (object) ['page' => (object) ['input' => 'page'], 'slug' => (object) ['input' => 'slug']]], 'ssr' => true], (object) ['fields' => (object) [], 'name' => 'Login', 'path' => '/admin/login', 'query' => (object) ['id' => '7e61ed614efefee483119985d10401d8', 'operation' => 'LoginQuery', 'text' => 'query LoginQuery {
   ...LayoutFragment
 }
 
@@ -332,20 +185,8 @@ fragment LayoutFragment on RootQuery {
       accent
     }
   }
-  navigationPosts: posts(first: 100) {
-    nodes {
-      status
-      id
-    }
-  }
-  navigationProducts: products(first: 100) {
-    nodes {
-      status
-      id
-    }
-  }
 }
-', 'variables' => (object) []], 'ssr' => true], (object) ['fields' => (object) [], 'name' => 'AdminHome', 'path' => '/admin', 'query' => (object) ['id' => 'df6da31fccdfbbb4d2e17d9a9535a8fe', 'operation' => 'AdminQuery', 'text' => 'query AdminQuery {
+', 'variables' => (object) []], 'ssr' => true], (object) ['fields' => (object) [], 'name' => 'AdminHome', 'path' => '/admin', 'query' => (object) ['id' => 'fe6ba302ad7792cfdc34a49b507cafbb', 'operation' => 'AdminQuery', 'text' => 'query AdminQuery {
   ...AdminLayoutFragment
   viewer {
     id
@@ -362,29 +203,29 @@ fragment LayoutFragment on RootQuery {
   publishedPages: recentPages(where: {status: PUBLISHED}, first: 0) {
     totalCount
   }
-  posts: recentPosts(first: 5) {
+  items: recentPageItems(first: 5) {
     totalCount
     nodes {
       id
       title
       status
       updatedAt
+      kind
+      page {
+        slug
+        id
+      }
     }
   }
-  publishedPosts: recentPosts(where: {status: PUBLISHED}, first: 0) {
-    totalCount
-  }
-  products: recentProducts(first: 5) {
-    totalCount
+  itemPages: pages(first: 100) {
     nodes {
       id
       title
-      status
-      updatedAt
+      slug
+      defaultItemKind
+      itemCount
+      publishedItemCount
     }
-  }
-  publishedProducts: recentProducts(where: {status: PUBLISHED}, first: 0) {
-    totalCount
   }
 }
 
@@ -396,14 +237,17 @@ fragment AdminLayoutFragment on RootQuery {
   pageCount: pages(first: 1) {
     totalCount
   }
-  postCount: posts(first: 1) {
-    totalCount
-  }
-  productCount: products(first: 1) {
-    totalCount
+  itemPages: pages(first: 100) {
+    nodes {
+      title
+      slug
+      defaultItemKind
+      itemCount
+      id
+    }
   }
 }
-', 'variables' => (object) []], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true], 'q' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true], 'status' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'AdminPageList', 'path' => '/admin/pages', 'query' => (object) ['id' => '12cfe7b9258ead963a590592ea023a28', 'operation' => 'AdminPageListQuery', 'text' => 'query AdminPageListQuery(
+', 'variables' => (object) []], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true], 'q' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true], 'status' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'AdminPageList', 'path' => '/admin/pages', 'query' => (object) ['id' => 'be3bdd28dabcc3953db1e46cdd69f5fd', 'operation' => 'AdminPageListQuery', 'text' => 'query AdminPageListQuery(
   $after: String
 ) {
   ...AdminLayoutFragment
@@ -430,14 +274,17 @@ fragment AdminLayoutFragment on RootQuery {
   pageCount: pages(first: 1) {
     totalCount
   }
-  postCount: posts(first: 1) {
-    totalCount
-  }
-  productCount: products(first: 1) {
-    totalCount
+  itemPages: pages(first: 100) {
+    nodes {
+      title
+      slug
+      defaultItemKind
+      itemCount
+      id
+    }
   }
 }
-', 'variables' => (object) ['after' => (object) ['input' => 'after']]], 'ssr' => true], (object) ['fields' => (object) [], 'name' => 'AdminPageCreate', 'path' => '/admin/pages/new', 'query' => (object) ['id' => '49a713d009cbfd87d8987bdc99e625fd', 'operation' => 'AdminPageCreateQuery', 'text' => 'query AdminPageCreateQuery {
+', 'variables' => (object) ['after' => (object) ['input' => 'after']]], 'ssr' => true], (object) ['fields' => (object) [], 'name' => 'AdminPageCreate', 'path' => '/admin/pages/new', 'query' => (object) ['id' => '69e56867e0cb2eca2978db0d9acf4a6a', 'operation' => 'AdminPageCreateQuery', 'text' => 'query AdminPageCreateQuery {
   ...AdminLayoutFragment
   viewer {
     id
@@ -452,14 +299,17 @@ fragment AdminLayoutFragment on RootQuery {
   pageCount: pages(first: 1) {
     totalCount
   }
-  postCount: posts(first: 1) {
-    totalCount
-  }
-  productCount: products(first: 1) {
-    totalCount
+  itemPages: pages(first: 100) {
+    nodes {
+      title
+      slug
+      defaultItemKind
+      itemCount
+      id
+    }
   }
 }
-', 'variables' => (object) []], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminPageDetail', 'path' => '/admin/pages/:id', 'query' => (object) ['id' => 'afeea4bbb1763e1df2fb425509d3b68e', 'operation' => 'AdminPageQuery', 'text' => 'query AdminPageQuery(
+', 'variables' => (object) []], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminPageDetail', 'path' => '/admin/pages/:id', 'query' => (object) ['id' => '9e76b83f71b9f1115c88a05349f5d9a4', 'operation' => 'AdminPageQuery', 'text' => 'query AdminPageQuery(
   $id: ID!
 ) {
   ...AdminLayoutFragment
@@ -489,14 +339,17 @@ fragment AdminLayoutFragment on RootQuery {
   pageCount: pages(first: 1) {
     totalCount
   }
-  postCount: posts(first: 1) {
-    totalCount
-  }
-  productCount: products(first: 1) {
-    totalCount
+  itemPages: pages(first: 100) {
+    nodes {
+      title
+      slug
+      defaultItemKind
+      itemCount
+      id
+    }
   }
 }
-', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminPageEdit', 'path' => '/admin/pages/:id/edit', 'query' => (object) ['id' => 'afeea4bbb1763e1df2fb425509d3b68e', 'operation' => 'AdminPageQuery', 'text' => 'query AdminPageQuery(
+', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminPageEdit', 'path' => '/admin/pages/:id/edit', 'query' => (object) ['id' => '9e76b83f71b9f1115c88a05349f5d9a4', 'operation' => 'AdminPageQuery', 'text' => 'query AdminPageQuery(
   $id: ID!
 ) {
   ...AdminLayoutFragment
@@ -526,18 +379,28 @@ fragment AdminLayoutFragment on RootQuery {
   pageCount: pages(first: 1) {
     totalCount
   }
-  postCount: posts(first: 1) {
-    totalCount
-  }
-  productCount: products(first: 1) {
-    totalCount
+  itemPages: pages(first: 100) {
+    nodes {
+      title
+      slug
+      defaultItemKind
+      itemCount
+      id
+    }
   }
 }
-', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true], 'q' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true], 'status' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'AdminPostList', 'path' => '/admin/news', 'query' => (object) ['id' => 'dff86c06acb2c466cabe1662792b5987', 'operation' => 'AdminPostListQuery', 'text' => 'query AdminPostListQuery(
+', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true], 'page' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false], 'q' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true], 'status' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'AdminPageItemList', 'path' => '/admin/items/:page', 'query' => (object) ['id' => '77d958892bbd6d13b3eeac72ea6fe955', 'operation' => 'AdminPageItemListQuery', 'text' => 'query AdminPageItemListQuery(
+  $page: String!
   $after: String
 ) {
   ...AdminLayoutFragment
-  posts(first: 20, after: $after) {
+  pageBySlug(slug: $page) {
+    id
+    title
+    slug
+    defaultItemKind
+  }
+  pageItemsOfPage(where: {page: $page}, first: 20, after: $after) {
     nodes {
       id
       title
@@ -561,138 +424,29 @@ fragment AdminLayoutFragment on RootQuery {
   pageCount: pages(first: 1) {
     totalCount
   }
-  postCount: posts(first: 1) {
-    totalCount
-  }
-  productCount: products(first: 1) {
-    totalCount
-  }
-}
-', 'variables' => (object) ['after' => (object) ['input' => 'after']]], 'ssr' => true], (object) ['fields' => (object) [], 'name' => 'AdminPostCreate', 'path' => '/admin/news/new', 'query' => (object) ['id' => '9507ce88faf42861274aff138dfb666d', 'operation' => 'AdminPostCreateQuery', 'text' => 'query AdminPostCreateQuery {
-  ...AdminLayoutFragment
-  viewer {
-    id
-  }
-}
-
-fragment AdminLayoutFragment on RootQuery {
-  viewer {
-    id
-    displayName
-  }
-  pageCount: pages(first: 1) {
-    totalCount
-  }
-  postCount: posts(first: 1) {
-    totalCount
-  }
-  productCount: products(first: 1) {
-    totalCount
-  }
-}
-', 'variables' => (object) []], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminPostDetail', 'path' => '/admin/news/:id', 'query' => (object) ['id' => '61b146c4d4458157331be252570c9ab6', 'operation' => 'AdminPostQuery', 'text' => 'query AdminPostQuery(
-  $id: ID!
-) {
-  ...AdminLayoutFragment
-  post(id: $id) {
-    id
-    title
-    slug
-    content
-    excerpt
-    status
-    publishedAt
-    createdAt
-    updatedAt
-  }
-}
-
-fragment AdminLayoutFragment on RootQuery {
-  viewer {
-    id
-    displayName
-  }
-  pageCount: pages(first: 1) {
-    totalCount
-  }
-  postCount: posts(first: 1) {
-    totalCount
-  }
-  productCount: products(first: 1) {
-    totalCount
-  }
-}
-', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminPostEdit', 'path' => '/admin/news/:id/edit', 'query' => (object) ['id' => '61b146c4d4458157331be252570c9ab6', 'operation' => 'AdminPostQuery', 'text' => 'query AdminPostQuery(
-  $id: ID!
-) {
-  ...AdminLayoutFragment
-  post(id: $id) {
-    id
-    title
-    slug
-    content
-    excerpt
-    status
-    publishedAt
-    createdAt
-    updatedAt
-  }
-}
-
-fragment AdminLayoutFragment on RootQuery {
-  viewer {
-    id
-    displayName
-  }
-  pageCount: pages(first: 1) {
-    totalCount
-  }
-  postCount: posts(first: 1) {
-    totalCount
-  }
-  productCount: products(first: 1) {
-    totalCount
-  }
-}
-', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['after' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true], 'q' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true], 'status' => (object) ['in' => 'query', 'kind' => 'string', 'optional' => true]], 'name' => 'AdminProductList', 'path' => '/admin/products', 'query' => (object) ['id' => '913a8cc640ffe8bc7bb23bab5533e0fd', 'operation' => 'AdminProductListQuery', 'text' => 'query AdminProductListQuery(
-  $after: String
-) {
-  ...AdminLayoutFragment
-  products(first: 20, after: $after) {
+  itemPages: pages(first: 100) {
     nodes {
-      id
       title
       slug
-      status
-      updatedAt
-    }
-    pageInfo {
-      hasNextPage
-      endCursor
+      defaultItemKind
+      itemCount
+      id
     }
   }
 }
-
-fragment AdminLayoutFragment on RootQuery {
-  viewer {
-    id
-    displayName
-  }
-  pageCount: pages(first: 1) {
-    totalCount
-  }
-  postCount: posts(first: 1) {
-    totalCount
-  }
-  productCount: products(first: 1) {
-    totalCount
-  }
-}
-', 'variables' => (object) ['after' => (object) ['input' => 'after']]], 'ssr' => true], (object) ['fields' => (object) [], 'name' => 'AdminProductCreate', 'path' => '/admin/products/new', 'query' => (object) ['id' => 'e2c07990c6624cadc34e0c9ad727587d', 'operation' => 'AdminProductCreateQuery', 'text' => 'query AdminProductCreateQuery {
+', 'variables' => (object) ['after' => (object) ['input' => 'after'], 'page' => (object) ['input' => 'page']]], 'ssr' => true], (object) ['fields' => (object) ['page' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminPageItemCreate', 'path' => '/admin/items/:page/new', 'query' => (object) ['id' => '816de6cb94d21ad1432beca3ac3db2b6', 'operation' => 'AdminPageItemCreateQuery', 'text' => 'query AdminPageItemCreateQuery(
+  $page: String!
+) {
   ...AdminLayoutFragment
   viewer {
     id
   }
+  pageBySlug(slug: $page) {
+    id
+    title
+    slug
+    defaultItemKind
+  }
 }
 
 fragment AdminLayoutFragment on RootQuery {
@@ -703,18 +457,28 @@ fragment AdminLayoutFragment on RootQuery {
   pageCount: pages(first: 1) {
     totalCount
   }
-  postCount: posts(first: 1) {
-    totalCount
-  }
-  productCount: products(first: 1) {
-    totalCount
+  itemPages: pages(first: 100) {
+    nodes {
+      title
+      slug
+      defaultItemKind
+      itemCount
+      id
+    }
   }
 }
-', 'variables' => (object) []], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminProductDetail', 'path' => '/admin/products/:id', 'query' => (object) ['id' => '04edab7bcc1d60619c62ade975d9bb52', 'operation' => 'AdminProductQuery', 'text' => 'query AdminProductQuery(
+', 'variables' => (object) ['page' => (object) ['input' => 'page']]], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false], 'page' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminPageItemDetail', 'path' => '/admin/items/:page/:id', 'query' => (object) ['id' => '3f5b211337428b9d7bd6796d02e313e2', 'operation' => 'AdminPageItemQuery', 'text' => 'query AdminPageItemQuery(
+  $page: String!
   $id: ID!
 ) {
   ...AdminLayoutFragment
-  product(id: $id) {
+  pageBySlug(slug: $page) {
+    id
+    title
+    slug
+    defaultItemKind
+  }
+  pageItem(id: $id) {
     id
     title
     slug
@@ -724,7 +488,14 @@ fragment AdminLayoutFragment on RootQuery {
     publishedAt
     createdAt
     updatedAt
+    kind
     enquiryUrl
+    author {
+      displayName
+    }
+    page {
+      id
+    }
   }
 }
 
@@ -736,18 +507,28 @@ fragment AdminLayoutFragment on RootQuery {
   pageCount: pages(first: 1) {
     totalCount
   }
-  postCount: posts(first: 1) {
-    totalCount
-  }
-  productCount: products(first: 1) {
-    totalCount
+  itemPages: pages(first: 100) {
+    nodes {
+      title
+      slug
+      defaultItemKind
+      itemCount
+      id
+    }
   }
 }
-', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminProductEdit', 'path' => '/admin/products/:id/edit', 'query' => (object) ['id' => '04edab7bcc1d60619c62ade975d9bb52', 'operation' => 'AdminProductQuery', 'text' => 'query AdminProductQuery(
+', 'variables' => (object) ['id' => (object) ['input' => 'id'], 'page' => (object) ['input' => 'page']]], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false], 'page' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminPageItemEdit', 'path' => '/admin/items/:page/:id/edit', 'query' => (object) ['id' => '3f5b211337428b9d7bd6796d02e313e2', 'operation' => 'AdminPageItemQuery', 'text' => 'query AdminPageItemQuery(
+  $page: String!
   $id: ID!
 ) {
   ...AdminLayoutFragment
-  product(id: $id) {
+  pageBySlug(slug: $page) {
+    id
+    title
+    slug
+    defaultItemKind
+  }
+  pageItem(id: $id) {
     id
     title
     slug
@@ -757,7 +538,14 @@ fragment AdminLayoutFragment on RootQuery {
     publishedAt
     createdAt
     updatedAt
+    kind
     enquiryUrl
+    author {
+      displayName
+    }
+    page {
+      id
+    }
   }
 }
 
@@ -769,14 +557,17 @@ fragment AdminLayoutFragment on RootQuery {
   pageCount: pages(first: 1) {
     totalCount
   }
-  postCount: posts(first: 1) {
-    totalCount
-  }
-  productCount: products(first: 1) {
-    totalCount
+  itemPages: pages(first: 100) {
+    nodes {
+      title
+      slug
+      defaultItemKind
+      itemCount
+      id
+    }
   }
 }
-', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminUserDetail', 'path' => '/admin/users/:id', 'query' => (object) ['id' => '8f4b5eccc449933db2c386792c607389', 'operation' => 'AdminUserQuery', 'text' => 'query AdminUserQuery(
+', 'variables' => (object) ['id' => (object) ['input' => 'id'], 'page' => (object) ['input' => 'page']]], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminUserDetail', 'path' => '/admin/users/:id', 'query' => (object) ['id' => 'e6f898d9f0cf98d1e4ed0058292c289f', 'operation' => 'AdminUserQuery', 'text' => 'query AdminUserQuery(
   $id: ID!
 ) {
   ...AdminLayoutFragment
@@ -795,14 +586,17 @@ fragment AdminLayoutFragment on RootQuery {
   pageCount: pages(first: 1) {
     totalCount
   }
-  postCount: posts(first: 1) {
-    totalCount
-  }
-  productCount: products(first: 1) {
-    totalCount
+  itemPages: pages(first: 100) {
+    nodes {
+      title
+      slug
+      defaultItemKind
+      itemCount
+      id
+    }
   }
 }
-', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminUserEdit', 'path' => '/admin/users/:id/edit', 'query' => (object) ['id' => '8f4b5eccc449933db2c386792c607389', 'operation' => 'AdminUserQuery', 'text' => 'query AdminUserQuery(
+', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true], (object) ['fields' => (object) ['id' => (object) ['in' => 'path', 'kind' => 'string', 'optional' => false]], 'name' => 'AdminUserEdit', 'path' => '/admin/users/:id/edit', 'query' => (object) ['id' => 'e6f898d9f0cf98d1e4ed0058292c289f', 'operation' => 'AdminUserQuery', 'text' => 'query AdminUserQuery(
   $id: ID!
 ) {
   ...AdminLayoutFragment
@@ -821,11 +615,14 @@ fragment AdminLayoutFragment on RootQuery {
   pageCount: pages(first: 1) {
     totalCount
   }
-  postCount: posts(first: 1) {
-    totalCount
-  }
-  productCount: products(first: 1) {
-    totalCount
+  itemPages: pages(first: 100) {
+    nodes {
+      title
+      slug
+      defaultItemKind
+      itemCount
+      id
+    }
   }
 }
 ', 'variables' => (object) ['id' => (object) ['input' => 'id']]], 'ssr' => true]], 'version' => 1]);

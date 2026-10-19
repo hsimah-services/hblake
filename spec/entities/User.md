@@ -5,7 +5,7 @@ retains editor/admin roles; multiple accounts and account lifecycle screens are
 outside v1. The account has no email. Its username is the login: 3–32 lowercase
 letters, digits, dots, hyphens or underscores, starting with a letter or digit,
 unique, set at bootstrap and not editable in the UI. The display name is the public
-author name on posts and cannot be blank. Settings show the username and display
+author name on pages and items and cannot be blank. Settings show the username and display
 name, edit only the display name, and change the password. Role/active are internal
 and not shown.
 

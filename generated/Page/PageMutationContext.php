@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Page/PageMutationContext.php
- * digest: sha256:8cc2554036751bd4989e3b1915161b3acb3b9d7bcd4131af718773162902a4b5
+ * digest: sha256:77d7fa344cc8d17e9520cfcd56052c5e4dd9e1f2d711b38b1559f179d60ad73f
  */
 
 namespace Hsimah\Entity\Page;
@@ -207,6 +207,20 @@ final readonly class PageMutationContext implements MutationContext
         return $value;
     }
 
+    public function originalDefaultItemKind(): ?string {
+        $value = $this->context->original('defaultItemKind');
+        assert(null === $value || is_string($value));
+
+        return $value;
+    }
+
+    public function pendingDefaultItemKind(): ?string {
+        $value = $this->context->pending('defaultItemKind');
+        assert(null === $value || is_string($value));
+
+        return $value;
+    }
+
     public function originalShowInNavigation(): ?bool {
         $value = $this->context->original('showInNavigation');
         assert(null === $value || is_bool($value));
@@ -275,6 +289,14 @@ final readonly class PageMutationContext implements MutationContext
         assert(null === $value || $value instanceof PageAccent);
 
         return $value;
+    }
+
+    public function pendingAuthor(): ?Identifier {
+        return $this->context->pendingEdge('author')[0] ?? null;
+    }
+
+    public function isAuthorChanged(): bool {
+        return $this->context->isEdgeChanged('author');
     }
 
     public static function of(

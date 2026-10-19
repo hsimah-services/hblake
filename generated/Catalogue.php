@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Catalogue.php
- * digest: sha256:466fc62a7d10d6002ffeda13d86b4af527afb1fc8441f1bed8d2114e8820a836
+ * digest: sha256:f154f71872202dc07ab4d881332533d99782d0678538da31522a51a06bb1b5bc
  */
 
 namespace Hsimah\Entity;
@@ -24,6 +24,17 @@ use Eleph\Runtime\Policy\NoPolicies;
 use Eleph\Runtime\Query\Hydrator;
 use Eleph\Runtime\Storage\DeletionRule;
 use Eleph\Runtime\Verification\EntityVerifiers;
+use Hsimah\Entity\PageItem\Contract\PageItemPublishAction;
+use Hsimah\Entity\PageItem\Contract\PageItemUnpublishAction;
+use Hsimah\Entity\PageItem\PageItemDeleter;
+use Hsimah\Entity\PageItem\PageItemFinder;
+use Hsimah\Entity\PageItem\PageItemHydrator;
+use Hsimah\Entity\PageItem\PageItemInput;
+use Hsimah\Entity\PageItem\PageItemMutator;
+use Hsimah\Entity\PageItem\PageItemReadPolicies;
+use Hsimah\Entity\PageItem\PageItemSideEffects;
+use Hsimah\Entity\PageItem\PageItemVerifiers;
+use Hsimah\Entity\PageItem\PageItemWritePolicies;
 use Hsimah\Entity\Page\Contract\PagePublishAction;
 use Hsimah\Entity\Page\Contract\PageUnpublishAction;
 use Hsimah\Entity\Page\PageDeleter;
@@ -35,28 +46,6 @@ use Hsimah\Entity\Page\PageReadPolicies;
 use Hsimah\Entity\Page\PageSideEffects;
 use Hsimah\Entity\Page\PageVerifiers;
 use Hsimah\Entity\Page\PageWritePolicies;
-use Hsimah\Entity\Post\Contract\PostPublishAction;
-use Hsimah\Entity\Post\Contract\PostUnpublishAction;
-use Hsimah\Entity\Post\PostDeleter;
-use Hsimah\Entity\Post\PostFinder;
-use Hsimah\Entity\Post\PostHydrator;
-use Hsimah\Entity\Post\PostInput;
-use Hsimah\Entity\Post\PostMutator;
-use Hsimah\Entity\Post\PostReadPolicies;
-use Hsimah\Entity\Post\PostSideEffects;
-use Hsimah\Entity\Post\PostVerifiers;
-use Hsimah\Entity\Post\PostWritePolicies;
-use Hsimah\Entity\Product\Contract\ProductPublishAction;
-use Hsimah\Entity\Product\Contract\ProductUnpublishAction;
-use Hsimah\Entity\Product\ProductDeleter;
-use Hsimah\Entity\Product\ProductFinder;
-use Hsimah\Entity\Product\ProductHydrator;
-use Hsimah\Entity\Product\ProductInput;
-use Hsimah\Entity\Product\ProductMutator;
-use Hsimah\Entity\Product\ProductReadPolicies;
-use Hsimah\Entity\Product\ProductSideEffects;
-use Hsimah\Entity\Product\ProductVerifiers;
-use Hsimah\Entity\Product\ProductWritePolicies;
 use Hsimah\Entity\User\UserDeleter;
 use Hsimah\Entity\User\UserHydrator;
 use Hsimah\Entity\User\UserInput;
@@ -83,7 +72,7 @@ final readonly class Catalogue implements EntityCatalogue
      * @return list<string>
      */
     public function entities(): array {
-        return ['Page', 'Post', 'Product', 'User'];
+        return ['Page', 'PageItem', 'User'];
     }
 
     /**
@@ -94,8 +83,7 @@ final readonly class Catalogue implements EntityCatalogue
     ): Hydrator {
         $service = match ($entity) {
             'Page' => $this->container->get(PageHydrator::class),
-            'Post' => $this->container->get(PostHydrator::class),
-            'Product' => $this->container->get(ProductHydrator::class),
+            'PageItem' => $this->container->get(PageItemHydrator::class),
             'User' => $this->container->get(UserHydrator::class),
             default => throw new RuntimeException(sprintf('No entity named "%s".', $entity)),
         };
@@ -110,8 +98,7 @@ final readonly class Catalogue implements EntityCatalogue
     ): EntityVerifiers {
         $service = match ($entity) {
             'Page' => $this->container->get(PageVerifiers::class),
-            'Post' => $this->container->get(PostVerifiers::class),
-            'Product' => $this->container->get(ProductVerifiers::class),
+            'PageItem' => $this->container->get(PageItemVerifiers::class),
             'User' => $this->container->get(UserVerifiers::class),
             default => throw new RuntimeException(sprintf('No entity named "%s".', $entity)),
         };
@@ -126,8 +113,7 @@ final readonly class Catalogue implements EntityCatalogue
     ): EntitySideEffects {
         $service = match ($entity) {
             'Page' => $this->container->get(PageSideEffects::class),
-            'Post' => $this->container->get(PostSideEffects::class),
-            'Product' => $this->container->get(ProductSideEffects::class),
+            'PageItem' => $this->container->get(PageItemSideEffects::class),
             'User' => $this->container->get(UserSideEffects::class),
             default => throw new RuntimeException(sprintf('No entity named "%s".', $entity)),
         };
@@ -145,18 +131,10 @@ final readonly class Catalogue implements EntityCatalogue
         return $policies;
     }
 
-    private function readPoliciesPostReadPolicies(): EntityReadPolicies {
-        $policies = $this->container->get(PostReadPolicies::class);
+    private function readPoliciesPageItemReadPolicies(): EntityReadPolicies {
+        $policies = $this->container->get(PageItemReadPolicies::class);
 
-        assert($policies instanceof PostReadPolicies);
-
-        return $policies;
-    }
-
-    private function readPoliciesProductReadPolicies(): EntityReadPolicies {
-        $policies = $this->container->get(ProductReadPolicies::class);
-
-        assert($policies instanceof ProductReadPolicies);
+        assert($policies instanceof PageItemReadPolicies);
 
         return $policies;
     }
@@ -174,8 +152,7 @@ final readonly class Catalogue implements EntityCatalogue
     ): EntityReadPolicies {
         return match ($entity) {
             'Page' => $this->readPoliciesPageReadPolicies(),
-            'Post' => $this->readPoliciesPostReadPolicies(),
-            'Product' => $this->readPoliciesProductReadPolicies(),
+            'PageItem' => $this->readPoliciesPageItemReadPolicies(),
             'User' => $this->readPoliciesUserReadPolicies(),
             default => throw new RuntimeException(sprintf('No entity named "%s".', $entity)),
         };
@@ -189,18 +166,10 @@ final readonly class Catalogue implements EntityCatalogue
         return $policies;
     }
 
-    private function writePoliciesPostWritePolicies(): EntityWritePolicies {
-        $policies = $this->container->get(PostWritePolicies::class);
+    private function writePoliciesPageItemWritePolicies(): EntityWritePolicies {
+        $policies = $this->container->get(PageItemWritePolicies::class);
 
-        assert($policies instanceof PostWritePolicies);
-
-        return $policies;
-    }
-
-    private function writePoliciesProductWritePolicies(): EntityWritePolicies {
-        $policies = $this->container->get(ProductWritePolicies::class);
-
-        assert($policies instanceof ProductWritePolicies);
+        assert($policies instanceof PageItemWritePolicies);
 
         return $policies;
     }
@@ -218,8 +187,7 @@ final readonly class Catalogue implements EntityCatalogue
     ): EntityWritePolicies {
         return match ($entity) {
             'Page' => $this->writePoliciesPageWritePolicies(),
-            'Post' => $this->writePoliciesPostWritePolicies(),
-            'Product' => $this->writePoliciesProductWritePolicies(),
+            'PageItem' => $this->writePoliciesPageItemWritePolicies(),
             'User' => $this->writePoliciesUserWritePolicies(),
             default => throw new RuntimeException(sprintf('No entity named "%s".', $entity)),
         };
@@ -229,7 +197,11 @@ final readonly class Catalogue implements EntityCatalogue
      * @return array<string, string> "Entity.edge" => target entity
      */
     public function edgeTargets(): array {
-        return [];
+        return [
+            'Page.author' => 'User',
+            'PageItem.author' => 'User',
+            'PageItem.page' => 'Page',
+        ];
     }
 
     /**
@@ -246,9 +218,8 @@ final readonly class Catalogue implements EntityCatalogue
         string $entity,
     ): array {
         return match ($entity) {
-            'Page' => ['title', 'slug', 'content', 'excerpt', 'status', 'publishedAt', 'createdAt', 'updatedAt', 'showInNavigation', 'navigationOrder', 'featureOnHome', 'homeOrder', 'accent'],
-            'Post' => ['title', 'slug', 'content', 'excerpt', 'status', 'publishedAt', 'createdAt', 'updatedAt'],
-            'Product' => ['title', 'slug', 'content', 'excerpt', 'status', 'publishedAt', 'createdAt', 'updatedAt', 'enquiryUrl'],
+            'Page' => ['title', 'slug', 'content', 'excerpt', 'status', 'publishedAt', 'createdAt', 'updatedAt', 'defaultItemKind', 'showInNavigation', 'navigationOrder', 'featureOnHome', 'homeOrder', 'accent'],
+            'PageItem' => ['title', 'slug', 'content', 'excerpt', 'status', 'publishedAt', 'createdAt', 'updatedAt', 'kind', 'enquiryUrl'],
             'User' => ['createdAt', 'updatedAt', 'username', 'displayName', 'role', 'active'],
             default => [],
         };
@@ -262,8 +233,7 @@ final readonly class Catalogue implements EntityCatalogue
     ): array {
         return match ($entity) {
             'Page' => ['title', 'slug'],
-            'Post' => ['title', 'slug'],
-            'Product' => ['title', 'slug'],
+            'PageItem' => ['title', 'slug'],
             'User' => ['username', 'displayName'],
             default => [],
         };
@@ -277,8 +247,7 @@ final readonly class Catalogue implements EntityCatalogue
     ): array {
         return match ($entity) {
             'Page' => ['title', 'slug', 'content', 'excerpt', 'status', 'createdAt', 'updatedAt', 'showInNavigation', 'navigationOrder', 'featureOnHome', 'homeOrder', 'accent'],
-            'Post' => ['title', 'slug', 'content', 'excerpt', 'status', 'createdAt', 'updatedAt'],
-            'Product' => ['title', 'slug', 'content', 'excerpt', 'status', 'createdAt', 'updatedAt'],
+            'PageItem' => ['title', 'slug', 'content', 'excerpt', 'status', 'createdAt', 'updatedAt', 'kind'],
             'User' => ['createdAt', 'updatedAt', 'username', 'displayName', 'role', 'active'],
             default => [],
         };
@@ -292,8 +261,7 @@ final readonly class Catalogue implements EntityCatalogue
     ): array {
         return match ($entity) {
             'Page' => [],
-            'Post' => [],
-            'Product' => [],
+            'PageItem' => ['page'],
             'User' => [],
             default => [],
         };
@@ -307,8 +275,7 @@ final readonly class Catalogue implements EntityCatalogue
     ): array {
         return match ($entity) {
             'Page' => ['slug'],
-            'Post' => ['slug'],
-            'Product' => ['slug'],
+            'PageItem' => ['slug'],
             'User' => ['username'],
             default => [],
         };
@@ -321,10 +288,8 @@ final readonly class Catalogue implements EntityCatalogue
         return [
             'Page.createdAt' => Managed::Created,
             'Page.updatedAt' => Managed::Modified,
-            'Post.createdAt' => Managed::Created,
-            'Post.updatedAt' => Managed::Modified,
-            'Product.createdAt' => Managed::Created,
-            'Product.updatedAt' => Managed::Modified,
+            'PageItem.createdAt' => Managed::Created,
+            'PageItem.updatedAt' => Managed::Modified,
             'User.createdAt' => Managed::Created,
             'User.updatedAt' => Managed::Modified,
         ];
@@ -338,8 +303,7 @@ final readonly class Catalogue implements EntityCatalogue
     ): array {
         return match ($entity) {
             'Page' => PageDeleter::rules(),
-            'Post' => PostDeleter::rules(),
-            'Product' => ProductDeleter::rules(),
+            'PageItem' => PageItemDeleter::rules(),
             'User' => UserDeleter::rules(),
             default => [],
         };
@@ -350,8 +314,7 @@ final readonly class Catalogue implements EntityCatalogue
     ): object {
         $finder = match ($entity) {
             'Page' => $this->container->get(PageFinder::class),
-            'Post' => $this->container->get(PostFinder::class),
-            'Product' => $this->container->get(ProductFinder::class),
+            'PageItem' => $this->container->get(PageItemFinder::class),
             default => throw new RuntimeException(sprintf('%s declares no queries.', $entity)),
         };
 
@@ -366,8 +329,7 @@ final readonly class Catalogue implements EntityCatalogue
     ): object {
         return match ($entity) {
             'Page' => new PageMutator($buffer, $this->resolve(PagePublishAction::class), $this->resolve(PageUnpublishAction::class)),
-            'Post' => new PostMutator($buffer, $this->resolve(PostPublishAction::class), $this->resolve(PostUnpublishAction::class)),
-            'Product' => new ProductMutator($buffer, $this->resolve(ProductPublishAction::class), $this->resolve(ProductUnpublishAction::class)),
+            'PageItem' => new PageItemMutator($buffer, $this->resolve(PageItemPublishAction::class), $this->resolve(PageItemUnpublishAction::class)),
             'User' => new UserMutator($buffer),
             default => throw new RuntimeException(sprintf('No entity named "%s".', $entity)),
         };
@@ -384,10 +346,9 @@ final readonly class Catalogue implements EntityCatalogue
             'Page.bySlug' => ['slug'],
             'Page.placed' => ['home'],
             'Page.recent' => ['status'],
-            'Post.bySlug' => ['slug'],
-            'Post.recent' => ['status'],
-            'Product.bySlug' => ['slug'],
-            'Product.recent' => ['status'],
+            'PageItem.bySlug' => ['slug'],
+            'PageItem.ofPage' => ['page'],
+            'PageItem.recent' => ['kind', 'status'],
             default => [],
         };
     }
@@ -402,10 +363,8 @@ final readonly class Catalogue implements EntityCatalogue
         return match ($entity . '.' . $action) {
             'Page.publish' => [],
             'Page.unpublish' => [],
-            'Post.publish' => [],
-            'Post.unpublish' => [],
-            'Product.publish' => [],
-            'Product.unpublish' => [],
+            'PageItem.publish' => [],
+            'PageItem.unpublish' => [],
             default => [],
         };
     }
@@ -429,28 +388,13 @@ final readonly class Catalogue implements EntityCatalogue
      * @param array<string, mixed> $args
      * @return array<string, mixed>
      */
-    private function decodePostInputActionArguments(
+    private function decodePageItemInputActionArguments(
         string $action,
         array $args,
     ): array {
-        $input = $this->container->get(PostInput::class);
+        $input = $this->container->get(PageItemInput::class);
 
-        assert($input instanceof PostInput);
-
-        return $input->decodeAction($action, $args);
-    }
-
-    /**
-     * @param array<string, mixed> $args
-     * @return array<string, mixed>
-     */
-    private function decodeProductInputActionArguments(
-        string $action,
-        array $args,
-    ): array {
-        $input = $this->container->get(ProductInput::class);
-
-        assert($input instanceof ProductInput);
+        assert($input instanceof PageItemInput);
 
         return $input->decodeAction($action, $args);
     }
@@ -481,8 +425,7 @@ final readonly class Catalogue implements EntityCatalogue
     ): array {
         return match ($entity) {
             'Page' => $this->decodePageInputActionArguments($action, $args),
-            'Post' => $this->decodePostInputActionArguments($action, $args),
-            'Product' => $this->decodeProductInputActionArguments($action, $args),
+            'PageItem' => $this->decodePageItemInputActionArguments($action, $args),
             'User' => $this->decodeUserInputActionArguments($action, $args),
             default => throw new RuntimeException(sprintf('No entity named "%s".', $entity)),
         };
@@ -498,8 +441,7 @@ final readonly class Catalogue implements EntityCatalogue
     ): void {
         $applier = match ($entity) {
             'Page' => $this->container->get(PageInput::class),
-            'Post' => $this->container->get(PostInput::class),
-            'Product' => $this->container->get(ProductInput::class),
+            'PageItem' => $this->container->get(PageItemInput::class),
             'User' => $this->container->get(UserInput::class),
             default => throw new RuntimeException(sprintf('No entity named "%s".', $entity)),
         };
@@ -515,7 +457,7 @@ final readonly class Catalogue implements EntityCatalogue
      * @return list<string>
      */
     public function contracts(): array {
-        return ['Hsimah\\Entity\\Page\\Contract\\PageAccentVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageBySlugQuery', 'Hsimah\\Entity\\Page\\Contract\\PageContentVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageHomeOrderVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageNavigationOrderVerifier', 'Hsimah\\Entity\\Page\\Contract\\PagePlacedQuery', 'Hsimah\\Entity\\Page\\Contract\\PagePublishAction', 'Hsimah\\Entity\\Page\\Contract\\PagePublishedAtVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageRecentQuery', 'Hsimah\\Entity\\Page\\Contract\\PageSlugVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageStatusVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageTitleVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageUnpublishAction', 'Hsimah\\Entity\\Pattern\\Publishable\\Contract\\PublishableContentStaffWritePolicy', 'Hsimah\\Entity\\Pattern\\Publishable\\Contract\\PublishableContentVisibilityReadPolicy', 'Hsimah\\Entity\\Post\\Contract\\PostBySlugQuery', 'Hsimah\\Entity\\Post\\Contract\\PostContentVerifier', 'Hsimah\\Entity\\Post\\Contract\\PostPublishAction', 'Hsimah\\Entity\\Post\\Contract\\PostPublishedAtVerifier', 'Hsimah\\Entity\\Post\\Contract\\PostRecentQuery', 'Hsimah\\Entity\\Post\\Contract\\PostSlugVerifier', 'Hsimah\\Entity\\Post\\Contract\\PostStatusVerifier', 'Hsimah\\Entity\\Post\\Contract\\PostTitleVerifier', 'Hsimah\\Entity\\Post\\Contract\\PostUnpublishAction', 'Hsimah\\Entity\\Product\\Contract\\ProductBySlugQuery', 'Hsimah\\Entity\\Product\\Contract\\ProductContentVerifier', 'Hsimah\\Entity\\Product\\Contract\\ProductEnquiryUrlVerifier', 'Hsimah\\Entity\\Product\\Contract\\ProductPublishAction', 'Hsimah\\Entity\\Product\\Contract\\ProductPublishedAtVerifier', 'Hsimah\\Entity\\Product\\Contract\\ProductRecentQuery', 'Hsimah\\Entity\\Product\\Contract\\ProductSlugVerifier', 'Hsimah\\Entity\\Product\\Contract\\ProductStatusVerifier', 'Hsimah\\Entity\\Product\\Contract\\ProductTitleVerifier', 'Hsimah\\Entity\\Product\\Contract\\ProductUnpublishAction', 'Hsimah\\Entity\\User\\Contract\\UserAdminAccountsWritePolicy', 'Hsimah\\Entity\\User\\Contract\\UserDisplayNameVerifier', 'Hsimah\\Entity\\User\\Contract\\UserStaffProfileReadPolicy', 'Hsimah\\Entity\\User\\Contract\\UserUsernameVerifier'];
+        return ['Hsimah\\Entity\\PageItem\\Contract\\PageItemBySlugQuery', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemContentVerifier', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemEnquiryUrlVerifier', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemKindVerifier', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemOfPageQuery', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemPublishAction', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemPublishedAtVerifier', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemRecentQuery', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemSlugVerifier', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemStatusVerifier', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemTitleVerifier', 'Hsimah\\Entity\\PageItem\\Contract\\PageItemUnpublishAction', 'Hsimah\\Entity\\Page\\Contract\\PageAccentVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageBySlugQuery', 'Hsimah\\Entity\\Page\\Contract\\PageContentVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageDefaultItemKindVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageHomeOrderVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageNavigationOrderVerifier', 'Hsimah\\Entity\\Page\\Contract\\PagePlacedQuery', 'Hsimah\\Entity\\Page\\Contract\\PagePublishAction', 'Hsimah\\Entity\\Page\\Contract\\PagePublishedAtVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageRecentQuery', 'Hsimah\\Entity\\Page\\Contract\\PageSlugVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageStatusVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageTitleVerifier', 'Hsimah\\Entity\\Page\\Contract\\PageUnpublishAction', 'Hsimah\\Entity\\Pattern\\Publishable\\Contract\\PublishableContentStaffWritePolicy', 'Hsimah\\Entity\\Pattern\\Publishable\\Contract\\PublishableContentVisibilityReadPolicy', 'Hsimah\\Entity\\User\\Contract\\UserAdminAccountsWritePolicy', 'Hsimah\\Entity\\User\\Contract\\UserDisplayNameVerifier', 'Hsimah\\Entity\\User\\Contract\\UserStaffProfileReadPolicy', 'Hsimah\\Entity\\User\\Contract\\UserUsernameVerifier'];
     }
 
     /**

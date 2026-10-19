@@ -5,7 +5,8 @@ published Page whose slug is `home`. Initial suggested pages: home, services,
 about and contact; copy and contact details must be supplied before publication.
 
 Uses Content, Publishable and Timestamps without overriding them. Slugs are unique
-within Page, not across content kinds. Empty bodies are allowed for drafts, but a
+within Page, not across content kinds. A page slug may not be `admin`, `assets`, `auth`,
+`graphql`, `media` or `pages`, because items live at `/<page-slug>/<item-slug>`. Empty bodies are allowed for drafts, but a
 published Page must have a nonblank title and body. No hierarchy or block editor
 in this version. Updating `home` affects `/` and `/pages/home` consistently;
 `/pages/home` redirects to `/` to keep one canonical URL.
@@ -29,8 +30,8 @@ The `placed` query (GraphQL `placedPages(where: { home })`) returns the publishe
 pages for the home page (`home: true`) or the navigation (`home: false`) in that order,
 so the site never filters a partial page list.
 
-News and Products are collections, not pages: their navigation links appear after
-the pages whenever they have published records, with no placement settings.
+News and Products are ordinary pages that hold items (below), so they are placed like any
+other page. The launch content adds both after Contact us in the navigation.
 The launch content features About, Frameworks, Portfolio and Contact us in that
 order (green, orange, blue, berry) and keeps Home out of the navigation; migration
 `0001-page-placement` sets the same on databases created before placement.
@@ -38,3 +39,15 @@ order (green, orange, blue, berry) and keeps Home out of the navigation; migrati
 The `recent` query (GraphQL `recentPages(where: { status })`) lists records newest-edited
 first, optionally of one status, under read policies. The admin dashboard uses it for
 its counts and its Recently edited list.
+
+## Items
+
+`defaultItemKind` (nullable text, up to 80 characters) makes a page hold items. A page with
+a kind holds [PageItems](PageItem.md); new items take that kind unless given another
+(a page such as Frameworks holds several kinds). `null` means the page holds none.
+A page with items shows its content, then its published items, newest first, with
+cursor pagination (`?after=`). `itemCount` and `publishedItemCount` give the items the
+viewer can read, all and published, for the admin sidebar and dashboard.
+
+Every page records its `author`, the signed-in staff member who created it, set by the
+server. Only the display name is public.

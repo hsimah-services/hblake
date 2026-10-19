@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   storage-manifest.php
- * digest: sha256:35257a52a97556cbcc2d83305c10797e903dc1207964e1d42fbb64122594a8cc
+ * digest: sha256:0f351951341776dd09e1a78295b2d506c3558ac9d9e2460982374f8cac7c1da5
  */
 
 namespace Eleph\SQLite\Manifest;
@@ -31,20 +31,23 @@ return new StorageManifest(
                 'published_at' => new Column('published_at', 'TEXT', true, false, null),
                 'created_at' => new Column('created_at', 'TEXT', false, false, null),
                 'updated_at' => new Column('updated_at', 'TEXT', false, false, null),
+                'default_item_kind' => new Column('default_item_kind', 'TEXT', true, false, null),
                 'show_in_navigation' => new Column('show_in_navigation', 'INTEGER', false, false, null),
                 'navigation_order' => new Column('navigation_order', 'INTEGER', false, false, null),
                 'feature_on_home' => new Column('feature_on_home', 'INTEGER', false, false, null),
                 'home_order' => new Column('home_order', 'INTEGER', false, false, null),
                 'accent' => new Column('accent', 'TEXT', false, false, null),
+                'author_id' => new Column('author_id', 'INTEGER', true, false, null),
             ],
             [
                 'hsimah_page_slug_uniq' => new Index('hsimah_page_slug_uniq', ['slug'], true),
                 'hsimah_page_status_idx' => new Index('hsimah_page_status_idx', ['status'], false),
+                'hsimah_page_author_id_idx' => new Index('hsimah_page_author_id_idx', ['author_id'], false),
             ],
             'id',
         ),
-        'Post' => new TableSchema(
-            'hsimah_post',
+        'PageItem' => new TableSchema(
+            'hsimah_page_item',
             [
                 'id' => new Column('id', 'INTEGER', false, true, null),
                 'title' => new Column('title', 'TEXT', false, false, null),
@@ -55,30 +58,17 @@ return new StorageManifest(
                 'published_at' => new Column('published_at', 'TEXT', true, false, null),
                 'created_at' => new Column('created_at', 'TEXT', false, false, null),
                 'updated_at' => new Column('updated_at', 'TEXT', false, false, null),
-            ],
-            [
-                'hsimah_post_slug_uniq' => new Index('hsimah_post_slug_uniq', ['slug'], true),
-                'hsimah_post_status_idx' => new Index('hsimah_post_status_idx', ['status'], false),
-            ],
-            'id',
-        ),
-        'Product' => new TableSchema(
-            'hsimah_product',
-            [
-                'id' => new Column('id', 'INTEGER', false, true, null),
-                'title' => new Column('title', 'TEXT', false, false, null),
-                'slug' => new Column('slug', 'TEXT', false, false, null),
-                'content' => new Column('content', 'TEXT', false, false, null),
-                'excerpt' => new Column('excerpt', 'TEXT', false, false, null),
-                'status' => new Column('status', 'TEXT', false, false, null),
-                'published_at' => new Column('published_at', 'TEXT', true, false, null),
-                'created_at' => new Column('created_at', 'TEXT', false, false, null),
-                'updated_at' => new Column('updated_at', 'TEXT', false, false, null),
+                'kind' => new Column('kind', 'TEXT', false, false, null),
                 'enquiry_url' => new Column('enquiry_url', 'TEXT', true, false, null),
+                'author_id' => new Column('author_id', 'INTEGER', true, false, null),
+                'page_id' => new Column('page_id', 'INTEGER', true, false, null),
             ],
             [
-                'hsimah_product_slug_uniq' => new Index('hsimah_product_slug_uniq', ['slug'], true),
-                'hsimah_product_status_idx' => new Index('hsimah_product_status_idx', ['status'], false),
+                'hsimah_page_item_slug_uniq' => new Index('hsimah_page_item_slug_uniq', ['slug'], true),
+                'hsimah_page_item_status_idx' => new Index('hsimah_page_item_status_idx', ['status'], false),
+                'hsimah_page_item_kind_idx' => new Index('hsimah_page_item_kind_idx', ['kind'], false),
+                'hsimah_page_item_author_id_idx' => new Index('hsimah_page_item_author_id_idx', ['author_id'], false),
+                'hsimah_page_item_page_id_idx' => new Index('hsimah_page_item_page_id_idx', ['page_id'], false),
             ],
             'id',
         ),
@@ -100,12 +90,13 @@ return new StorageManifest(
         ),
     ],
     placements: [
-
+        'Page.author' => new EdgePlacement('Page', 'author', 'User', RelationKind::ManyToOne, 'hsimah_page', 'author_id', null, 'hsimah_user'),
+        'PageItem.author' => new EdgePlacement('PageItem', 'author', 'User', RelationKind::ManyToOne, 'hsimah_page_item', 'author_id', null, 'hsimah_user'),
+        'PageItem.page' => new EdgePlacement('PageItem', 'page', 'Page', RelationKind::ManyToOne, 'hsimah_page_item', 'page_id', null, 'hsimah_page'),
     ],
     columns: [
-        'Page' => ['title' => 'title', 'slug' => 'slug', 'content' => 'content', 'excerpt' => 'excerpt', 'status' => 'status', 'publishedAt' => 'published_at', 'createdAt' => 'created_at', 'updatedAt' => 'updated_at', 'showInNavigation' => 'show_in_navigation', 'navigationOrder' => 'navigation_order', 'featureOnHome' => 'feature_on_home', 'homeOrder' => 'home_order', 'accent' => 'accent'],
-        'Post' => ['title' => 'title', 'slug' => 'slug', 'content' => 'content', 'excerpt' => 'excerpt', 'status' => 'status', 'publishedAt' => 'published_at', 'createdAt' => 'created_at', 'updatedAt' => 'updated_at'],
-        'Product' => ['title' => 'title', 'slug' => 'slug', 'content' => 'content', 'excerpt' => 'excerpt', 'status' => 'status', 'publishedAt' => 'published_at', 'createdAt' => 'created_at', 'updatedAt' => 'updated_at', 'enquiryUrl' => 'enquiry_url'],
+        'Page' => ['title' => 'title', 'slug' => 'slug', 'content' => 'content', 'excerpt' => 'excerpt', 'status' => 'status', 'publishedAt' => 'published_at', 'createdAt' => 'created_at', 'updatedAt' => 'updated_at', 'defaultItemKind' => 'default_item_kind', 'showInNavigation' => 'show_in_navigation', 'navigationOrder' => 'navigation_order', 'featureOnHome' => 'feature_on_home', 'homeOrder' => 'home_order', 'accent' => 'accent'],
+        'PageItem' => ['title' => 'title', 'slug' => 'slug', 'content' => 'content', 'excerpt' => 'excerpt', 'status' => 'status', 'publishedAt' => 'published_at', 'createdAt' => 'created_at', 'updatedAt' => 'updated_at', 'kind' => 'kind', 'enquiryUrl' => 'enquiry_url'],
         'User' => ['createdAt' => 'created_at', 'updatedAt' => 'updated_at', 'username' => 'username', 'displayName' => 'display_name', 'role' => 'role', 'active' => 'active'],
     ],
     joinTables: [

@@ -9,7 +9,7 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   install.php
- * digest: sha256:1df90bcfc91583a33b3ee1525fb32e34176689c750f75eaba7375e3a848ef4e9
+ * digest: sha256:3651e49d963eb276f35830ca82887297618533c587fd94b9e1029b4a274efbaa
  */
 
 /**
@@ -40,28 +40,18 @@ return static function (\PDO $database, string $prefix = ''): void {
     ' . '"published_at" TEXT' . ',
     ' . '"created_at" TEXT NOT NULL' . ',
     ' . '"updated_at" TEXT NOT NULL' . ',
+    ' . '"default_item_kind" TEXT CHECK (length("default_item_kind") <= 80)' . ',
     ' . '"show_in_navigation" INTEGER NOT NULL CHECK ("show_in_navigation" IN (0, 1))' . ',
     ' . '"navigation_order" INTEGER NOT NULL' . ',
     ' . '"feature_on_home" INTEGER NOT NULL CHECK ("feature_on_home" IN (0, 1))' . ',
     ' . '"home_order" INTEGER NOT NULL' . ',
-    ' . '"accent" TEXT NOT NULL CHECK ("accent" IN (\'ink\', \'green\', \'orange\', \'blue\', \'berry\'))' . '
+    ' . '"accent" TEXT NOT NULL CHECK ("accent" IN (\'ink\', \'green\', \'orange\', \'blue\', \'berry\'))' . ',
+    ' . '"author_id" INTEGER' . ' REFERENCES ' . $table('hsimah_user') . '("id") ON DELETE RESTRICT' . '
 )',
         'CREATE UNIQUE INDEX ' . $table('hsimah_page_slug_uniq') . ' ON ' . $table('hsimah_page') . ' ("slug")',
         'CREATE INDEX ' . $table('hsimah_page_status_idx') . ' ON ' . $table('hsimah_page') . ' ("status")',
-        'CREATE TABLE ' . $table('hsimah_post') . ' (
-    ' . '"id" INTEGER PRIMARY KEY AUTOINCREMENT' . ',
-    ' . '"title" TEXT NOT NULL CHECK (length("title") <= 200)' . ',
-    ' . '"slug" TEXT NOT NULL CHECK (length("slug") <= 160)' . ',
-    ' . '"content" TEXT NOT NULL' . ',
-    ' . '"excerpt" TEXT NOT NULL CHECK (length("excerpt") <= 300)' . ',
-    ' . '"status" TEXT NOT NULL CHECK ("status" IN (\'draft\', \'published\'))' . ',
-    ' . '"published_at" TEXT' . ',
-    ' . '"created_at" TEXT NOT NULL' . ',
-    ' . '"updated_at" TEXT NOT NULL' . '
-)',
-        'CREATE UNIQUE INDEX ' . $table('hsimah_post_slug_uniq') . ' ON ' . $table('hsimah_post') . ' ("slug")',
-        'CREATE INDEX ' . $table('hsimah_post_status_idx') . ' ON ' . $table('hsimah_post') . ' ("status")',
-        'CREATE TABLE ' . $table('hsimah_product') . ' (
+        'CREATE INDEX ' . $table('hsimah_page_author_id_idx') . ' ON ' . $table('hsimah_page') . ' ("author_id")',
+        'CREATE TABLE ' . $table('hsimah_page_item') . ' (
     ' . '"id" INTEGER PRIMARY KEY AUTOINCREMENT' . ',
     ' . '"title" TEXT NOT NULL CHECK (length("title") <= 200)' . ',
     ' . '"slug" TEXT NOT NULL CHECK (length("slug") <= 160)' . ',
@@ -71,10 +61,16 @@ return static function (\PDO $database, string $prefix = ''): void {
     ' . '"published_at" TEXT' . ',
     ' . '"created_at" TEXT NOT NULL' . ',
     ' . '"updated_at" TEXT NOT NULL' . ',
-    ' . '"enquiry_url" TEXT CHECK (length("enquiry_url") <= 2048)' . '
+    ' . '"kind" TEXT NOT NULL CHECK (length("kind") <= 80)' . ',
+    ' . '"enquiry_url" TEXT CHECK (length("enquiry_url") <= 2048)' . ',
+    ' . '"author_id" INTEGER' . ' REFERENCES ' . $table('hsimah_user') . '("id") ON DELETE RESTRICT' . ',
+    ' . '"page_id" INTEGER' . ' REFERENCES ' . $table('hsimah_page') . '("id") ON DELETE RESTRICT' . '
 )',
-        'CREATE UNIQUE INDEX ' . $table('hsimah_product_slug_uniq') . ' ON ' . $table('hsimah_product') . ' ("slug")',
-        'CREATE INDEX ' . $table('hsimah_product_status_idx') . ' ON ' . $table('hsimah_product') . ' ("status")',
+        'CREATE UNIQUE INDEX ' . $table('hsimah_page_item_slug_uniq') . ' ON ' . $table('hsimah_page_item') . ' ("slug")',
+        'CREATE INDEX ' . $table('hsimah_page_item_status_idx') . ' ON ' . $table('hsimah_page_item') . ' ("status")',
+        'CREATE INDEX ' . $table('hsimah_page_item_kind_idx') . ' ON ' . $table('hsimah_page_item') . ' ("kind")',
+        'CREATE INDEX ' . $table('hsimah_page_item_author_id_idx') . ' ON ' . $table('hsimah_page_item') . ' ("author_id")',
+        'CREATE INDEX ' . $table('hsimah_page_item_page_id_idx') . ' ON ' . $table('hsimah_page_item') . ' ("page_id")',
         'CREATE TABLE ' . $table('hsimah_user') . ' (
     ' . '"id" INTEGER PRIMARY KEY AUTOINCREMENT' . ',
     ' . '"created_at" TEXT NOT NULL' . ',

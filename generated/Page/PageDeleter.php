@@ -9,13 +9,14 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Page/PageDeleter.php
- * digest: sha256:f1bee52465b9224ac59c3e033835cec8af817a1a9885b2000e83b78d79909829
+ * digest: sha256:ea1ea8f15b7c8612d1a10ebb2a24139e1ee9dce0770b0989aa8a15085a4c8160
  */
 
 namespace Hsimah\Entity\Page;
 
 use Eleph\Runtime\Identity\EntityId;
 use Eleph\Runtime\Mutation\Deletion;
+use Eleph\Runtime\Storage\DeletionPolicy;
 use Eleph\Runtime\Storage\DeletionRule;
 use Eleph\Runtime\UnitOfWork\UnitOfWork;
 
@@ -43,6 +44,8 @@ final class PageDeleter
      * @return list<DeletionRule>
      */
     public static function rules(): array {
-        return [];
+        return [
+            new DeletionRule('PageItem', 'page', 'PageItem', DeletionPolicy::Cascade, false),
+        ];
     }
 }

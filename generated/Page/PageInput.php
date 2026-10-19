@@ -9,12 +9,13 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Page/PageInput.php
- * digest: sha256:2a59b197ab2a714c5b9229c5b69cc57534c451d1d0bfbaf4210e1034b0257fc3
+ * digest: sha256:842884312d9ef908695e913666d7798d7aa64497f89ff9fb3fca65b12ece3baf
  */
 
 namespace Hsimah\Entity\Page;
 
 use DateTimeImmutable;
+use Eleph\Runtime\Identity\Identifier;
 use Eleph\Runtime\Mutation\MutationBuffer;
 use Eleph\Runtime\Query\ValueDecoder;
 use Hsimah\Entity\Enum\PageAccent;
@@ -92,6 +93,16 @@ final readonly class PageInput
         return $this->decode->datetime($value, 'Page.publishedAt');
     }
 
+    private function defaultItemKind(
+        mixed $value,
+    ): ?string {
+        if (null === $value) {
+            return null;
+        }
+
+        return $this->decode->string($value, 'Page.defaultItemKind');
+    }
+
     private function showInNavigation(
         mixed $value,
     ): ?bool {
@@ -143,6 +154,19 @@ final readonly class PageInput
     }
 
     /**
+     * @return list<Identifier>
+     */
+    private function author(
+        mixed $value,
+    ): array {
+        if (null === $value) {
+            return [];
+        }
+
+        return [$this->decode->id($value, 'Page.author')];
+    }
+
+    /**
      * Seeds declared defaults on create and applies explicit input.
      * Absent update keys and existing pending values are not reset by defaults.
      *
@@ -188,6 +212,10 @@ final readonly class PageInput
             $buffer->set('publishedAt', $this->publishedAt($input['publishedAt']));
         }
 
+        if (array_key_exists('defaultItemKind', $input)) {
+            $buffer->set('defaultItemKind', $this->defaultItemKind($input['defaultItemKind']));
+        }
+
         if (!$buffer->target()->isPersisted() && !$buffer->isChanged('showInNavigation') && !array_key_exists('showInNavigation', $input)) {
             $buffer->set('showInNavigation', $this->showInNavigation(true));
         }
@@ -226,6 +254,10 @@ final readonly class PageInput
 
         if (array_key_exists('accent', $input)) {
             $buffer->set('accent', $this->accent($input['accent']));
+        }
+
+        if (array_key_exists('author', $input)) {
+            $buffer->edge('author')->set($this->author($input['author']));
         }
     }
 

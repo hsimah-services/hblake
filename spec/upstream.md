@@ -159,3 +159,32 @@ write invalidation refreshes collection and navigation data on the next load.
 Successful sign-in/sign-out invalidates the root record so route queries reload for
 the current session.
 Admin UI generation remains tracked in #7; these releases do not generate forms.
+
+## Gaps found while adding PageItem (2026-10-19)
+
+Not yet filed upstream; each needs an issue with the evidence, impact, solution and
+acceptance check below before the workaround is removed.
+
+- **Generated contract names collide across entities.** `Page.itemKind` and
+  `PageItem.kind` each generate an interface named `PageItemKindVerifier`
+  (`Hsimah\Entity\Page\Contract\PageItemKindVerifier` and
+  `Hsimah\Entity\PageItem\Contract\PageItemKindVerifier`), and the generated
+  `Wiring.php` imports both, which is a fatal "name is already in use" error at load.
+  `eleph validate` and `eleph generate` both succeed, so nothing warns before runtime.
+  *Impact:* a field name that, prefixed with its entity, equals another entity-prefixed
+  field breaks the whole application. *Solution:* detect colliding generated names in
+  `validate` (as GraphQL builder #1 asks for GraphQL type names), or alias imports in
+  generated code. *Acceptance:* a spec with `Page.itemKind` and `PageItem.kind` either
+  fails `eleph validate` with a clear message or loads. *Workaround:* the field is named
+  `Page.defaultItemKind`.
+- **Edge inputs are named after the edge, and "required" is not a GraphQL constraint.**
+  `PageItem.page` (`required: true`) is `page: ID`, nullable, in `CreatePageItemInput`, so
+  a create without it reaches the runtime. *Solution:* make required to-one edges
+  `ID!` on create inputs. *Workaround:* `Hsimah\PageItems` rejects a missing page.
+- **No generated way to set an edge from the session.** `author` (an edge to `User`,
+  which is not exposed) needs the signed-in user on create. *Solution:* a spec-level
+  `managed` source such as `viewer` for edges, as for timestamps. *Workaround:*
+  `Hsimah\PageItems::authored` adds it to the GraphQL input before the mutation runs.
+- **Edge filters read in an unexpected direction.** `EdgeFilter::along` returns the
+  targets of an edge and `::back` returns the rows pointing at them; "items of a page"
+  is `back('PageItem', 'page', ...)`. Worth a documented example.

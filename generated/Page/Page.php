@@ -9,16 +9,20 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   Page/Page.php
- * digest: sha256:fd7515f1ed55f7197098ba4c2c59cd4b08ca117ee39dc5cadcf77d8e0628bad6
+ * digest: sha256:e5837304a207261ec145d777303765dea8b400cdb59c418bd44986f9e13c8bdb
  */
 
 namespace Hsimah\Entity\Page;
 
 use DateTimeImmutable;
 use Eleph\Runtime\Identity\EntityId;
+use Eleph\Runtime\Query\EdgeLoader;
+use Eleph\Runtime\Query\EntityQuery;
 use Hsimah\Entity\Enum\PageAccent;
 use Hsimah\Entity\Enum\PublicationStatus;
+use Hsimah\Entity\PageItem\PageItem;
 use Hsimah\Entity\Pattern\Publishable\Publishable;
+use Hsimah\Entity\User\User;
 
 /**
  * Durable consulting page.
@@ -27,6 +31,7 @@ final class Page implements Publishable
 {
     private function __construct(
         private readonly EntityId $id,
+        private readonly EdgeLoader $edges,
         private readonly string $title,
         private readonly string $slug,
         private readonly string $content,
@@ -35,6 +40,7 @@ final class Page implements Publishable
         private readonly ?DateTimeImmutable $publishedAt,
         private readonly DateTimeImmutable $createdAt,
         private readonly DateTimeImmutable $updatedAt,
+        private readonly ?string $defaultItemKind,
         private readonly bool $showInNavigation,
         private readonly int $navigationOrder,
         private readonly bool $featureOnHome,
@@ -80,6 +86,10 @@ final class Page implements Publishable
         return $this->updatedAt;
     }
 
+    public function getDefaultItemKind(): ?string {
+        return $this->defaultItemKind;
+    }
+
     public function getShowInNavigation(): bool {
         return $this->showInNavigation;
     }
@@ -100,8 +110,31 @@ final class Page implements Publishable
         return $this->accent;
     }
 
+    /**
+     * @return User|null
+     */
+    public function getAuthor(): ?User {
+        $related = $this->edges->toOne('Page', $this->id, 'author');
+        assert(null === $related || $related instanceof User);
+
+        return $related;
+    }
+
+    /**
+     * Every PageItem whose "page" points here.
+     *
+     * @return EntityQuery<PageItem>
+     */
+    public function items(): EntityQuery {
+        /** @var EntityQuery<PageItem> $related */
+        $related = $this->edges->inverseToMany('PageItem', 'page', $this->id);
+
+        return $related;
+    }
+
     public static function of(
         EntityId $id,
+        EdgeLoader $edges,
         string $title,
         string $slug,
         string $content,
@@ -110,12 +143,13 @@ final class Page implements Publishable
         ?DateTimeImmutable $publishedAt,
         DateTimeImmutable $createdAt,
         DateTimeImmutable $updatedAt,
+        ?string $defaultItemKind,
         bool $showInNavigation,
         int $navigationOrder,
         bool $featureOnHome,
         int $homeOrder,
         PageAccent $accent,
     ): self {
-        return new self($id, $title, $slug, $content, $excerpt, $status, $publishedAt, $createdAt, $updatedAt, $showInNavigation, $navigationOrder, $featureOnHome, $homeOrder, $accent);
+        return new self($id, $edges, $title, $slug, $content, $excerpt, $status, $publishedAt, $createdAt, $updatedAt, $defaultItemKind, $showInNavigation, $navigationOrder, $featureOnHome, $homeOrder, $accent);
     }
 }

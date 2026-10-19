@@ -9,13 +9,14 @@ declare(strict_types=1);
  * detected by the build and rejected.
  *
  * path:   User/UserDeleter.php
- * digest: sha256:cad80fb5dbc9daeb0f732162e48d7462f7555e167a65071971e9c0772e3544b2
+ * digest: sha256:6a7d3c4a736d5714880d0a72f2348949682202750212270b5db52b5adcae9d9b
  */
 
 namespace Hsimah\Entity\User;
 
 use Eleph\Runtime\Identity\EntityId;
 use Eleph\Runtime\Mutation\Deletion;
+use Eleph\Runtime\Storage\DeletionPolicy;
 use Eleph\Runtime\Storage\DeletionRule;
 use Eleph\Runtime\UnitOfWork\UnitOfWork;
 
@@ -43,6 +44,9 @@ final class UserDeleter
      * @return list<DeletionRule>
      */
     public static function rules(): array {
-        return [];
+        return [
+            new DeletionRule('Page', 'author', 'Page', DeletionPolicy::Restrict, false),
+            new DeletionRule('PageItem', 'author', 'PageItem', DeletionPolicy::Restrict, false),
+        ];
     }
 }
