@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Runs a command in the .NET SDK container with the repository mounted at /app.
+#   scripts/dotnet dotnet build -c Release
+# NuGet packages are cached outside the repository. Extra container flags can be passed in
+# DOTNET_RUN_ARGS (for example --network hblake-cosmos).
+set -euo pipefail
+cd "$(dirname "$0")/.."
+ENGINE=$(command -v podman || command -v docker)
+IMAGE=${HSIMAH_DOTNET_IMAGE:-mcr.microsoft.com/dotnet/sdk:10.0}
+CACHE=${XDG_CACHE_HOME:-$HOME/.cache}/hsimah/nuget
+mkdir -p "$CACHE"
+USER_ARGS=()
+[ "$(basename "$ENGINE")" = docker ] && USER_ARGS=(--user "$(id -u):$(id -g)")
+# shellcheck disable=SC2086
+exec "$ENGINE" run --rm "${USER_ARGS[@]}" ${DOTNET_RUN_ARGS:-} \
+  -v "$PWD:/app:z" -v "$CACHE:/nuget:z" -e NUGET_PACKAGES=/nuget \
+  -e DOTNET_CLI_HOME=/tmp -e DOTNET_NOLOGO=1 -e DOTNET_CLI_TELEMETRY_OPTOUT=1 -e HOME=/tmp \
+  -e ADMIN_USERNAME -e ADMIN_PASSWORD -e ADMIN_DISPLAY_NAME -e BASE_URL \
+  -w /app "$IMAGE" "$@"

@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Runs the pinned `eleph` compiler (no host install needed). The release is downloaded
+# once into .cache/eleph and verified against the release's SHA256SUMS.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+VERSION=${ELEPH_VERSION:-0.16.1}
+DIR=.cache/eleph/$VERSION
+if [ ! -x "$DIR/eleph" ]; then
+  mkdir -p "$DIR"
+  base=https://github.com/hsimah-services/elephentity/releases/download/v$VERSION
+  archive=eleph-$VERSION-linux-x64.tar.gz
+  curl -fsSL "$base/$archive" -o "$DIR/$archive"
+  curl -fsSL "$base/SHA256SUMS" -o "$DIR/SHA256SUMS"
+  (cd "$DIR" && sha256sum --check --ignore-missing SHA256SUMS && tar -xzf "$archive" eleph)
+fi
+exec "$DIR/eleph" "$@"

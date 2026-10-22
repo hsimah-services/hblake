@@ -1,8 +1,7 @@
 project: Hsimah
 description: Software engineering consulting website and content administration.
 storage:
-  driver: sqlite
-  tablePrefix: hsimah_
+  driver: cosmos
 integrations:
   graphql: {}
   tsquid: {}
