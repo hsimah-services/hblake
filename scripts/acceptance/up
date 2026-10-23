@@ -12,9 +12,9 @@ source "$(dirname "$0")/common"
 if ! "$ENGINE" container inspect "$COSMOS" --format '{{.State.Running}}' 2>/dev/null | grep -q true; then
   "$ENGINE" rm -f "$COSMOS" >/dev/null 2>&1 || true
   "$ENGINE" run -d --name "$COSMOS" --network "$NETWORK" --memory 8g \
-    -e AZURE_COSMOS_EMULATOR_PARTITION_COUNT=3 -e AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE=false "$EMULATOR_IMAGE" >/dev/null
+    -e AZURE_COSMOS_EMULATOR_PARTITION_COUNT=1 -e AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE=false "$EMULATOR_IMAGE" >/dev/null
 fi
-wait_for "\"$ENGINE\" logs \"$COSMOS\" 2>&1 | tr -d \\r | grep -x Started" 120 2 || { "$ENGINE" logs "$COSMOS" >&2; echo "the Cosmos DB emulator did not start" >&2; exit 1; }
+wait_for "\"$ENGINE\" logs \"$COSMOS\" 2>&1 | grep -Ex 'Started.?'" 120 2 || { "$ENGINE" logs "$COSMOS" >&2; echo "the Cosmos DB emulator did not start" >&2; exit 1; }
 
 scripts/dotnet dotnet publish src/Hsimah.Server -c Release -o "$PUBLISH" --nologo -v quiet >/dev/null
 rm -rf "$MEDIA"; mkdir -p "$MEDIA"; chmod 700 "$DATA" "$MEDIA"

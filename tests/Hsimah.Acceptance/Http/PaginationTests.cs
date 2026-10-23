@@ -18,15 +18,28 @@ public sealed class PagingData : IAsyncLifetime
     {
         Operator = await Api.Operator();
         Anonymous = await Api.Anonymous();
-        // 105 published articles with drafts interleaved; publish order is creation order.
-        for (var i = 0; i < 105; i++)
+        // 105 articles with drafts interleaved. They are created concurrently, which is safe because nothing depends on creation
+        // order; they are then published one at a time in index order, so publish order (which the ordering tests assert) is index order.
+        using var limit = new SemaphoreSlim(8);
+        async Task<Content> Create(string title)
         {
-            var item = await CreateOk(Operator, Kind.Article, Input(("title", $"Paging {Env.RunId} {i:D3}")));
-            Published.Add(await PublishOk(Operator, Kind.Article, item.Id));
-            if (i % 5 == 0)
+            await limit.WaitAsync();
+            try
             {
-                Drafts.Add(await CreateOk(Operator, Kind.Article, Input(("title", $"Paging draft {Env.RunId} {i}"))));
+                return await CreateOk(Operator, Kind.Article, Input(("title", title)));
             }
+            finally
+            {
+                limit.Release();
+            }
+        }
+
+        var created = await Task.WhenAll(Enumerable.Range(0, 105).Select(i => Create($"Paging {Env.RunId} {i:D3}")));
+        var drafts = await Task.WhenAll(Enumerable.Range(0, 105).Where(i => i % 5 == 0).Select(i => Create($"Paging draft {Env.RunId} {i}")));
+        Drafts.AddRange(drafts);
+        foreach (var item in created)
+        {
+            Published.Add(await PublishOk(Operator, Kind.Article, item.Id));
         }
     }
 
