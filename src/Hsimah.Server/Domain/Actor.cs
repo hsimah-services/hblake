@@ -27,7 +27,12 @@ public sealed class RequestState(Actor actor)
 {
     private Task<HashSet<string>>? hiddenItems;
 
+    private Task<Dictionary<string, (long All, long Published)>>? itemCounts;
+
     public Actor Actor { get; } = actor;
+
+    /// <summary>The item counts of every page, computed once per request on first use.</summary>
+    public Task<Dictionary<string, (long All, long Published)>> ItemCounts(Func<Task<Dictionary<string, (long All, long Published)>>> compute) => itemCounts ??= compute();
 
     /// <summary>The ids of items whose page is not published, computed once per request on first use.</summary>
     public Task<HashSet<string>> HiddenItems(Func<Task<HashSet<string>>> compute) => hiddenItems ??= compute();

@@ -163,16 +163,47 @@ public static class HsimahSchema
         return user is null ? null : new Author(user.DisplayName);
     }
 
-    /// <summary>The items of a page the viewer can read, optionally only the published ones.</summary>
+    /// <summary>
+    /// The items of a page the viewer can read, optionally only the published ones. Counted in storage, and for every page at once the
+    /// first time a request asks (the admin lists them for all pages): staff may read every item, and a visitor only reads the published
+    /// items of a page they can already see, so no row has to be loaded and checked.
+    /// </summary>
     private static async ValueTask<object?> CountItems(IServiceProvider services, Page page, bool published, CancellationToken token)
     {
-        var criteria = Criteria.For("PageItem").LinkedTo(EdgeFilter.Back("PageItem", "page", page.Id));
-        if (published)
+        var staff = RequestViewerProvider.Actor.HasRole("admin") || RequestViewerProvider.Actor.HasRole("editor");
+        var counts = await RequestViewerProvider.State.ItemCounts(() => CountAllPages(services, staff, token)).ConfigureAwait(false);
+        var (all, publishedCount) = counts.GetValueOrDefault(page.Id.ToString());
+        return published || !staff ? publishedCount : all;
+    }
+
+    private static async Task<Dictionary<string, (long All, long Published)>> CountAllPages(IServiceProvider services, bool staff, CancellationToken token)
+    {
+        var storage = services.GetRequiredService<IStorageAdaptor>();
+        var runtime = services.GetRequiredService<Elephentity.Runtime.Gateway.Runtime>();
+        IReadOnlyList<Page> pages;
+        using (RequestViewerProvider.Use(Actor.Operator))
         {
-            criteria = criteria.Where(Filter.Equal("status", "published"));
+            pages = await runtime.Queries().Of(services.GetRequiredService<PageHydrator>(), Criteria.For("Page")).AllAsync(token).ConfigureAwait(false);
         }
 
-        var runtime = services.GetRequiredService<Elephentity.Runtime.Gateway.Runtime>();
-        return await runtime.Queries().Of(services.GetRequiredService<PageItemHydrator>(), criteria).CountAsync(token).ConfigureAwait(false);
+        using var limit = new SemaphoreSlim(8);
+        async Task<(string Id, long All, long Published)> Count(Page page)
+        {
+            await limit.WaitAsync(token).ConfigureAwait(false);
+            try
+            {
+                var items = Criteria.For("PageItem").LinkedTo(EdgeFilter.Back("PageItem", "page", page.Id));
+                var published = await storage.CountAsync(items.Where(Filter.Equal("status", "published")), token).ConfigureAwait(false);
+                var all = staff ? await storage.CountAsync(items, token).ConfigureAwait(false) : published;
+                return (page.Id.ToString(), all, published);
+            }
+            finally
+            {
+                limit.Release();
+            }
+        }
+
+        var counted = await Task.WhenAll(pages.Select(Count)).ConfigureAwait(false);
+        return counted.ToDictionary(row => row.Id, row => (row.All, row.Published));
     }
 }
