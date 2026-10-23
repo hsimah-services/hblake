@@ -19,6 +19,15 @@ public abstract class BrowserTest : IAsyncLifetime
         Page = await Context.NewPageAsync();
     }
 
+    /// <summary>Replaces this test's context with one built from <paramref name="options" />, for per-test colour schemes and motion.</summary>
+    protected async Task Use(BrowserNewContextOptions options)
+    {
+        await Context.CloseAsync();
+        Context = await Browsers.NewContextAsync(options);
+        Context.SetDefaultTimeout(30_000);
+        Page = await Context.NewPageAsync();
+    }
+
     public virtual async ValueTask DisposeAsync()
     {
         if (TestContext.Current.TestState?.Result == TestResult.Failed)

@@ -16,6 +16,7 @@ namespace Hsimah;
 
 public static class Composition
 {
+    /// <summary>The application on Cosmos DB.</summary>
     public static IServiceCollection AddHsimah(this IServiceCollection services, HsimahOptions options)
     {
         services.AddSingleton(options);
@@ -23,7 +24,12 @@ public static class Composition
         services.AddSingleton(StorageManifest.Create(options.Container));
         services.AddSingleton<IStorageAdaptor>(provider => new CosmosAdaptor(
             provider.GetRequiredService<CosmosClient>(), options.Database, provider.GetRequiredService<Elephentity.Cosmos.Manifest.CosmosStorageManifest>()));
+        return services.AddHsimahDomain();
+    }
 
+    /// <summary>Everything but storage: the policies, verifiers, actions, queries and GraphQL. Unit tests add an in-memory adaptor.</summary>
+    public static IServiceCollection AddHsimahDomain(this IServiceCollection services)
+    {
         services.AddSingleton<IViewerProvider, RequestViewerProvider>();
 
         // Contracts: the policies, verifiers, actions and queries the generated code asks the application for.
@@ -60,6 +66,7 @@ public static class Composition
             new ApplicationGateway(provider.GetRequiredService<Elephentity.Runtime.Gateway.Runtime>())));
 
         services.AddSingleton<global::GraphQL.Types.ISchema>(provider => HsimahSchema.Build(provider, provider.GetRequiredService<Elephentity.GraphQL.ElephentityGraphQLOptions>()));
+        services.AddSingleton<HsimahExecutor>();
         services.AddElephentityGraphQL(GraphQLManifestFactory.Create(), graphql =>
         {
             graphql.DefaultPageSize = 20;

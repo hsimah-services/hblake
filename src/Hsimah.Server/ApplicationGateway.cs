@@ -22,8 +22,29 @@ public sealed class ApplicationGateway(IEntityGateway inner) : IEntityGateway
     public ValueTask<object?> RunQueryAsync(string entity, string query, IReadOnlyDictionary<string, object?> args, CancellationToken cancellationToken = default) =>
         inner.RunQueryAsync(entity, query, args, cancellationToken);
 
+    /// <summary>
+    /// The spec's maxLength for the string fields the generated C# does not check itself (those without a hand-written verifier).
+    /// </summary>
+    private static readonly Dictionary<string, (string Field, int Max)[]> Limits = new()
+    {
+        ["Page"] = [("excerpt", 300)],
+        ["PageItem"] = [("excerpt", 300), ("imageUrl", 100), ("imageAlt", 300)],
+    };
+
+    private static void CheckLengths(string entity, IReadOnlyDictionary<string, object?> input)
+    {
+        foreach (var (field, max) in Limits.GetValueOrDefault(entity) ?? [])
+        {
+            if (input.TryGetValue(field, out var value) && value is string text && text.Length > max)
+            {
+                throw new GraphQLInputException($"The {field} must be at most {max} characters.");
+            }
+        }
+    }
+
     public async Task<MutationResult> CreateAsync(string entity, IReadOnlyDictionary<string, object?> input, CancellationToken cancellationToken = default)
     {
+        CheckLengths(entity, input);
         var fields = new Dictionary<string, object?>(input);
         if (entity == "PageItem")
         {
@@ -44,6 +65,7 @@ public sealed class ApplicationGateway(IEntityGateway inner) : IEntityGateway
 
     public async Task<MutationResult> UpdateAsync(string entity, EntityId id, IReadOnlyDictionary<string, object?> input, CancellationToken cancellationToken = default)
     {
+        CheckLengths(entity, input);
         if (entity == "PageItem" && input.TryGetValue("page", out var page))
         {
             await PageOf(page, cancellationToken).ConfigureAwait(false);

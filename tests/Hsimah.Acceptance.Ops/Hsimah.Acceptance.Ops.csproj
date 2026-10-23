@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Hsimah.Acceptance.Ops</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <NoWarn>$(NoWarn);CA1707;xUnit1051</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" Version="4.0.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+    <Using Include="Xunit" />
+  </ItemGroup>
+</Project>

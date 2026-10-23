@@ -80,7 +80,7 @@ public static class Operator
     }
 
     /// <summary>Replaces all Page and PageItem content with the owner's launch pages; accounts, credentials and sessions are kept.</summary>
-    private static async Task ReplaceContentAsync(IServiceProvider services)
+    public static async Task ReplaceContentAsync(IServiceProvider services)
     {
         var runtime = services.GetRequiredService<Elephentity.Runtime.Gateway.Runtime>();
         var options = services.GetRequiredService<HsimahOptions>();

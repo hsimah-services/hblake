@@ -1,7 +1,7 @@
 using System.Text;
 using System.Text.Json.Nodes;
 using System.Xml;
-using Elephentity.GraphQL.Http;
+using Hsimah;
 using GraphQL;
 using GraphQL.Transport;
 using Hsimah.Domain;
@@ -18,7 +18,7 @@ public static class NewsFeed
 
     public static async Task<string> RenderAsync(IServiceProvider services, string origin, CancellationToken token)
     {
-        var executor = services.GetRequiredService<ElephentityGraphQLExecutor>();
+        var executor = services.GetRequiredService<HsimahExecutor>();
         JsonNode? result;
         using (RequestViewerProvider.Use(Actor.Visitor))
         {

@@ -2,7 +2,7 @@ using System.Net.Mime;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
-using Elephentity.GraphQL.Http;
+using Hsimah;
 using Elephentity.Tsquid;
 using Elephentity.Tsquid.Manifest;
 using GraphQL;
@@ -22,7 +22,7 @@ public sealed partial class Router(
     HsimahOptions options,
     AuthService auth,
     Media media,
-    ElephentityGraphQLExecutor executor,
+    HsimahExecutor executor,
     ILogger<Router> log)
 {
     private const int MaxBody = 1_048_576;
