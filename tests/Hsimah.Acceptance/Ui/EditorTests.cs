@@ -183,6 +183,8 @@ public partial class EditorTests : BrowserTest
         await Page.GetByLabel("Slug").FillAsync(slug);
         await Editor().ClickAsync();
         await Toolbar().GetByRole(AriaRole.Button, new() { Name = "Bold" }).ClickAsync();
+        // Clicking a toolbar button hands focus back to the editor asynchronously; typing before that drops the first characters.
+        await Expect(Editor()).ToBeFocusedAsync();
         await Page.Keyboard.TypeAsync("Strong words");
         await Page.GetByRole(AriaRole.Button, new() { Name = "Create" }).ClickAsync();
         await Expect(Page.GetByRole(AriaRole.Status).Filter(new() { HasTextRegex = Rx("created") })).ToBeVisibleAsync();

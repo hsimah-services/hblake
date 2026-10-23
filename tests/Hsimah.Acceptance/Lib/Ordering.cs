@@ -1,7 +1,7 @@
 using Xunit.Sdk;
 using Xunit.v3;
 
-[assembly: TestClassOrderer(typeof(Hsimah.Acceptance.Lib.ByClassName))]
+[assembly: TestCollectionOrderer(typeof(Hsimah.Acceptance.Lib.ByCollectionName))]
 [assembly: TestCaseOrderer(typeof(Hsimah.Acceptance.Lib.ByDeclaration))]
 
 namespace Hsimah.Acceptance.Lib;
@@ -17,10 +17,13 @@ public sealed class ByDeclaration : ITestCaseOrderer
         testCases.OrderBy(test => test is IXunitTestCase xunit ? xunit.TestMethod.Method.MetadataToken : 0).ToList();
 }
 
-/// <summary>Runs test classes in name order, as the TypeScript suite ran its files.</summary>
-public sealed class ByClassName : ITestClassOrderer
+/// <summary>
+/// Runs test classes in name order, as the TypeScript suite ran its files. Each class is its own collection, so the order is a
+/// collection order.
+/// </summary>
+public sealed class ByCollectionName : ITestCollectionOrderer
 {
-    public IReadOnlyCollection<TTestClass?> OrderTestClasses<TTestClass>(IReadOnlyCollection<TTestClass?> testClasses)
-        where TTestClass : ITestClass =>
-        testClasses.OrderBy(testClass => testClass?.TestClassName, StringComparer.Ordinal).ToList();
+    public IReadOnlyCollection<TTestCollection> OrderTestCollections<TTestCollection>(IReadOnlyCollection<TTestCollection> testCollections)
+        where TTestCollection : ITestCollection =>
+        testCollections.OrderBy(collection => collection.TestCollectionDisplayName, StringComparer.Ordinal).ToList();
 }
