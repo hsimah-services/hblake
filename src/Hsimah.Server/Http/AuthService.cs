@@ -158,7 +158,7 @@ public sealed class AuthService(CosmosClient client, HsimahOptions options, Elep
             ["pk"] = Partition,
             ["kind"] = "credential",
             ["userId"] = userId,
-            ["passwordHash"] = BCrypt.Net.BCrypt.HashPassword(password, 12),
+            ["passwordHash"] = BCrypt.Net.BCrypt.HashPassword(password, 10),
         };
         await Auth.UpsertItemAsync(node, new PartitionKey(Partition), cancellationToken: token).ConfigureAwait(false);
     }
