@@ -22,23 +22,36 @@ public sealed class Actor(User? user = null, bool bootstrap = false) : IViewer
     public bool Can(string capability) => false;
 }
 
+/// <summary>What is known about the request in progress: who is acting, and facts several policy checks share.</summary>
+public sealed class RequestState(Actor actor)
+{
+    private Task<HashSet<string>>? hiddenItems;
+
+    public Actor Actor { get; } = actor;
+
+    /// <summary>The ids of items whose page is not published, computed once per request on first use.</summary>
+    public Task<HashSet<string>> HiddenItems(Func<Task<HashSet<string>>> compute) => hiddenItems ??= compute();
+}
+
 /// <summary>The viewer of the current async flow; set by the request pipeline and the operator commands.</summary>
 public sealed class RequestViewerProvider : IViewerProvider
 {
-    private static readonly AsyncLocal<Actor?> Current = new();
+    private static readonly AsyncLocal<RequestState?> Current = new();
 
-    public static Actor Actor => Current.Value ?? Actor.Visitor;
+    public static Actor Actor => Current.Value?.Actor ?? Actor.Visitor;
+
+    public static RequestState State => Current.Value ?? new RequestState(Actor.Visitor);
 
     public IViewer Viewer() => Actor;
 
     public static IDisposable Use(Actor actor)
     {
         var previous = Current.Value;
-        Current.Value = actor;
+        Current.Value = new RequestState(actor);
         return new Scope(previous);
     }
 
-    private sealed class Scope(Actor? previous) : IDisposable
+    private sealed class Scope(RequestState? previous) : IDisposable
     {
         public void Dispose() => Current.Value = previous;
     }
