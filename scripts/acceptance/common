@@ -2,7 +2,7 @@
 # Shared by the acceptance harness: the stack is a Cosmos DB emulator and the published C# server on one podman/docker network.
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/../.."
-ENGINE=$(command -v podman || command -v docker)
+ENGINE=${CONTAINER_ENGINE:-$(command -v podman || command -v docker)}
 NETWORK=hblake-acceptance
 COSMOS=hblake-acceptance-cosmos
 SERVER=hblake-acceptance-server

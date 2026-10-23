@@ -5,7 +5,7 @@
 # DOTNET_RUN_ARGS (for example --network hblake-cosmos).
 set -euo pipefail
 cd "$(dirname "$0")/.."
-ENGINE=$(command -v podman || command -v docker)
+ENGINE=${CONTAINER_ENGINE:-$(command -v podman || command -v docker)}
 IMAGE=${HSIMAH_DOTNET_IMAGE:-mcr.microsoft.com/dotnet/sdk:10.0}
 CACHE=${XDG_CACHE_HOME:-$HOME/.cache}/hsimah/nuget
 mkdir -p "$CACHE"

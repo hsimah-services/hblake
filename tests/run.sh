@@ -17,7 +17,7 @@ export ADMIN_USERNAME="${ADMIN_USERNAME:-acceptance-operator}"
 export ADMIN_PASSWORD="${ADMIN_PASSWORD:-$(python3 -c 'import secrets; print(secrets.token_urlsafe(18))')}"
 export ADMIN_DISPLAY_NAME="${ADMIN_DISPLAY_NAME:-Site Operator}"
 
-ENGINE="$(command -v podman || command -v docker || true)"
+ENGINE="${CONTAINER_ENGINE:-$(command -v podman || command -v docker || true)}"
 [ -n "$ENGINE" ] || { echo "podman or docker is required" >&2; exit 2; }
 
 failures=()
