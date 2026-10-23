@@ -169,6 +169,8 @@ public class AdminShellTests : BrowserTest
     [Fact]
     public async Task New_type_opens_an_empty_form_for_the_type()
     {
+        // With no products the list shows a second "New product" link in its empty state; the toolbar link is the one under test.
+        await CreateOk(api, Kind.Product);
         await Page.GotoAsync(AdminPath(Kind.Product));
         await Page.GetByRole(AriaRole.Main).GetByRole(AriaRole.Link, new() { NameRegex = Rx("^new product$") }).ClickAsync();
         await Expect(Page).ToHaveURLAsync($"{Env.BaseUrl}{AdminPath(Kind.Product)}/new");

@@ -93,6 +93,7 @@ public partial class AdminTests : BrowserTest
         await SignIn(Page);
         await Page.GotoAsync("/");
         var group = Page.GetByRole(AriaRole.Banner).GetByRole(AriaRole.Group, new() { Name = "Display and account" });
+        await Expect(group.Locator("a, button")).ToHaveCountAsync(4);
         var names = await ControlNames(group);
         Assert.Equal(4, names.Length);
         Assert.Matches(Rx("switch to (dark|light) mode"), names[0]!);
@@ -103,6 +104,7 @@ public partial class AdminTests : BrowserTest
         await Expect(Page).ToHaveURLAsync($"{Env.BaseUrl}/admin");
         // The admin's group is the inverse: View site in place of Admin.
         var adminGroup = Page.GetByRole(AriaRole.Banner).GetByRole(AriaRole.Group, new() { Name = "Display and account" });
+        await Expect(adminGroup.Locator("a, button")).ToHaveCountAsync(4);
         var adminNames = await ControlNames(adminGroup);
         Assert.Equal(4, adminNames.Length);
         Assert.Matches(Rx("switch to (dark|light) mode"), adminNames[0]!);
