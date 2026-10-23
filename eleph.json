@@ -6,7 +6,17 @@
       "builder": "eleph-gen-csharp@0.1.0-alpha.1",
       "output": "src/Hsimah.Server/Generated",
       "namespace": "Hsimah.Entity",
-      "typeNamespace": "Hsimah.Type"
+      "typeNamespace": "Hsimah.Type",
+      "check": [
+        "scripts/dotnet",
+        "dotnet",
+        "run",
+        "--no-build",
+        "--project",
+        "src/Hsimah.Contracts",
+        "--",
+        "eleph-check"
+      ]
     },
     "cosmos": {
       "builder": "eleph-gen-cosmos@0.1.0-alpha.1",

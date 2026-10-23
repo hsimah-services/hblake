@@ -1,17 +1,16 @@
 #!/usr/bin/env bash
 # Runs the acceptance suite against a fresh stack. See tests/README.md.
 #
-#   tests/run.sh                 gates, then Playwright, then ops
-#   tests/run.sh playwright      only Playwright (still starts a fresh stack)
-#   PLAYWRIGHT_ARGS="--project=api --grep publish" tests/run.sh playwright
+#   tests/run.sh                 gates, then the browser and HTTP tests, then ops
+#   tests/run.sh playwright      only the browser and HTTP tests (still starts a fresh stack)
+#   TEST_ARGS="-class Hsimah.Acceptance.Http.AuthTests" tests/run.sh playwright
 #
-# Needs bash, python3 and podman or docker on the host; Node runs in a container.
+# Needs bash, python3 and podman or docker on the host; .NET, Node and the browsers run in containers.
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 HARNESS="$ROOT/scripts/acceptance"
 STAGES="${1:-all}"
-PLAYWRIGHT_IMAGE="mcr.microsoft.com/playwright:v1.63.0-noble"
 
 export BASE_URL="${BASE_URL:-http://localhost:8080}"
 export ADMIN_USERNAME="${ADMIN_USERNAME:-acceptance-operator}"
@@ -50,17 +49,26 @@ if want playwright || want ops; then
 fi
 
 if want playwright; then
-  stage "Playwright"
-  run playwright "$ENGINE" run --rm --network host --ipc host \
-    -v "$ROOT:/repo:z" -w /repo/tests/acceptance \
-    -e BASE_URL -e ADMIN_USERNAME -e ADMIN_PASSWORD -e ADMIN_DISPLAY_NAME -e REPO_ROOT=/repo -e CI=1 \
-    "$PLAYWRIGHT_IMAGE" \
-    bash -c "npm ci --no-audit --no-fund --loglevel=error && npx playwright test ${PLAYWRIGHT_ARGS:-}"
+  stage "Browser and HTTP tests"
+  # Stages run in order against the one stack: static reads the repository, fresh asserts the empty site (so it must see the
+  # database before anything is created), http is the contract, ui drives the browser. The tests share the database, so they run
+  # one at a time, in the order they are written.
+  if [ -n "${TEST_ARGS:-}" ]; then
+    selection="dotnet run --no-build --project tests/Hsimah.Acceptance -- -noColor $TEST_ARGS"
+  else
+    selection="for stage in Static Fresh Http Ui; do dotnet run --no-build --project tests/Hsimah.Acceptance -- -noColor -namespace Hsimah.Acceptance.\$stage || status=1; done; exit \${status:-0}"
+  fi
+  run playwright "$ROOT/scripts/tests-dotnet" bash -c "dotnet build tests/Hsimah.Acceptance --nologo -v quiet && $selection"
 fi
 
 if want ops; then
   stage "Operator procedures"
-  run ops python3 -I "$ROOT/tests/ops/test_ops.py"
+  # Built self-contained in a container, so the host runs them without a .NET install and they can run the harness scripts.
+  if "$ROOT/scripts/dotnet" dotnet publish tests/Hsimah.Acceptance.Ops -c Release -r linux-x64 --self-contained -o .cache/ops --nologo -v quiet; then
+    run ops env REPO_ROOT="$ROOT" "$ROOT/.cache/ops/Hsimah.Acceptance.Ops" -noColor
+  else
+    failures+=(ops-build)
+  fi
 fi
 
 echo

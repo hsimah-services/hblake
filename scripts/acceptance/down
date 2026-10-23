@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
+# Stops the stack and discards its database and uploaded images.
 source "$(dirname "$0")/common"
-"$ENGINE" rm -f "$STACK" >/dev/null 2>&1 || true
-python3 - "$DATA" <<'PY'
-import sys
-from pathlib import Path
-for name in ['site.sqlite','site.sqlite-wal','site.sqlite-shm']:
-    Path(sys.argv[1],name).unlink(missing_ok=True)
-PY
+"$ENGINE" rm -f "$SERVER" "$COSMOS" >/dev/null 2>&1 || true
+rm -rf "$MEDIA"

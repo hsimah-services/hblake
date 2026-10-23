@@ -91,10 +91,14 @@ UI descriptor checks verify internal consistency only; tsquid cannot consume adm
   public frontend remains a client-rendered tsquid app; route queries are hydrated
   from inlined initial data using tsquid 0.3.0 (including PR #8) and
   elephentity/codegen-tsquid 0.1.0.
-- SQLite upgrades remain application-owned reviewed migrations; the initial
-  installer is not an upgrade engine.
+- Cosmos DB unique keys and composite indexes cannot change on an existing container, so a
+  model change that alters them is applied by backup, install into a new container and
+  restore; the installer is not an upgrade engine.
 
-## Implementation findings
+## Implementation findings (the PHP/SQLite stack, kept as history)
+
+The sections below this one, up to "Gaps found porting to Elephentity.NET", describe the stack this repository ran before it moved to
+ASP.NET Core; the Elephentity.NET port is the last section.
 
 The implementation uses tagged releases: runtime/CLI 0.13.1, coordinator 0.6.1,
 PHP builder 0.7.0, SQLite runtime 0.1.0-alpha.5, GraphQL runtime 0.2.0-alpha.1,
@@ -188,3 +192,46 @@ acceptance check below before the workaround is removed.
 - **Edge filters read in an unexpected direction.** `EdgeFilter::along` returns the
   targets of an edge and `::back` returns the rows pointing at them; "items of a page"
   is `back('PageItem', 'page', ...)`. Worth a documented example.
+
+## Gaps found porting to Elephentity.NET (2026-10-22)
+
+The server moved from PHP/SQLite to ASP.NET Core on `Elephentity.*` 0.1.0-alpha.2 (builders `eleph-gen-csharp`,
+`eleph-gen-cosmos`, `eleph-gen-graphql-csharp` 0.1.0-alpha.1, `eleph-gen-tsquid` 0.2.0, coordinator `eleph-codegen` 0.7.0). No
+generated file was edited: every gap below is worked around in application code and listed with what the generator should do instead.
+Not yet filed upstream; each needs an issue with the evidence, impact, solution, compatibility and acceptance check given here
+before its workaround is removed. Check for existing reports first.
+
+1. **No SQLite storage for .NET.** The runtime ships a memory driver and a Cosmos adaptor. `driver: sqlite` with the C# builder fails
+   with "No installed builder generates for storage driver sqlite". *Impact:* a project on SQLite (the Raspberry Pi v1) cannot port.
+   *Decision here:* the storage driver became `cosmos` (owner decision). *Solution:* `Elephentity.Sqlite` plus an
+   `eleph-gen-sqlite` manifest for C#. *Compatibility:* additive. *Acceptance:* the adaptor passes `AdaptorConformance`.
+2. **Query orderings are not part of the spec.** `eleph-gen-cosmos` declares composite indexes only for single `indexed`/`unique`
+   fields, but handler queries sort by several (`updatedAt desc, id desc`; `navigationOrder, title, id`; `publishedAt desc, id desc`).
+   Cosmos rejects an `ORDER BY` without a composite index and the query fails at run time (500). *Workaround:*
+   `src/Hsimah.Server/Storage.cs` adds the `CosmosOrdering` entries to the generated manifest. *Solution:* let a query declare its
+   order (for example `orderBy:` on the query) and feed it to the storage builders. *Acceptance:* a spec query with a two-field order
+   runs on the emulator without hand-written indexes.
+3. **`maxLength` is not enforced.** The C# builder ignores `maxLength` on string fields without `verify: true` (`Page.excerpt` 300,
+   `PageItem.imageUrl` 100, `PageItem.imageAlt` 300); the PHP builder rejected an over-long value. *Impact:* oversized values are
+   stored. *Workaround:* `ApplicationGateway.CheckLengths`. *Solution:* generate a field violation in the mutator. *Acceptance:* an
+   over-long excerpt is rejected as in `Http/ValidationTests`.
+4. **The per-query edge cache is not thread-safe.** `CachingEdgeLoader` keeps a plain `Dictionary`, but GraphQL.NET resolves the
+   fields of a list's items in parallel, so `Page.author` and `PageItem.page` across a list sporadically fail with "Operations that
+   change non-concurrent collections must have exclusive access" (INTERNAL errors). *Workaround:* `HsimahExecutor` runs every
+   operation with `SerialExecutionStrategy`. *Solution:* a concurrent cache, or select the serial strategy in
+   `Elephentity.GraphQL`'s executor. *Acceptance:* listing 50 items with `author` and `page` never errors.
+5. **No extension point for application-owned GraphQL.** `ElephentitySchema.Build` returns a finished schema; adding `viewer`,
+   `adminUser`, `updateAdminUser`, `Page.itemCount`, the public `author` projection, removing `databaseId` and preparing mutation
+   input (author from the session, page checks) meant rebuilding the manifest, mutating the built schema and wrapping
+   `IEntityGateway` (`HsimahSchema`, `ApplicationGateway`). *Solution:* documented hooks for extra fields, field removal and input
+   preparation. *Acceptance:* `Http/SchemaTests` passes without schema mutation after build.
+6. **The tsquid integration is mandatory but only emits PHP.** `eleph-gen-tsquid` 0.2.0 writes `tsquid-manifest.php`; a C# server
+   reads `routes.manifest.json` through `ManifestJson.Parse`, so the generated file is unused. The target is still required because
+   the spec declares `integrations: tsquid`. *Solution:* a C# manifest output, or make the integration optional for C# projects.
+7. **Builder options are undocumented.** The GraphQL builder needs `namespace` and `entityNamespace` in its target, and the tsquid
+   `manifest` path is relative to the target's output; neither is in the builder README quickstart.
+8. **`CommitRejected` messages say "The change was rejected by N violation(s)."** The violations are in `extensions.violations`; the
+   PHP stack put the first violation's text in `message`, which the UI shows. *Impact:* none for the current client, which reads
+   `extensions`; noted for clients that show `message`.
+9. **Operational: the Linux Cosmos DB emulator crashes** now and then under sustained load ("sqlpal.dll ... Last Chance"). The
+   acceptance harness restarts a stopped emulator on `up`; rerun a failed stage after a crash.

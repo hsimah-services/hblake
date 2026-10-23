@@ -19,12 +19,10 @@ jobs:
       - uses: actions/checkout@v4
       - name: Run all acceptance stages
         run: tests/run.sh
-      - name: Upload Playwright results
+      - name: Upload failure screenshots
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-results
-          path: |
-            tests/acceptance/test-results/
-            tests/acceptance/playwright-report/
+          name: test-failures
+          path: tests/Hsimah.Acceptance/test-results/
           if-no-files-found: ignore

@@ -6,7 +6,5 @@ client/dist/
 *.log
 .pnpm-store/
 client/.pnpm-store/
-tests/acceptance/node_modules/
-tests/acceptance/test-results/
-tests/acceptance/playwright-report/
+tests/Hsimah.Acceptance/test-results/
 tools/builders/

@@ -15,7 +15,7 @@ Contributor instructions live in [AGENTS.md](../AGENTS.md).
 
 ## Assumptions for review
 
-- Standalone PHP with SQLite, rather than WordPress storage or hosting.
+- Standalone ASP.NET Core with Azure Cosmos DB, rather than WordPress storage or hosting.
 - React/tsquid public site and admin, Relay over standalone Elephentity GraphQL.
 - Rich-text editing stored as Markdown, with sanitized rendering; no block editor.
 - V1 has one operator-provisioned admin account. The model retains editor/admin

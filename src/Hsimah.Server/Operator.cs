@@ -27,6 +27,7 @@ public static class Operator
             switch (command)
             {
                 case "install": await InstallAsync(services).ConfigureAwait(false); break;
+                case "reset": await ResetAsync(services).ConfigureAwait(false); break;
                 case "bootstrap": await BootstrapAsync(services).ConfigureAwait(false); break;
                 case "replace-content": await ReplaceContentAsync(services).ConfigureAwait(false); Console.WriteLine("Site content replaced."); break;
                 case "backup": await BackupAsync(services, args.ElementAtOrDefault(1) ?? string.Empty).ConfigureAwait(false); break;
@@ -42,6 +43,27 @@ public static class Operator
         {
             await Console.Error.WriteLineAsync(error.Message).ConfigureAwait(false);
             return 1;
+        }
+    }
+
+    /// <summary>
+    /// Deletes the whole database. For acceptance stacks only: it refuses any database whose name does not end in "-acceptance", so a
+    /// mistaken environment cannot lose real data.
+    /// </summary>
+    private static async Task ResetAsync(IServiceProvider services)
+    {
+        var options = services.GetRequiredService<HsimahOptions>();
+        if (!options.Database.EndsWith("-acceptance", StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("Refusing to reset a database that is not an acceptance database.");
+        }
+
+        try
+        {
+            await services.GetRequiredService<CosmosClient>().GetDatabase(options.Database).DeleteAsync().ConfigureAwait(false);
+        }
+        catch (CosmosException error) when (error.StatusCode == HttpStatusCode.NotFound)
+        {
         }
     }
 
@@ -74,7 +96,10 @@ public static class Operator
         var displayName = Environment.GetEnvironmentVariable("ADMIN_DISPLAY_NAME") is { Length: > 0 } name ? name : "Site Operator";
         var created = await runtime.CreateAsync("User", new Dictionary<string, object?>
         {
-            ["username"] = username, ["displayName"] = displayName, ["role"] = "admin", ["active"] = true,
+            ["username"] = username,
+            ["displayName"] = displayName,
+            ["role"] = "admin",
+            ["active"] = true,
         }).ConfigureAwait(false);
         await services.GetRequiredService<AuthService>().SetPassword(created.Id.ToString(), password, CancellationToken.None).ConfigureAwait(false);
     }

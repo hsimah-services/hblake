@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
+# Test hook: expires every session as though its lifetime had passed.
 source "$(dirname "$0")/common"
-exec scripts/php php server/console.php expire-sessions "$@"
+console_command expire-sessions

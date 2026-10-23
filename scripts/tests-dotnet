@@ -8,5 +8,5 @@ CACHE=${XDG_CACHE_HOME:-$HOME/.cache}/hsimah/nuget
 mkdir -p "$CACHE"
 exec "$ENGINE" run --rm --network host --ipc host -v "$PWD:/repo:z" -v "$CACHE:/nuget:z" -w /repo \
   -e NUGET_PACKAGES=/nuget -e DOTNET_CLI_HOME=/tmp -e DOTNET_NOLOGO=1 -e DOTNET_CLI_TELEMETRY_OPTOUT=1 -e HOME=/tmp \
-  -e BASE_URL -e ADMIN_USERNAME -e ADMIN_PASSWORD -e ADMIN_DISPLAY_NAME -e REPO_ROOT=/repo -e HSIMAH_TEST_ARGS \
+  -e BASE_URL -e ADMIN_USERNAME -e ADMIN_PASSWORD -e ADMIN_DISPLAY_NAME -e REPO_ROOT=/repo \
   "$IMAGE" "$@"

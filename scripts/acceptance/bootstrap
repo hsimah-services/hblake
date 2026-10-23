@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
+# The operator bootstrap, using ADMIN_USERNAME, ADMIN_PASSWORD and ADMIN_DISPLAY_NAME. Fails when an account already exists.
 source "$(dirname "$0")/common"
-exec scripts/php php server/console.php bootstrap "$@"
+console_command bootstrap

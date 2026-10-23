@@ -154,7 +154,10 @@ public sealed class AuthService(CosmosClient client, HsimahOptions options, Elep
     {
         var node = new JsonObject
         {
-            ["id"] = "cred-" + userId, ["pk"] = Partition, ["kind"] = "credential", ["userId"] = userId,
+            ["id"] = "cred-" + userId,
+            ["pk"] = Partition,
+            ["kind"] = "credential",
+            ["userId"] = userId,
             ["passwordHash"] = BCrypt.Net.BCrypt.HashPassword(password, 12),
         };
         await Auth.UpsertItemAsync(node, new PartitionKey(Partition), cancellationToken: token).ConfigureAwait(false);
@@ -199,7 +202,9 @@ public sealed class AuthService(CosmosClient client, HsimahOptions options, Elep
         var fresh = existing is not null && existing["startedAt"]!.GetValue<long>() >= now - FailureWindowSeconds;
         var node = new JsonObject
         {
-            ["id"] = "fail-" + address, ["pk"] = Partition, ["kind"] = "failure",
+            ["id"] = "fail-" + address,
+            ["pk"] = Partition,
+            ["kind"] = "failure",
             ["attempts"] = fresh ? existing!["attempts"]!.GetValue<int>() + 1 : 1,
             ["startedAt"] = fresh ? existing!["startedAt"]!.GetValue<long>() : now,
             ["ttl"] = FailureWindowSeconds,
@@ -230,8 +235,13 @@ public sealed class AuthService(CosmosClient client, HsimahOptions options, Elep
         var session = new Session(Hash(raw), userId, Convert.ToHexString(RandomNumberGenerator.GetBytes(32)).ToLowerInvariant(), Now() + SessionSeconds);
         var node = new JsonObject
         {
-            ["id"] = session.TokenHash, ["pk"] = Partition, ["kind"] = "session", ["userId"] = userId, ["csrf"] = session.Csrf,
-            ["expiresAt"] = session.ExpiresAt, ["ttl"] = SessionSeconds,
+            ["id"] = session.TokenHash,
+            ["pk"] = Partition,
+            ["kind"] = "session",
+            ["userId"] = userId,
+            ["csrf"] = session.Csrf,
+            ["expiresAt"] = session.ExpiresAt,
+            ["ttl"] = SessionSeconds,
         };
         await Auth.CreateItemAsync(node, new PartitionKey(Partition), cancellationToken: http.RequestAborted).ConfigureAwait(false);
         http.Items[typeof(Session)] = session;

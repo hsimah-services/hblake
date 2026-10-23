@@ -1,13 +1,29 @@
 #!/usr/bin/env bash
+# Starts the whole site on one origin at BASE_URL against a new, empty database: a Cosmos DB emulator and the C# server, which
+# serves the built client, POST /graphql, /auth/* and /media. Runs the installer and the operator bootstrap, then returns once the
+# site answers requests.
 source "$(dirname "$0")/common"
-if "$ENGINE" container inspect "$STACK" >/dev/null 2>&1; then "$ENGINE" rm -f "$STACK" >/dev/null; fi
-python3 - "$DATA" <<'PY'
-import sys
-from pathlib import Path
-root=Path(sys.argv[1]); root.mkdir(mode=0o700, parents=True, exist_ok=True); root.parent.chmod(0o700); root.chmod(0o700)
-for name in ['site.sqlite','site.sqlite-wal','site.sqlite-shm']:
-    (root/name).unlink(missing_ok=True)
-PY
-scripts/php php server/console.php install
-scripts/php php server/console.php bootstrap
-start_stack
+
+[ -f client/dist/index.html ] || scripts/node build
+"$ENGINE" network exists "$NETWORK" || "$ENGINE" network create "$NETWORK" >/dev/null
+"$ENGINE" rm -f "$SERVER" >/dev/null 2>&1 || true
+
+# The emulator is slow to start and crashes now and then, so a stack that is not answering is replaced.
+if ! "$ENGINE" container inspect "$COSMOS" --format '{{.State.Running}}' 2>/dev/null | grep -q true; then
+  "$ENGINE" rm -f "$COSMOS" >/dev/null 2>&1 || true
+  "$ENGINE" run -d --name "$COSMOS" --network "$NETWORK" --memory 8g \
+    -e AZURE_COSMOS_EMULATOR_PARTITION_COUNT=3 -e AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE=false "$EMULATOR_IMAGE" >/dev/null
+fi
+wait_for "\"$ENGINE\" logs \"$COSMOS\" 2>&1 | tr -d \\r | grep -x Started" 120 2 || { "$ENGINE" logs "$COSMOS" >&2; echo "the Cosmos DB emulator did not start" >&2; exit 1; }
+
+scripts/dotnet dotnet publish src/Hsimah.Server -c Release -o "$PUBLISH" --nologo -v quiet >/dev/null
+rm -rf "$MEDIA"; mkdir -p "$MEDIA"; chmod 700 "$DATA" "$MEDIA"
+console_command reset
+console_command install
+console_command bootstrap
+
+# shellcheck disable=SC2046
+"$ENGINE" run -d --name "$SERVER" --network "$NETWORK" -p "$(port):8080" $(stack_env) -e ASPNETCORE_URLS=http://0.0.0.0:8080 \
+  -v "$PWD/$PUBLISH:/srv:ro,z" -v "$PWD/$MEDIA:/data/media:z" -v "$PWD:/repo:ro,z" -w /repo "$RUNTIME_IMAGE" dotnet /srv/Hsimah.Server.dll >/dev/null
+wait_for 'python3 -c "import os,urllib.request; urllib.request.urlopen(os.environ[\"BASE_URL\"]+\"/auth/csrf\", timeout=1)"' 60 0.5 \
+  || { "$ENGINE" logs "$SERVER" >&2; exit 1; }

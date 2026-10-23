@@ -1,10 +1,10 @@
 # Consulting website
 
-The site for hbla.ke: a standalone PHP/SQLite content backend built from the [Elephentity specifications](spec/README.md), with a React client using tsquid routes, Relay, Astryx and StyleX. The public site uses owner-provided copy, four coloured navigation blocks and a latest-news feature. Pages and the items they hold (articles, products, framework entries) start as drafts; a single operator account manages them through `/admin`.
+The site for hbla.ke: a standalone ASP.NET Core (C#) content backend on Elephentity.NET and Azure Cosmos DB, built from the [Elephentity specifications](spec/README.md), with a React client using tsquid routes, Relay, Astryx and StyleX. The public site uses owner-provided copy, four coloured navigation blocks and a latest-news feature. Pages and the items they hold (articles, products, framework entries) start as drafts; a single operator account manages them through `/admin`.
 
 ## Verify and run locally
 
-The host needs bash, Python 3 and Podman or Docker. PHP, Rust, Composer, Node and Playwright run in containers. The PHP image is built from `.docker/php.Dockerfile` on first use. Dependencies and Rust builds are cached outside the web root.
+The host needs bash, Python 3 and Podman or Docker. The .NET SDK, the Elephentity compiler's builders, Node, Playwright and the Cosmos DB emulator run in containers (`scripts/dotnet`, `scripts/eleph`, `scripts/node`, `scripts/tests-dotnet`). NuGet and the `eleph` release are cached outside the repository.
 
 ```sh
 scripts/acceptance/gates
@@ -16,9 +16,9 @@ scripts/acceptance/up
 scripts/acceptance/down
 ```
 
-`up` creates a **fresh database**, and `down` discards it: these are development/acceptance commands, not production start/stop procedures. The acceptance stack's database is `.var/acceptance/site.sqlite`; the harness and `tests/run.sh` never touch the default local database, `.var/site.sqlite`, which the console commands and any server started without `HSIMAH_DATABASE` use. Set `BASE_URL` to choose the local origin/port. Use a password of at least 12 characters. Never put operator credentials in the repository or command history.
+`up` starts a Cosmos DB emulator (`mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator`, about 3 GB, a minute to start) and the published server on one Podman network, creates a **fresh database** and runs the installer and the bootstrap. `down` discards the database, the uploaded images and the emulator: these are development/acceptance commands, not production start/stop procedures. The acceptance stack uses the database `hsimah-acceptance` and `.var/acceptance/media`; nothing else is touched. Set `BASE_URL` to choose the local origin/port. Use a password of at least 12 characters. Never put operator credentials in the repository or command history.
 
-Run the owner-provided verification unchanged:
+Run the verification:
 
 ```sh
 tests/run.sh
@@ -26,47 +26,52 @@ tests/run.sh
 tests/run.sh gates
 tests/run.sh playwright
 tests/run.sh ops
+TEST_ARGS="-class Hsimah.Acceptance.Http.AuthTests" tests/run.sh playwright
 ```
 
-`tests/run.sh` passes. The gates validate live builder metadata, generated artifact drift and accessor conformance, PHPStan at maximum level, application unit tests, tsquid routes, Relay artifacts, ESLint/architecture, TypeScript and the production build. `tests/` remains owner-maintained; implementation tests live in `server/tests`.
+`tests/run.sh` is the definition of done. The gates validate the model with the live builders, generated artifact drift and contract conformance, the C# build and formatting, the server unit tests (`src/Hsimah.Server.Tests`, on the in-memory driver), tsquid routes, Relay artifacts, ESLint/architecture, TypeScript and the production build. The tests in `tests/` are xUnit v3 with Playwright for .NET: `tests/Hsimah.Acceptance` for the repository, HTTP, GraphQL and browser contracts, and `tests/Hsimah.Acceptance.Ops` for the operator procedures.
 
-GitHub Actions runs the same `tests/run.sh` on pushes and pull requests, and uploads Playwright results when a run fails.
+GitHub Actions runs the same `tests/run.sh` on pushes and pull requests, and uploads the failure screenshots when a run fails.
 
 ## Generation and implementation boundaries
 
-`spec/` is the model source; `eleph.json` configures the actual PHP, SQLite, GraphQL and tsquid builders. `generated/`, `client/persisted_queries.json`, `client/src/routes/__generated__/` and Relay `__generated__/` directories are machine-owned. Regenerate in dependency order: `scripts/node relay` (persisted queries), `scripts/node routes` (routes and `routes.manifest.json`), then `scripts/php vendor/bin/eleph generate` (which compiles the route manifest into `generated/tsquid/`). Never edit the generated output. `client/schema.graphql` uses server order as canonical: export it with `HSIMAH_DATABASE=:memory: scripts/php php server/console.php schema > client/schema.graphql`. `scripts/node schema` provides live introspection in sorted SDL order; checks normalize both representations. Re-export with the operator command before committing the schema. Set `GRAPHQL_SCHEMA_ENDPOINT` to introspect another development endpoint. `scripts/node schema:check` compares the exported server schema; `scripts/node relay:check` checks persisted operation IDs.
+`spec/` is the model source; `eleph.json` configures the C#, Cosmos DB, GraphQL and tsquid builders. `scripts/eleph` downloads the pinned `eleph` release; `scripts/eleph install` fetches the pinned builders into `tools/builders/`. `src/Hsimah.Server/Generated/`, `client/persisted_queries.json`, `client/src/routes/__generated__/` and Relay `__generated__/` directories are machine-owned. Regenerate in dependency order: `scripts/node relay` (persisted queries), `scripts/node routes` (routes and `routes.manifest.json`), then `scripts/eleph generate`. Never edit the generated output; where the generators fall short, the application adapts around them (see `src/Hsimah.Server/Storage.cs`, `ApplicationGateway.cs`, `HsimahExecutor.cs` and `HsimahSchema.cs`) and [spec/upstream.md](spec/upstream.md) records the gap. `client/schema.graphql` matches the server's schema: `Http/SchemaTests` compares their types, fields, arguments and enum values, and `dotnet src/Hsimah.Server/bin/.../Hsimah.Server.dll console schema` prints the running schema.
 
 tsquid 0.3.0 generates routes, route-query variable helpers and entrypoint parameter unions. Its schema/persisted-query CLIs and network/mutation helpers replace the former local utilities. The ESLint plugin is 0.2.0; the Vite plugin remains at its latest release, 0.1.1. Astryx links use tsquid preloading through the application link provider. Content screens remain application-owned. The application shares its form, preview and detail behavior explicitly; it does not label these screens generated. [tsquid #7](https://github.com/hsimah-services/tsquid/issues/7) tracks the metadata-driven admin generator.
 
-The toolchain uses released Elephentity runtime/CLI 0.13.1, coordinator 0.6.1, PHP builder 0.7.0, SQLite runtime 0.1.0-alpha.5, GraphQL runtime 0.2.0-alpha.1 and integration builders 0.1.0-alpha.3. Composer locks tagged releases, with no branch pins, aliases or custom repositories. These releases include the upstream enum decoder and generated PHPStan fixes, scalar query support, create defaults, final-state nullable validation and read-only action context. Publication actions now read original state directly; the former schema adapters are removed. The schema gate exports the server schema and compares normalized SDL against `client/schema.graphql` before Relay validation. See [upstream findings](spec/upstream.md) for release evidence and remaining framework gaps.
+The toolchain uses `eleph` 0.16.1 with coordinator `eleph-codegen` 0.7.0, the C# and GraphQL builders `eleph-gen-csharp` and `eleph-gen-graphql-csharp` 0.1.0-alpha.1, the Cosmos builder `eleph-gen-cosmos` 0.1.0-alpha.1 and the tsquid builder 0.2.0, with the NuGet packages `Elephentity.Runtime`, `.Cosmos`, `.GraphQL`, `.Tsquid` and `.Runtime.Memory` at 0.1.0-alpha.2. All are pinned releases, with no project references or custom NuGet sources. See [upstream findings](spec/upstream.md) for the framework gaps this port found.
 
 ## Operator data procedures
 
-SQLite, credentials, sessions and dependency caches live outside `server/public` and the built static client. A deployment must serve only those public roots, route `/graphql`, `/auth/*` and every HTML (non-asset) request to PHP so route data can be inlined, use HTTPS, and give the private data directory mode 0700. Item images live in `media/` beside the database (override with `HSIMAH_MEDIA`) and are served by PHP from `/media/`, so route `/media/*` to PHP too. PHP needs the GD extension with JPEG and WebP support, `upload_max_filesize` of at least 6M and `post_max_size` of at least 8M; `.docker/php.Dockerfile` (image `localhost/hsimah-php:2`) sets these up. Backups include credential hashes and sessions; protect them as private data. Session cookies use Secure for HTTPS and all public hosts; plain HTTP loopback requests are the only exception. Login throttling uses REMOTE_ADDR: configure trusted-proxy address handling before deploying behind a reverse proxy so clients do not share one failure bucket. No production deployment is configured here.
+Content and the account live in an Azure Cosmos DB account (one database, two containers: `hsimah` for the Elephentity documents and `hsimah-auth` for credentials, sessions and login failures). Configuration is by environment:
 
-Initial installation is explicit and refuses existing tables:
+| Variable | Default | |
+| --- | --- | --- |
+| `HSIMAH_COSMOS_ENDPOINT` | `https://localhost:8081` | the account endpoint |
+| `HSIMAH_COSMOS_KEY` | the emulator's key | the account key; never commit a real one |
+| `HSIMAH_COSMOS_DATABASE` | `hsimah` | |
+| `HSIMAH_COSMOS_CONTAINER`, `HSIMAH_COSMOS_AUTH_CONTAINER` | `hsimah`, `hsimah-auth` | |
+| `HSIMAH_COSMOS_ALLOW_ANY_CERTIFICATE` | `false` | `true` only for the emulator's self-signed certificate |
+| `HSIMAH_MEDIA` | `.var/media` | where item images are stored; keep it private and back it up |
+| `HSIMAH_CLIENT`, `HSIMAH_ROUTES`, `HSIMAH_CONTENT` | the repository's built client, route manifest and launch content | |
 
-```sh
-scripts/php php server/console.php install
-scripts/php php server/console.php bootstrap
-```
+The server serves the built client, `/graphql`, `/auth/*`, `/media/*` and every HTML request (so route data can be inlined) itself; nothing else on disk is reachable. Use HTTPS, give the media directory mode 0700, and run the server behind a TLS proxy only after configuring trusted-proxy address handling: login throttling uses the connection's remote address, so clients behind one proxy would share a failure bucket. Session cookies use Secure for HTTPS and all public hosts; plain HTTP loopback requests are the only exception. Backups include credential hashes; protect them as private data. No production deployment is configured here.
 
-Bootstrap reads `ADMIN_USERNAME`, `ADMIN_DISPLAY_NAME` (the author name shown on pages and items) and `ADMIN_PASSWORD` (at least 12 characters), and refuses to create a second account. The account has no email; change its password from Settings in the admin. The application exposes only the operator's allowlisted profile fields, never generic user lifecycle operations or credentials. Account activation/session expiry hooks are for acceptance testing and future operator workflows.
-
-For a running acceptance stack:
-
-```sh
-scripts/acceptance/backup /private/path/site-backup.tar
-scripts/acceptance/restore /private/path/site-backup.tar
-```
-
-A backup is a tar of a `VACUUM INTO` database snapshot (`site.sqlite`) and the item images (`media/`). Restore validates the archive and the database's integrity before stopping the server, then replaces the database and images and restarts before returning. Run the equivalent procedure under maintenance mode in production. Do not rerun the initial installer as an upgrade. Schema changes ship as reviewed migrations in `server/src/Migrations.php` (tested in `server/tests/MigrationsTest.php`); after deploying a release, take a backup and then apply them:
+Publish the server with `dotnet publish src/Hsimah.Server -c Release` and run it with the .NET 10 ASP.NET Core runtime. The operator commands are the same binary:
 
 ```sh
-scripts/php php server/console.php upgrade
+dotnet Hsimah.Server.dll console install
+dotnet Hsimah.Server.dll console bootstrap
 ```
 
-Each migration runs once in a transaction and is recorded in `schema_migration`; a fresh install records them all as applied. If an upgrade misbehaves, restore the backup taken before it.
+`install` creates the database and containers and refuses a populated content container. Bootstrap reads `ADMIN_USERNAME`, `ADMIN_DISPLAY_NAME` (the author name shown on pages and items) and `ADMIN_PASSWORD` (at least 12 characters), and refuses to create a second account. The account has no email; change its password from Settings in the admin. The application exposes only the operator's allowlisted profile fields, never generic user lifecycle operations or credentials. `console expire-sessions` and `console set-active true|false` are for acceptance testing and future operator workflows.
+
+```sh
+dotnet Hsimah.Server.dll console backup /private/path/site-backup.tar
+dotnet Hsimah.Server.dll console restore /private/path/site-backup.tar
+```
+
+A backup is a tar of the content documents and the account credentials (JSON Lines) and the item images (`media/`). Restore validates the archive, then recreates both containers, imports it and replaces the images. Cosmos DB also takes periodic backups of the account itself; use those for recovery and this procedure for moving data. Unique keys and composite indexes cannot be changed on an existing container, so a model change that alters them ships as: back up, install into a new container, restore.
 
 V1 is client-rendered; each route's HTML carries its query response as tsquid initial data (`#tsquid-data`), executed as the requesting viewer. Initial-HTML SEO, concurrent edit protection, additional accounts and commerce are deferred, as recorded in the specification. The site name is hblake; launch copy and public contact links are supplied by the owner. Deployment remains a separate operator action.
 
@@ -77,10 +82,10 @@ and Contact us copy. After installation, replace all Page and PageItem content
 with these six published pages (the four launch pages plus the News and Products pages, which hold items):
 
 ```sh
-scripts/php php server/console.php replace-content
+dotnet Hsimah.Server.dll console replace-content
 ```
 
-This command is destructive to existing content and runs atomically. Accounts,
+This command is destructive to existing content and is not atomic (Cosmos DB batches are limited to 100 operations), so take a backup first. Accounts,
 credentials and sessions are preserved. It is explicit and never runs during
 acceptance startup, which requires an empty content database. Subsequent edits can
 be made through the admin screens. The homepage displays the latest published

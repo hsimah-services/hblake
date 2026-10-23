@@ -29,7 +29,11 @@ public sealed partial class Router(
 
     private static readonly Dictionary<string, string> ContentTypes = new()
     {
-        [".js"] = "application/javascript", [".css"] = "text/css", [".svg"] = "image/svg+xml", [".png"] = "image/png", [".ico"] = "image/x-icon",
+        [".js"] = "application/javascript",
+        [".css"] = "text/css",
+        [".svg"] = "image/svg+xml",
+        [".png"] = "image/png",
+        [".ico"] = "image/x-icon",
     };
 
     private readonly Lazy<InitialData> initial = new(() => new InitialData(
