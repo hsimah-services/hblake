@@ -198,39 +198,39 @@ acceptance check below before the workaround is removed.
 The server moved from PHP/SQLite to ASP.NET Core on `Elephentity.*` 0.1.0-alpha.2 (builders `eleph-gen-csharp`,
 `eleph-gen-cosmos`, `eleph-gen-graphql-csharp` 0.1.0-alpha.1, `eleph-gen-tsquid` 0.2.0, coordinator `eleph-codegen` 0.7.0). No
 generated file was edited: every gap below is worked around in application code and listed with what the generator should do instead.
-Not yet filed upstream; each needs an issue with the evidence, impact, solution, compatibility and acceptance check given here
-before its workaround is removed. Check for existing reports first.
+Filed upstream on 2026-10-22, with the evidence, impact, solution, compatibility and acceptance check given here (no existing
+reports were found); remove each workaround when its issue ships.
 
-1. **No SQLite storage for .NET.** The runtime ships a memory driver and a Cosmos adaptor. `driver: sqlite` with the C# builder fails
+1. **No SQLite storage for .NET.** ([elephentity#190](https://github.com/hsimah-services/elephentity/issues/190)) The runtime ships a memory driver and a Cosmos adaptor. `driver: sqlite` with the C# builder fails
    with "No installed builder generates for storage driver sqlite". *Impact:* a project on SQLite (the Raspberry Pi v1) cannot port.
    *Decision here:* the storage driver became `cosmos` (owner decision). *Solution:* `Elephentity.Sqlite` plus an
    `eleph-gen-sqlite` manifest for C#. *Compatibility:* additive. *Acceptance:* the adaptor passes `AdaptorConformance`.
-2. **Query orderings are not part of the spec.** `eleph-gen-cosmos` declares composite indexes only for single `indexed`/`unique`
+2. **Query orderings are not part of the spec.** ([elephentity#191](https://github.com/hsimah-services/elephentity/issues/191)) `eleph-gen-cosmos` declares composite indexes only for single `indexed`/`unique`
    fields, but handler queries sort by several (`updatedAt desc, id desc`; `navigationOrder, title, id`; `publishedAt desc, id desc`).
    Cosmos rejects an `ORDER BY` without a composite index and the query fails at run time (500). *Workaround:*
    `src/Hsimah.Server/Storage.cs` adds the `CosmosOrdering` entries to the generated manifest. *Solution:* let a query declare its
    order (for example `orderBy:` on the query) and feed it to the storage builders. *Acceptance:* a spec query with a two-field order
    runs on the emulator without hand-written indexes.
-3. **`maxLength` is not enforced.** The C# builder ignores `maxLength` on string fields without `verify: true` (`Page.excerpt` 300,
+3. **`maxLength` is not enforced.** ([elephentity#192](https://github.com/hsimah-services/elephentity/issues/192)) The C# builder ignores `maxLength` on string fields without `verify: true` (`Page.excerpt` 300,
    `PageItem.imageUrl` 100, `PageItem.imageAlt` 300); the PHP builder rejected an over-long value. *Impact:* oversized values are
    stored. *Workaround:* `ApplicationGateway.CheckLengths`. *Solution:* generate a field violation in the mutator. *Acceptance:* an
    over-long excerpt is rejected as in `Http/ValidationTests`.
-4. **The per-query edge cache is not thread-safe.** `CachingEdgeLoader` keeps a plain `Dictionary`, but GraphQL.NET resolves the
+4. **The per-query edge cache is not thread-safe.** ([elephentity#193](https://github.com/hsimah-services/elephentity/issues/193)) `CachingEdgeLoader` keeps a plain `Dictionary`, but GraphQL.NET resolves the
    fields of a list's items in parallel, so `Page.author` and `PageItem.page` across a list sporadically fail with "Operations that
    change non-concurrent collections must have exclusive access" (INTERNAL errors). *Workaround:* `HsimahExecutor` runs every
    operation with `SerialExecutionStrategy`. *Solution:* a concurrent cache, or select the serial strategy in
    `Elephentity.GraphQL`'s executor. *Acceptance:* listing 50 items with `author` and `page` never errors.
-5. **No extension point for application-owned GraphQL.** `ElephentitySchema.Build` returns a finished schema; adding `viewer`,
+5. **No extension point for application-owned GraphQL.** ([elephentity#194](https://github.com/hsimah-services/elephentity/issues/194)) `ElephentitySchema.Build` returns a finished schema; adding `viewer`,
    `adminUser`, `updateAdminUser`, `Page.itemCount`, the public `author` projection, removing `databaseId` and preparing mutation
    input (author from the session, page checks) meant rebuilding the manifest, mutating the built schema and wrapping
    `IEntityGateway` (`HsimahSchema`, `ApplicationGateway`). *Solution:* documented hooks for extra fields, field removal and input
    preparation. *Acceptance:* `Http/SchemaTests` passes without schema mutation after build.
-6. **The tsquid integration is mandatory but only emits PHP.** `eleph-gen-tsquid` 0.2.0 writes `tsquid-manifest.php`; a C# server
+6. **The tsquid integration is mandatory but only emits PHP.** ([elephentity#195](https://github.com/hsimah-services/elephentity/issues/195)) `eleph-gen-tsquid` 0.2.0 writes `tsquid-manifest.php`; a C# server
    reads `routes.manifest.json` through `ManifestJson.Parse`, so the generated file is unused. The target is still required because
    the spec declares `integrations: tsquid`. *Solution:* a C# manifest output, or make the integration optional for C# projects.
-7. **Builder options are undocumented.** The GraphQL builder needs `namespace` and `entityNamespace` in its target, and the tsquid
+7. **Builder options are undocumented.** ([elephentity#196](https://github.com/hsimah-services/elephentity/issues/196)) The GraphQL builder needs `namespace` and `entityNamespace` in its target, and the tsquid
    `manifest` path is relative to the target's output; neither is in the builder README quickstart.
-8. **`CommitRejected` messages say "The change was rejected by N violation(s)."** The violations are in `extensions.violations`; the
+8. **`CommitRejected` messages say "The change was rejected by N violation(s)."** ([elephentity#197](https://github.com/hsimah-services/elephentity/issues/197)) The violations are in `extensions.violations`; the
    PHP stack put the first violation's text in `message`, which the UI shows. *Impact:* none for the current client, which reads
    `extensions`; noted for clients that show `message`.
 9. **Operational: the Linux Cosmos DB emulator crashes** now and then under sustained load ("sqlpal.dll ... Last Chance"). The
