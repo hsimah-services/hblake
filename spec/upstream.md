@@ -234,3 +234,7 @@ reports were found); remove each workaround when its issue ships.
    `extensions`; noted for clients that show `message`.
 9. **Operational: the Linux Cosmos DB emulator crashes** now and then under sustained load ("sqlpal.dll ... Last Chance"). The
    acceptance harness restarts a stopped emulator on `up`; rerun a failed stage after a crash.
+10. **List reads cost storage round trips per row.** ([elephentity#200](https://github.com/hsimah-services/elephentity/issues/200), related to
+    [#153](https://github.com/hsimah-services/elephentity/issues/153)) Edge loads and read policies that need a related row are not batched, so
+    a visitor's list of 20 items took 14 s (28 s with `totalCount`, 31 s with `author` and `page`) on the Cosmos emulator. *Workaround:*
+    `ContentVisibility` decides which items are hidden once per request (0.27 s, 0.55 s, 6 s); the per-row `author`/`page` loads remain.
