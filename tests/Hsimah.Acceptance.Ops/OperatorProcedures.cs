@@ -7,16 +7,16 @@ using Xunit.Sdk;
 using Xunit.v3;
 
 [assembly: System.Runtime.Versioning.UnsupportedOSPlatform("windows")]
-[assembly: TestCaseOrderer(typeof(Hsimah.Acceptance.Ops.ByName))]
+[assembly: TestMethodOrderer(typeof(Hsimah.Acceptance.Ops.ByName))]
 
 namespace Hsimah.Acceptance.Ops;
 
 /// <summary>Runs the tests in name order: the rate limit is last because it may block further logins.</summary>
-public sealed class ByName : ITestCaseOrderer
+public sealed class ByName : ITestMethodOrderer
 {
-    public IReadOnlyCollection<TTestCase> OrderTestCases<TTestCase>(IReadOnlyCollection<TTestCase> testCases)
-        where TTestCase : notnull, ITestCase =>
-        testCases.OrderBy(test => test.TestCaseDisplayName, StringComparer.Ordinal).ToList();
+    public IReadOnlyCollection<TTestMethod?> OrderTestMethods<TTestMethod>(IReadOnlyCollection<TTestMethod?> testMethods)
+        where TTestMethod : ITestMethod =>
+        testMethods.OrderBy(method => method?.MethodName, StringComparer.Ordinal).ToList();
 }
 
 /// <summary>One cookie jar: GET /auth/csrf, POST /auth/login|logout and POST /graphql.</summary>

@@ -5,7 +5,7 @@
 source "$(dirname "$0")/common"
 
 [ -f client/dist/index.html ] || scripts/node build
-"$ENGINE" network exists "$NETWORK" || "$ENGINE" network create "$NETWORK" >/dev/null
+"$ENGINE" network inspect "$NETWORK" >/dev/null 2>&1 || "$ENGINE" network create "$NETWORK" >/dev/null
 "$ENGINE" rm -f "$SERVER" >/dev/null 2>&1 || true
 
 # The emulator is slow to start and crashes now and then, so a stack that is not answering is replaced.
