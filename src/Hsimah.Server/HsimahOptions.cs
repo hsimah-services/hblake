@@ -23,8 +23,6 @@ public sealed record HsimahOptions
 
     public string ClientDirectory { get; init; } = Path.Combine(Directory.GetCurrentDirectory(), "client", "dist");
 
-    public string RouteManifest { get; init; } = Path.Combine(Directory.GetCurrentDirectory(), "client", "src", "routes", "__generated__", "routes.manifest.json");
-
     /// <summary>The bcrypt work factor for new passwords. Each step doubles the cost; the acceptance stack lowers it to keep logins quick.</summary>
     public int PasswordCost { get; init; } = 12;
 
@@ -44,7 +42,6 @@ public sealed record HsimahOptions
             AllowAnyCertificate = Get("HSIMAH_COSMOS_ALLOW_ANY_CERTIFICATE", "false") == "true",
             MediaDirectory = Get("HSIMAH_MEDIA", defaults.MediaDirectory),
             ClientDirectory = Get("HSIMAH_CLIENT", defaults.ClientDirectory),
-            RouteManifest = Get("HSIMAH_ROUTES", defaults.RouteManifest),
             PasswordCost = int.TryParse(Environment.GetEnvironmentVariable("HSIMAH_PASSWORD_COST"), out var cost) && cost is >= 4 and <= 31 ? cost : defaults.PasswordCost,
             ContentFile = Get("HSIMAH_CONTENT", defaults.ContentFile),
         };

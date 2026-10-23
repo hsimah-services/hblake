@@ -225,9 +225,8 @@ reports were found); remove each workaround when its issue ships.
    input (author from the session, page checks) meant rebuilding the manifest, mutating the built schema and wrapping
    `IEntityGateway` (`HsimahSchema`, `ApplicationGateway`). *Solution:* documented hooks for extra fields, field removal and input
    preparation. *Acceptance:* `Http/SchemaTests` passes without schema mutation after build.
-6. **The tsquid integration is mandatory but only emits PHP.** ([elephentity#195](https://github.com/hsimah-services/elephentity/issues/195)) `eleph-gen-tsquid` 0.2.0 writes `tsquid-manifest.php`; a C# server
-   reads `routes.manifest.json` through `ManifestJson.Parse`, so the generated file is unused. The target is still required because
-   the spec declares `integrations: tsquid`. *Solution:* a C# manifest output, or make the integration optional for C# projects.
+6. **tsquid emits C# when `language` is `csharp`.** Withdrawn: this entry first said the builder only wrote PHP, which was wrong. The target's
+   `language` option (documented in the builder README, accepted by 0.2.0) selects C#. [elephentity#195](https://github.com/hsimah-services/elephentity/issues/195) is closed.
 7. **Builder options are undocumented.** ([elephentity#196](https://github.com/hsimah-services/elephentity/issues/196)) The GraphQL builder needs `namespace` and `entityNamespace` in its target, and the tsquid
    `manifest` path is relative to the target's output; neither is in the builder README quickstart.
 8. **`CommitRejected` messages say "The change was rejected by N violation(s)."** ([elephentity#197](https://github.com/hsimah-services/elephentity/issues/197)) The violations are in `extensions.violations`; the

@@ -36,7 +36,7 @@ The implementation uses these `eleph.json` targets:
 }
 ```
 
-The `tsquid` target and the `check` command are in `eleph.json` too.
+The `tsquid` target (`language: csharp`) and the `check` command are in `eleph.json` too.
 
 Application-owned code supplies dependency wiring, Viewer construction, HTTP
 transport, authentication, policies, verifiers, publication actions, bySlug query
@@ -110,7 +110,7 @@ V1 remains a client Vite/Relay app for public content and administration, with
 initial-data hydration. Relay persists operations to `client/persisted_queries.json`;
 `tsquid-codegen` resolves each route's query into `routes.manifest.json`; the
 `tsquid` Elephentity target (elephentity/codegen-tsquid) compiles that manifest into
-`generated/tsquid/tsquid-manifest.php` (the C# server reads `routes.manifest.json` directly). For HTML requests the router matches the
+`Generated/Tsquid/TsquidManifest.cs` (the tsquid target sets `language: csharp`). For HTML requests the router matches the
 URL, executes the route query through the same GraphQL endpoint, viewer, policies and
 error formatting as `POST /graphql`, and inlines the response as `#tsquid-data` with
 `Cache-Control: private, no-store`. The client's Relay network answers the matching

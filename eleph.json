@@ -32,7 +32,9 @@
     "tsquid": {
       "builder": "eleph-gen-tsquid@0.2.0",
       "output": "src/Hsimah.Server/Generated/Tsquid",
-      "manifest": "../../../../client/src/routes/__generated__/routes.manifest.json"
+      "manifest": "../../../../client/src/routes/__generated__/routes.manifest.json",
+      "language": "csharp",
+      "namespace": "Hsimah.Tsquid"
     }
   }
 }

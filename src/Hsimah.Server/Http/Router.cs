@@ -4,7 +4,6 @@ using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using Hsimah;
 using Elephentity.Tsquid;
-using Elephentity.Tsquid.Manifest;
 using GraphQL;
 using GraphQL.Transport;
 using GraphQLParser;
@@ -36,8 +35,7 @@ public sealed partial class Router(
         [".ico"] = "image/x-icon",
     };
 
-    private readonly Lazy<InitialData> initial = new(() => new InitialData(
-        ManifestJson.Parse(File.ReadAllText(options.RouteManifest)), null));
+    private readonly Lazy<InitialData> initial = new(() => new InitialData(Hsimah.Tsquid.TsquidManifestFactory.Create(), null));
 
     public async Task InvokeAsync(HttpContext http)
     {
