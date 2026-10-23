@@ -52,6 +52,7 @@ Content and the account live in an Azure Cosmos DB account (one database, two co
 | `HSIMAH_COSMOS_DATABASE` | `hsimah` | |
 | `HSIMAH_COSMOS_CONTAINER`, `HSIMAH_COSMOS_AUTH_CONTAINER` | `hsimah`, `hsimah-auth` | |
 | `HSIMAH_COSMOS_ALLOW_ANY_CERTIFICATE` | `false` | `true` only for the emulator's self-signed certificate |
+| `HSIMAH_PASSWORD_COST` | `12` | bcrypt cost for new passwords (4 to 31; each step doubles the work). The acceptance stack uses 10 |
 | `HSIMAH_MEDIA` | `.var/media` | where item images are stored; keep it private and back it up |
 | `HSIMAH_CLIENT`, `HSIMAH_ROUTES`, `HSIMAH_CONTENT` | the repository's built client, route manifest and launch content | |
 

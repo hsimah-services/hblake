@@ -20,7 +20,7 @@ port() { python3 -c 'import os,urllib.parse; print(urllib.parse.urlparse(os.envi
 stack_env() {
   printf '%s\n' \
     -e "HSIMAH_COSMOS_ENDPOINT=https://$COSMOS:8081" -e HSIMAH_COSMOS_ALLOW_ANY_CERTIFICATE=true -e HSIMAH_COSMOS_DATABASE=hsimah-acceptance \
-    -e HSIMAH_MEDIA=/data/media -e HSIMAH_CLIENT=/repo/client/dist -e HSIMAH_CONTENT=/repo/content/pages.json \
+    -e HSIMAH_PASSWORD_COST=10 -e HSIMAH_MEDIA=/data/media -e HSIMAH_CLIENT=/repo/client/dist -e HSIMAH_CONTENT=/repo/content/pages.json \
     -e HSIMAH_ROUTES=/repo/client/src/routes/__generated__/routes.manifest.json \
     -e ADMIN_USERNAME -e ADMIN_PASSWORD -e ADMIN_DISPLAY_NAME -e BASE_URL
 }
