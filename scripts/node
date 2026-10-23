@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 cd "$(dirname "$0")/.."
-engine=$(command -v podman || command -v docker)
+engine=${CONTAINER_ENGINE:-$(command -v podman || command -v docker)}
+user=()
+[ "$(basename "$engine")" = docker ] && user=(--user "$(id -u):$(id -g)")
 mkdir -p .cache/corepack
-exec "$engine" run --rm --network host -v "$PWD:/app:z" -w /app/client -e BASE_URL -e GRAPHQL_SCHEMA_ENDPOINT -e COREPACK_HOME=/app/.cache/corepack docker.io/library/node:22-bookworm-slim sh -c 'corepack pnpm "$@"' sh "$@"
+exec "$engine" run --rm "${user[@]}" --network host -e HOME=/tmp -v "$PWD:/app:z" -w /app/client -e BASE_URL -e GRAPHQL_SCHEMA_ENDPOINT -e COREPACK_HOME=/app/.cache/corepack docker.io/library/node:22-bookworm-slim sh -c 'corepack pnpm "$@"' sh "$@"

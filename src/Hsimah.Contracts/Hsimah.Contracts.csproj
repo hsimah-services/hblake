@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Elephentity.Runtime.Testing" Version="0.1.0-alpha.2" />
+    <PackageReference Include="Elephentity.Runtime.Memory" Version="0.1.0-alpha.2" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="../Hsimah.Server/Hsimah.Server.csproj" />
+  </ItemGroup>
+</Project>

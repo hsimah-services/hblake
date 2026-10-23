@@ -1,10 +1,10 @@
 # Acceptance checks for implementation
 
 The implementation is verified by the owner-maintained tests/run.sh plus the
-application tests in server/tests. The original acceptance tests are unchanged.
+application tests in src/Hsimah.Server.Tests. The acceptance tests were ported from TypeScript and Python to C# with the server.
 `tests/run.sh` passes.
 
-1. Eleph fmt/validate accept every entity, type and pattern with the actual SQLite
+1. Eleph fmt/validate accept every entity, type and pattern with the actual Cosmos
    and GraphQL integrations installed. generate --check reports no artifact drift;
    eleph check verifies real accessors. tsquid route and UI checks are deterministic.
 2. Creating a Page or PageItem reuses shared fields and starts as draft. Runtime
@@ -37,12 +37,11 @@ application tests in server/tests. The original acceptance tests are unchanged.
     visitors. SSR and initial-HTML SEO are deferred. Admin/draft responses and HTML
     carrying data avoid shared caching; unpublish invalidates public content responses.
     Text is legible in light and dark colour schemes, and document titles name each screen.
-11. Install works on an empty SQLite database only. Reviewed upgrade preserves
-    content; backup restore succeeds. Secrets/database are unreachable over HTTP.
+11. Install works on an empty Cosmos database only. Backup restore succeeds. Secrets/database are unreachable over HTTP.
 
 ## Implementation verification
 
 Live `eleph validate spec` discovers the configured builders. Canonical formatting,
-generated drift/accessor checks, maximum-level PHPStan, application unit tests,
+generated drift/accessor checks, the C# build and formatting, application unit tests,
 tsquid routes, server/client schema agreement, Relay artifacts, lint, TypeScript,
 production build and HTTP/UI/operator acceptance checks run through `tests/run.sh`.

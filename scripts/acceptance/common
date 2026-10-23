@@ -1,22 +1,57 @@
 #!/usr/bin/env bash
+# Shared by the acceptance harness: the stack is a Cosmos DB emulator and the published C# server on one podman/docker network.
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/../.."
-ENGINE=$(command -v podman || command -v docker)
-IMAGE=${HSIMAH_PHP_IMAGE:-localhost/hsimah-php:2}
-STACK=hsimah-acceptance
+ENGINE=${CONTAINER_ENGINE:-$(command -v podman || command -v docker)}
+NETWORK=hblake-acceptance
+COSMOS=hblake-acceptance-cosmos
+SERVER=hblake-acceptance-server
+RUNTIME_IMAGE=${HSIMAH_RUNTIME_IMAGE:-mcr.microsoft.com/dotnet/aspnet:10.0}
+EMULATOR_IMAGE=${HSIMAH_EMULATOR_IMAGE:-mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:latest}
 export BASE_URL=${BASE_URL:-http://localhost:8080}
-# The acceptance stack owns a separate database, so up/down never touch the local
-# development database at the default .var/site.sqlite.
+PUBLISH=.cache/publish/server
+# The stack keeps its images and uploads apart from the development data in .var.
 DATA=.var/acceptance
-export HSIMAH_DATABASE=/app/$DATA/site.sqlite
-start_stack() {
-  local port
-  port=$(python3 -c 'import os,urllib.parse; print(urllib.parse.urlparse(os.environ["BASE_URL"]).port or 8080)')
-  "$ENGINE" run -d --stop-timeout 1 --name "$STACK" --network host -v "$PWD:/app:z" -w /app -e ADMIN_USERNAME -e ADMIN_PASSWORD -e ADMIN_DISPLAY_NAME -e BASE_URL -e HSIMAH_DATABASE "$IMAGE" php -S "0.0.0.0:$port" -t server/public server/public/router.php >/dev/null
-  for attempt in {1..60}; do
-    if python3 -c 'import os,urllib.request; urllib.request.urlopen(os.environ["BASE_URL"]+"/auth/csrf", timeout=1)' >/dev/null 2>&1; then return; fi
-    sleep 0.5
+MEDIA=$DATA/media
+
+port() { python3 -c 'import os,urllib.parse; print(urllib.parse.urlparse(os.environ["BASE_URL"]).port or 8080)'; }
+
+# Environment shared by the server and the one-off operator commands.
+stack_env() {
+  printf '%s\n' \
+    -e "HSIMAH_COSMOS_ENDPOINT=https://$COSMOS:8081" -e HSIMAH_COSMOS_ALLOW_ANY_CERTIFICATE=true -e HSIMAH_COSMOS_DATABASE=hsimah-acceptance \
+    -e HSIMAH_PASSWORD_COST=10 -e HSIMAH_MEDIA=/data/media -e HSIMAH_CLIENT=/repo/client/dist -e HSIMAH_CONTENT=/repo/content/pages.json \
+    -e ADMIN_USERNAME -e ADMIN_PASSWORD -e ADMIN_DISPLAY_NAME -e BASE_URL
+}
+
+# Runs `Hsimah.Server console <args>` against the running stack, with the same media directory as the server.
+console() {
+  [ -f "$PUBLISH/Hsimah.Server.dll" ] || { echo "the server is not published; run scripts/acceptance/up" >&2; return 1; }
+  mkdir -p "$MEDIA"
+  # shellcheck disable=SC2046
+  "$ENGINE" run --rm --network "$NETWORK" $(stack_env) -v "$PWD/$PUBLISH:/srv:ro,z" -v "$PWD/$MEDIA:/data/media:z" -v "$PWD:/repo:ro,z" \
+    "$@" 
+}
+
+console_command() {
+  local mounts=()
+  if [ "${1:-}" = backup ] || [ "${1:-}" = restore ]; then
+    # The backup path is on the host: mount its directory and name the file inside the container.
+    local target dir
+    target=$(python3 -c 'import os,sys; print(os.path.abspath(sys.argv[1]))' "$2")
+    dir=$(dirname "$target")
+    mkdir -p "$dir"
+    mounts=(-v "$dir:/backup:z")
+    set -- "$1" "/backup/$(basename "$target")"
+  fi
+  console "${mounts[@]}" "$RUNTIME_IMAGE" dotnet /srv/Hsimah.Server.dll console "$@"
+}
+
+wait_for() {
+  local attempt
+  for attempt in $(seq 1 "$2"); do
+    if eval "$1" >/dev/null 2>&1; then return 0; fi
+    sleep "${3:-1}"
   done
-  "$ENGINE" logs "$STACK" >&2
   return 1
 }

@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
+# The initial installer against the running stack's database. Fails on a populated database.
 source "$(dirname "$0")/common"
-exec scripts/php php server/console.php install "$@"
+console_command install

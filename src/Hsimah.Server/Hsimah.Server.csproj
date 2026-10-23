@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <RootNamespace>Hsimah</RootNamespace>
+    <AssemblyName>Hsimah.Server</AssemblyName>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <NoWarn>$(NoWarn);ASP0000</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Elephentity.Runtime" Version="0.1.0-alpha.2" />
+    <PackageReference Include="Elephentity.Cosmos" Version="0.1.0-alpha.2" />
+    <PackageReference Include="Elephentity.GraphQL" Version="0.1.0-alpha.2" />
+    <PackageReference Include="Elephentity.Tsquid" Version="0.1.0-alpha.2" />
+    <PackageReference Include="BCrypt.Net-Next" Version="4.2.1" />
+    <PackageReference Include="SkiaSharp" Version="4.153.1" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="4.153.1" />
+  </ItemGroup>
+</Project>

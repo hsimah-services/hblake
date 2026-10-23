@@ -1,16 +1,23 @@
 #!/usr/bin/env bash
+# Every build gate: the compiler's formatting, validation, drift and contract checks, the C# build, formatting and unit tests, and the
+# client's routes, Relay artifacts, lint, types and production build.
 source "$(dirname "$0")/common"
-scripts/php composer install --no-interaction --prefer-dist
-scripts/php sh -c 'for package in codegen codegen-php codegen-sqlite codegen-graphql-php codegen-tsquid; do cargo build --release --locked --manifest-path vendor/elephentity/$package/Cargo.toml || exit; done'
-scripts/php vendor/bin/eleph fmt
-scripts/php vendor/bin/eleph validate spec
-scripts/php vendor/bin/eleph generate --check
-scripts/php vendor/bin/eleph check
-scripts/php vendor/bin/phpstan analyse --no-progress
-scripts/php vendor/bin/phpunit
+
+scripts/eleph install
+scripts/eleph install --check
+scripts/eleph fmt
+scripts/eleph validate spec
+scripts/eleph generate --check
+
+PROJECTS=(src/Hsimah.Server src/Hsimah.Server.Tests src/Hsimah.Contracts tests/Hsimah.Acceptance tests/Hsimah.Acceptance.Ops)
+for project in "${PROJECTS[@]}"; do
+  scripts/dotnet dotnet build "$project" --nologo -v quiet
+  scripts/dotnet dotnet format "$project" --verify-no-changes --exclude src/Hsimah.Server/Generated
+done
+scripts/eleph check
+scripts/dotnet dotnet run --no-build --project src/Hsimah.Server.Tests -- -noColor
+
 scripts/node install --frozen-lockfile
-HSIMAH_DATABASE=:memory: scripts/php php server/console.php schema > .cache/server-schema.graphql
-scripts/node schema:check
 scripts/node routes:check
 scripts/node exec relay-compiler --validate
 scripts/node relay:check

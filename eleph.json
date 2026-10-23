@@ -1,24 +1,40 @@
 {
   "spec": "spec",
+  "codegen": "eleph-codegen@0.7.0",
   "targets": {
-    "php": {
-      "builder": "vendor/bin/eleph-gen-php",
-      "output": "generated",
-      "namespace": "Hsimah\\Entity",
-      "typeNamespace": "Hsimah\\Type"
+    "csharp": {
+      "builder": "eleph-gen-csharp@0.1.0-alpha.1",
+      "output": "src/Hsimah.Server/Generated",
+      "namespace": "Hsimah.Entity",
+      "typeNamespace": "Hsimah.Type",
+      "check": [
+        "scripts/dotnet",
+        "dotnet",
+        "run",
+        "--no-build",
+        "--project",
+        "src/Hsimah.Contracts",
+        "--",
+        "eleph-check"
+      ]
     },
-    "sqlite": {
-      "builder": "vendor/bin/eleph-gen-sqlite",
-      "output": "generated/sqlite"
+    "cosmos": {
+      "builder": "eleph-gen-cosmos@0.1.0-alpha.1",
+      "output": "src/Hsimah.Server/Generated/Storage",
+      "namespace": "Hsimah.Storage"
     },
-    "graphql-php": {
-      "builder": "vendor/bin/eleph-gen-graphql-php",
-      "output": "generated/graphql"
+    "graphql": {
+      "builder": "eleph-gen-graphql-csharp@0.1.0-alpha.1",
+      "output": "src/Hsimah.Server/Generated/GraphQL",
+      "namespace": "Hsimah.GraphQL",
+      "entityNamespace": "Hsimah.Entity"
     },
     "tsquid": {
-      "builder": "vendor/bin/eleph-gen-tsquid",
-      "output": "generated/tsquid",
-      "manifest": "../../client/src/routes/__generated__/routes.manifest.json"
+      "builder": "eleph-gen-tsquid@0.2.0",
+      "output": "src/Hsimah.Server/Generated/Tsquid",
+      "manifest": "../../../../client/src/routes/__generated__/routes.manifest.json",
+      "language": "csharp",
+      "namespace": "Hsimah.Tsquid"
     }
   }
 }
