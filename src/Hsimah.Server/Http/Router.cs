@@ -44,7 +44,14 @@ public sealed partial class Router(
         var path = http.Request.Path.Value ?? "/";
         try
         {
-            if (path == "/news/feed.xml")
+            if (path == "/healthz")
+            {
+                // A cheap liveness check for the platform's probes: it reaches no database and starts no session.
+                http.Response.ContentType = "text/plain";
+                http.Response.Headers.CacheControl = "no-store";
+                await http.Response.WriteAsync("ok", http.RequestAborted).ConfigureAwait(false);
+            }
+            else if (path == "/news/feed.xml")
             {
                 await FeedAsync(http).ConfigureAwait(false);
             }

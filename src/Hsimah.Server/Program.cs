@@ -38,6 +38,11 @@ if (Environment.GetEnvironmentVariable("ASPNETCORE_URLS") is not { Length: > 0 }
 }
 
 var app = builder.Build();
+if (options.TrustProxy)
+{
+    app.UseForwardedHeaders(ProxyHeaders.Options());
+}
+
 app.UseMiddleware<Router>();
 await app.RunAsync().ConfigureAwait(false);
 return 0;

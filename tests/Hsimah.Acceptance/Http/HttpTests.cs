@@ -82,6 +82,17 @@ public class HttpTests
     }
 
     [Fact]
+    public async Task Healthz_answers_without_a_database_session_or_cache()
+    {
+        await using var api = await Api.Anonymous();
+        var response = await api.Context.GetAsync("/healthz");
+        Assert.Equal(200, response.Status);
+        Assert.Equal("ok", await response.TextAsync());
+        Assert.Empty(Api.SetCookies(response));
+        Assert.Contains("no-store", response.Headers.GetValueOrDefault("cache-control") ?? string.Empty);
+    }
+
+    [Fact]
     public async Task The_removed_Post_and_Product_addresses_are_not_served_as_content()
     {
         await using var api = await Api.Anonymous();
