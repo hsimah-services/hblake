@@ -9,12 +9,13 @@ scripts/eleph fmt
 scripts/eleph validate spec
 scripts/eleph generate --check
 
-PROJECTS=(src/Hsimah.Server src/Hsimah.Server.Tests src/Hsimah.Contracts tests/Hsimah.Acceptance tests/Hsimah.Acceptance.Ops)
+PROJECTS=(src/Hsimah.Assets src/Hsimah.Assets.Tests src/Hsimah.Server src/Hsimah.Server.Tests src/Hsimah.Contracts tests/Hsimah.Acceptance tests/Hsimah.Acceptance.Ops)
 for project in "${PROJECTS[@]}"; do
   scripts/dotnet dotnet build "$project" --nologo -v quiet
   scripts/dotnet dotnet format "$project" --verify-no-changes --exclude src/Hsimah.Server/Generated
 done
 scripts/eleph check
+scripts/dotnet dotnet run --no-build --project src/Hsimah.Assets.Tests -- -noColor
 scripts/dotnet dotnet run --no-build --project src/Hsimah.Server.Tests -- -noColor
 
 scripts/node install --frozen-lockfile

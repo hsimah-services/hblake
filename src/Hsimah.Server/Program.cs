@@ -9,7 +9,6 @@ static void AddApplication(IServiceCollection services, HsimahOptions options)
 {
     services.AddHsimah(options);
     services.AddSingleton<AuthService>();
-    services.AddSingleton<Media>();
 }
 
 if (args is ["console", "schema"])

@@ -6,13 +6,16 @@ ENGINE=${CONTAINER_ENGINE:-$(command -v podman || command -v docker)}
 NETWORK=hblake-acceptance
 COSMOS=hblake-acceptance-cosmos
 SERVER=hblake-acceptance-server
+AZURITE=hblake-acceptance-azurite
+AZURITE_IMAGE=${HSIMAH_AZURITE_IMAGE:-mcr.microsoft.com/azure-storage/azurite:latest}
+# Azurite's published development account; item images are kept in its blob service, as they are in Azure.
+BLOB_CONNECTION="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://$AZURITE:10000/devstoreaccount1;"
 RUNTIME_IMAGE=${HSIMAH_RUNTIME_IMAGE:-mcr.microsoft.com/dotnet/aspnet:10.0}
 EMULATOR_IMAGE=${HSIMAH_EMULATOR_IMAGE:-mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:latest}
 export BASE_URL=${BASE_URL:-http://localhost:8080}
 PUBLISH=.cache/publish/server
 # The stack keeps its images and uploads apart from the development data in .var.
 DATA=.var/acceptance
-MEDIA=$DATA/media
 
 port() { python3 -c 'import os,urllib.parse; print(urllib.parse.urlparse(os.environ["BASE_URL"]).port or 8080)'; }
 
@@ -20,16 +23,15 @@ port() { python3 -c 'import os,urllib.parse; print(urllib.parse.urlparse(os.envi
 stack_env() {
   printf '%s\n' \
     -e "HSIMAH_COSMOS_ENDPOINT=https://$COSMOS:8081" -e HSIMAH_COSMOS_ALLOW_ANY_CERTIFICATE=true -e HSIMAH_COSMOS_DATABASE=hsimah-acceptance \
-    -e HSIMAH_PASSWORD_COST=10 -e HSIMAH_MEDIA=/data/media -e HSIMAH_CLIENT=/repo/client/dist -e HSIMAH_CONTENT=/repo/content/pages.json \
+    -e HSIMAH_PASSWORD_COST=10 -e HSIMAH_ASSET_STORE=blob -e "HSIMAH_BLOB_CONNECTION_STRING=$BLOB_CONNECTION" -e HSIMAH_CLIENT=/repo/client/dist -e HSIMAH_CONTENT=/repo/content/pages.json \
     -e ADMIN_USERNAME -e ADMIN_PASSWORD -e ADMIN_DISPLAY_NAME -e BASE_URL
 }
 
 # Runs `Hsimah.Server console <args>` against the running stack, with the same media directory as the server.
 console() {
   [ -f "$PUBLISH/Hsimah.Server.dll" ] || { echo "the server is not published; run scripts/acceptance/up" >&2; return 1; }
-  mkdir -p "$MEDIA"
   # shellcheck disable=SC2046
-  "$ENGINE" run --rm --network "$NETWORK" $(stack_env) -v "$PWD/$PUBLISH:/srv:ro,z" -v "$PWD/$MEDIA:/data/media:z" -v "$PWD:/repo:ro,z" \
+  "$ENGINE" run --rm --network "$NETWORK" $(stack_env) -v "$PWD/$PUBLISH:/srv:ro,z" -v "$PWD:/repo:ro,z" \
     "$@" 
 }
 

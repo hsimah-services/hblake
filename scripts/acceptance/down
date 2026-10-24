@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
 # Stops the stack and discards its database and uploaded images.
 source "$(dirname "$0")/common"
-"$ENGINE" rm -f "$SERVER" "$COSMOS" >/dev/null 2>&1 || true
-rm -rf "$MEDIA"
+"$ENGINE" rm -f "$SERVER" "$COSMOS" "$AZURITE" >/dev/null 2>&1 || true

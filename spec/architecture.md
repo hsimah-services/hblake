@@ -53,6 +53,13 @@ user. Credentials never occur in generated model fields or Relay query artifacts
 The public author projection, `Page.author` and `PageItem.author`, is an explicit allowlist of
 displayName, read from trusted storage for the single account.
 
+## Image assets
+
+`HasImageAsset` is a pattern with an optional image URL and its alt text. Its behaviour lives in `Hsimah.Assets` (checking, normalising,
+storing and serving images) over a pluggable store: a directory for development, a private Azure Blob Storage container in production.
+Images are delivered through the application, so the storage account stays private. One image per record; a gallery would be a separate
+entity or pattern.
+
 ## Shared behavior
 
 Content contributes title, unique slug, Markdown content and excerpt to Page

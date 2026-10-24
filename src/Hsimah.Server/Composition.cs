@@ -1,4 +1,5 @@
 using Elephentity.Cosmos;
+using Hsimah.Assets;
 using Elephentity.GraphQL.Http;
 using Elephentity.Runtime.Policy;
 using Elephentity.Runtime.Storage;
@@ -24,6 +25,7 @@ public static class Composition
         services.AddSingleton(StorageManifest.Create(options.Container));
         services.AddSingleton<IStorageAdaptor>(provider => new CosmosAdaptor(
             provider.GetRequiredService<CosmosClient>(), options.Database, provider.GetRequiredService<Elephentity.Cosmos.Manifest.CosmosStorageManifest>()));
+        services.AddSingleton<IAssetStore>(provider => AssetStores.Create(provider.GetRequiredService<HsimahOptions>()));
         return services.AddHsimahDomain();
     }
 
@@ -31,6 +33,8 @@ public static class Composition
     public static IServiceCollection AddHsimahDomain(this IServiceCollection services)
     {
         services.AddSingleton<IViewerProvider, RequestViewerProvider>();
+        services.TryAddSingleton(new AssetOptions());
+        services.AddSingleton<ImageAssets>();
 
         // Contracts: the policies, verifiers, actions and queries the generated code asks the application for.
         services.AddSingleton<IPublishableContentStaffWritePolicy, ContentStaff>();

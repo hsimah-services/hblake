@@ -67,10 +67,12 @@ public sealed class EnquiryUrlVerifier : IPageItemEnquiryUrlVerifier
 }
 
 /// <summary>An item's image: a stored upload (/media/&lt;name&gt;) that always has alt text.</summary>
-public sealed class ImageUrlVerifier : IPageItemImageUrlVerifier
+public sealed class ImageUrlVerifier(Hsimah.Assets.ImageAssets assets) : IPageItemImageUrlVerifier
 {
     public ValueTask<Verification> VerifyAsync(string? value, PageItemMutationContext context, CancellationToken cancellationToken = default) =>
-        Done.Of(value is null ? Verification.Ok() : Rules.Image(value, context.PendingImageAlt()));
+        Done.Of(value is null
+            ? Verification.Ok()
+            : Rules.Check(assets.IsAssetUrl(value) && !string.IsNullOrWhiteSpace(context.PendingImageAlt()), "Use an image uploaded through the editor, with alt text."));
 }
 
 public sealed class ImageAltVerifier : IPageItemImageAltVerifier

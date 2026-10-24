@@ -6,6 +6,7 @@ using System.Text.Json.Nodes;
 using Elephentity.Cosmos;
 using Elephentity.Runtime.Gateway;
 using Elephentity.Runtime.Storage;
+using Hsimah.Assets;
 using Hsimah.Domain;
 using Hsimah.Entity;
 using Hsimah.Http;
@@ -47,7 +48,7 @@ public static class Operator
     }
 
     /// <summary>
-    /// Deletes the whole database. For acceptance stacks only: it refuses any database whose name does not end in "-acceptance", so a
+    /// Deletes the whole database and every stored image. For acceptance stacks only: it refuses any database whose name does not end in "-acceptance", so a
     /// mistaken environment cannot lose real data.
     /// </summary>
     private static async Task ResetAsync(IServiceProvider services)
@@ -56,6 +57,12 @@ public static class Operator
         if (!options.Database.EndsWith("-acceptance", StringComparison.Ordinal))
         {
             throw new InvalidOperationException("Refusing to reset a database that is not an acceptance database.");
+        }
+
+        var assets = services.GetRequiredService<IAssetStore>();
+        foreach (var name in await assets.ListAsync(CancellationToken.None).ConfigureAwait(false))
+        {
+            await assets.DeleteAsync(name, CancellationToken.None).ConfigureAwait(false);
         }
 
         try
@@ -184,12 +191,17 @@ public static class Operator
             {
                 await tar.WriteEntryAsync(content, "content.jsonl").ConfigureAwait(false);
                 await tar.WriteEntryAsync(accounts, "auth.jsonl").ConfigureAwait(false);
-                if (Directory.Exists(options.MediaDirectory))
+                var assets = services.GetRequiredService<IAssetStore>();
+                foreach (var name in await assets.ListAsync(CancellationToken.None).ConfigureAwait(false))
                 {
-                    foreach (var file in Directory.GetFiles(options.MediaDirectory))
+                    var file = Path.Combine(work.FullName, "asset-" + name);
+                    await using (var asset = await assets.OpenAsync(name, CancellationToken.None).ConfigureAwait(false) ?? throw new InvalidOperationException($"{name} vanished during the backup."))
+                    await using (var target = File.Create(file))
                     {
-                        await tar.WriteEntryAsync(file, "media/" + Path.GetFileName(file)).ConfigureAwait(false);
+                        await asset.Content.CopyToAsync(target).ConfigureAwait(false);
                     }
+
+                    await tar.WriteEntryAsync(file, "media/" + name).ConfigureAwait(false);
                 }
             }
 
@@ -259,23 +271,24 @@ public static class Operator
                 await auth.UpsertItemAsync(JsonNode.Parse(line)!.AsObject(), new PartitionKey("auth")).ConfigureAwait(false);
             }
 
-            if (Directory.Exists(options.MediaDirectory))
+            var assets = services.GetRequiredService<IAssetStore>();
+            foreach (var name in await assets.ListAsync(CancellationToken.None).ConfigureAwait(false))
             {
-                foreach (var file in Directory.GetFiles(options.MediaDirectory))
-                {
-                    File.Delete(file);
-                }
+                await assets.DeleteAsync(name, CancellationToken.None).ConfigureAwait(false);
             }
 
             var media = Path.Combine(work.FullName, "media");
             if (Directory.Exists(media))
             {
-                Directory.CreateDirectory(options.MediaDirectory, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
                 foreach (var file in Directory.GetFiles(media))
                 {
-                    var target = Path.Combine(options.MediaDirectory, Path.GetFileName(file));
-                    File.Copy(file, target, true);
-                    File.SetUnixFileMode(target, UnixFileMode.UserRead | UnixFileMode.UserWrite);
+                    var name = Path.GetFileName(file);
+                    if (!ImageAssets.IsAssetName(name))
+                    {
+                        throw new InvalidOperationException($"The backup holds a file that is not an image asset: {name}.");
+                    }
+
+                    await assets.PutAsync(name, ImageProcessor.ContentTypeFor(name[(name.LastIndexOf('.') + 1)..])!, await File.ReadAllBytesAsync(file).ConfigureAwait(false), CancellationToken.None).ConfigureAwait(false);
                 }
             }
         }
