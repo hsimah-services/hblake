@@ -19,6 +19,17 @@ public sealed record HsimahOptions
     /// <summary>True only for the local emulator, whose certificate is self-signed.</summary>
     public bool AllowAnyCertificate { get; init; }
 
+    /// <summary>Where item images are stored: <c>filesystem</c> (the media directory) or <c>blob</c> (Azure Blob Storage).</summary>
+    public string AssetStore { get; init; } = "filesystem";
+
+    /// <summary>The Blob Storage account endpoint (https://account.blob.core.windows.net); the server signs in with its managed identity.</summary>
+    public string? BlobEndpoint { get; init; }
+
+    /// <summary>A Blob Storage connection string, for Azurite in development and tests. Takes precedence over the endpoint.</summary>
+    public string? BlobConnectionString { get; init; }
+
+    public string BlobContainer { get; init; } = "media";
+
     public string MediaDirectory { get; init; } = Path.Combine(Directory.GetCurrentDirectory(), ".var", "media");
 
     public string ClientDirectory { get; init; } = Path.Combine(Directory.GetCurrentDirectory(), "client", "dist");
@@ -40,6 +51,10 @@ public sealed record HsimahOptions
             Container = Get("HSIMAH_COSMOS_CONTAINER", defaults.Container),
             AuthContainer = Get("HSIMAH_COSMOS_AUTH_CONTAINER", defaults.AuthContainer),
             AllowAnyCertificate = Get("HSIMAH_COSMOS_ALLOW_ANY_CERTIFICATE", "false") == "true",
+            AssetStore = Get("HSIMAH_ASSET_STORE", defaults.AssetStore),
+            BlobEndpoint = Environment.GetEnvironmentVariable("HSIMAH_BLOB_ENDPOINT") is { Length: > 0 } endpoint ? endpoint : null,
+            BlobConnectionString = Environment.GetEnvironmentVariable("HSIMAH_BLOB_CONNECTION_STRING") is { Length: > 0 } connection ? connection : null,
+            BlobContainer = Get("HSIMAH_BLOB_CONTAINER", defaults.BlobContainer),
             MediaDirectory = Get("HSIMAH_MEDIA", defaults.MediaDirectory),
             ClientDirectory = Get("HSIMAH_CLIENT", defaults.ClientDirectory),
             PasswordCost = int.TryParse(Environment.GetEnvironmentVariable("HSIMAH_PASSWORD_COST"), out var cost) && cost is >= 4 and <= 31 ? cost : defaults.PasswordCost,

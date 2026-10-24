@@ -14,16 +14,20 @@ if ! "$ENGINE" container inspect "$COSMOS" --format '{{.State.Running}}' 2>/dev/
   "$ENGINE" run -d --name "$COSMOS" --network "$NETWORK" \
     -e AZURE_COSMOS_EMULATOR_PARTITION_COUNT=1 -e AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE=false "$EMULATOR_IMAGE" >/dev/null
 fi
+if ! "$ENGINE" container inspect "$AZURITE" --format '{{.State.Running}}' 2>/dev/null | grep -q true; then
+  "$ENGINE" rm -f "$AZURITE" >/dev/null 2>&1 || true
+  "$ENGINE" run -d --name "$AZURITE" --network "$NETWORK" "$AZURITE_IMAGE" azurite-blob --blobHost 0.0.0.0 --skipApiVersionCheck >/dev/null
+fi
 wait_for "\"$ENGINE\" logs \"$COSMOS\" 2>&1 | grep -Ex 'Started.?'" 120 2 || { "$ENGINE" ps -a >&2; "$ENGINE" inspect "$COSMOS" --format "{{json .State}}" >&2; "$ENGINE" logs "$COSMOS" >&2; echo "the Cosmos DB emulator did not start" >&2; exit 1; }
 
 scripts/dotnet dotnet publish src/Hsimah.Server -c Release -o "$PUBLISH" --nologo -v quiet >/dev/null
-rm -rf "$MEDIA"; mkdir -p "$MEDIA"; chmod 700 "$DATA" "$MEDIA"
+mkdir -p "$DATA"; chmod 700 "$DATA"
 console_command reset
 console_command install
 console_command bootstrap
 
 # shellcheck disable=SC2046
 "$ENGINE" run -d --name "$SERVER" --network "$NETWORK" -p "$(port):8080" $(stack_env) -e ASPNETCORE_URLS=http://0.0.0.0:8080 \
-  -v "$PWD/$PUBLISH:/srv:ro,z" -v "$PWD/$MEDIA:/data/media:z" -v "$PWD:/repo:ro,z" -w /repo "$RUNTIME_IMAGE" dotnet /srv/Hsimah.Server.dll >/dev/null
+  -v "$PWD/$PUBLISH:/srv:ro,z" -v "$PWD:/repo:ro,z" -w /repo "$RUNTIME_IMAGE" dotnet /srv/Hsimah.Server.dll >/dev/null
 wait_for 'python3 -c "import os,urllib.request; urllib.request.urlopen(os.environ[\"BASE_URL\"]+\"/auth/csrf\", timeout=1)"' 60 0.5 \
   || { "$ENGINE" logs "$SERVER" >&2; exit 1; }

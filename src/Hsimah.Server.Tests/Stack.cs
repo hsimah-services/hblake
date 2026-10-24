@@ -19,6 +19,7 @@ public sealed class Stack : IDisposable
         var collection = new ServiceCollection().AddLogging();
         collection.AddSingleton(options ?? new HsimahOptions { ContentFile = Path.Combine(RepoRoot(), "content", "pages.json") });
         collection.AddSingleton<IStorageAdaptor>(new Elephentity.Runtime.Memory.MemoryAdaptor());
+        collection.AddSingleton<Hsimah.Assets.IAssetStore>(new Hsimah.Assets.FileSystemAssetStore(Path.Combine(Path.GetTempPath(), "hsimah-test-assets-" + Guid.NewGuid().ToString("N"))));
         collection.AddHsimahDomain();
         services = collection.BuildServiceProvider();
         Runtime = services.GetRequiredService<Elephentity.Runtime.Gateway.Runtime>();

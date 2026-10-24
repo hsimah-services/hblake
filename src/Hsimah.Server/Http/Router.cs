@@ -8,6 +8,7 @@ using GraphQL;
 using GraphQL.Transport;
 using GraphQLParser;
 using GraphQLParser.AST;
+using Hsimah.Assets;
 using Hsimah.Domain;
 
 namespace Hsimah.Http;
@@ -20,7 +21,7 @@ public sealed partial class Router(
     RequestDelegate next,
     HsimahOptions options,
     AuthService auth,
-    Media media,
+    ImageAssets assets,
     HsimahExecutor executor,
     ILogger<Router> log)
 {
@@ -53,7 +54,7 @@ public sealed partial class Router(
             }
             else if (path.StartsWith("/media/", StringComparison.Ordinal))
             {
-                await media.ServeAsync(http).ConfigureAwait(false);
+                await assets.ServeAsync(http).ConfigureAwait(false);
             }
             else if (path == "/graphql" || path.StartsWith("/auth/", StringComparison.Ordinal))
             {
@@ -130,14 +131,14 @@ public sealed partial class Router(
                 return;
             }
 
-            if (file.Length > Media.MaxBytes)
+            if (file.Length > assets.Options.MaxBytes)
             {
                 await Json(http, 413, new { error = "Images must be 5 MB or smaller." }).ConfigureAwait(false);
                 return;
             }
 
             await using var stream = file.OpenReadStream();
-            var stored = await media.StoreAsync(stream, http.RequestAborted).ConfigureAwait(false);
+            var stored = await assets.UploadAsync(stream, http.RequestAborted).ConfigureAwait(false);
             await Json(http, stored.Status, stored.Body).ConfigureAwait(false);
         }
         catch (Exception error) when (error is not OperationCanceledException)

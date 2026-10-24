@@ -65,10 +65,6 @@ public static partial class Rules
         return Check(valid, "Use a valid HTTPS URL or mailto email address.");
     }
 
-    /// <summary>An uploaded image kept by Media (/media/&lt;32 hex&gt;.&lt;ext&gt;), with nonblank alt text.</summary>
-    public static Verification Image(string url, string? alt) =>
-        Check(MediaUrl().IsMatch(url) && !string.IsNullOrWhiteSpace(alt), "Use an image uploaded through the editor, with alt text.");
-
     public static Verification Username(string value) =>
         Check(UsernamePattern().IsMatch(value), "Use 3–32 lowercase letters, digits, dots, hyphens or underscores, starting with a letter or digit.");
 
@@ -80,9 +76,6 @@ public static partial class Rules
 
     [GeneratedRegex(@"^[a-z0-9]+(?:-[a-z0-9]+)*\z")]
     private static partial Regex SlugPattern();
-
-    [GeneratedRegex(@"^/media/[a-f0-9]{32}\.(png|jpg|webp)\z")]
-    private static partial Regex MediaUrl();
 
     [GeneratedRegex(@"^[a-z0-9][a-z0-9._-]{2,31}\z")]
     private static partial Regex UsernamePattern();

@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 var services = new ServiceCollection().AddLogging();
 services.AddSingleton<IStorageAdaptor>(new Elephentity.Runtime.Memory.MemoryAdaptor());
 services.AddSingleton(new HsimahOptions());
+services.AddSingleton<Hsimah.Assets.IAssetStore>(new Hsimah.Assets.FileSystemAssetStore(Path.Combine(Path.GetTempPath(), "hsimah-contracts")));
 services.AddHsimahDomain();
 using var provider = services.BuildServiceProvider();
 return ContractCheck.TryRunConsole(args, provider.GetRequiredService<IEntityCatalogue>(), provider, Console.Out, out var exitCode)

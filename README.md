@@ -53,7 +53,11 @@ Content and the account live in an Azure Cosmos DB account (one database, two co
 | `HSIMAH_COSMOS_CONTAINER`, `HSIMAH_COSMOS_AUTH_CONTAINER` | `hsimah`, `hsimah-auth` | |
 | `HSIMAH_COSMOS_ALLOW_ANY_CERTIFICATE` | `false` | `true` only for the emulator's self-signed certificate |
 | `HSIMAH_PASSWORD_COST` | `12` | bcrypt cost for new passwords (4 to 31; each step doubles the work). The acceptance stack uses 10 |
-| `HSIMAH_MEDIA` | `.var/media` | where item images are stored; keep it private and back it up |
+| `HSIMAH_ASSET_STORE` | `filesystem` | where item images are stored: `filesystem` or `blob` (Azure Blob Storage) |
+| `HSIMAH_BLOB_ENDPOINT` | | the storage account's blob endpoint (`https://<account>.blob.core.windows.net`); the server signs in with its managed identity, which needs the *Storage Blob Data Contributor* role on the container |
+| `HSIMAH_BLOB_CONNECTION_STRING` | | a connection string instead of the endpoint, for Azurite in development and tests |
+| `HSIMAH_BLOB_CONTAINER` | `media` | the private container (created on first use) |
+| `HSIMAH_MEDIA` | `.var/media` | the directory for the `filesystem` store; keep it private and back it up |
 | `HSIMAH_CLIENT`, `HSIMAH_CONTENT` | the repository's built client and launch content | |
 
 The server serves the built client, `/graphql`, `/auth/*`, `/media/*` and every HTML request (so route data can be inlined) itself; nothing else on disk is reachable. Use HTTPS, give the media directory mode 0700, and run the server behind a TLS proxy only after configuring trusted-proxy address handling: login throttling uses the connection's remote address, so clients behind one proxy would share a failure bucket. Session cookies use Secure for HTTPS and all public hosts; plain HTTP loopback requests are the only exception. Backups include credential hashes; protect them as private data. No production deployment is configured here.
@@ -72,9 +76,17 @@ dotnet Hsimah.Server.dll console backup /private/path/site-backup.tar
 dotnet Hsimah.Server.dll console restore /private/path/site-backup.tar
 ```
 
-A backup is a tar of the content documents and the account credentials (JSON Lines) and the item images (`media/`). Restore validates the archive, then recreates both containers, imports it and replaces the images. Cosmos DB also takes periodic backups of the account itself; use those for recovery and this procedure for moving data. Unique keys and composite indexes cannot be changed on an existing container, so a model change that alters them ships as: back up, install into a new container, restore.
+A backup is a tar of the content documents and the account credentials (JSON Lines) and the item images (`media/`, read from whichever asset store is configured). Restore validates the archive, then recreates both containers, imports it and replaces the images. Cosmos DB also takes periodic backups of the account itself; use those for recovery and this procedure for moving data. Unique keys and composite indexes cannot be changed on an existing container, so a model change that alters them ships as: back up, install into a new container, restore.
 
 V1 is client-rendered; each route's HTML carries its query response as tsquid initial data (`#tsquid-data`), executed as the requesting viewer. Initial-HTML SEO, concurrent edit protection, additional accounts and commerce are deferred, as recorded in the specification. The site name is hblake; launch copy and public contact links are supplied by the owner. Deployment remains a separate operator action.
+
+## Image assets
+
+Item images are an Elephentity-style building block, kept apart from the site so other products can reuse it:
+
+- The `HasImageAsset` pattern (`spec/patterns/HasImageAsset.yml`) gives an entity an optional `imageUrl` and `imageAlt`, both verified: the URL must be an asset this application stored, and alt text must accompany an image.
+- `src/Hsimah.Assets` holds the behaviour. `ImageProcessor` accepts PNG, JPEG and WebP by content, bounds the size and pixels, turns JPEGs upright and re-encodes (which drops EXIF and location data). `ImageAssets` names the result at random, stores it, and serves `/media/<name>` with long cache headers. `IAssetStore` is the pluggable part, with `FileSystemAssetStore` and `AzureBlobAssetStore` (a private container, never public URLs; the server streams images).
+- The acceptance stack stores images in Azurite, so the Blob path is what the tests and the backup/restore round trip exercise.
 
 ## Launch content
 

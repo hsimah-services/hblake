@@ -1,0 +1,15 @@
+pattern: HasImageAsset
+description: One image per record, stored as an uploaded asset, with alt text that must accompany it.
+fields:
+  imageUrl:
+    type: string
+    description: The URL of an uploaded image asset (/media/<name>), served by the application; null when there is no image.
+    nullable: true
+    maxLength: 100
+    verify: true
+  imageAlt:
+    type: string
+    description: The image's alt text. Required whenever there is an image.
+    nullable: true
+    maxLength: 300
+    verify: true

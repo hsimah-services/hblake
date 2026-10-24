@@ -1,6 +1,6 @@
 entity: PageItem
 description: Item attached to a page, such as a news article, product or framework entry, grouped by kind.
-use: [PageItem]
+use: [PageItem, HasImageAsset]
 configure:
   PageItem:
     name: Item
@@ -19,16 +19,6 @@ fields:
     type: string
     nullable: true
     maxLength: 2048
-    verify: true
-  imageUrl:
-    type: string
-    nullable: true
-    maxLength: 100
-    verify: true
-  imageAlt:
-    type: string
-    nullable: true
-    maxLength: 300
     verify: true
 queries:
   bySlug:
