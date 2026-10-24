@@ -52,6 +52,7 @@ Content and the account live in an Azure Cosmos DB account (one database, two co
 | `HSIMAH_COSMOS_DATABASE` | `hsimah` | |
 | `HSIMAH_COSMOS_CONTAINER`, `HSIMAH_COSMOS_AUTH_CONTAINER` | `hsimah`, `hsimah-auth` | |
 | `HSIMAH_COSMOS_ALLOW_ANY_CERTIFICATE` | `false` | `true` only for the emulator's self-signed certificate |
+| `HSIMAH_TRUST_PROXY` | `false` | set `true` when the server is reachable only through one TLS-terminating proxy (Azure Container Apps ingress): it then believes that proxy's `X-Forwarded-For`/`-Proto`/`-Host`, one hop only, so login throttling counts the real client and cookies see HTTPS. Never set it where clients can reach the server directly: they could send those headers themselves |
 | `HSIMAH_PASSWORD_COST` | `12` | bcrypt cost for new passwords (4 to 31; each step doubles the work). The acceptance stack uses 10 |
 | `HSIMAH_ASSET_STORE` | `filesystem` | where item images are stored: `filesystem` or `blob` (Azure Blob Storage) |
 | `HSIMAH_BLOB_ENDPOINT` | | the storage account's blob endpoint (`https://<account>.blob.core.windows.net`); the server signs in with its managed identity, which needs the *Storage Blob Data Contributor* role on the container |
@@ -60,7 +61,7 @@ Content and the account live in an Azure Cosmos DB account (one database, two co
 | `HSIMAH_MEDIA` | `.var/media` | the directory for the `filesystem` store; keep it private and back it up |
 | `HSIMAH_CLIENT`, `HSIMAH_CONTENT` | the repository's built client and launch content | |
 
-The server serves the built client, `/graphql`, `/auth/*`, `/media/*` and every HTML request (so route data can be inlined) itself; nothing else on disk is reachable. Use HTTPS, give the media directory mode 0700, and run the server behind a TLS proxy only after configuring trusted-proxy address handling: login throttling uses the connection's remote address, so clients behind one proxy would share a failure bucket. Session cookies use Secure for HTTPS and all public hosts; plain HTTP loopback requests are the only exception. Backups include credential hashes; protect them as private data. No production deployment is configured here.
+The server serves the built client, `/graphql`, `/auth/*`, `/media/*` and every HTML request (so route data can be inlined) itself; nothing else on disk is reachable. Use HTTPS. Behind Azure Container Apps (or any single TLS proxy) set `HSIMAH_TRUST_PROXY=true`, otherwise login throttling sees the proxy's address for every visitor and 12 failed logins by anyone would lock the operator out for 15 minutes. `GET /healthz` answers `ok` without touching Cosmos or starting a session, for the platform's probes. Session cookies use Secure for HTTPS and all public hosts; plain HTTP loopback requests are the only exception. Backups include credential hashes; protect them as private data. No production deployment is configured here.
 
 ### Cosmos DB sign-in (managed identity)
 
