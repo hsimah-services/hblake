@@ -92,6 +92,10 @@ A backup is a tar of the content documents and the account credentials (JSON Lin
 
 V1 is client-rendered; each route's HTML carries its query response as tsquid initial data (`#tsquid-data`), executed as the requesting viewer. Initial-HTML SEO, concurrent edit protection, additional accounts and commerce are deferred, as recorded in the specification. The site name is hblake; launch copy and public contact links are supplied by the owner. Deployment remains a separate operator action.
 
+## Deploying to Azure
+
+The `Dockerfile` builds the client and publishes the server into one image (ASP.NET 10, non-root, port 8080); `docker build -t hblake .` from the repository root. `.github/workflows/deploy.yml` builds that image, pushes it to the Azure Container Registry and updates the Container App after the Tests workflow passes on `main`. It signs in with a federated credential (OIDC), so no secret is stored, and it does nothing until these repository variables are set: `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `AZURE_RESOURCE_GROUP`, `ACR_NAME`, `ACR_LOGIN_SERVER` and `CONTAINER_APP_NAME`. The app's settings (Cosmos, Blob Storage) are set on the Container App, not in the image. Database installation, the operator account and launch content are one-off operator commands (above), not part of the deploy.
+
 ## Image assets
 
 Item images are an Elephentity-style building block, kept apart from the site so other products can reuse it:

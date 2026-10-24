@@ -1,0 +1,57 @@
+name: Deploy
+
+# Builds the image and updates the Container App, after the Tests workflow has passed on main. It signs in to Azure with a federated
+# credential (OIDC), so no secret is stored. It does nothing until the repository variables below are set.
+#
+# Repository variables: AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID (the app registration with the federated credential),
+# AZURE_RESOURCE_GROUP, ACR_NAME (the registry's name, for example hblake), ACR_LOGIN_SERVER (its login server, which can carry a suffix:
+# hblake-dge8ggh5hkhaa5cz.azurecr.io), CONTAINER_APP_NAME.
+
+on:
+  workflow_run:
+    workflows: [Tests]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: vars.AZURE_CLIENT_ID != '' && (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env:
+      SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SHA }}
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Build and push the image
+        run: |
+          az acr login --name "$ACR_NAME"
+          docker build -t "$ACR_LOGIN_SERVER/hblake:$SHA" -t "$ACR_LOGIN_SERVER/hblake:latest" .
+          docker push "$ACR_LOGIN_SERVER/hblake:$SHA"
+          docker push "$ACR_LOGIN_SERVER/hblake:latest"
+        env:
+          ACR_NAME: ${{ vars.ACR_NAME }}
+          ACR_LOGIN_SERVER: ${{ vars.ACR_LOGIN_SERVER }}
+      - name: Update the Container App
+        run: |
+          az containerapp update --name "$CONTAINER_APP_NAME" --resource-group "$AZURE_RESOURCE_GROUP" \
+            --image "$ACR_LOGIN_SERVER/hblake:$SHA"
+        env:
+          ACR_LOGIN_SERVER: ${{ vars.ACR_LOGIN_SERVER }}
+          CONTAINER_APP_NAME: ${{ vars.CONTAINER_APP_NAME }}
+          AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
