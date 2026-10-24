@@ -6,6 +6,7 @@
     <NoWarn>$(NoWarn);ASP0000</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="1.21.0" />
     <PackageReference Include="Elephentity.Runtime" Version="0.1.0-alpha.2" />
     <PackageReference Include="Elephentity.Cosmos" Version="0.1.0-alpha.2" />
     <PackageReference Include="Elephentity.GraphQL" Version="0.1.0-alpha.2" />

@@ -21,7 +21,7 @@ public static class Composition
     public static IServiceCollection AddHsimah(this IServiceCollection services, HsimahOptions options)
     {
         services.AddSingleton(options);
-        services.AddSingleton(_ => new CosmosClientSettings(AllowAnyServerCertificate: options.AllowAnyCertificate).CreateClient(options.Endpoint, options.Key));
+        services.AddSingleton(_ => CosmosAuth.CreateClient(options));
         services.AddSingleton(StorageManifest.Create(options.Container));
         services.AddSingleton<IStorageAdaptor>(provider => new CosmosAdaptor(
             provider.GetRequiredService<CosmosClient>(), options.Database, provider.GetRequiredService<Elephentity.Cosmos.Manifest.CosmosStorageManifest>()));
