@@ -94,7 +94,7 @@ V1 is client-rendered; each route's HTML carries its query response as tsquid in
 
 ## Deploying to Azure
 
-The `Dockerfile` builds the client and publishes the server into one image (ASP.NET 10, non-root, port 8080); `docker build -t hblake .` from the repository root. `.github/workflows/deploy.yml` builds that image, pushes it to the Azure Container Registry and updates the Container App after the Tests workflow passes on `main`. It signs in with a federated credential (OIDC), so no secret is stored, and it does nothing until these repository variables are set: `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `AZURE_RESOURCE_GROUP`, `ACR_LOGIN_SERVER` and `CONTAINER_APP_NAME`. The app's settings (Cosmos, Blob Storage) are set on the Container App, not in the image. Database installation, the operator account and launch content are one-off operator commands (above), not part of the deploy.
+The `Dockerfile` builds the client and publishes the server into one image (ASP.NET 10, non-root, port 8080); `docker build -t hblake .` from the repository root. `.github/workflows/deploy.yml` builds that image, pushes it to the Azure Container Registry and updates the Container App after the Tests workflow passes on `main`. It signs in with a federated credential (OIDC), so no secret is stored, and it does nothing until these repository variables are set: `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `AZURE_RESOURCE_GROUP`, `ACR_NAME`, `ACR_LOGIN_SERVER` and `CONTAINER_APP_NAME`. The app's settings (Cosmos, Blob Storage) are set on the Container App, not in the image. Database installation, the operator account and launch content are one-off operator commands (above), not part of the deploy.
 
 ## Image assets
 
