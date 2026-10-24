@@ -1,0 +1,12 @@
+.git
+.cache
+.var
+.pnpm-store
+vendor
+tools
+recording_*.mkv
+**/node_modules
+**/bin
+**/obj
+client/dist
+tests
