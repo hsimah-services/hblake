@@ -8,7 +8,11 @@ public sealed record HsimahOptions
 
     public string Endpoint { get; init; } = "https://localhost:8081";
 
-    public string Key { get; init; } = EmulatorKey;
+    /// <summary>
+    /// The account key. Leave it unset to sign in as the application's identity (managed identity in Azure, your <c>az login</c> locally), which
+    /// is what a deployment should do; the local emulator needs no key setting either (see <see cref="CosmosAuth" />).
+    /// </summary>
+    public string? Key { get; init; }
 
     public string Database { get; init; } = "hsimah";
 
@@ -46,7 +50,7 @@ public sealed record HsimahOptions
         return new HsimahOptions
         {
             Endpoint = Get("HSIMAH_COSMOS_ENDPOINT", defaults.Endpoint),
-            Key = Get("HSIMAH_COSMOS_KEY", defaults.Key),
+            Key = Environment.GetEnvironmentVariable("HSIMAH_COSMOS_KEY") is { Length: > 0 } key ? key : null,
             Database = Get("HSIMAH_COSMOS_DATABASE", defaults.Database),
             Container = Get("HSIMAH_COSMOS_CONTAINER", defaults.Container),
             AuthContainer = Get("HSIMAH_COSMOS_AUTH_CONTAINER", defaults.AuthContainer),

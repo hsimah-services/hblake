@@ -48,7 +48,7 @@ Content and the account live in an Azure Cosmos DB account (one database, two co
 | Variable | Default | |
 | --- | --- | --- |
 | `HSIMAH_COSMOS_ENDPOINT` | `https://localhost:8081` | the account endpoint |
-| `HSIMAH_COSMOS_KEY` | the emulator's key | the account key; never commit a real one |
+| `HSIMAH_COSMOS_KEY` | unset | an account key. Leave it unset: the server then signs in as its identity (see below). The local emulator needs no key either; it is recognised by its loopback endpoint or `HSIMAH_COSMOS_ALLOW_ANY_CERTIFICATE` |
 | `HSIMAH_COSMOS_DATABASE` | `hsimah` | |
 | `HSIMAH_COSMOS_CONTAINER`, `HSIMAH_COSMOS_AUTH_CONTAINER` | `hsimah`, `hsimah-auth` | |
 | `HSIMAH_COSMOS_ALLOW_ANY_CERTIFICATE` | `false` | `true` only for the emulator's self-signed certificate |
@@ -61,6 +61,17 @@ Content and the account live in an Azure Cosmos DB account (one database, two co
 | `HSIMAH_CLIENT`, `HSIMAH_CONTENT` | the repository's built client and launch content | |
 
 The server serves the built client, `/graphql`, `/auth/*`, `/media/*` and every HTML request (so route data can be inlined) itself; nothing else on disk is reachable. Use HTTPS, give the media directory mode 0700, and run the server behind a TLS proxy only after configuring trusted-proxy address handling: login throttling uses the connection's remote address, so clients behind one proxy would share a failure bucket. Session cookies use Secure for HTTPS and all public hosts; plain HTTP loopback requests are the only exception. Backups include credential hashes; protect them as private data. No production deployment is configured here.
+
+### Cosmos DB sign-in (managed identity)
+
+With `HSIMAH_COSMOS_KEY` unset and a real account endpoint, the server uses `DefaultAzureCredential`: the Container App's managed identity in Azure, your `az login` on your own machine. No secret is stored, and the account can then have key access turned off (`disableLocalAuth`). Cosmos DB data-plane access is a separate role system from Azure RBAC; give the identity *Cosmos DB Built-in Data Contributor* on the `hsimah` database, for example:
+
+```sh
+az cosmosdb sql role assignment create --account-name <account> --resource-group <group> \
+  --scope "/dbs/hsimah" --principal-id <identity object id> --role-definition-name "Cosmos DB Built-in Data Contributor"
+```
+
+(Check the command against the current Azure CLI.) Creating the database and containers is management-plane work that this role cannot do, so run `console install` once with the account key (`HSIMAH_COSMOS_KEY` set for that command only), then turn key access off.
 
 Publish the server with `dotnet publish src/Hsimah.Server -c Release` and run it with the .NET 10 ASP.NET Core runtime. The operator commands are the same binary:
 
