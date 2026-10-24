@@ -25,6 +25,19 @@ stage() { echo; echo "==> $*"; }
 run() { local name="$1"; shift; "$@" || failures+=("$name"); }
 want() { [ "$STAGES" = all ] || [ "$STAGES" = "$1" ]; }
 
+# The Cosmos DB Linux emulator occasionally crashes mid-run, which turns every later test into a misleading failure. If a stage fails and the
+# emulator is no longer running, say so, start a fresh stack and run the stage once more; a failure with the emulator still up is real.
+emulator_running() { [ "$("$ENGINE" container inspect hblake-acceptance-cosmos --format '{{.State.Running}}' 2>/dev/null)" = true ]; }
+run_with_retry() {
+  local name="$1"; shift
+  if "$@"; then return 0; fi
+  if emulator_running; then failures+=("$name"); return 0; fi
+  echo; echo "==> The Cosmos DB emulator stopped during $name; its failures are not test results. Starting a fresh stack and running it once more."
+  "$ENGINE" logs --tail 40 hblake-acceptance-cosmos >&2 2>/dev/null || true
+  if "$HARNESS/up" && "$@"; then return 0; fi
+  failures+=("$name")
+}
+
 missing=()
 for script in gates up down bootstrap install backup restore expire-sessions set-active; do
   [ -x "$HARNESS/$script" ] || missing+=("scripts/acceptance/$script")
@@ -58,14 +71,14 @@ if want playwright; then
   else
     selection="for stage in Static Fresh Http Ui; do dotnet run --no-build --project tests/Hsimah.Acceptance -- -noColor -namespace Hsimah.Acceptance.\$stage || status=1; done; exit \${status:-0}"
   fi
-  run playwright "$ROOT/scripts/tests-dotnet" bash -c "dotnet build tests/Hsimah.Acceptance --nologo -v quiet && $selection"
+  run_with_retry playwright "$ROOT/scripts/tests-dotnet" bash -c "dotnet build tests/Hsimah.Acceptance --nologo -v quiet && $selection"
 fi
 
 if want ops; then
   stage "Operator procedures"
   # Built self-contained in a container, so the host runs them without a .NET install and they can run the harness scripts.
   if "$ROOT/scripts/dotnet" dotnet publish tests/Hsimah.Acceptance.Ops -c Release -r linux-x64 --self-contained -o .cache/ops --nologo -v quiet; then
-    run ops env REPO_ROOT="$ROOT" "$ROOT/.cache/ops/Hsimah.Acceptance.Ops" -noColor
+    run_with_retry ops env REPO_ROOT="$ROOT" "$ROOT/.cache/ops/Hsimah.Acceptance.Ops" -noColor
   else
     failures+=(ops-build)
   fi
